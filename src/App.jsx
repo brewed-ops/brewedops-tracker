@@ -1434,7 +1434,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
               justifyContent: 'center',
               flexShrink: 0
             }}>
-              <Banknote style={{ width: isSmall ? '16px' : '18px', height: isSmall ? '16px' : '18px', color: '#fafafa' }} />
+              <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: isSmall ? '32px' : '36px', height: isSmall ? '32px' : '36px', borderRadius: '50%', objectFit: 'cover' }} />
             </div>
             {/* For production, replace above div with: <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: isSmall ? '32px' : '36px', height: isSmall ? '32px' : '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} /> */}
             <h1 style={{ fontSize: isSmall ? '14px' : '15px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
