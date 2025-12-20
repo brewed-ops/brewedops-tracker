@@ -175,14 +175,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               width: '32px',
               height: '32px',
               borderRadius: '6px',
-              backgroundColor: isDark ? '#27272a' : '#18181b',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
+              overflow: 'hidden'
             }}>
-              <Banknote style={{ width: '16px', height: '16px', color: '#fafafa' }} />
+              <img src="https://i.imgur.com/R52jwPv.png" alt="BrewedOps Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
-            {/* For production, replace above div with: <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '6px', objectFit: 'contain' }} /> */}
             <span style={{ fontSize: '16px', fontWeight: '600', color: theme.text }}>BrewedOps</span>
           </div>
           
@@ -674,14 +670,10 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
             width: '48px',
             height: '48px',
             borderRadius: '50%',
-            backgroundColor: isDark ? '#27272a' : '#18181b',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
+            overflow: 'hidden',
             margin: '0 auto 12px'
           }}>
-            <Banknote style={{ width: '24px', height: '24px', color: '#fafafa' }} />
-            {/* For production, replace this div with: <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '48px', height: '48px', borderRadius: '50%', objectFit: 'cover' }} /> */}
+            <img src="https://i.imgur.com/R52jwPv.png" alt="BrewedOps Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           </div>
           <h1 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
             BrewedOps Tracker
@@ -1424,19 +1416,17 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       }}>
         <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '8px' : '12px' }}>
-            <div style={{
-              width: isSmall ? '32px' : '36px',
-              height: isSmall ? '32px' : '36px',
-              borderRadius: '50%',
-              backgroundColor: isDark ? '#27272a' : '#18181b',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0
-            }}>
-              <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: isSmall ? '32px' : '36px', height: isSmall ? '32px' : '36px', borderRadius: '50%', objectFit: 'cover' }} />
-            </div>
-            {/* For production, replace above div with: <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: isSmall ? '32px' : '36px', height: isSmall ? '32px' : '36px', borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} /> */}
+            <img 
+              src="https://i.imgur.com/R52jwPv.png" 
+              alt="BrewedOps Logo" 
+              style={{ 
+                width: isSmall ? '32px' : '36px', 
+                height: isSmall ? '32px' : '36px', 
+                borderRadius: '50%', 
+                objectFit: 'cover',
+                flexShrink: 0 
+              }} 
+            />
             <h1 style={{ fontSize: isSmall ? '14px' : '15px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
           </div>
 
@@ -3097,18 +3087,17 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       }}>
         <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '50%',
-              backgroundColor: '#dc2626',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}>
-              <Banknote style={{ width: '18px', height: '18px', color: '#fafafa' }} />
-            </div>
-            {/* For production, replace above div with: <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #dc2626' }} /> */}
+            <img 
+              src="https://i.imgur.com/R52jwPv.png" 
+              alt="BrewedOps Logo" 
+              style={{ 
+                width: '36px', 
+                height: '36px', 
+                borderRadius: '50%', 
+                objectFit: 'cover',
+                border: '2px solid #dc2626'
+              }} 
+            />
             <div>
               <h1 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Admin</h1>
               <p style={{ fontSize: '11px', color: '#dc2626', margin: 0, fontWeight: '500' }}>Administrator</p>
