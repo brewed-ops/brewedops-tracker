@@ -1808,7 +1808,7 @@ const getInitial = (name) => {
           marginBottom: isSmall ? '12px' : '24px',
         }}>
           {/* Add New Entry Card */}
-          <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', flex: isMobile ? 'none' : '1', minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
+<div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', flex: isMobile ? 'none' : '1', minWidth: 0, maxWidth: '100%' }}>
             <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, marginBottom: '16px', height: isMobile ? 'auto' : '36px', display: 'flex', alignItems: 'center' }}>Add New Entry</h2>
             
             {/* Mode Toggle */}
@@ -1860,19 +1860,21 @@ const getInitial = (name) => {
                 </button>
                 
                 {categoryDropdownOpen && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    right: 0,
-                    marginTop: '4px',
-                    backgroundColor: theme.cardBg,
-                    border: `1px solid ${theme.inputBorder}`,
-                    borderRadius: '6px',
-                    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
-                    zIndex: 50,
-                    overflow: 'hidden'
-                  }}>
+  <div style={{
+    position: 'fixed',
+    top: 'auto',
+    left: 'auto',
+    width: '280px',
+    marginTop: '4px',
+    backgroundColor: theme.cardBg,
+    border: `1px solid ${theme.inputBorder}`,
+    borderRadius: '6px',
+    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
+    zIndex: 9999,
+    overflow: 'hidden',
+    maxHeight: '300px',
+    overflowY: 'auto'
+  }}>
                     {CATEGORIES.map(c => (
                       <button
                         key={c.value}
