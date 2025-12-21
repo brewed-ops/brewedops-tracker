@@ -1105,6 +1105,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       const isImage = mediaType.startsWith('image/');
 
       // Call Supabase Edge Function instead of OpenAI directly
+      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-receipt`, {
         method: 'POST',
         headers: {
