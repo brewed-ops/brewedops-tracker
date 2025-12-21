@@ -954,20 +954,22 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const saveEntry = async (newEntry) => {
     try {
       const { data, error } = await supabase
-        .from('expenses')
-        .insert([{
-          user_id: user.id,
-          name: newEntry.name,
-          amount: newEntry.amount,
-          category: newEntry.type,
-          date: newEntry.date,
-          due_date: newEntry.dueDate || null,
-          file_name: newEntry.file?.name || null,
-          file_type: newEntry.file?.type || null,
-          file_data: newEntry.file?.data || null
-        }])
-        .select()
-        .single();
+  .from('expenses')
+  .insert([{
+    user_id: user.id,
+    user_email: user.email,
+    user_nickname: user.user_metadata?.nickname || 'User',
+    name: newEntry.name,
+    amount: newEntry.amount,
+    category: newEntry.type,
+    date: newEntry.date,
+    due_date: newEntry.dueDate || null,
+    file_name: newEntry.file?.name || null,
+    file_type: newEntry.file?.type || null,
+    file_data: newEntry.file?.data || null
+  }])
+  .select()
+  .single();
 
       if (error) throw error;
       
