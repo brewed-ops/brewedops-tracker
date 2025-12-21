@@ -29,7 +29,7 @@ const CURRENCIES = [
 // Admin credentials
 const ADMIN_CREDENTIALS = {
   email: 'admin@brewedops.com',
-  password: 'Admin@123'
+  password: 'Brewedopsadmin12!@'
 };
 
 // Badge colors for light and dark mode
