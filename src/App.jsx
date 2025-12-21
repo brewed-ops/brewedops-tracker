@@ -1728,23 +1728,105 @@ const getInitial = (name) => {
                 {isDark ? <Sun style={{ width: '14px', height: '14px' }} /> : <Moon style={{ width: '14px', height: '14px' }} />}
               </button>
               
-              <button
-                onClick={onLogout}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  backgroundColor: 'transparent',
-                  border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '6px',
-                  color: theme.textMuted,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <LogOut style={{ width: '14px', height: '14px' }} />
-              </button>
+              {/* Mobile Profile Avatar with Dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '50%',
+                    backgroundColor: '#3b82f6',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {getInitial(user.user_metadata?.nickname)}
+                </button>
+
+                {showProfileMenu && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '40px',
+                    right: 0,
+                    width: '200px',
+                    backgroundColor: theme.cardBg,
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: '8px',
+                    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
+                    zIndex: 50,
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
+                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        color: theme.text,
+                        textAlign: 'left'
+                      }}
+                    >
+                      <Edit style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                      Edit Profile
+                    </button>
+                    <button
+                      onClick={() => { setShowProfileMenu(false); setShowFeedback(true); }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        color: theme.text,
+                        textAlign: 'left'
+                      }}
+                    >
+                      <MessageSquare style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                      Send Feedback
+                    </button>
+                    <button
+                      onClick={() => { setShowProfileMenu(false); onLogout(); }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        color: '#ef4444',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <LogOut style={{ width: '16px', height: '16px' }} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>
