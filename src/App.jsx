@@ -1104,42 +1104,26 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       const mediaType = uploadedFile.type;
       const isImage = mediaType.startsWith('image/');
 
-      const extractionPrompt = `Extract from this receipt/invoice and respond ONLY with JSON (no markdown):
-{"name": "vendor name", "amount": number, "date": "YYYY-MM-DD or empty", "dueDate": "YYYY-MM-DD or empty"}`;
+      // Call Supabase Edge Function instead of OpenAI directly
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-receipt`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          base64Data,
+          mediaType,
+          isImage
+        })
+      });
 
-      const content = isImage
-        ? [{ type: 'image', source: { type: 'base64', media_type: mediaType, data: base64Data } }, { type: 'text', text: extractionPrompt }]
-        : [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64Data } }, { type: 'text', text: extractionPrompt }];
-
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
-  },
-  body: JSON.stringify({
-    model: 'gpt-4o-mini',
-    messages: [
-      {
-        role: 'user',
-        content: isImage
-          ? [
-              { type: 'text', text: extractionPrompt },
-              { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64Data}` } }
-            ]
-          : [
-              { type: 'text', text: `${extractionPrompt}\n\nDocument content: ${atob(base64Data)}` }
-            ]
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to extract data');
       }
-    ],
-    max_tokens: 1000
-  })
-});
 
-      if (!response.ok) throw new Error(`API error: ${response.status}`);
-      const data = await response.json();
-const text = data.choices?.[0]?.message?.content || '';
-const extracted = JSON.parse(text.replace(/```json|```/g, '').trim());
+      const extracted = await response.json();
 
       setPendingUpload({
         id: Date.now().toString(),
