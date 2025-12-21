@@ -743,7 +743,7 @@ const switchMode = () => {
             </label>
             <input
               type="email"
-              placeholder="you@example.com"
+              placeholder=""
               value={email}
               onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }); }}
               onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
