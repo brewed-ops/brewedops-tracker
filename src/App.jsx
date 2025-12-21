@@ -3578,10 +3578,9 @@ export default function App() {
           const { data: adminData } = await supabase
             .from('admins')
             .select('id')
-            .eq('id', session.user.id)
-            .single();
+            .eq('id', session.user.id);
           
-          if (adminData) {
+          if (adminData && adminData.length > 0) {
             setUser({ ...session.user, isAdmin: true });
           } else {
             setUser(session.user);
@@ -3606,10 +3605,9 @@ export default function App() {
           const { data: adminData } = await supabase
             .from('admins')
             .select('id')
-            .eq('id', session.user.id)
-            .single();
+            .eq('id', session.user.id);
           
-          if (adminData) {
+          if (adminData && adminData.length > 0) {
             setUser({ ...session.user, isAdmin: true });
           } else {
             setUser(session.user);
