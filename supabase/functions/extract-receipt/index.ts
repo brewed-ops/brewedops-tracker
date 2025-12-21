@@ -8,7 +8,6 @@ const corsHeaders = {
 }
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { 
       status: 204,
@@ -17,13 +16,7 @@ serve(async (req: Request) => {
   }
 
   try {
-    const { base64Data, mediaType, isImage } = await req.json()
-
-    // Check file size (base64 is ~33% larger than original)
-    const estimatedSizeKB = (base64Data.length * 0.75) / 1024
-    if (estimatedSizeKB > 5000) {
-      throw new Error('File too large. Please upload a smaller file (max 5MB).')
-    }
+    const { base64Data, mediaType } = await req.json()
 
     const extractionPrompt = `Extract from this receipt/invoice and respond ONLY with JSON (no markdown):
 {"name": "vendor name", "amount": number, "date": "YYYY-MM-DD or empty", "dueDate": "YYYY-MM-DD or empty"}`
@@ -34,32 +27,7 @@ serve(async (req: Request) => {
       throw new Error('OpenAI API key not configured')
     }
 
-    let messages;
-    
-    if (isImage) {
-      // For images, use vision
-      messages = [
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: extractionPrompt },
-            { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64Data}`, detail: 'low' } }
-          ]
-        }
-      ]
-    } else {
-      // For PDFs, send as image (works for scanned receipts)
-      messages = [
-        {
-          role: 'user',
-          content: [
-            { type: 'text', text: extractionPrompt },
-            { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64Data}`, detail: 'low' } }
-          ]
-        }
-      ]
-    }
-
+    // Send everything as image_url - this works for both images AND PDFs in gpt-4o-mini
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -68,8 +36,16 @@ serve(async (req: Request) => {
       },
       body: JSON.stringify({
         model: 'gpt-4o-mini',
-        messages: messages,
-        max_tokens: 500
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: extractionPrompt },
+              { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64Data}` } }
+            ]
+          }
+        ],
+        max_tokens: 1000
       })
     })
 

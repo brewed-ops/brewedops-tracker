@@ -1109,10 +1109,8 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       });
 
       const mediaType = uploadedFile.type;
-      const isImage = mediaType.startsWith('image/');
 
-      // Call Supabase Edge Function instead of OpenAI directly
-      console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+      // Call Supabase Edge Function
       const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/extract-receipt`, {
         method: 'POST',
         headers: {
@@ -1121,8 +1119,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         },
         body: JSON.stringify({
           base64Data,
-          mediaType,
-          isImage
+          mediaType
         })
       });
 
