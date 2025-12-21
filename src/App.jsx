@@ -947,7 +947,10 @@ const switchMode = () => {
 const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [currency, setCurrency] = useState('₱');
+  const [currency, setCurrency] = useState(() => {
+    const saved = localStorage.getItem('currency');
+    return saved || '₱';
+  });
   
   const theme = getTheme(isDark);
   const { width } = useWindowSize();
@@ -1003,6 +1006,11 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+   // Save currency preference
+  useEffect(() => {
+    localStorage.setItem('currency', currency);
+  }, [currency]);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
