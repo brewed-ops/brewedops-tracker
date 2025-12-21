@@ -890,6 +890,28 @@ const switchMode = () => {
             {isSignup ? 'Create Account' : 'Sign In'}
           </button>
 
+          {!isSignup && (
+            <button
+              onClick={handleForgotPassword}
+              disabled={loading}
+              style={{
+                background: 'none',
+                border: 'none',
+                color: theme.textMuted,
+                fontSize: '13px',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                textDecoration: 'underline',
+                padding: 0,
+                marginTop: '8px',
+                display: 'block',
+                width: '100%',
+                textAlign: 'center'
+              }}
+            >
+              Forgot password?
+            </button>
+          )}
+
           <p style={{ textAlign: 'center', fontSize: '14px', color: theme.textSubtle }}>
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button

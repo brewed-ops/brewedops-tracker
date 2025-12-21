@@ -18,6 +18,8 @@ serve(async (req: Request) => {
   try {
     const { base64Data, mediaType } = await req.json()
 
+    const isImage = mediaType.startsWith('image/')
+    
     const extractionPrompt = `Extract from this receipt/invoice and respond ONLY with JSON (no markdown):
 {"name": "vendor name", "amount": number, "date": "YYYY-MM-DD or empty", "dueDate": "YYYY-MM-DD or empty"}`
 
@@ -27,14 +29,11 @@ serve(async (req: Request) => {
       throw new Error('OpenAI API key not configured')
     }
 
-    // Send everything as image_url - this works for both images AND PDFs in gpt-4o-mini
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${openAiKey}`
-      },
-      body: JSON.stringify({
+    let requestBody;
+
+    if (isImage) {
+      // For images, use vision
+      requestBody = {
         model: 'gpt-4o-mini',
         messages: [
           {
@@ -46,7 +45,37 @@ serve(async (req: Request) => {
           }
         ],
         max_tokens: 1000
-      })
+      }
+    } else {
+      // For PDFs, use gpt-4o with file input
+      requestBody = {
+        model: 'gpt-4o',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: extractionPrompt },
+              { 
+                type: 'file', 
+                file: { 
+                  filename: 'document.pdf',
+                  file_data: `data:${mediaType};base64,${base64Data}`
+                } 
+              }
+            ]
+          }
+        ],
+        max_tokens: 1000
+      }
+    }
+
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${openAiKey}`
+      },
+      body: JSON.stringify(requestBody)
     })
 
     const data = await response.json()
