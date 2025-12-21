@@ -994,6 +994,19 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [deletingEntry, setDeletingEntry] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [toast, setToast] = useState(null);
+
+  // Auto-hide toast after 3 seconds
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
   // Load entries from Supabase
   useEffect(() => {
     const loadEntries = async () => {
@@ -1173,20 +1186,21 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       clearAttachedFile();
     } catch (error) {
       console.error('Extraction failed:', error);
-      alert(`Failed to extract data: ${error.message}`);
+      showToast(`Failed to extract data: ${error.message}`, 'error');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const confirmPendingUpload = async () => {
+ const confirmPendingUpload = async () => {
     if (pendingUpload) {
       try {
         await saveEntry(pendingUpload);
         setPendingUpload(null);
         setSelectedCategory('');
+        showToast('Entry saved successfully', 'success');
       } catch (e) {
-        alert('Failed to save entry');
+        showToast('Failed to save entry', 'error');
       }
     }
   };
@@ -1199,7 +1213,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
 
   const handleManualSubmit = async () => {
     if (!selectedCategory || !manualForm.name || !manualForm.amount) {
-      alert('Please fill required fields');
+      showToast('Please fill required fields', 'error');
       return;
     }
     setIsSaving(true);
@@ -1214,8 +1228,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       await saveEntry(newEntry);
       setSelectedCategory('');
       setManualForm({ name: '', amount: '', date: '', dueDate: '' });
+      showToast('Entry added successfully', 'success');
     } catch (e) {
-      alert('Failed to save entry');
+      showToast('Failed to save entry', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -1241,7 +1256,7 @@ const getInitial = (name) => {
         setFeedbackSent(false);
       }, 2000);
     } catch (e) {
-      alert('Failed to send feedback');
+      showToast('Failed to send feedback', 'error');
     }
   };
   const handleDeleteEntry = async () => {
@@ -1250,8 +1265,9 @@ const getInitial = (name) => {
     try {
       await deleteEntry(deletingEntry.id);
       setDeletingEntry(null);
+      showToast('Entry deleted successfully', 'success');
     } catch (e) {
-      alert('Failed to delete entry');
+      showToast('Failed to delete entry', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -1279,9 +1295,10 @@ const getInitial = (name) => {
           : e
       ));
       setEditingEntry(null);
+      showToast('Entry updated successfully', 'success');
     } catch (e) {
       console.error('Failed to update:', e);
-      alert('Failed to update entry');
+      showToast('Failed to update entry', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -3395,11 +3412,56 @@ const getInitial = (name) => {
           </div>
         </div>
       )}
+ {/* Toast Notification */}
+      {toast && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          padding: '14px 20px',
+          backgroundColor: toast.type === 'success' ? '#10b981' : toast.type === 'error' ? '#ef4444' : '#3b82f6',
+          color: '#fff',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          zIndex: 100,
+          animation: 'slideIn 0.3s ease',
+          maxWidth: '350px'
+        }}>
+          {toast.type === 'success' ? (
+            <Check style={{ width: '18px', height: '18px', flexShrink: 0 }} />
+          ) : (
+            <AlertCircle style={{ width: '18px', height: '18px', flexShrink: 0 }} />
+          )}
+          <span style={{ fontSize: '14px', fontWeight: '500' }}>{toast.message}</span>
+          <button 
+            onClick={() => setToast(null)}
+            style={{ 
+              marginLeft: 'auto',
+              background: 'none', 
+              border: 'none', 
+              color: '#fff', 
+              cursor: 'pointer',
+              padding: '0',
+              display: 'flex',
+              opacity: 0.8
+            }}
+          >
+            <X style={{ width: '16px', height: '16px' }} />
+          </button>
+        </div>
+      )}
 
       <style>{`
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
         }
         * { box-sizing: border-box; }
         input, select, button { font-family: inherit; }
