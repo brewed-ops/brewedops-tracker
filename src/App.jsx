@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 // ============================================
@@ -805,7 +805,7 @@ const switchMode = () => {
             </label>
             <input
               type="password"
-              placeholder={isSignup ? 'Min 8 chars, uppercase, lowercase, number' : 'Enter your password'}
+              placeholder={isSignup ? 'Minimum 8 characters' : 'Enter your password'}
               value={password}
               onChange={(e) => { setPassword(e.target.value); setErrors({ ...errors, password: '' }); }}
               onKeyDown={(e) => e.key === 'Enter' && !isSignup && handleSubmit()}
@@ -956,7 +956,12 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   // Modal state
   const [previewFile, setPreviewFile] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackSent, setFeedbackSent] = useState(false);
+  const [editNickname, setEditNickname] = useState(user.user_metadata?.nickname || '');
   // Load entries from Supabase
   useEffect(() => {
     const loadEntries = async () => {
@@ -1191,7 +1196,30 @@ const extracted = JSON.parse(text.replace(/```json|```/g, '').trim());
       alert('Failed to save entry');
     }
   };
+const getInitial = (name) => {
+    return name ? name.charAt(0).toUpperCase() : 'U';
+  };
 
+  const handleSubmitFeedback = async () => {
+    if (!feedbackMessage.trim()) return;
+    try {
+      const { error } = await supabase.from('feedbacks').insert([{
+        user_id: user.id,
+        user_email: user.email,
+        nickname: user.user_metadata?.nickname || 'User',
+        message: feedbackMessage.trim()
+      }]);
+      if (error) throw error;
+      setFeedbackSent(true);
+      setTimeout(() => {
+        setShowFeedback(false);
+        setFeedbackMessage('');
+        setFeedbackSent(false);
+      }, 2000);
+    } catch (e) {
+      alert('Failed to send feedback');
+    }
+  };
   const handleDeleteEntry = async (id) => {
     if (window.confirm('Are you sure you want to delete this entry?')) {
       await deleteEntry(id);
@@ -1505,8 +1533,6 @@ const extracted = JSON.parse(text.replace(/```json|```/g, '').trim());
           {/* Desktop Header Actions */}
           {!isMobile ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <span style={{ fontSize: '13px', color: theme.textSubtle }}>{user.email}</span>
-              
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
@@ -1526,6 +1552,27 @@ const extracted = JSON.parse(text.replace(/```json|```/g, '').trim());
                   <option key={c.symbol} value={c.symbol}>{c.label}</option>
                 ))}
               </select>
+
+              {/* Feedback Button */}
+              <button
+                onClick={() => setShowFeedback(true)}
+                style={{
+                  height: '32px',
+                  padding: '0 12px',
+                  backgroundColor: 'transparent',
+                  border: `1px solid ${theme.inputBorder}`,
+                  borderRadius: '6px',
+                  color: theme.textMuted,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '13px'
+                }}
+              >
+                <MessageSquare style={{ width: '14px', height: '14px' }} />
+                Feedback
+              </button>
               
               <button
                 onClick={() => setIsDark(!isDark)}
@@ -1544,26 +1591,87 @@ const extracted = JSON.parse(text.replace(/```json|```/g, '').trim());
               >
                 {isDark ? <Sun style={{ width: '16px', height: '16px' }} /> : <Moon style={{ width: '16px', height: '16px' }} />}
               </button>
-              
-              <button
-                onClick={onLogout}
-                style={{
-                  height: '32px',
-                  backgroundColor: 'transparent',
-                  border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '6px',
-                  padding: '0 12px',
-                  fontSize: '13px',
-                  color: theme.textMuted,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <LogOut style={{ width: '14px', height: '14px' }} />
-                Logout
-              </button>
+
+              {/* Profile Avatar with Dropdown */}
+              <div style={{ position: 'relative' }}>
+                <button
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                  style={{
+                    width: '36px',
+                    height: '36px',
+                    borderRadius: '50%',
+                    backgroundColor: '#3b82f6',
+                    border: 'none',
+                    color: '#fff',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
+                  {getInitial(user.user_metadata?.nickname)}
+                </button>
+
+                {showProfileMenu && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '44px',
+                    right: 0,
+                    width: '200px',
+                    backgroundColor: theme.cardBg,
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: '8px',
+                    boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
+                    zIndex: 50,
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
+                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
+                    </div>
+                    <button
+                      onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        color: theme.text,
+                        textAlign: 'left'
+                      }}
+                    >
+                      <Edit style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                      Edit Profile
+                    </button>
+                    <button
+                      onClick={() => { setShowProfileMenu(false); onLogout(); }}
+                      style={{
+                        width: '100%',
+                        padding: '10px 16px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        color: '#ef4444',
+                        textAlign: 'left'
+                      }}
+                    >
+                      <LogOut style={{ width: '16px', height: '16px' }} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             /* Mobile Header Actions */
@@ -2825,6 +2933,97 @@ const extracted = JSON.parse(text.replace(/```json|```/g, '').trim());
           </div>
         )}
       </main>
+        {/* Edit Profile Modal */}
+      {showEditProfile && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowEditProfile(false)}>
+          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit Profile</h3>
+              <button onClick={() => setShowEditProfile(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '32px', fontWeight: '600', marginBottom: '12px' }}>
+                {getInitial(editNickname)}
+              </div>
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Nickname</label>
+              <input
+                type="text"
+                value={editNickname}
+                onChange={(e) => setEditNickname(e.target.value)}
+                style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+              />
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Email</label>
+              <input
+                type="email"
+                value={user.email}
+                disabled
+                style={{ width: '100%', height: '44px', backgroundColor: theme.statBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.textMuted, outline: 'none', boxSizing: 'border-box' }}
+              />
+            </div>
+            <button
+              onClick={async () => {
+                try {
+                  const { error } = await supabase.auth.updateUser({ data: { nickname: editNickname } });
+                  if (error) throw error;
+                  setShowEditProfile(false);
+                  window.location.reload();
+                } catch (e) {
+                  alert('Failed to update profile');
+                }
+              }}
+              style={{ width: '100%', height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '500', cursor: 'pointer' }}
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Modal */}
+      {showFeedback && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowFeedback(false)}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            {feedbackSent ? (
+              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <Check style={{ width: '32px', height: '32px', color: '#fff' }} />
+                </div>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Thank You!</h3>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>Your feedback has been submitted.</p>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Send Feedback</h3>
+                  <button onClick={() => setShowFeedback(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <X style={{ width: '18px', height: '18px' }} />
+                  </button>
+                </div>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>We'd love to hear your thoughts, suggestions, or issues.</p>
+                <textarea
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                  placeholder="Write your feedback here..."
+                  style={{ width: '100%', height: '120px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '12px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box', resize: 'none', fontFamily: 'inherit' }}
+                />
+                <button
+                  onClick={handleSubmitFeedback}
+                  disabled={!feedbackMessage.trim()}
+                  style={{ width: '100%', height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '500', cursor: feedbackMessage.trim() ? 'pointer' : 'not-allowed', marginTop: '16px', opacity: feedbackMessage.trim() ? 1 : 0.5 }}
+                >
+                  Submit Feedback
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* File Preview Modal */}
       {previewFile && (
