@@ -3615,7 +3615,10 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
 export default function App() {
   const [user, setUser] = useState(null);
-  const [isDark, setIsDark] = useState(true);
+  const [isDark, setIsDark] = useState(() => {
+  const saved = localStorage.getItem('theme');
+  return saved ? saved === 'dark' : true;
+});
   const [currentPage, setCurrentPage] = useState('home');
   const [loading, setLoading] = useState(true);
 
@@ -3645,6 +3648,11 @@ export default function App() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  // Save theme preference
+  useEffect(() => {
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
   
   const handleLogin = (userData) => {
     if (userData.isAdmin) {
