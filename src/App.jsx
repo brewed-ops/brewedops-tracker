@@ -2121,9 +2121,9 @@ const getInitial = (name) => {
 
         {/* Dashboard Section */}
         <div style={cardStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
-            <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Dashboard</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
+            <h2 style={{ fontSize: isSmall ? '14px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Dashboard</h2>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', flex: isSmall ? '1 1 100%' : 'none' }}>
               {/* Category Filter */}
               <select
                 value={dashboardCategory}
@@ -2133,11 +2133,13 @@ const getInitial = (name) => {
                   backgroundColor: theme.inputBg,
                   border: `1px solid ${theme.inputBorder}`,
                   borderRadius: '6px',
-                  padding: '0 8px',
-                  fontSize: '13px',
+                  padding: '0 6px',
+                  fontSize: isSmall ? '11px' : '13px',
                   color: theme.text,
                   cursor: 'pointer',
-                  outline: 'none'
+                  outline: 'none',
+                  flex: isSmall ? '1' : 'none',
+                  minWidth: 0
                 }}
               >
                 <option value="all">All Categories</option>
@@ -2147,13 +2149,14 @@ const getInitial = (name) => {
               </select>
               
               {/* Time Filter */}
-              <div style={{ display: 'flex', gap: '4px', backgroundColor: theme.toggleBg, borderRadius: '6px', padding: '4px' }}>
+              <div style={{ display: 'flex', gap: '2px', backgroundColor: theme.toggleBg, borderRadius: '6px', padding: '3px' }}>
                 {['Day', 'Month', 'Year'].map(v => (
                   <button
                     key={v}
                     onClick={() => setDashboardView(v)}
                     style={{
-                      padding: isSmall ? '6px 12px' : '6px 16px',
+                      padding: isSmall ? '4px 8px' : '6px 16px',
+                      fontSize: isSmall ? '11px' : '13px',
                       backgroundColor: dashboardView === v ? theme.toggleActive : 'transparent',
                       border: 'none',
                       borderRadius: '4px',
@@ -2172,16 +2175,16 @@ const getInitial = (name) => {
           </div>
 
           {/* Stats Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isSmall ? '10px' : '16px', marginBottom: '20px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isSmall ? '8px' : '16px', marginBottom: '20px', overflow: 'hidden' }}>
             {[
               { label: 'Today', value: stats.today },
               { label: 'This Month', value: stats.month },
               { label: 'This Year', value: stats.year },
               { label: 'All Time', value: stats.total },
             ].map(stat => (
-              <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
-                <p style={{ fontSize: isSmall ? '11px' : '13px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
-                <p style={{ fontSize: isSmall ? '18px' : '24px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
+              <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '10px' : '16px', overflow: 'hidden', minWidth: 0 }}>
+                <p style={{ fontSize: isSmall ? '10px' : '13px', color: theme.textSubtle, margin: '0 0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stat.label}</p>
+                <p style={{ fontSize: isSmall ? '14px' : '24px', fontWeight: '700', color: theme.text, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currency}{formatAmount(stat.value)}</p>
               </div>
             ))}
           </div>
