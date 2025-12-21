@@ -591,26 +591,25 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     }
   };
 
-  const handleResendVerification = async () => {
-  if (!email) {
-    setErrors({ email: 'Please enter your email first' });
-    return;
-  }
-  
-  setLoading(true);
-  try {
-    const { error } = await supabase.auth.resend({
-      type: 'signup',
-      email: email
-    });
-    if (error) throw error;
-    setSuccessMessage('Verification email sent! Please check your inbox and spam folder.');
-  } catch (error) {
-    setErrors({ general: error.message });
-  } finally {
-    setLoading(false);
-  }
-};
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setErrors({ email: 'Please enter your email first' });
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      });
+      if (error) throw error;
+      setSuccessMessage('Password reset email sent! Check your inbox.');
+    } catch (error) {
+      setErrors({ general: error.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const switchMode = () => {
     setIsSignup(!isSignup);
@@ -896,39 +895,6 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
             {loading && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
             {isSignup ? 'Create Account' : 'Sign In'}
           </button>
-          {/* Forgot Password & Resend Verification - Only for Login */}
-{!isSignup && (
-  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
-    <button
-      onClick={handleForgotPassword}
-      disabled={loading}
-      style={{
-        background: 'none',
-        border: 'none',
-        color: theme.textMuted,
-        fontSize: '13px',
-        cursor: 'pointer',
-        padding: 0
-      }}
-    >
-      Forgot password?
-    </button>
-    <button
-      onClick={handleResendVerification}
-      disabled={loading}
-      style={{
-        background: 'none',
-        border: 'none',
-        color: '#3b82f6',
-        fontSize: '13px',
-        cursor: 'pointer',
-        padding: 0
-      }}
-    >
-      Resend verification
-    </button>
-  </div>
-)}
 
           <p style={{ textAlign: 'center', fontSize: '14px', color: theme.textSubtle }}>
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
@@ -2948,6 +2914,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     </div>
   );
 };
+
 
 // ============================================
 // ADMIN DASHBOARD
