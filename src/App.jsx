@@ -963,6 +963,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [editNickname, setEditNickname] = useState(user.user_metadata?.nickname || '');
+  const [deletingEntry, setDeletingEntry] = useState(null);
   // Load entries from Supabase
   useEffect(() => {
     const loadEntries = async () => {
@@ -1221,10 +1222,10 @@ const getInitial = (name) => {
       alert('Failed to send feedback');
     }
   };
-  const handleDeleteEntry = async (id) => {
-    if (window.confirm('Are you sure you want to delete this entry?')) {
-      await deleteEntry(id);
-    }
+  const handleDeleteEntry = async () => {
+    if (!deletingEntry) return;
+    await deleteEntry(deletingEntry.id);
+    setDeletingEntry(null);
   };
 
   const handleDownloadFile = (entry) => {
@@ -2099,9 +2100,9 @@ const getInitial = (name) => {
                                   </button>
                                 </>
                               )}
-                              <button onClick={() => handleDeleteEntry(entry.id)} style={{ width: '26px', height: '26px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-                                <Trash2 style={{ width: '14px', height: '14px' }} />
-                              </button>
+                              <button onClick={() => setDeletingEntry(entry)} style={{ width: '26px', height: '26px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+  <Trash2 style={{ width: '14px', height: '14px' }} />
+</button>
                             </div>
                           </td>
                         </tr>
@@ -2922,9 +2923,9 @@ const getInitial = (name) => {
                                   </button>
                                 </>
                               )}
-                              <button onClick={() => handleDeleteEntry(entry.id)} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '4px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Trash2 style={{ width: '14px', height: '14px' }} />
-                              </button>
+                              <button onClick={() => setDeletingEntry(entry)} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '4px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+  <Trash2 style={{ width: '14px', height: '14px' }} />
+</button>
                             </div>
                           </td>
                         </tr>
@@ -3047,6 +3048,44 @@ const getInitial = (name) => {
           </div>
         </div>
       )}
+{/* Delete Entry Modal */}
+      {deletingEntry && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setDeletingEntry(null)}>
+          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete Entry?</h3>
+            <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>Are you sure you want to delete this entry? This action cannot be undone.</p>
+            
+            <div style={{ padding: '16px', backgroundColor: theme.statBg, borderRadius: '8px', marginBottom: '20px', textAlign: 'left' }}>
+              <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 4px' }}>{deletingEntry.name}</p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <span style={{ fontSize: '13px', color: theme.textMuted, textTransform: 'capitalize' }}>{deletingEntry.type}</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: '#ef4444' }}>{currency}{formatAmount(deletingEntry.amount)}</span>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => setDeletingEntry(null)}
+                style={{ flex: 1, height: '44px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteEntry}
+                style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+              >
+                <Trash2 style={{ width: '16px', height: '16px' }} />
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
 
       {/* File Preview Modal */}
       {previewFile && (
