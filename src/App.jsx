@@ -2175,19 +2175,35 @@ const getInitial = (name) => {
           </div>
 
           {/* Stats Grid */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
-            {[
-              { label: 'Today', value: stats.today },
-              { label: 'This Month', value: stats.month },
-              { label: 'This Year', value: stats.year },
-              { label: 'All Time', value: stats.total },
-            ].map(stat => (
-              <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <p style={{ fontSize: '13px', color: theme.textSubtle, margin: 0 }}>{stat.label}</p>
-                <p style={{ fontSize: '13px', fontWeight: '600', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
-              </div>
-            ))}
-          </div>
+          {isSmall ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+              {[
+                { label: 'Today', value: stats.today },
+                { label: 'This Month', value: stats.month },
+                { label: 'This Year', value: stats.year },
+                { label: 'All Time', value: stats.total },
+              ].map(stat => (
+                <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <p style={{ fontSize: '13px', color: theme.textSubtle, margin: 0 }}>{stat.label}</p>
+                  <p style={{ fontSize: '13px', fontWeight: '600', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: '16px', marginBottom: '20px' }}>
+              {[
+                { label: 'Today', value: stats.today },
+                { label: 'This Month', value: stats.month },
+                { label: 'This Year', value: stats.year },
+                { label: 'All Time', value: stats.total },
+              ].map(stat => (
+                <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: '16px' }}>
+                  <p style={{ fontSize: '13px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
+                  <p style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Charts */}
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
