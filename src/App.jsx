@@ -3570,32 +3570,50 @@ export default function App() {
   // Check for existing session on load
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      if (session?.user) {
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        setUser(isAdmin ? { ...session.user, isAdmin: true } : session.user);
+      } else {
+        localStorage.removeItem('isAdmin');
+        setUser(null);
+      }
       setLoading(false);
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+      if (session?.user) {
+        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        setUser(isAdmin ? { ...session.user, isAdmin: true } : session.user);
+      } else {
+        localStorage.removeItem('isAdmin');
+        setUser(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
   
   const handleLogin = (userData) => {
+    if (userData.isAdmin) {
+      localStorage.setItem('isAdmin', 'true');
+    } else {
+      localStorage.removeItem('isAdmin');
+    }
     setUser(userData);
   };
 
  const handleLogout = async () => {
-  if (user?.isAdmin) {
+    localStorage.removeItem('isAdmin');
+    if (user?.isAdmin) {
+      setUser(null);
+      setCurrentPage('home');
+      return;
+    }
+    await supabase.auth.signOut();
     setUser(null);
     setCurrentPage('home');
-    return;
-  }
-  await supabase.auth.signOut();
-  setUser(null);
-  setCurrentPage('home');
-};
+  };
 
   // Show loading screen
   if (loading) {
