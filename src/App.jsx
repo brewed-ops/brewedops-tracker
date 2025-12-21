@@ -3298,11 +3298,16 @@ export default function App() {
     setUser(userData);
   };
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
+ const handleLogout = async () => {
+  if (user?.isAdmin) {
     setUser(null);
     setCurrentPage('home');
-  };
+    return;
+  }
+  await supabase.auth.signOut();
+  setUser(null);
+  setCurrentPage('home');
+};
 
   // Show loading screen
   if (loading) {
@@ -3325,9 +3330,15 @@ export default function App() {
     );
   }
   
-  if (user) {
-    return <ExpenseTrackerApp user={user} onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
-  }
+  // Admin Dashboard
+if (user?.isAdmin) {
+  return <AdminDashboard onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
+}
+
+// User Dashboard  
+if (user) {
+  return <ExpenseTrackerApp user={user} onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
+}
   
   if (currentPage === 'login' || currentPage === 'signup') {
     return <LoginPage 
