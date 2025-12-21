@@ -736,6 +736,37 @@ const switchMode = () => {
             </div>
           )}
 
+<div>
+            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
+              Email
+            </label>
+            <input
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }); }}
+              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+              style={{
+                width: '100%',
+                height: '44px',
+                backgroundColor: theme.inputBg,
+                border: `1px solid ${errors.email ? '#ef4444' : theme.inputBorder}`,
+                borderRadius: '8px',
+                padding: '0 12px',
+                fontSize: '16px',
+                color: theme.text,
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+            />
+            {errors.email && (
+              <p style={{ fontSize: '12px', color: '#ef4444', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                <AlertCircle style={{ width: '12px', height: '12px' }} />
+                {errors.email}
+              </p>
+            )}
+          </div>
+
        {/* Nickname - Only for Signup */}
           {isSignup && (
             <div>
