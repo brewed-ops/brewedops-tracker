@@ -499,7 +499,11 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     setLoading(true);
     setErrors({});
     setSuccessMessage('');
-    
+     // Check for admin login FIRST
+    if (!isSignup && email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
+      onLogin({ email: ADMIN_CREDENTIALS.email, isAdmin: true });
+      return;
+    }
     const newErrors = {};
 
     // Validate email
