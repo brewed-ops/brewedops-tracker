@@ -2182,9 +2182,9 @@ const getInitial = (name) => {
               { label: 'This Year', value: stats.year },
               { label: 'All Time', value: stats.total },
             ].map(stat => (
-              <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '10px' : '16px', overflow: 'hidden', minWidth: 0 }}>
-                <p style={{ fontSize: isSmall ? '10px' : '13px', color: theme.textSubtle, margin: '0 0 4px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{stat.label}</p>
-                <p style={{ fontSize: isSmall ? '14px' : '24px', fontWeight: '700', color: theme.text, margin: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{currency}{formatAmount(stat.value)}</p>
+              <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '10px' : '16px', minWidth: 0 }}>
+                <p style={{ fontSize: isSmall ? '10px' : '13px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
+                <p style={{ fontSize: isSmall ? '13px' : '24px', fontWeight: '700', color: theme.text, margin: 0, wordBreak: 'break-all' }}>{currency}{formatAmount(stat.value)}</p>
               </div>
             ))}
           </div>
