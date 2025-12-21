@@ -3570,22 +3570,27 @@ export default function App() {
   // Check for existing session on load
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session?.user) {
-        // Check if user is admin
-        const { data: adminData } = await supabase
-          .from('admins')
-          .select('id')
-          .eq('id', session.user.id)
-          .single();
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (adminData) {
-          setUser({ ...session.user, isAdmin: true });
+        if (session?.user) {
+          // Check if user is admin
+          const { data: adminData } = await supabase
+            .from('admins')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (adminData) {
+            setUser({ ...session.user, isAdmin: true });
+          } else {
+            setUser(session.user);
+          }
         } else {
-          setUser(session.user);
+          setUser(null);
         }
-      } else {
+      } catch (error) {
+        console.error('Session check error:', error);
         setUser(null);
       }
       setLoading(false);
@@ -3596,16 +3601,20 @@ export default function App() {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
-        // Check if user is admin
-        const { data: adminData } = await supabase
-          .from('admins')
-          .select('id')
-          .eq('id', session.user.id)
-          .single();
-        
-        if (adminData) {
-          setUser({ ...session.user, isAdmin: true });
-        } else {
+        try {
+          // Check if user is admin
+          const { data: adminData } = await supabase
+            .from('admins')
+            .select('id')
+            .eq('id', session.user.id)
+            .single();
+          
+          if (adminData) {
+            setUser({ ...session.user, isAdmin: true });
+          } else {
+            setUser(session.user);
+          }
+        } catch (error) {
           setUser(session.user);
         }
       } else {
