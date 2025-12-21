@@ -1918,14 +1918,15 @@ const getInitial = (name) => {
                     border: `1px solid ${isDark ? '#065f46' : '#86efac'}`,
                     backgroundColor: isDark ? '#022c22' : '#f0fdf4',
                     borderRadius: '8px',
-                    padding: '16px',
-                    marginTop: 'auto'
+                    padding: isSmall ? '12px' : '16px',
+                    marginTop: 'auto',
+                    overflow: 'hidden'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981' }} />
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }} />
                       <span style={{ fontSize: '12px', fontWeight: '500', color: isDark ? '#34d399' : '#047857' }}>Extracted successfully</span>
                     </div>
-                    <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: '0 0 4px', wordBreak: 'break-word' }}>{pendingUpload.name}</p>
+                    <p style={{ fontSize: isSmall ? '13px' : '14px', fontWeight: '500', color: theme.text, margin: '0 0 4px', wordBreak: 'break-word', overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' }}>{pendingUpload.name}</p>
                     <p style={{ fontSize: '13px', color: '#10b981', fontWeight: '600', margin: '0 0 12px' }}>{currency}{formatAmount(pendingUpload.amount)}</p>
                     <div style={{ display: 'flex', gap: '8px', flexDirection: isSmall ? 'column' : 'row' }}>
                       <button onClick={confirmPendingUpload} style={{ flex: 1, height: '40px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
@@ -1941,14 +1942,15 @@ const getInitial = (name) => {
                     border: `1px solid ${isDark ? '#1e3a8a' : '#93c5fd'}`,
                     backgroundColor: isDark ? '#172554' : '#eff6ff',
                     borderRadius: '8px',
-                    padding: '16px',
-                    marginTop: 'auto'
+                    padding: isSmall ? '12px' : '16px',
+                    marginTop: 'auto',
+                    overflow: 'hidden'
                   }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#3b82f6' }} />
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#3b82f6', flexShrink: 0 }} />
                       <span style={{ fontSize: '12px', fontWeight: '500', color: isDark ? '#60a5fa' : '#1d4ed8' }}>File attached</span>
                     </div>
-                    <p style={{ fontSize: '14px', color: theme.text, margin: '0 0 4px', wordBreak: 'break-word' }}>{uploadedFile.name}</p>
+                    <p style={{ fontSize: isSmall ? '13px' : '14px', color: theme.text, margin: '0 0 4px', wordBreak: 'break-word', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{uploadedFile.name}</p>
                     <p style={{ fontSize: '12px', color: theme.textSubtle, margin: '0 0 12px' }}>{(uploadedFile.size / 1024).toFixed(1)} KB</p>
                     <div style={{ display: 'flex', gap: '8px', flexDirection: isSmall ? 'column' : 'row' }}>
                       <button onClick={processAttachedFile} disabled={isProcessing} style={{ flex: 1, height: '40px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isProcessing ? 0.7 : 1 }}>
