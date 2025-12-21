@@ -453,7 +453,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         textAlign: 'center'
       }}>
         <p style={{ fontSize: '13px', color: theme.textSubtle, margin: 0 }}>
-          © 2025 BrewedOps Tracker
+          © 2025 BrewedOps Tracker by Kenneth V.
         </p>
       </footer>
     </div>
