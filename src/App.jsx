@@ -27,10 +27,7 @@ const CURRENCIES = [
 ];
 
 // Admin credentials
-const ADMIN_CREDENTIALS = {
-  email: 'admin@brewedops.com',
-  password: 'Brewedopsadmin12!@'
-};
+
 
 // Badge colors for light and dark mode
 const getBadgeStyle = (type, isDark) => {
@@ -500,10 +497,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     setErrors({});
     setSuccessMessage('');
      // Check for admin login FIRST
-    if (!isSignup && email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-      onLogin({ email: ADMIN_CREDENTIALS.email, isAdmin: true });
-      return;
-    }
+    
     const newErrors = {};
 
     // Validate email
@@ -563,7 +557,17 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
         });
         
         if (error) throw error;
-        onLogin(data.user);
+        const { data: adminData } = await supabase
+  .from('admins')
+  .select('id')
+  .eq('id', data.user.id)
+  .single();
+
+if (adminData) {
+  onLogin({ ...data.user, isAdmin: true });
+} else {
+  onLogin(data.user);
+}
       }
     } catch (e) {
       setErrors({ general: e.message || 'Something went wrong. Please try again.' });
