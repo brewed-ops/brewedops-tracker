@@ -776,7 +776,7 @@ const switchMode = () => {
               </label>
               <input
                 type="text"
-                placeholder="What should we call you?"
+                placeholder=""
                 value={nickname}
                 onChange={(e) => { setNickname(e.target.value); setErrors({ ...errors, nickname: '' }); }}
                 style={{
@@ -806,7 +806,7 @@ const switchMode = () => {
             </label>
             <input
               type="password"
-              placeholder={isSignup ? 'Minimum 8 characters' : 'Enter your password'}
+              placeholder={isSignup ? 'ex. Sample12!@' : 'Enter your password'}
               value={password}
               onChange={(e) => { setPassword(e.target.value); setErrors({ ...errors, password: '' }); }}
               onKeyDown={(e) => e.key === 'Enter' && !isSignup && handleSubmit()}
@@ -839,7 +839,7 @@ const switchMode = () => {
               </label>
               <input
                 type="password"
-                placeholder="Re-enter your password"
+                placeholder=""
                 value={confirmPassword}
                 onChange={(e) => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }); }}
                 onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
