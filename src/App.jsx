@@ -3569,14 +3569,48 @@ export default function App() {
 
   // Check for existing session on load
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (session?.user) {
+        // Check if user is admin
+        const { data: adminData } = await supabase
+          .from('admins')
+          .select('id')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (adminData) {
+          setUser({ ...session.user, isAdmin: true });
+        } else {
+          setUser(session.user);
+        }
+      } else {
+        setUser(null);
+      }
       setLoading(false);
-    });
+    };
+    
+    checkSession();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        // Check if user is admin
+        const { data: adminData } = await supabase
+          .from('admins')
+          .select('id')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (adminData) {
+          setUser({ ...session.user, isAdmin: true });
+        } else {
+          setUser(session.user);
+        }
+      } else {
+        setUser(null);
+      }
     });
 
     return () => subscription.unsubscribe();
