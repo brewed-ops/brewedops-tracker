@@ -466,6 +466,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }) => {
   const [isSignup, setIsSignup] = useState(initialMode === 'signup');
   const [email, setEmail] = useState('');
+  const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -506,6 +507,10 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     } else if (!validateEmail(email)) {
       newErrors.email = 'Please enter a valid email address';
     }
+// Validate nickname for signup
+if (isSignup && !nickname.trim()) {
+  newErrors.nickname = 'Nickname is required';
+}
 
     // Validate password
     if (!password) {
@@ -536,9 +541,14 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
       if (isSignup) {
         // Signup with Supabase
         const { data, error } = await supabase.auth.signUp({
-          email,
-          password
-        });
+  email,
+  password,
+  options: {
+    data: {
+      nickname: nickname.trim()
+    }
+  }
+});
         
         if (error) throw error;
         
@@ -595,13 +605,14 @@ if (adminData) {
     }
   };
 
-  const switchMode = () => {
-    setIsSignup(!isSignup);
-    setErrors({});
-    setSuccessMessage('');
-    setPassword('');
-    setConfirmPassword('');
-  };
+const switchMode = () => {
+  setIsSignup(!isSignup);
+  setErrors({});
+  setSuccessMessage('');
+  setPassword('');
+  setConfirmPassword('');
+  setNickname('');  // Add this line
+};
 
   return (
     <div style={{ 
@@ -725,37 +736,38 @@ if (adminData) {
             </div>
           )}
 
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-              style={{
-                width: '100%',
-                height: '44px',
-                backgroundColor: theme.inputBg,
-                border: `1px solid ${errors.email ? '#ef4444' : theme.inputBorder}`,
-                borderRadius: '8px',
-                padding: '0 12px',
-                fontSize: '16px',
-                color: theme.text,
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-            />
-            {errors.email && (
-              <p style={{ fontSize: '12px', color: '#ef4444', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <AlertCircle style={{ width: '12px', height: '12px' }} />
-                {errors.email}
-              </p>
-            )}
-          </div>
-          
+       {/* Nickname - Only for Signup */}
+          {isSignup && (
+            <div>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
+                Nickname
+              </label>
+              <input
+                type="text"
+                placeholder="What should we call you?"
+                value={nickname}
+                onChange={(e) => { setNickname(e.target.value); setErrors({ ...errors, nickname: '' }); }}
+                style={{
+                  width: '100%',
+                  height: '44px',
+                  backgroundColor: theme.inputBg,
+                  border: `1px solid ${errors.nickname ? '#ef4444' : theme.inputBorder}`,
+                  borderRadius: '8px',
+                  padding: '0 12px',
+                  fontSize: '16px',
+                  color: theme.text,
+                  outline: 'none',
+                  boxSizing: 'border-box'
+                }}
+              />
+              {errors.nickname && (
+                <p style={{ fontSize: '12px', color: '#ef4444', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <AlertCircle style={{ width: '12px', height: '12px' }} />
+                  {errors.nickname}
+                </p>
+              )}
+            </div>
+          )}
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
               Password
