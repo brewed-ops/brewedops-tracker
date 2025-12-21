@@ -987,6 +987,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [editNickname, setEditNickname] = useState(user.user_metadata?.nickname || '');
   const [deletingEntry, setDeletingEntry] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
   // Load entries from Supabase
   useEffect(() => {
     const loadEntries = async () => {
@@ -1195,6 +1196,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       alert('Please fill required fields');
       return;
     }
+    setIsSaving(true);
     const newEntry = {
       type: selectedCategory,
       name: manualForm.name,
@@ -1208,6 +1210,8 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       setManualForm({ name: '', amount: '', date: '', dueDate: '' });
     } catch (e) {
       alert('Failed to save entry');
+    } finally {
+      setIsSaving(false);
     }
   };
 const getInitial = (name) => {
@@ -1236,11 +1240,19 @@ const getInitial = (name) => {
   };
   const handleDeleteEntry = async () => {
     if (!deletingEntry) return;
-    await deleteEntry(deletingEntry.id);
-    setDeletingEntry(null);
+    setIsSaving(true);
+    try {
+      await deleteEntry(deletingEntry.id);
+      setDeletingEntry(null);
+    } catch (e) {
+      alert('Failed to delete entry');
+    } finally {
+      setIsSaving(false);
+    }
   };
   const handleUpdateEntry = async () => {
     if (!editingEntry) return;
+    setIsSaving(true);
     try {
       const { error } = await supabase
         .from('expenses')
@@ -1264,6 +1276,8 @@ const getInitial = (name) => {
     } catch (e) {
       console.error('Failed to update:', e);
       alert('Failed to update entry');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -2129,8 +2143,8 @@ const getInitial = (name) => {
                     <input type="date" value={manualForm.dueDate} onChange={(e) => setManualForm({ ...manualForm, dueDate: e.target.value })} style={inputStyle} />
                   </div>
                 </div>
-                <button onClick={handleManualSubmit} disabled={!selectedCategory} style={{ height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: selectedCategory ? 1 : 0.5 }}>
-                  <Plus style={{ width: '16px', height: '16px' }} /> Add Entry
+                <button onClick={handleManualSubmit} disabled={!selectedCategory || isSaving} style={{ height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: (!selectedCategory || isSaving) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: (!selectedCategory || isSaving) ? 0.5 : 1 }}>
+                  {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Plus style={{ width: '16px', height: '16px' }} /> Add Entry</>}
                 </button>
               </div>
             )}
@@ -3252,11 +3266,10 @@ const getInitial = (name) => {
               </button>
               <button
                 onClick={handleUpdateEntry}
-                disabled={!editingEntry.name || !editingEntry.amount}
-                style={{ flex: 1, height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: (!editingEntry.name || !editingEntry.amount) ? 0.5 : 1 }}
+                disabled={!editingEntry.name || !editingEntry.amount || isSaving}
+                style={{ flex: 1, height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: (!editingEntry.name || !editingEntry.amount || isSaving) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: (!editingEntry.name || !editingEntry.amount || isSaving) ? 0.5 : 1 }}
               >
-                <Check style={{ width: '16px', height: '16px' }} />
-                Save Changes
+                {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Check style={{ width: '16px', height: '16px' }} /> Save Changes</>}
               </button>
             </div>
           </div>
@@ -3290,10 +3303,10 @@ const getInitial = (name) => {
               </button>
               <button
                 onClick={handleDeleteEntry}
-                style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+                disabled={isSaving}
+                style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
               >
-                <Trash2 style={{ width: '16px', height: '16px' }} />
-                Delete
+                {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Delete</>}
               </button>
             </div>
           </div>
