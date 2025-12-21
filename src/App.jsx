@@ -2175,16 +2175,16 @@ const getInitial = (name) => {
           </div>
 
           {/* Stats Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isSmall ? '8px' : '16px', marginBottom: '20px', overflow: 'hidden' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: width < 360 ? '1fr' : isSmall ? '1fr 1fr' : 'repeat(4, 1fr)', gap: isSmall ? '8px' : '16px', marginBottom: '20px' }}>
             {[
               { label: 'Today', value: stats.today },
               { label: 'This Month', value: stats.month },
               { label: 'This Year', value: stats.year },
               { label: 'All Time', value: stats.total },
             ].map(stat => (
-              <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '8px' : '16px' }}>
-                <p style={{ fontSize: isSmall ? '9px' : '13px', color: theme.textSubtle, margin: '0 0 2px' }}>{stat.label}</p>
-                <p style={{ fontSize: isSmall ? '11px' : '24px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
+              <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
+                <p style={{ fontSize: isSmall ? '11px' : '13px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
+                <p style={{ fontSize: isSmall ? '16px' : '24px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
               </div>
             ))}
           </div>
