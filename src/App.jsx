@@ -1060,6 +1060,13 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('File too large. Maximum size is 5MB.');
+      e.target.value = '';
+      return;
+    }
     if (!selectedCategory) {
       setUploadError('Please select a category first');
       e.target.value = '';
