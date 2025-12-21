@@ -986,6 +986,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [editNickname, setEditNickname] = useState(user.user_metadata?.nickname || '');
   const [deletingEntry, setDeletingEntry] = useState(null);
+  const [editingEntry, setEditingEntry] = useState(null);
   // Load entries from Supabase
   useEffect(() => {
     const loadEntries = async () => {
@@ -1237,6 +1238,33 @@ const getInitial = (name) => {
     if (!deletingEntry) return;
     await deleteEntry(deletingEntry.id);
     setDeletingEntry(null);
+  };
+  const handleUpdateEntry = async () => {
+    if (!editingEntry) return;
+    try {
+      const { error } = await supabase
+        .from('expenses')
+        .update({
+          name: editingEntry.name,
+          amount: parseFloat(editingEntry.amount),
+          category: editingEntry.type,
+          date: editingEntry.date,
+          due_date: editingEntry.dueDate || null
+        })
+        .eq('id', editingEntry.id);
+
+      if (error) throw error;
+
+      setEntries(prev => prev.map(e => 
+        e.id === editingEntry.id 
+          ? { ...e, name: editingEntry.name, amount: parseFloat(editingEntry.amount), type: editingEntry.type, date: editingEntry.date, dueDate: editingEntry.dueDate }
+          : e
+      ));
+      setEditingEntry(null);
+    } catch (e) {
+      console.error('Failed to update:', e);
+      alert('Failed to update entry');
+    }
   };
 
   const handleDownloadFile = (entry) => {
@@ -2193,6 +2221,9 @@ const getInitial = (name) => {
                                   </button>
                                 </>
                               )}
+                              <button onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})} style={{ width: '26px', height: '26px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+                                <Edit style={{ width: '14px', height: '14px' }} />
+                              </button>
                               <button onClick={() => setDeletingEntry(entry)} style={{ width: '26px', height: '26px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
   <Trash2 style={{ width: '14px', height: '14px' }} />
 </button>
@@ -3016,6 +3047,9 @@ const getInitial = (name) => {
                                   </button>
                                 </>
                               )}
+                              <button onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '4px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Edit style={{ width: '14px', height: '14px' }} />
+                              </button>
                               <button onClick={() => setDeletingEntry(entry)} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '4px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
   <Trash2 style={{ width: '14px', height: '14px' }} />
 </button>
@@ -3141,6 +3175,94 @@ const getInitial = (name) => {
           </div>
         </div>
       )}
+{/* Edit Entry Modal */}
+      {editingEntry && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setEditingEntry(null)}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit Entry</h3>
+              <button onClick={() => setEditingEntry(null)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Name *</label>
+                <input
+                  type="text"
+                  value={editingEntry.name}
+                  onChange={(e) => setEditingEntry({...editingEntry, name: e.target.value})}
+                  style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Category *</label>
+                <select
+                  value={editingEntry.type}
+                  onChange={(e) => setEditingEntry({...editingEntry, type: e.target.value})}
+                  style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box', cursor: 'pointer' }}
+                >
+                  {CATEGORIES.map(c => (
+                    <option key={c.value} value={c.value}>{c.label}</option>
+                  ))}
+                </select>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Amount *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={editingEntry.amount}
+                  onChange={(e) => setEditingEntry({...editingEntry, amount: e.target.value})}
+                  style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Date</label>
+                  <input
+                    type="date"
+                    value={editingEntry.date}
+                    onChange={(e) => setEditingEntry({...editingEntry, date: e.target.value})}
+                    style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Due Date</label>
+                  <input
+                    type="date"
+                    value={editingEntry.dueDate || ''}
+                    onChange={(e) => setEditingEntry({...editingEntry, dueDate: e.target.value})}
+                    style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
+              <button
+                onClick={() => setEditingEntry(null)}
+                style={{ flex: 1, height: '44px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleUpdateEntry}
+                disabled={!editingEntry.name || !editingEntry.amount}
+                style={{ flex: 1, height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: (!editingEntry.name || !editingEntry.amount) ? 0.5 : 1 }}
+              >
+                <Check style={{ width: '16px', height: '16px' }} />
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 {/* Delete Entry Modal */}
       {deletingEntry && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setDeletingEntry(null)}>
