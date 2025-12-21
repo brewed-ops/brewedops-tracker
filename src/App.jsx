@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Users, MessageSquare, Camera, User, AlertTriangle, Calendar } from 'lucide-react';
+import { Upload, FileText, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 // ============================================
@@ -29,7 +29,7 @@ const CURRENCIES = [
 // Admin credentials
 const ADMIN_CREDENTIALS = {
   email: 'admin@brewedops.com',
-  password: 'Brewedopsadmin12!@'
+  password: 'Admin@123'
 };
 
 // Badge colors for light and dark mode
@@ -95,13 +95,6 @@ const useWindowSize = () => {
 // ============================================
 const formatAmount = (amount) => {
   return amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
-
-// ============================================
-// GET INITIAL FROM NAME
-// ============================================
-const getInitial = (name) => {
-  return name ? name.charAt(0).toUpperCase() : 'U';
 };
 
 // ============================================
@@ -476,7 +469,6 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }) => {
   const [isSignup, setIsSignup] = useState(initialMode === 'signup');
   const [email, setEmail] = useState('');
-  const [nickname, setNickname] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
@@ -510,22 +502,11 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     
     const newErrors = {};
 
-    // Check for admin login FIRST
-    if (!isSignup && email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-      onLogin({ email: ADMIN_CREDENTIALS.email, isAdmin: true });
-      return;
-    }
-
     // Validate email
     if (!email) {
       newErrors.email = 'Email is required';
     } else if (!validateEmail(email)) {
       newErrors.email = 'Please enter a valid email address';
-    }
-
-    // Validate nickname for signup
-    if (isSignup && !nickname.trim()) {
-      newErrors.nickname = 'Nickname is required';
     }
 
     // Validate password
@@ -555,15 +536,10 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
 
     try {
       if (isSignup) {
-        // Signup with Supabase - include nickname
+        // Signup with Supabase
         const { data, error } = await supabase.auth.signUp({
           email,
-          password,
-          options: {
-            data: {
-              nickname: nickname.trim()
-            }
-          }
+          password
         });
         
         if (error) throw error;
@@ -617,7 +593,6 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     setSuccessMessage('');
     setPassword('');
     setConfirmPassword('');
-    setNickname('');
   };
 
   return (
@@ -772,39 +747,6 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
               </p>
             )}
           </div>
-
-          {/* Nickname field - only for signup */}
-          {isSignup && (
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
-                Nickname
-              </label>
-              <input
-                type="text"
-                placeholder="What should we call you?"
-                value={nickname}
-                onChange={(e) => { setNickname(e.target.value); setErrors({ ...errors, nickname: '' }); }}
-                style={{
-                  width: '100%',
-                  height: '44px',
-                  backgroundColor: theme.inputBg,
-                  border: `1px solid ${errors.nickname ? '#ef4444' : theme.inputBorder}`,
-                  borderRadius: '8px',
-                  padding: '0 12px',
-                  fontSize: '16px',
-                  color: theme.text,
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-              />
-              {errors.nickname && (
-                <p style={{ fontSize: '12px', color: '#ef4444', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <AlertCircle style={{ width: '12px', height: '12px' }} />
-                  {errors.nickname}
-                </p>
-              )}
-            </div>
-          )}
           
           <div>
             <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
@@ -1856,14 +1798,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                     <p style={{ fontSize: '12px', color: theme.textDim, margin: 0 }}>PDF or Image (max 10MB)</p>
                     <input type="file" accept="image/*,.pdf" onChange={handleFileSelect} disabled={!selectedCategory} style={{ display: 'none' }} />
                   </label>
-
-// ============================================
-// END OF PART A - CONTINUE WITH PART B BELOW
-// ============================================
-// ============================================
-// PART B - PASTE THIS DIRECTLY AFTER PART A
-// ============================================
-
                 )}
               </div>
             ) : (
@@ -2915,403 +2849,553 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   );
 };
 
-
 // ============================================
 // ADMIN DASHBOARD
 // ============================================
 
 const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [editingUser, setEditingUser] = useState(null);
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [newUser, setNewUser] = useState({ email: '', password: '' });
+  const [editForm, setEditForm] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+
   const theme = getTheme(isDark);
   const { width } = useWindowSize();
   const isMobile = width < 768;
   const isSmall = width < 480;
 
-  const [adminTab, setAdminTab] = useState('users');
-  const [users, setUsers] = useState([]);
-  const [feedbacks, setFeedbacks] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [userSearch, setUserSearch] = useState('');
-  const [viewingUser, setViewingUser] = useState(null);
-  const [viewingFeedback, setViewingFeedback] = useState(null);
-  const [deletingUser, setDeletingUser] = useState(null);
-  const [expenseSearch, setExpenseSearch] = useState('');
-
+  // Load users
   useEffect(() => {
-    fetchUsers();
-    fetchFeedbacks();
+    loadUsers();
   }, []);
 
-  const fetchUsers = async () => {
-    setLoading(true);
+  const loadUsers = async () => {
     try {
-      const { data: expenses, error } = await supabase
-        .from('expenses')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const result = await window.storage.get('expense-tracker-users');
+      if (result?.value) {
+        const usersData = JSON.parse(result.value);
+        const userList = Object.entries(usersData).map(([email, data]) => ({
+          email,
+          password: data.password,
+          entriesCount: data.entries?.length || 0,
+          createdAt: data.createdAt || 'N/A'
+        }));
+        setUsers(userList);
+      }
+    } catch (e) {
+      console.error('Failed to load users:', e);
+    }
+    setLoading(false);
+  };
 
-      if (error) throw error;
-
-      const userMap = {};
-      expenses?.forEach(expense => {
-        if (!userMap[expense.user_id]) {
-          userMap[expense.user_id] = {
-            id: expense.user_id,
-            email: expense.user_email || 'Unknown',
-            nickname: expense.user_nickname || 'User',
-            expenses: [],
-            totalSpent: 0,
-            createdAt: expense.created_at
+  const saveUsers = async (userList) => {
+    try {
+      const result = await window.storage.get('expense-tracker-users');
+      const usersData = result?.value ? JSON.parse(result.value) : {};
+      
+      // Rebuild users object
+      const newUsersData = {};
+      userList.forEach(user => {
+        if (usersData[user.email]) {
+          newUsersData[user.email] = {
+            ...usersData[user.email],
+            password: user.password
+          };
+        } else {
+          newUsersData[user.email] = {
+            password: user.password,
+            entries: [],
+            createdAt: new Date().toISOString()
           };
         }
-        userMap[expense.user_id].expenses.push(expense);
-        userMap[expense.user_id].totalSpent += expense.amount;
       });
-
-      setUsers(Object.values(userMap));
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    } finally {
-      setLoading(false);
+      
+      await window.storage.set('expense-tracker-users', JSON.stringify(newUsersData));
+      setUsers(userList);
+    } catch (e) {
+      console.error('Failed to save users:', e);
     }
   };
 
-  const fetchFeedbacks = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('feedbacks')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setFeedbacks(data || []);
-    } catch (error) {
-      console.error('Error fetching feedbacks:', error);
+  const handleAddUser = async () => {
+    setError('');
+    
+    if (!newUser.email || !newUser.password) {
+      setError('Email and password are required');
+      return;
     }
+    
+    if (!validateEmail(newUser.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (newUser.email === ADMIN_CREDENTIALS.email) {
+      setError('This email is reserved');
+      return;
+    }
+    
+    if (users.find(u => u.email === newUser.email)) {
+      setError('A user with this email already exists');
+      return;
+    }
+    
+    const passwordIssues = validatePassword(newUser.password);
+    if (passwordIssues.length > 0) {
+      setError(`Password needs: ${passwordIssues.join(', ')}`);
+      return;
+    }
+    
+    const newUserObj = {
+      email: newUser.email,
+      password: newUser.password,
+      entriesCount: 0,
+      createdAt: new Date().toISOString()
+    };
+    
+    await saveUsers([...users, newUserObj]);
+    setNewUser({ email: '', password: '' });
+    setShowAddUser(false);
+    setSuccess('User added successfully');
+    setTimeout(() => setSuccess(''), 3000);
   };
 
-  const handleDeleteExpense = async (expenseId) => {
-    if (!window.confirm('Delete this entry?')) return;
-    try {
-      const { error } = await supabase.from('expenses').delete().eq('id', expenseId);
-      if (error) throw error;
-      fetchUsers();
-      if (viewingUser) {
-        setViewingUser(prev => ({
-          ...prev,
-          expenses: prev.expenses.filter(e => e.id !== expenseId),
-          totalSpent: prev.expenses.filter(e => e.id !== expenseId).reduce((sum, e) => sum + e.amount, 0)
-        }));
+  const handleEditUser = async () => {
+    setError('');
+    
+    if (!editForm.email) {
+      setError('Email is required');
+      return;
+    }
+    
+    if (!validateEmail(editForm.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    if (editForm.email === ADMIN_CREDENTIALS.email) {
+      setError('This email is reserved');
+      return;
+    }
+    
+    // Check if new email already exists (if email changed)
+    if (editForm.email !== editingUser.email && users.find(u => u.email === editForm.email)) {
+      setError('A user with this email already exists');
+      return;
+    }
+    
+    if (editForm.password) {
+      const passwordIssues = validatePassword(editForm.password);
+      if (passwordIssues.length > 0) {
+        setError(`Password needs: ${passwordIssues.join(', ')}`);
+        return;
       }
-    } catch (error) {
-      console.error('Error:', error);
     }
-  };
-
-  const handleDeleteUser = async () => {
-    if (!deletingUser) return;
+    
+    // Update user
     try {
-      const { error } = await supabase.from('expenses').delete().eq('user_id', deletingUser.id);
-      if (error) throw error;
-      setUsers(prev => prev.filter(u => u.id !== deletingUser.id));
-      setDeletingUser(null);
-    } catch (error) {
-      console.error('Error:', error);
+      const result = await window.storage.get('expense-tracker-users');
+      const usersData = result?.value ? JSON.parse(result.value) : {};
+      
+      // If email changed, we need to move the data
+      if (editForm.email !== editingUser.email) {
+        usersData[editForm.email] = {
+          ...usersData[editingUser.email],
+          password: editForm.password || editingUser.password
+        };
+        delete usersData[editingUser.email];
+      } else {
+        usersData[editingUser.email].password = editForm.password || editingUser.password;
+      }
+      
+      await window.storage.set('expense-tracker-users', JSON.stringify(usersData));
+      await loadUsers();
+      setEditingUser(null);
+      setEditForm({ email: '', password: '' });
+      setSuccess('User updated successfully');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (e) {
+      setError('Failed to update user');
     }
   };
 
-  const openFeedbackDetail = (feedback) => {
-    setViewingFeedback(feedback);
-    if (!feedback.read) {
-      supabase.from('feedbacks').update({ read: true }).eq('id', feedback.id).then(() => {
-        setFeedbacks(prev => prev.map(f => f.id === feedback.id ? { ...f, read: true } : f));
-      });
+  const handleDeleteUser = async (email) => {
+    if (!confirm(`Are you sure you want to delete ${email}? This will also delete all their entries.`)) {
+      return;
+    }
+    
+    try {
+      const result = await window.storage.get('expense-tracker-users');
+      const usersData = result?.value ? JSON.parse(result.value) : {};
+      delete usersData[email];
+      await window.storage.set('expense-tracker-users', JSON.stringify(usersData));
+      await loadUsers();
+      setSuccess('User deleted successfully');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch (e) {
+      setError('Failed to delete user');
     }
   };
 
-  const filteredUsers = users.filter(user => 
-    user.email.toLowerCase().includes(userSearch.toLowerCase()) ||
-    user.nickname?.toLowerCase().includes(userSearch.toLowerCase())
+  const filteredUsers = users.filter(u => 
+    u.email.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const filteredExpenses = viewingUser?.expenses.filter(expense =>
-    expense.name.toLowerCase().includes(expenseSearch.toLowerCase()) ||
-    expense.category.toLowerCase().includes(expenseSearch.toLowerCase())
-  ) || [];
+  const cardStyle = {
+    backgroundColor: theme.cardBg,
+    borderRadius: '12px',
+    border: `1px solid ${theme.cardBorder}`,
+    padding: isSmall ? '16px' : '24px'
+  };
 
-  const unreadCount = feedbacks.filter(f => !f.read).length;
-  const totalUsers = users.length;
-  const totalEntries = users.reduce((sum, user) => sum + user.expenses.length, 0);
+  const inputStyle = {
+    width: '100%',
+    height: '36px',
+    backgroundColor: theme.inputBg,
+    border: `1px solid ${theme.inputBorder}`,
+    borderRadius: '6px',
+    padding: '0 12px',
+    fontSize: '14px',
+    color: theme.text,
+    outline: 'none',
+    boxSizing: 'border-box'
+  };
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Loader2 style={{ width: '32px', height: '32px', color: theme.textSubtle, animation: 'spin 1s linear infinite' }} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
-      <header style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: `1px solid ${theme.cardBorder}`, padding: '16px 24px', position: 'sticky', top: 0, zIndex: 20 }}>
+      {/* Header */}
+      <header style={{
+        backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
+        borderBottom: `1px solid ${theme.cardBorder}`,
+        padding: isSmall ? '10px 12px' : '12px 24px',
+        position: 'sticky',
+        top: 0,
+        zIndex: 20
+      }}>
         <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid #dc2626' }} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <img 
+              src="https://i.imgur.com/R52jwPv.png" 
+              alt="BrewedOps Logo" 
+              style={{ 
+                width: '36px', 
+                height: '36px', 
+                borderRadius: '50%', 
+                objectFit: 'cover',
+                border: '2px solid #dc2626'
+              }} 
+            />
             <div>
-              <h1 style={{ fontSize: '17px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Admin</h1>
-              <p style={{ fontSize: '12px', color: '#dc2626', margin: 0, fontWeight: '500' }}>Administrator</p>
+              <h1 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Admin</h1>
+              <p style={{ fontSize: '11px', color: '#dc2626', margin: 0, fontWeight: '500' }}>Administrator</p>
             </div>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            {!isSmall && <span style={{ fontSize: '14px', color: theme.textSubtle }}>admin@brewedops.com</span>}
-            <button onClick={() => setIsDark(!isDark)} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              {isDark ? <Sun style={{ width: '16px', height: '16px' }} /> : <Moon style={{ width: '16px', height: '16px' }} />}
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              onClick={() => setIsDark(!isDark)}
+              style={{
+                width: '32px',
+                height: '32px',
+                backgroundColor: 'transparent',
+                border: `1px solid ${theme.inputBorder}`,
+                borderRadius: '6px',
+                color: theme.textMuted,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+            >
+              {isDark ? <Sun style={{ width: '14px', height: '14px' }} /> : <Moon style={{ width: '14px', height: '14px' }} />}
             </button>
-            <button onClick={onLogout} style={{ height: '36px', padding: '0 14px', backgroundColor: '#dc2626', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '14px', fontWeight: '500' }}>
-              <LogOut style={{ width: '15px', height: '15px' }} />{!isSmall && 'Logout'}
+            <button
+              onClick={onLogout}
+              style={{
+                height: '32px',
+                backgroundColor: 'transparent',
+                border: `1px solid ${theme.inputBorder}`,
+                borderRadius: '6px',
+                padding: '0 12px',
+                fontSize: '13px',
+                color: theme.textMuted,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <LogOut style={{ width: '14px', height: '14px' }} />
+              {!isSmall && 'Logout'}
             </button>
           </div>
         </div>
       </header>
 
-      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: `1px solid ${theme.cardBorder}`, padding: '0 24px' }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', gap: '4px', padding: '0 16px' }}>
-          <button onClick={() => setAdminTab('users')} style={{ padding: '14px 18px', backgroundColor: 'transparent', border: 'none', borderBottom: adminTab === 'users' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent', fontSize: '15px', fontWeight: '500', color: adminTab === 'users' ? theme.text : theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Users style={{ width: '16px', height: '16px' }} />All Users
-          </button>
-          <button onClick={() => setAdminTab('feedback')} style={{ padding: '14px 18px', backgroundColor: 'transparent', border: 'none', borderBottom: adminTab === 'feedback' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent', fontSize: '15px', fontWeight: '500', color: adminTab === 'feedback' ? theme.text : theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <MessageSquare style={{ width: '16px', height: '16px' }} />Feedback
-            {unreadCount > 0 && <span style={{ backgroundColor: '#dc2626', color: '#fff', fontSize: '11px', fontWeight: '600', padding: '2px 6px', borderRadius: '10px' }}>{unreadCount}</span>}
-          </button>
-        </div>
-      </div>
-
-      <main style={{ maxWidth: '1600px', margin: '0 auto', padding: isSmall ? '16px' : '24px 40px' }}>
-        {adminTab === 'users' ? (
-          <>
-            <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr 1fr' : 'repeat(2, 1fr)', gap: '16px', marginBottom: '24px', maxWidth: '500px' }}>
-              <div style={{ padding: '20px', borderRadius: '12px', backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Total Users</span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#3b82f620', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <Users style={{ width: '18px', height: '18px', color: '#3b82f6' }} />
-                  </div>
-                </div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>{totalUsers}</p>
-              </div>
-              <div style={{ padding: '20px', borderRadius: '12px', backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Total Entries</span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#10b98120', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <FileText style={{ width: '18px', height: '18px', color: '#10b981' }} />
-                  </div>
-                </div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>{totalEntries}</p>
-              </div>
-            </div>
-
-            <div style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }}>
-              <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                <div>
-                  <h2 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>All Users</h2>
-                  <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>Manage registered users</p>
-                </div>
-                <div style={{ position: 'relative' }}>
-                  <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: theme.textMuted }} />
-                  <input type="text" placeholder="Search..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} style={{ height: '36px', width: isSmall ? '100%' : '220px', paddingLeft: '38px', paddingRight: '12px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', color: theme.text, outline: 'none' }} />
-                </div>
-              </div>
-
-              {loading ? (
-                <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-                  <Loader2 style={{ width: '32px', height: '32px', color: theme.textMuted, animation: 'spin 1s linear infinite', margin: '0 auto' }} />
-                </div>
-              ) : filteredUsers.length === 0 ? (
-                <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-                  <Users style={{ width: '48px', height: '48px', color: theme.textMuted, margin: '0 auto 16px' }} />
-                  <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>{userSearch ? 'No users found' : 'No users yet'}</p>
-                </div>
-              ) : (
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
-                    <thead>
-                      <tr style={{ backgroundColor: theme.statBg }}>
-                        <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>User</th>
-                        <th style={{ textAlign: 'center', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Entries</th>
-                        <th style={{ textAlign: 'right', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Total Spent</th>
-                        <th style={{ textAlign: 'center', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {filteredUsers.map((user) => (
-                        <tr key={user.id} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
-                          <td style={{ padding: '16px 20px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                              <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '14px', fontWeight: '600' }}>{getInitial(user.nickname)}</div>
-                              <div>
-                                <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: 0 }}>{user.nickname || 'User'}</p>
-                                <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>{user.email}</p>
-                              </div>
-                            </div>
-                          </td>
-                          <td style={{ padding: '16px 20px', textAlign: 'center' }}>
-                            <span style={{ fontSize: '13px', padding: '4px 12px', borderRadius: '20px', backgroundColor: isDark ? '#1e3a5f' : '#dbeafe', color: isDark ? '#60a5fa' : '#1d4ed8' }}>{user.expenses.length} entries</span>
-                          </td>
-                          <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                            <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>₱{formatAmount(user.totalSpent)}</span>
-                          </td>
-                          <td style={{ padding: '16px 20px', textAlign: 'center' }}>
-                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                              <button onClick={() => { setViewingUser(user); setExpenseSearch(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Eye style={{ width: '14px', height: '14px' }} />
-                              </button>
-                              <button onClick={() => setDeletingUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: '1px solid #dc2626', borderRadius: '6px', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Trash2 style={{ width: '14px', height: '14px' }} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </>
-        ) : (
-          <div style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }}>
-            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-              <h2 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>User Feedback</h2>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>{feedbacks.length} submissions</p>
-            </div>
-            {feedbacks.length === 0 ? (
-              <div style={{ padding: '60px 20px', textAlign: 'center' }}>
-                <MessageSquare style={{ width: '48px', height: '48px', color: theme.textMuted, margin: '0 auto 16px' }} />
-                <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>No feedback yet</p>
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column' }}>
-                {feedbacks.map((feedback) => (
-                  <div key={feedback.id} onClick={() => openFeedbackDetail(feedback)} style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, backgroundColor: feedback.read ? 'transparent' : (isDark ? '#1e293b' : '#f0f9ff'), cursor: 'pointer' }}>
-                    <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '14px', fontWeight: '600' }}>{getInitial(feedback.nickname)}</div>
-                        <div>
-                          <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{feedback.nickname || 'User'}</p>
-                          <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>{feedback.user_email}</p>
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        {!feedback.read && <span style={{ backgroundColor: '#3b82f6', color: '#fff', fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '10px' }}>NEW</span>}
-                        <span style={{ fontSize: '12px', color: theme.textMuted }}>{new Date(feedback.created_at).toLocaleDateString()}</span>
-                      </div>
-                    </div>
-                    <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.5', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{feedback.message}</p>
-                  </div>
-                ))}
-              </div>
-            )}
+      <main style={{ maxWidth: '1600px', margin: '0 auto', padding: isSmall ? '12px' : '24px 40px' }}>
+        {/* Success/Error Messages */}
+        {success && (
+          <div style={{
+            padding: '12px 16px',
+            backgroundColor: isDark ? '#052e16' : '#f0fdf4',
+            border: `1px solid ${isDark ? '#166534' : '#86efac'}`,
+            borderRadius: '8px',
+            marginBottom: '16px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <Check style={{ width: '16px', height: '16px', color: '#22c55e' }} />
+            <span style={{ fontSize: '14px', color: isDark ? '#86efac' : '#166534' }}>{success}</span>
           </div>
         )}
-      </main>
 
-      {viewingUser && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '20px' }}>
-          <div style={{ width: '100%', maxWidth: '700px', maxHeight: '80vh', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, flexShrink: 0 }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '18px', fontWeight: '600' }}>{getInitial(viewingUser.nickname)}</div>
-                  <div>
-                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{viewingUser.nickname || 'User'}</h3>
-                    <p style={{ fontSize: '13px', color: theme.textMuted, margin: '2px 0 0' }}>{viewingUser.email}</p>
-                  </div>
-                </div>
-                <button onClick={() => setViewingUser(null)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <X style={{ width: '16px', height: '16px' }} />
-                </button>
-              </div>
-              <div style={{ position: 'relative' }}>
-                <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: theme.textMuted }} />
-                <input type="text" placeholder="Search entries..." value={expenseSearch} onChange={(e) => setExpenseSearch(e.target.value)} style={{ width: '100%', height: '40px', paddingLeft: '38px', paddingRight: '12px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box' }} />
-              </div>
+        <div style={cardStyle}>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
+            <div>
+              <h2 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>User Management</h2>
+              <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>{users.length} registered users</p>
             </div>
-            <div style={{ flex: 1, overflowY: 'auto', padding: '16px 20px' }}>
-              {filteredExpenses.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 20px' }}><p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>No entries found</p></div>
-              ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                  {filteredExpenses.map((expense) => {
-                    const badge = getBadgeStyle(expense.category, isDark);
-                    return (
-                      <div key={expense.id} style={{ padding: '16px', backgroundColor: theme.statBg, borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flex: 1 }}>
-                          <div style={{ width: '42px', height: '42px', borderRadius: '10px', backgroundColor: badge.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            <FileText style={{ width: '18px', height: '18px', color: badge.color }} />
-                          </div>
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: 0 }}>{expense.name}</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px', flexWrap: 'wrap' }}>
-                              <span style={{ fontSize: '11px', padding: '2px 8px', borderRadius: '4px', backgroundColor: badge.bg, color: badge.color, textTransform: 'capitalize' }}>{expense.category}</span>
-                              <span style={{ fontSize: '12px', color: theme.textMuted }}>{new Date(expense.date).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                          <span style={{ fontSize: '16px', fontWeight: '600', color: theme.text }}>₱{formatAmount(expense.amount)}</span>
-                          <button onClick={() => handleDeleteExpense(expense.id)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: '1px solid #dc2626', borderRadius: '6px', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <button
+              onClick={() => { setShowAddUser(true); setError(''); }}
+              style={{
+                height: '36px',
+                padding: '0 16px',
+                backgroundColor: isDark ? '#fafafa' : '#18181b',
+                color: isDark ? '#18181b' : '#fafafa',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '13px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              <Plus style={{ width: '14px', height: '14px' }} />
+              Add User
+            </button>
+          </div>
+
+          {/* Search */}
+          <div style={{ marginBottom: '16px' }}>
+            <div style={{ position: 'relative', width: '250px' }}>
+              <Search style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textDim }} />
+              <input
+                placeholder="Search users..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                style={{ ...inputStyle, paddingLeft: '32px' }}
+              />
+            </div>
+          </div>
+
+          {/* Users Table */}
+          <div style={{ overflowX: 'auto', maxHeight: '500px', overflowY: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+              <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg, zIndex: 1 }}>
+                <tr style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                  <th style={{ padding: '12px 8px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Email</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Entries</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Created</th>
+                  <th style={{ padding: '12px 8px', textAlign: 'center', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} style={{ textAlign: 'center', padding: '40px 0', color: theme.textDim }}>No users found</td>
+                  </tr>
+                ) : (
+                  filteredUsers.map(user => (
+                    <tr key={user.email} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                      <td style={{ padding: '12px 8px', fontSize: '14px', color: theme.text }}>{user.email}</td>
+                      <td style={{ padding: '12px 8px', fontSize: '14px', color: theme.textMuted, textAlign: 'center' }}>{user.entriesCount}</td>
+                      <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted }}>
+                        {user.createdAt !== 'N/A' ? new Date(user.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
+                      </td>
+                      <td style={{ padding: '12px 8px', textAlign: 'center' }}>
+                        <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
+                          <button
+                            onClick={() => {
+                              setEditingUser(user);
+                              setEditForm({ email: user.email, password: '' });
+                              setError('');
+                            }}
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              backgroundColor: 'transparent',
+                              border: `1px solid ${theme.inputBorder}`,
+                              borderRadius: '4px',
+                              color: theme.textMuted,
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                            title="Edit"
+                          >
+                            <FileText style={{ width: '14px', height: '14px' }} />
+                          </button>
+                          <button
+                            onClick={() => handleDeleteUser(user.email)}
+                            style={{
+                              width: '28px',
+                              height: '28px',
+                              backgroundColor: 'transparent',
+                              border: `1px solid ${theme.inputBorder}`,
+                              borderRadius: '4px',
+                              color: '#ef4444',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                            title="Delete"
+                          >
                             <Trash2 style={{ width: '14px', height: '14px' }} />
                           </button>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-            <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, backgroundColor: theme.statBg, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexShrink: 0 }}>
-              <span style={{ fontSize: '14px', color: theme.textMuted }}>{filteredExpenses.length} entries</span>
-              <span style={{ fontSize: '16px', fontWeight: '600', color: theme.text }}>Total: ₱{formatAmount(viewingUser.totalSpent)}</span>
-            </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
-      )}
+      </main>
 
-      {deletingUser && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ width: '100%', maxWidth: '420px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center', margin: '16px' }}>
-            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <AlertTriangle style={{ width: '28px', height: '28px', color: '#dc2626' }} />
+      {/* Add User Modal */}
+      {showAddUser && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowAddUser(false)}>
+          <div style={{ ...cardStyle, maxWidth: '400px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Add New User</h3>
+              <button onClick={() => setShowAddUser(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
+              </button>
             </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete User?</h3>
-            <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 8px' }}>Are you sure you want to delete this user?</p>
-            <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: '0 0 8px', padding: '8px 12px', backgroundColor: theme.statBg, borderRadius: '6px', display: 'inline-block' }}>{deletingUser.email}</p>
-            <p style={{ fontSize: '13px', color: '#dc2626', margin: '12px 0 20px' }}>⚠️ This cannot be undone. All {deletingUser.expenses.length} entries will be removed.</p>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setDeletingUser(null)} style={{ flex: 1, height: '42px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, color: theme.text, borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={handleDeleteUser} style={{ flex: 1, height: '42px', backgroundColor: '#dc2626', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                <Trash2 style={{ width: '16px', height: '16px' }} />Delete
+
+            {error && (
+              <div style={{ padding: '10px 12px', backgroundColor: isDark ? '#450a0a' : '#fef2f2', border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`, borderRadius: '6px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertCircle style={{ width: '14px', height: '14px', color: '#ef4444', flexShrink: 0 }} />
+                <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>{error}</span>
+              </div>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Email *</label>
+                <input
+                  type="email"
+                  placeholder="user@example.com"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Password *</label>
+                <input
+                  type="password"
+                  placeholder="Min 8 chars, uppercase, lowercase, number"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <button
+                onClick={handleAddUser}
+                style={{
+                  height: '40px',
+                  backgroundColor: isDark ? '#fafafa' : '#18181b',
+                  color: isDark ? '#18181b' : '#fafafa',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  marginTop: '4px'
+                }}
+              >
+                Add User
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {viewingFeedback && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '20px' }}>
-          <div style={{ width: '100%', maxWidth: '500px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }}>
-            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '18px', fontWeight: '600' }}>{getInitial(viewingFeedback.nickname)}</div>
-                <div>
-                  <p style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{viewingFeedback.nickname || 'User'}</p>
-                  <p style={{ fontSize: '13px', color: theme.textMuted, margin: '2px 0 0' }}>{viewingFeedback.user_email}</p>
-                </div>
-              </div>
-              <button onClick={() => setViewingFeedback(null)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X style={{ width: '16px', height: '16px' }} />
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setEditingUser(null)}>
+          <div style={{ ...cardStyle, maxWidth: '400px', width: '100%' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit User</h3>
+              <button onClick={() => setEditingUser(null)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
               </button>
             </div>
-            <div style={{ padding: '20px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
-                <MessageSquare style={{ width: '16px', height: '16px', color: theme.textMuted }} />
-                <span style={{ fontSize: '13px', color: theme.textMuted }}>Submitted on {new Date(viewingFeedback.created_at).toLocaleDateString()}</span>
+
+            {error && (
+              <div style={{ padding: '10px 12px', backgroundColor: isDark ? '#450a0a' : '#fef2f2', border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`, borderRadius: '6px', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <AlertCircle style={{ width: '14px', height: '14px', color: '#ef4444', flexShrink: 0 }} />
+                <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>{error}</span>
               </div>
-              <p style={{ fontSize: '15px', color: theme.text, margin: 0, lineHeight: '1.7', whiteSpace: 'pre-wrap' }}>{viewingFeedback.message}</p>
-            </div>
-            <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, backgroundColor: theme.statBg, display: 'flex', justifyContent: 'flex-end' }}>
-              <button onClick={() => setViewingFeedback(null)} style={{ height: '38px', padding: '0 20px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>Close</button>
+            )}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Email</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>New Password (leave blank to keep current)</label>
+                <input
+                  type="password"
+                  placeholder="Enter new password"
+                  value={editForm.password}
+                  onChange={(e) => setEditForm({ ...editForm, password: e.target.value })}
+                  style={inputStyle}
+                />
+              </div>
+              <button
+                onClick={handleEditUser}
+                style={{
+                  height: '40px',
+                  backgroundColor: isDark ? '#fafafa' : '#18181b',
+                  color: isDark ? '#18181b' : '#fafafa',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  marginTop: '4px'
+                }}
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         </div>
@@ -3322,6 +3406,9 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
+        * { box-sizing: border-box; }
+        input, select, button { font-family: inherit; }
+        input::placeholder { color: ${theme.textDim}; }
       `}</style>
     </div>
   );
@@ -3353,24 +3440,10 @@ export default function App() {
   }, []);
   
   const handleLogin = (userData) => {
-    // Check if admin login
-    if (userData.isAdmin) {
-      setUser(userData);
-      setCurrentPage('admin');
-    } else {
-      setUser(userData);
-      setCurrentPage('app');
-    }
+    setUser(userData);
   };
 
   const handleLogout = async () => {
-    // Check if hardcoded admin (not in Supabase)
-    if (user?.isAdmin) {
-      setUser(null);
-      setCurrentPage('home');
-      return;
-    }
-    
     await supabase.auth.signOut();
     setUser(null);
     setCurrentPage('home');
@@ -3397,13 +3470,7 @@ export default function App() {
     );
   }
   
-  // Admin Dashboard
-  if (currentPage === 'admin' && user?.isAdmin) {
-    return <AdminDashboard onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
-  }
-  
-  // User Dashboard
-  if (user && !user.isAdmin) {
+  if (user) {
     return <ExpenseTrackerApp user={user} onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
   }
   
