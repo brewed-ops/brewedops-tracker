@@ -865,7 +865,7 @@ const switchMode = () => {
             </div>
           )}
 
-          <button
+         <button
             onClick={handleSubmit}
             disabled={loading}
             style={{
@@ -886,8 +886,14 @@ const switchMode = () => {
               marginTop: '4px'
             }}
           >
-            {loading && <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />}
-            {isSignup ? 'Create Account' : 'Sign In'}
+            {loading ? (
+              <>
+                <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+                {isSignup ? 'Creating Account...' : 'Signing In...'}
+              </>
+            ) : (
+              isSignup ? 'Create Account' : 'Sign In'
+            )}
           </button>
 
           {!isSignup && (
