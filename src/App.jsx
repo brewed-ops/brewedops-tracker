@@ -146,10 +146,11 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   // shadcn-style card
   const cardStyle = {
     backgroundColor: theme.cardBg,
-    borderRadius: '8px',
+    borderRadius: '12px',
     border: `1px solid ${theme.cardBorder}`,
-    padding: '24px',
-    boxShadow: isDark ? 'none' : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)'
+    padding: isSmall ? '12px' : '20px',
+    overflow: 'hidden',
+    boxSizing: 'border-box'
   };
 
   return (
@@ -1795,20 +1796,19 @@ const getInitial = (name) => {
         </div>
       </div>
 
-      <main style={{ maxWidth: '1600px', margin: '0 auto', padding: isSmall ? '12px' : '24px 40px' }}>
+      <main style={{ maxWidth: '1600px', margin: '0 auto', padding: isSmall ? '8px' : '24px 40px', boxSizing: 'border-box', overflow: 'hidden' }}>
         
         {activeTab === 'dashboard' ? (
           <>
-        {/* Top Section: Add Entry + History */}
+         {/* Top Section: Add Entry + History */}
         <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr', 
+          display: 'flex', 
+          flexDirection: isMobile ? 'column' : 'row',
           gap: isSmall ? '12px' : '24px', 
           marginBottom: isSmall ? '12px' : '24px',
-          alignItems: 'stretch'
         }}>
           {/* Add New Entry Card */}
-          <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column' }}>
+          <div style={{ ...cardStyle, display: 'flex', flexDirection: 'column', flex: isMobile ? 'none' : '1', minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
             <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, marginBottom: '16px', height: isMobile ? 'auto' : '36px', display: 'flex', alignItems: 'center' }}>Add New Entry</h2>
             
             {/* Mode Toggle */}
@@ -2013,7 +2013,7 @@ const getInitial = (name) => {
           </div>
 
           {/* History Card */}
-          <div style={{...cardStyle, display: 'flex', flexDirection: 'column'}}>
+          <div style={{...cardStyle, display: 'flex', flexDirection: 'column', flex: isMobile ? 'none' : '1.5', minWidth: 0, maxWidth: '100%', overflow: 'hidden' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px', height: isMobile ? 'auto' : '36px' }}>
               <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center' }}>History</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? '1 1 100%' : 'none' }}>
