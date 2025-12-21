@@ -1059,16 +1059,35 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         ? [{ type: 'image', source: { type: 'base64', media_type: mediaType, data: base64Data } }, { type: 'text', text: extractionPrompt }]
         : [{ type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: base64Data } }, { type: 'text', text: extractionPrompt }];
 
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content }] })
-      });
+      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${import.meta.env.VITE_OPENAI_API_KEY}`
+  },
+  body: JSON.stringify({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'user',
+        content: isImage
+          ? [
+              { type: 'text', text: extractionPrompt },
+              { type: 'image_url', image_url: { url: `data:${mediaType};base64,${base64Data}` } }
+            ]
+          : [
+              { type: 'text', text: `${extractionPrompt}\n\nDocument content: ${atob(base64Data)}` }
+            ]
+      }
+    ],
+    max_tokens: 1000
+  })
+});
 
       if (!response.ok) throw new Error(`API error: ${response.status}`);
       const data = await response.json();
-      const text = data.content?.map(item => item.text || '').join('') || '';
-      const extracted = JSON.parse(text.replace(/```json|```/g, '').trim());
+const text = data.choices?.[0]?.message?.content || '';
+const extracted = JSON.parse(text.replace(/```json|```/g, '').trim());
 
       setPendingUpload({
         id: Date.now().toString(),
