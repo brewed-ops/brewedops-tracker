@@ -3108,7 +3108,17 @@ const getInitial = (name) => {
                       const badge = getBadgeStyle(entry.type, isDark);
                       const categoryInfo = CATEGORIES.find(c => c.value === entry.type);
                       return (
-                        <tr key={entry.id} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                        <tr 
+                          key={entry.id} 
+                          onDoubleClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})}
+                          style={{ 
+                            borderBottom: `1px solid ${theme.cardBorder}`,
+                            cursor: 'pointer',
+                            transition: 'background-color 0.15s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#1f1f23' : '#fafafa'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
                           <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted }}>
                             {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </td>
