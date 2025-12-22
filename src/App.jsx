@@ -2339,32 +2339,9 @@ const getInitial = (name) => {
                             <p style={{ fontSize: '13px', color: theme.textDim, margin: 0, maxWidth: '300px' }}>
                               {historySearch || advancedCategory !== 'all' || advancedDateFrom || advancedDateTo 
                                 ? 'Try adjusting your filters or search term' 
-                                : 'Start tracking your expenses by adding your first entry on the Dashboard'}
+                                : 'Go to Dashboard to add your first expense'}
                             </p>
                           </div>
-                          {!historySearch && advancedCategory === 'all' && !advancedDateFrom && !advancedDateTo && (
-                            <button
-                              onClick={() => setActiveTab('dashboard')}
-                              style={{
-                                marginTop: '8px',
-                                height: '40px',
-                                padding: '0 20px',
-                                backgroundColor: isDark ? '#fafafa' : '#18181b',
-                                color: isDark ? '#18181b' : '#fafafa',
-                                border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '14px',
-                                fontWeight: '500',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px'
-                              }}
-                            >
-                              <Plus style={{ width: '16px', height: '16px' }} />
-                              Add First Entry
-                            </button>
-                          )}
                         </div>
                       </td>
                     </tr>
@@ -3306,25 +3283,29 @@ const getInitial = (name) => {
                 <tbody>
                   {filteredEntries.length === 0 ? (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', padding: '40px 16px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '12px' }}>
+                      <td colSpan={5} style={{ textAlign: 'center', padding: '60px 16px' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                           <div style={{
-                            width: '56px',
-                            height: '56px',
+                            width: '80px',
+                            height: '80px',
                             borderRadius: '50%',
                             backgroundColor: isDark ? '#27272a' : '#f4f4f5',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                           }}>
-                            <Receipt style={{ width: '24px', height: '24px', color: theme.textDim }} />
+                            <FileText style={{ width: '36px', height: '36px', color: theme.textDim }} />
                           </div>
                           <div>
-                            <p style={{ fontSize: '14px', fontWeight: '500', color: theme.textMuted, margin: '0 0 4px' }}>
-                              {historySearch ? 'No matching entries' : 'No entries yet'}
+                            <p style={{ fontSize: '16px', fontWeight: '600', color: theme.textMuted, margin: '0 0 6px' }}>
+                              {historySearch || advancedCategory !== 'all' || advancedDateFrom || advancedDateTo 
+                                ? 'No matching entries found' 
+                                : 'No expenses recorded yet'}
                             </p>
-                            <p style={{ fontSize: '12px', color: theme.textDim, margin: 0 }}>
-                              {historySearch ? 'Try a different search term' : 'Add your first expense to get started'}
+                            <p style={{ fontSize: '13px', color: theme.textDim, margin: 0, maxWidth: '300px' }}>
+                              {historySearch || advancedCategory !== 'all' || advancedDateFrom || advancedDateTo 
+                                ? 'Try adjusting your filters or search term' 
+                                : 'Go to Dashboard to add your first expense'}
                             </p>
                           </div>
                         </div>
