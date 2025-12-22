@@ -951,7 +951,13 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     const saved = localStorage.getItem('currency');
     return saved || '₱';
   });
-  
+ const [monthlyBudget, setMonthlyBudget] = useState(() => {
+    const saved = localStorage.getItem('monthlyBudget');
+    return saved ? parseFloat(saved) : 0;
+  });
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [budgetInput, setBudgetInput] = useState(''); 
+
   const theme = getTheme(isDark);
   const { width } = useWindowSize();
   const isMobile = width < 768;
@@ -1011,6 +1017,11 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   useEffect(() => {
     localStorage.setItem('currency', currency);
   }, [currency]);
+// Save budget preference
+  useEffect(() => {
+    localStorage.setItem('monthlyBudget', monthlyBudget.toString());
+  }, [monthlyBudget]);
+
 // Warn before leaving with unsaved changes
   useEffect(() => {
     const hasUnsavedChanges = 
@@ -1270,6 +1281,26 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
 const getInitial = (name) => {
     return name ? name.charAt(0).toUpperCase() : 'U';
   };
+const getBudgetStatus = () => {
+    if (monthlyBudget <= 0) return null;
+    const spent = stats.month;
+    const percentage = (spent / monthlyBudget) * 100;
+    const remaining = monthlyBudget - spent;
+    
+    let status = 'safe';
+    let color = '#10b981';
+    if (percentage >= 100) {
+      status = 'over';
+      color = '#ef4444';
+    } else if (percentage >= 80) {
+      status = 'warning';
+      color = '#f59e0b';
+    }
+    
+    return { spent, percentage: Math.min(percentage, 100), remaining, status, color };
+  };
+
+  const budgetStatus = getBudgetStatus();
 
   const handleSubmitFeedback = async () => {
     if (!feedbackMessage.trim()) return;
@@ -2579,7 +2610,105 @@ const getInitial = (name) => {
               </div>
             </div>
           </div>
+{/* Budget Progress */}
+          {monthlyBudget > 0 && budgetStatus && (
+            <div style={{ 
+              marginBottom: '20px', 
+              padding: '16px', 
+              backgroundColor: budgetStatus.status === 'over' ? (isDark ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2') : budgetStatus.status === 'warning' ? (isDark ? 'rgba(245, 158, 11, 0.1)' : '#fffbeb') : theme.statBg,
+              borderRadius: '8px',
+              border: `1px solid ${budgetStatus.status === 'over' ? '#ef4444' : budgetStatus.status === 'warning' ? '#f59e0b' : 'transparent'}`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Wallet style={{ width: '18px', height: '18px', color: budgetStatus.color }} />
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Monthly Budget</span>
+                </div>
+                <button
+                  onClick={() => { setBudgetInput(monthlyBudget.toString()); setShowBudgetModal(true); }}
+                  style={{ fontSize: '12px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  Edit
+                </button>
+              </div>
+              
+              {/* Progress Bar */}
+              <div style={{ 
+                height: '8px', 
+                backgroundColor: isDark ? '#27272a' : '#e4e4e7', 
+                borderRadius: '4px', 
+                overflow: 'hidden',
+                marginBottom: '12px'
+              }}>
+                <div style={{ 
+                  height: '100%', 
+                  width: `${budgetStatus.percentage}%`, 
+                  backgroundColor: budgetStatus.color,
+                  borderRadius: '4px',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Spent: </span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: budgetStatus.color }}>{currency}{formatAmount(budgetStatus.spent)}</span>
+                  <span style={{ fontSize: '13px', color: theme.textMuted }}> of {currency}{formatAmount(monthlyBudget)}</span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  {budgetStatus.status === 'over' ? (
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#ef4444' }}>
+                      Over by {currency}{formatAmount(Math.abs(budgetStatus.remaining))}
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: '13px', color: theme.textMuted }}>
+                      {currency}{formatAmount(budgetStatus.remaining)} left
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              {budgetStatus.status === 'over' && (
+                <div style={{ marginTop: '12px', padding: '10px 12px', backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertTriangle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>You've exceeded your monthly budget!</span>
+                </div>
+              )}
+              
+              {budgetStatus.status === 'warning' && (
+                <div style={{ marginTop: '12px', padding: '10px 12px', backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertCircle style={{ width: '16px', height: '16px', color: '#f59e0b', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', color: isDark ? '#fcd34d' : '#b45309' }}>You've used {budgetStatus.percentage.toFixed(0)}% of your monthly budget</span>
+                </div>
+              )}
+            </div>
+          )}
 
+          {/* Set Budget Button (if no budget set) */}
+          {monthlyBudget <= 0 && (
+            <button
+              onClick={() => { setBudgetInput(''); setShowBudgetModal(true); }}
+              style={{
+                width: '100%',
+                marginBottom: '20px',
+                padding: '14px 16px',
+                backgroundColor: 'transparent',
+                border: `2px dashed ${theme.inputBorder}`,
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                color: theme.textMuted,
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
+            >
+              <PiggyBank style={{ width: '18px', height: '18px' }} />
+              Set Monthly Budget
+            </button>
+          )}
           {/* Stats Grid */}
           {isSmall ? (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
@@ -3693,6 +3822,143 @@ const getInitial = (name) => {
           </div>
         </div>
       )}
+{/* Budget Modal */}
+      {showBudgetModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowBudgetModal(false)}>
+          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <PiggyBank style={{ width: '22px', height: '22px', color: '#3b82f6' }} />
+                Monthly Budget
+              </h3>
+              <button onClick={() => setShowBudgetModal(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
+            
+            <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 20px' }}>
+              Set a monthly spending limit to help track your expenses. You'll see warnings when approaching or exceeding your budget.
+            </p>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '8px' }}>
+                Budget Amount ({currency})
+              </label>
+              <div style={{ position: 'relative' }}>
+                <span style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', fontSize: '16px', color: theme.textMuted }}>{currency}</span>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={budgetInput}
+                  onChange={(e) => setBudgetInput(e.target.value)}
+                  style={{ 
+                    width: '100%', 
+                    height: '48px', 
+                    backgroundColor: theme.inputBg, 
+                    border: `1px solid ${theme.inputBorder}`, 
+                    borderRadius: '8px', 
+                    padding: '0 14px 0 36px', 
+                    fontSize: '18px', 
+                    fontWeight: '500',
+                    color: theme.text, 
+                    outline: 'none', 
+                    boxSizing: 'border-box' 
+                  }}
+                />
+              </div>
+            </div>
+            
+            {monthlyBudget > 0 && (
+              <div style={{ 
+                padding: '12px', 
+                backgroundColor: theme.statBg, 
+                borderRadius: '8px', 
+                marginBottom: '20px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <span style={{ fontSize: '13px', color: theme.textMuted }}>Current budget:</span>
+                <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(monthlyBudget)}</span>
+              </div>
+            )}
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              {monthlyBudget > 0 && (
+                <button
+                  onClick={() => {
+                    setMonthlyBudget(0);
+                    setShowBudgetModal(false);
+                    showToast('Budget removed', 'success');
+                  }}
+                  style={{ 
+                    height: '44px', 
+                    padding: '0 16px',
+                    backgroundColor: 'transparent', 
+                    border: `1px solid #ef4444`, 
+                    borderRadius: '8px', 
+                    fontSize: '14px', 
+                    fontWeight: '500', 
+                    color: '#ef4444', 
+                    cursor: 'pointer'
+                  }}
+                >
+                  Remove
+                </button>
+              )}
+              <button
+                onClick={() => setShowBudgetModal(false)}
+                style={{ 
+                  flex: monthlyBudget > 0 ? 'none' : 1,
+                  height: '44px', 
+                  padding: '0 16px',
+                  backgroundColor: 'transparent', 
+                  border: `1px solid ${theme.inputBorder}`, 
+                  borderRadius: '8px', 
+                  fontSize: '14px', 
+                  fontWeight: '500', 
+                  color: theme.text, 
+                  cursor: 'pointer' 
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const amount = parseFloat(budgetInput);
+                  if (amount > 0) {
+                    setMonthlyBudget(amount);
+                    setShowBudgetModal(false);
+                    showToast('Monthly budget set successfully', 'success');
+                  } else {
+                    showToast('Please enter a valid amount', 'error');
+                  }
+                }}
+                style={{ 
+                  flex: 1,
+                  height: '44px', 
+                  backgroundColor: isDark ? '#fafafa' : '#18181b', 
+                  color: isDark ? '#18181b' : '#fafafa', 
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  fontSize: '14px', 
+                  fontWeight: '500', 
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Check style={{ width: '16px', height: '16px' }} />
+                Save Budget
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
  {/* Toast Notification */}
       {toast && (
         <div style={{
