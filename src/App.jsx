@@ -1283,9 +1283,18 @@ const getInitial = (name) => {
   };
 const getBudgetStatus = () => {
     if (monthlyBudget <= 0) return null;
-    const spent = stats.month;
-    const percentage = (spent / monthlyBudget) * 100;
-    const remaining = monthlyBudget - spent;
+    
+    // Calculate month spending directly to avoid dependency on stats
+    const now = new Date();
+    const monthSpent = entries
+      .filter(e => {
+        const d = new Date(e.date);
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      })
+      .reduce((sum, e) => sum + e.amount, 0);
+    
+    const percentage = (monthSpent / monthlyBudget) * 100;
+    const remaining = monthlyBudget - monthSpent;
     
     let status = 'safe';
     let color = '#10b981';
@@ -1297,10 +1306,8 @@ const getBudgetStatus = () => {
       color = '#f59e0b';
     }
     
-    return { spent, percentage: Math.min(percentage, 100), remaining, status, color };
+    return { spent: monthSpent, percentage: Math.min(percentage, 100), remaining, status, color };
   };
-
-  const budgetStatus = getBudgetStatus();
 
   const handleSubmitFeedback = async () => {
     if (!feedbackMessage.trim()) return;
