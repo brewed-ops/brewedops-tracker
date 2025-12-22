@@ -967,7 +967,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [uploadMode, setUploadMode] = useState('file');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  const [manualForm, setManualForm] = useState({ name: '', amount: '', date: '', dueDate: '' });
+  const [manualForm, setManualForm] = useState({ name: '', amount: '', date: '', dueDate: '', notes: '' });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [pendingUpload, setPendingUpload] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -1070,6 +1070,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
           amount: parseFloat(expense.amount),
           date: expense.date,
           dueDate: expense.due_date,
+          notes: expense.notes || '',
           file: expense.file_name ? {
             name: expense.file_name,
             type: expense.file_type,
@@ -1100,6 +1101,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     category: newEntry.type,
     date: newEntry.date,
     due_date: newEntry.dueDate || null,
+    notes: newEntry.notes || null,
     file_name: newEntry.file?.name || null,
     file_type: newEntry.file?.type || null,
     file_data: newEntry.file?.data || null
@@ -1116,6 +1118,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         amount: parseFloat(data.amount),
         date: data.date,
         dueDate: data.due_date,
+        notes: data.notes || '',
         file: newEntry.file
       };
       
@@ -1265,12 +1268,13 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       name: manualForm.name,
       amount: parseFloat(manualForm.amount) || 0,
       date: manualForm.date || new Date().toISOString().split('T')[0],
-      dueDate: manualForm.dueDate || ''
+      dueDate: manualForm.dueDate || '',
+      notes: manualForm.notes || ''
     };
     try {
       await saveEntry(newEntry);
       setSelectedCategory('');
-      setManualForm({ name: '', amount: '', date: '', dueDate: '' });
+      setManualForm({ name: '', amount: '', date: '', dueDate: '', notes: '' });
       showToast('Entry added successfully', 'success');
     } catch (e) {
       showToast('Failed to save entry', 'error');
@@ -1353,7 +1357,8 @@ const getBudgetStatus = () => {
           amount: parseFloat(editingEntry.amount),
           category: editingEntry.type,
           date: editingEntry.date,
-          due_date: editingEntry.dueDate || null
+          due_date: editingEntry.dueDate || null,
+          notes: editingEntry.notes || null
         })
         .eq('id', editingEntry.id);
 
@@ -1361,7 +1366,7 @@ const getBudgetStatus = () => {
 
       setEntries(prev => prev.map(e => 
         e.id === editingEntry.id 
-          ? { ...e, name: editingEntry.name, amount: parseFloat(editingEntry.amount), type: editingEntry.type, date: editingEntry.date, dueDate: editingEntry.dueDate }
+          ? { ...e, name: editingEntry.name, amount: parseFloat(editingEntry.amount), type: editingEntry.type, date: editingEntry.date, dueDate: editingEntry.dueDate, notes: editingEntry.notes }
           : e
       ));
       setEditingEntry(null);
@@ -2284,11 +2289,21 @@ const getBudgetStatus = () => {
                     <input type="date" value={manualForm.dueDate} onChange={(e) => setManualForm({ ...manualForm, dueDate: e.target.value })} style={inputStyle} />
                   </div>
                 </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Notes (optional)</label>
+                  <input 
+                    type="text" 
+                    placeholder="Add a memo or note..." 
+                    value={manualForm.notes} 
+                    onChange={(e) => setManualForm({ ...manualForm, notes: e.target.value })} 
+                    style={inputStyle} 
+                  />
+                </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  {(manualForm.name || manualForm.amount || manualForm.date || manualForm.dueDate || selectedCategory) && (
+                  {(manualForm.name || manualForm.amount || manualForm.date || manualForm.dueDate || manualForm.notes || selectedCategory) && (
                     <button 
                       onClick={() => {
-                        setManualForm({ name: '', amount: '', date: '', dueDate: '' });
+                        setManualForm({ name: '', amount: '', date: '', dueDate: '', notes: '' });
                         setSelectedCategory('');
                       }} 
                       style={{ 
@@ -3697,6 +3712,17 @@ const getBudgetStatus = () => {
                     style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
                   />
                 </div>
+              </div>
+              
+              <div>
+                <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Notes (optional)</label>
+                <input
+                  type="text"
+                  placeholder="Add a memo or note..."
+                  value={editingEntry.notes || ''}
+                  onChange={(e) => setEditingEntry({...editingEntry, notes: e.target.value})}
+                  style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+                />
               </div>
             </div>
             
