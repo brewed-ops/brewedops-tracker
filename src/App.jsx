@@ -1292,6 +1292,8 @@ const getInitial = (name) => {
 const getBudgetStatus = () => {
     if (monthlyBudget <= 0) return null;
     
+
+    
     // Calculate month spending directly to avoid dependency on stats
     const now = new Date();
     const monthSpent = entries
@@ -1316,6 +1318,89 @@ const getBudgetStatus = () => {
     
     return { spent: monthSpent, percentage: Math.min(percentage, 100), remaining, status, color };
   };
+// Get all recurring/subscription entries
+  const getRecurringEntries = () => {
+    return entries.filter(e => e.recurring);
+  };
+
+  // Calculate next due date based on recurring type and last date
+  const getNextDueDate = (entry) => {
+    if (!entry.recurring) return null;
+    
+    const lastDate = new Date(entry.dueDate || entry.date);
+    const today = new Date();
+    let nextDate = new Date(lastDate);
+    
+    // Keep adding intervals until we get a future date
+    while (nextDate <= today) {
+      if (entry.recurring === 'weekly') {
+        nextDate.setDate(nextDate.getDate() + 7);
+      } else if (entry.recurring === 'monthly') {
+        nextDate.setMonth(nextDate.getMonth() + 1);
+      } else if (entry.recurring === 'yearly') {
+        nextDate.setFullYear(nextDate.getFullYear() + 1);
+      }
+    }
+    
+    return nextDate;
+  };
+
+  // Get days until next due
+  const getDaysUntilDue = (entry) => {
+    const nextDue = getNextDueDate(entry);
+    if (!nextDue) return null;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    nextDue.setHours(0, 0, 0, 0);
+    
+    const diffTime = nextDue - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // Get bills sorted by upcoming due date
+  const getUpcomingBills = () => {
+    const recurring = getRecurringEntries();
+    return recurring
+      .map(entry => ({
+        ...entry,
+        nextDueDate: getNextDueDate(entry),
+        daysUntil: getDaysUntilDue(entry)
+      }))
+      .sort((a, b) => a.daysUntil - b.daysUntil);
+  };
+
+  // Calculate total monthly recurring cost
+  const getMonthlyRecurringCost = () => {
+    const recurring = getRecurringEntries();
+    return recurring.reduce((total, entry) => {
+      if (entry.recurring === 'weekly') {
+        return total + (entry.amount * 4.33); // Average weeks per month
+      } else if (entry.recurring === 'monthly') {
+        return total + entry.amount;
+      } else if (entry.recurring === 'yearly') {
+        return total + (entry.amount / 12);
+      }
+      return total;
+    }, 0);
+  };
+
+  // Calculate total yearly recurring cost
+  const getYearlyRecurringCost = () => {
+    const recurring = getRecurringEntries();
+    return recurring.reduce((total, entry) => {
+      if (entry.recurring === 'weekly') {
+        return total + (entry.amount * 52);
+      } else if (entry.recurring === 'monthly') {
+        return total + (entry.amount * 12);
+      } else if (entry.recurring === 'yearly') {
+        return total + entry.amount;
+      }
+      return total;
+    }, 0);
+  };
+
 
   const handleSubmitFeedback = async () => {
     if (!feedbackMessage.trim()) return;
@@ -2077,6 +2162,40 @@ const getBudgetStatus = () => {
                 textAlign: 'center'
               }}>
                 {entries.length}
+              </span>
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('bills')}
+            style={{
+              padding: '12px 16px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'bills' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: activeTab === 'bills' ? theme.text : theme.textMuted,
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <CreditCard style={{ width: '15px', height: '15px' }} />
+            Bills
+            {entries.filter(e => e.recurring).length > 0 && (
+              <span style={{
+                backgroundColor: activeTab === 'bills' ? (isDark ? '#8b5cf6' : '#7c3aed') : (isDark ? '#3f3f46' : '#e4e4e7'),
+                color: activeTab === 'bills' ? '#fff' : theme.textMuted,
+                fontSize: '11px',
+                fontWeight: '600',
+                padding: '2px 7px',
+                borderRadius: '10px',
+                minWidth: '20px',
+                textAlign: 'center'
+              }}>
+                {entries.filter(e => e.recurring).length}
               </span>
             )}
           </button>
@@ -3316,7 +3435,7 @@ const getBudgetStatus = () => {
               );
             })()}
           </>
-        ) : (
+        ) : activeTab === 'entries' ? (
           /* All Entries Tab */
           <div style={cardStyle}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '12px' }}>
@@ -3608,7 +3727,7 @@ const getBudgetStatus = () => {
               </table>
             </div>
 
-            {/* Summary Footer */}
+           {/* Summary Footer */}
             <div style={{ 
               marginTop: '16px', 
               paddingTop: '16px', 
@@ -3627,7 +3746,380 @@ const getBudgetStatus = () => {
               </span>
             </div>
           </div>
-        )}
+        ) : activeTab === 'bills' ? (
+          /* Bills & Subscriptions Tab */
+          <>
+            {/* Bills Header Stats */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', 
+              gap: '16px', 
+              marginBottom: '24px' 
+            }}>
+              {/* Active Subscriptions */}
+              <div style={{
+                ...cardStyle,
+                background: isDark 
+                  ? 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)' 
+                  : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                border: 'none'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Active Bills</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CreditCard style={{ width: '18px', height: '18px', color: '#fff' }} />
+                  </div>
+                </div>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{getRecurringEntries().length}</p>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Recurring expenses</span>
+              </div>
+
+              {/* Monthly Cost */}
+              <div style={{
+                ...cardStyle,
+                background: isDark 
+                  ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' 
+                  : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                border: 'none'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Monthly Cost</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Wallet style={{ width: '18px', height: '18px', color: '#fff' }} />
+                  </div>
+                </div>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(getMonthlyRecurringCost())}</p>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Estimated monthly</span>
+              </div>
+
+              {/* Yearly Cost */}
+              <div style={{
+                ...cardStyle,
+                background: isDark 
+                  ? 'linear-gradient(135deg, #059669 0%, #047857 100%)' 
+                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                border: 'none'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Yearly Cost</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <TrendingUp style={{ width: '18px', height: '18px', color: '#fff' }} />
+                  </div>
+                </div>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(getYearlyRecurringCost())}</p>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Estimated yearly</span>
+              </div>
+
+              {/* Due Soon */}
+              <div style={{
+                ...cardStyle,
+                background: isDark 
+                  ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' 
+                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                border: 'none'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Due This Week</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Bell style={{ width: '18px', height: '18px', color: '#fff' }} />
+                  </div>
+                </div>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{getUpcomingBills().filter(b => b.daysUntil <= 7).length}</p>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Upcoming payments</span>
+              </div>
+            </div>
+
+            {/* Upcoming Bills */}
+            <div style={cardStyle}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                <div>
+                  <h2 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Upcoming Bills</h2>
+                  <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>Your next payments sorted by due date</p>
+                </div>
+                <button
+                  onClick={() => { setActiveTab('dashboard'); setUploadMode('manual'); }}
+                  style={{
+                    height: '36px',
+                    padding: '0 14px',
+                    backgroundColor: isDark ? '#fafafa' : '#18181b',
+                    color: isDark ? '#18181b' : '#fafafa',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Plus style={{ width: '14px', height: '14px' }} />
+                  Add Bill
+                </button>
+              </div>
+
+              {getUpcomingBills().length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+                  <div style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '50%',
+                    backgroundColor: isDark ? '#27272a' : '#f4f4f5',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 16px'
+                  }}>
+                    <CreditCard style={{ width: '36px', height: '36px', color: theme.textDim }} />
+                  </div>
+                  <p style={{ fontSize: '16px', fontWeight: '600', color: theme.textMuted, margin: '0 0 8px' }}>No recurring bills yet</p>
+                  <p style={{ fontSize: '13px', color: theme.textDim, margin: '0 0 20px' }}>Add expenses with "Recurring" option to track them here</p>
+                  <button
+                    onClick={() => { setActiveTab('dashboard'); setUploadMode('manual'); }}
+                    style={{
+                      height: '40px',
+                      padding: '0 20px',
+                      backgroundColor: isDark ? '#fafafa' : '#18181b',
+                      color: isDark ? '#18181b' : '#fafafa',
+                      border: 'none',
+                      borderRadius: '8px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}
+                  >
+                    <Plus style={{ width: '16px', height: '16px' }} />
+                    Add Your First Bill
+                  </button>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  {getUpcomingBills().map((bill) => {
+                    const badge = getBadgeStyle(bill.type, isDark);
+                    const isUrgent = bill.daysUntil <= 3;
+                    const isDueSoon = bill.daysUntil <= 7;
+                    
+                    return (
+                      <div 
+                        key={bill.id}
+                        onClick={() => setEditingEntry({...bill, amount: bill.amount.toString()})}
+                        style={{
+                          padding: '16px',
+                          backgroundColor: isUrgent ? (isDark ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2') : isDueSoon ? (isDark ? 'rgba(245, 158, 11, 0.1)' : '#fffbeb') : theme.statBg,
+                          borderRadius: '12px',
+                          border: `1px solid ${isUrgent ? '#ef4444' : isDueSoon ? '#f59e0b' : 'transparent'}`,
+                          cursor: 'pointer',
+                          transition: 'transform 0.15s, box-shadow 0.15s'
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.transform = 'translateY(-2px)';
+                          e.currentTarget.style.boxShadow = isDark ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.08)';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.transform = 'translateY(0)';
+                          e.currentTarget.style.boxShadow = 'none';
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                          <div style={{
+                            width: '48px',
+                            height: '48px',
+                            borderRadius: '12px',
+                            backgroundColor: badge.bg,
+                            border: `1px solid ${badge.border}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0
+                          }}>
+                            <span style={{ fontSize: '20px' }}>
+                              {bill.type === 'utilities' && '⚡'}
+                              {bill.type === 'subscription' && '📱'}
+                              {bill.type === 'food' && '🍔'}
+                              {bill.type === 'shopping' && '🛍️'}
+                              {bill.type === 'healthcare' && '💊'}
+                              {bill.type === 'entertainment' && '🎬'}
+                              {bill.type === 'other' && '📦'}
+                            </span>
+                          </div>
+
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                              <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                {bill.name}
+                              </p>
+                              <span style={{ 
+                                fontSize: '10px', 
+                                fontWeight: '600', 
+                                padding: '3px 8px', 
+                                borderRadius: '4px', 
+                                backgroundColor: isDark ? '#1e3a5f' : '#dbeafe', 
+                                color: isDark ? '#60a5fa' : '#1d4ed8',
+                                textTransform: 'capitalize',
+                                flexShrink: 0
+                              }}>
+                                {bill.recurring}
+                              </span>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                              <span style={{ fontSize: '12px', color: theme.textMuted, textTransform: 'capitalize' }}>
+                                {CATEGORIES.find(c => c.value === bill.type)?.label}
+                              </span>
+                              <span style={{ fontSize: '12px', color: theme.textDim }}>•</span>
+                              <span style={{ fontSize: '12px', color: isUrgent ? '#ef4444' : isDueSoon ? '#f59e0b' : theme.textMuted, fontWeight: isUrgent || isDueSoon ? '600' : '400' }}>
+                                {bill.daysUntil === 0 ? 'Due today!' : bill.daysUntil === 1 ? 'Due tomorrow' : `Due in ${bill.daysUntil} days`}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                            <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: '0 0 4px' }}>
+                              {currency}{formatAmount(bill.amount)}
+                            </p>
+                            <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>
+                              {bill.nextDueDate?.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </p>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setEditingEntry({...bill, amount: bill.amount.toString()}); }}
+                              style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                              <Edit style={{ width: '14px', height: '14px' }} />
+                            </button>
+                            <button 
+                              onClick={(e) => { e.stopPropagation(); setDeletingEntry(bill); }}
+                              style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                            >
+                              <Trash2 style={{ width: '14px', height: '14px' }} />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Bills by Category */}
+            {getRecurringEntries().length > 0 && (
+              <div style={{ ...cardStyle, marginTop: '24px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 20px' }}>Bills by Category</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '16px' }}>
+                  {CATEGORIES.map(category => {
+                    const categoryBills = getRecurringEntries().filter(e => e.type === category.value);
+                    if (categoryBills.length === 0) return null;
+                    
+                    const monthlyTotal = categoryBills.reduce((total, entry) => {
+                      if (entry.recurring === 'weekly') return total + (entry.amount * 4.33);
+                      if (entry.recurring === 'monthly') return total + entry.amount;
+                      if (entry.recurring === 'yearly') return total + (entry.amount / 12);
+                      return total;
+                    }, 0);
+
+                    return (
+                      <div key={category.value} style={{
+                        padding: '16px',
+                        backgroundColor: theme.statBg,
+                        borderRadius: '10px',
+                        borderLeft: `4px solid ${category.color}`
+                      }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                          <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>{category.label}</span>
+                          <span style={{ 
+                            fontSize: '11px', 
+                            padding: '3px 8px', 
+                            borderRadius: '10px', 
+                            backgroundColor: isDark ? '#27272a' : '#e4e4e7',
+                            color: theme.textMuted
+                          }}>
+                            {categoryBills.length} bill{categoryBills.length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
+                        <p style={{ fontSize: '20px', fontWeight: '700', color: category.color, margin: '0 0 4px' }}>
+                          {currency}{formatAmount(monthlyTotal)}
+                        </p>
+                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>per month</p>
+                        
+                        <div style={{ marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${theme.cardBorder}` }}>
+                          {categoryBills.slice(0, 3).map(bill => (
+                            <div key={bill.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                              <span style={{ fontSize: '12px', color: theme.textMuted, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60%' }}>{bill.name}</span>
+                              <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(bill.amount)}</span>
+                            </div>
+                          ))}
+                          {categoryBills.length > 3 && (
+                            <p style={{ fontSize: '11px', color: theme.textDim, margin: '4px 0 0' }}>+{categoryBills.length - 3} more</p>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Monthly Breakdown Chart */}
+            {getRecurringEntries().length > 0 && (
+              <div style={{ ...cardStyle, marginTop: '24px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 20px' }}>Recurring Cost Breakdown</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px' }}>
+                  <div>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <PieChart>
+                        <Pie 
+                          data={CATEGORIES.map(cat => {
+                            const bills = getRecurringEntries().filter(e => e.type === cat.value);
+                            const monthlyTotal = bills.reduce((total, entry) => {
+                              if (entry.recurring === 'weekly') return total + (entry.amount * 4.33);
+                              if (entry.recurring === 'monthly') return total + entry.amount;
+                              if (entry.recurring === 'yearly') return total + (entry.amount / 12);
+                              return total;
+                            }, 0);
+                            return { name: cat.label, value: monthlyTotal, color: cat.color };
+                          }).filter(c => c.value > 0)}
+                          cx="50%" 
+                          cy="50%" 
+                          innerRadius={50} 
+                          outerRadius={80} 
+                          paddingAngle={3} 
+                          dataKey="value"
+                        >
+                          {CATEGORIES.map(cat => {
+                            const bills = getRecurringEntries().filter(e => e.type === cat.value);
+                            if (bills.length === 0) return null;
+                            return <Cell key={cat.value} fill={cat.color} />;
+                          })}
+                        </Pie>
+                        <Tooltip formatter={(v) => `${currency}${formatAmount(v)}/mo`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px' }}>
+                    <div style={{ padding: '16px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 4px' }}>Daily average</p>
+                      <p style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: 0 }}>
+                        {currency}{formatAmount(getMonthlyRecurringCost() / 30)}
+                      </p>
+                    </div>
+                    <div style={{ padding: '16px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 4px' }}>% of monthly budget</p>
+                      <p style={{ fontSize: '24px', fontWeight: '700', color: monthlyBudget > 0 && (getMonthlyRecurringCost() / monthlyBudget * 100) > 80 ? '#ef4444' : theme.text, margin: 0 }}>
+                        {monthlyBudget > 0 ? `${(getMonthlyRecurringCost() / monthlyBudget * 100).toFixed(1)}%` : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
+        ) : null}
       </main>
         {/* Edit Profile Modal */}
       {showEditProfile && (
