@@ -2243,9 +2243,37 @@ const getInitial = (name) => {
                     <input type="date" value={manualForm.dueDate} onChange={(e) => setManualForm({ ...manualForm, dueDate: e.target.value })} style={inputStyle} />
                   </div>
                 </div>
-                <button onClick={handleManualSubmit} disabled={!selectedCategory || isSaving} style={{ height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: (!selectedCategory || isSaving) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: (!selectedCategory || isSaving) ? 0.5 : 1 }}>
-                  {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Plus style={{ width: '16px', height: '16px' }} /> Add Entry</>}
-                </button>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {(manualForm.name || manualForm.amount || manualForm.date || manualForm.dueDate || selectedCategory) && (
+                    <button 
+                      onClick={() => {
+                        setManualForm({ name: '', amount: '', date: '', dueDate: '' });
+                        setSelectedCategory('');
+                      }} 
+                      style={{ 
+                        height: '44px', 
+                        padding: '0 16px',
+                        backgroundColor: 'transparent', 
+                        border: `1px solid ${theme.inputBorder}`, 
+                        borderRadius: '6px', 
+                        fontSize: '14px', 
+                        fontWeight: '500', 
+                        color: theme.textMuted,
+                        cursor: 'pointer', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center', 
+                        gap: '6px'
+                      }}
+                    >
+                      <X style={{ width: '14px', height: '14px' }} />
+                      Clear
+                    </button>
+                  )}
+                  <button onClick={handleManualSubmit} disabled={!selectedCategory || isSaving} style={{ flex: 1, height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: (!selectedCategory || isSaving) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: (!selectedCategory || isSaving) ? 0.5 : 1 }}>
+                    {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Plus style={{ width: '16px', height: '16px' }} /> Add Entry</>}
+                  </button>
+                </div>
               </div>
             )}
           </div>
