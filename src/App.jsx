@@ -2435,7 +2435,14 @@ const getBudgetStatus = () => {
                             </span>
                           </td>
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle', maxWidth: '200px' }}>
-                            <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</p>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</p>
+                              {entry.notes && (
+                                <span title={entry.notes} style={{ flexShrink: 0, cursor: 'help' }}>
+                                  <MessageSquare style={{ width: '12px', height: '12px', color: theme.textMuted }} />
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right' }}>
                             <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(entry.amount)}</span>
@@ -2554,9 +2561,16 @@ const getBudgetStatus = () => {
                       </span>
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
-                      <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {entry.name}
-                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {entry.name}
+                        </p>
+                        {entry.notes && (
+                          <span title={entry.notes} style={{ flexShrink: 0, cursor: 'help' }}>
+                            <MessageSquare style={{ width: '12px', height: '12px', color: theme.textMuted }} />
+                          </span>
+                        )}
+                      </div>
                       <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>
                         {categoryInfo?.label} • {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </p>
@@ -3502,7 +3516,14 @@ const getBudgetStatus = () => {
                             </span>
                           </td>
                           <td style={{ padding: '12px 8px', fontSize: '14px', fontWeight: '500', color: theme.text, maxWidth: '250px' }}>
-                            <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</span>
+                              {entry.notes && (
+                                <span title={entry.notes} style={{ flexShrink: 0, cursor: 'help' }}>
+                                  <MessageSquare style={{ width: '13px', height: '13px', color: theme.textMuted }} />
+                                </span>
+                              )}
+                            </div>
                           </td>
                           <td style={{ padding: '12px 8px', fontSize: '14px', fontWeight: '600', color: theme.text, textAlign: 'right' }}>
                             {currency}{formatAmount(entry.amount)}
