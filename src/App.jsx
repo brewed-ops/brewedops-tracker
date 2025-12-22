@@ -1297,7 +1297,7 @@ const getBudgetStatus = () => {
     const remaining = monthlyBudget - monthSpent;
     
     let status = 'safe';
-    let color = '#10b981';
+    let color = '#2b5547ff';
     if (percentage >= 100) {
       status = 'over';
       color = '#ef4444';
@@ -1607,6 +1607,9 @@ const getBudgetStatus = () => {
   const categoryData = getCategoryData();
   const monthlyData = getMonthlyData();
   const filteredEntries = getFilteredEntries();
+  const budgetStatus = getBudgetStatus();
+  
+  
 
   if (loading) {
     return (
