@@ -2398,6 +2398,107 @@ const getInitial = (name) => {
           </div>
         </div>
 
+{/* Recent Entries Quick View */}
+        {entries.length > 0 && (
+          <div style={{ ...cardStyle, marginBottom: isSmall ? '12px' : '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Receipt style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                Recent Entries
+              </h2>
+              <button
+                onClick={() => setActiveTab('entries')}
+                style={{
+                  fontSize: '13px',
+                  color: '#3b82f6',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px'
+                }}
+              >
+                View All
+                <ChevronDown style={{ width: '14px', height: '14px', transform: 'rotate(-90deg)' }} />
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {entries.slice(0, 3).map(entry => {
+                const badge = getBadgeStyle(entry.type, isDark);
+                const categoryInfo = CATEGORIES.find(c => c.value === entry.type);
+                return (
+                  <div 
+                    key={entry.id}
+                    onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px',
+                      backgroundColor: theme.statBg,
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'transform 0.15s, box-shadow 0.15s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = isDark ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.08)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      backgroundColor: badge.bg,
+                      border: `1px solid ${badge.border}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
+                      <span style={{ fontSize: '16px' }}>
+                        {entry.type === 'utilities' && '⚡'}
+                        {entry.type === 'subscription' && '📱'}
+                        {entry.type === 'food' && '🍔'}
+                        {entry.type === 'shopping' && '🛍️'}
+                        {entry.type === 'healthcare' && '💊'}
+                        {entry.type === 'entertainment' && '🎬'}
+                        {entry.type === 'other' && '📦'}
+                      </span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {entry.name}
+                      </p>
+                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>
+                        {categoryInfo?.label} • {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
+                        {currency}{formatAmount(entry.amount)}
+                      </p>
+                      {entry.file && (
+                        <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0', display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
+                          <FileText style={{ width: '10px', height: '10px' }} />
+                          Receipt
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Dashboard Section */}
+
         {/* Dashboard Section */}
         <div style={cardStyle}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
