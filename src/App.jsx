@@ -1923,7 +1923,10 @@ const getInitial = (name) => {
               fontWeight: '500',
               color: activeTab === 'dashboard' ? theme.text : theme.textMuted,
               cursor: 'pointer',
-              transition: 'color 0.2s'
+              transition: 'color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
             Dashboard
@@ -1939,7 +1942,10 @@ const getInitial = (name) => {
               fontWeight: '500',
               color: activeTab === 'analytics' ? theme.text : theme.textMuted,
               cursor: 'pointer',
-              transition: 'color 0.2s'
+              transition: 'color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
             Analytics
@@ -1955,10 +1961,27 @@ const getInitial = (name) => {
               fontWeight: '500',
               color: activeTab === 'entries' ? theme.text : theme.textMuted,
               cursor: 'pointer',
-              transition: 'color 0.2s'
+              transition: 'color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
             }}
           >
             All Entries
+            {entries.length > 0 && (
+              <span style={{
+                backgroundColor: activeTab === 'entries' ? (isDark ? '#3b82f6' : '#2563eb') : (isDark ? '#3f3f46' : '#e4e4e7'),
+                color: activeTab === 'entries' ? '#fff' : theme.textMuted,
+                fontSize: '11px',
+                fontWeight: '600',
+                padding: '2px 7px',
+                borderRadius: '10px',
+                minWidth: '20px',
+                textAlign: 'center'
+              }}>
+                {entries.length}
+              </span>
+            )}
           </button>
         </div>
       </div>
