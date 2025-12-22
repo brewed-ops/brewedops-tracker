@@ -1011,6 +1011,30 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   useEffect(() => {
     localStorage.setItem('currency', currency);
   }, [currency]);
+// Warn before leaving with unsaved changes
+  useEffect(() => {
+    const hasUnsavedChanges = 
+      pendingUpload !== null || 
+      manualForm.name.trim() !== '' || 
+      manualForm.amount !== '' ||
+      uploadedFile !== null;
+
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    if (hasUnsavedChanges) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [pendingUpload, manualForm.name, manualForm.amount, uploadedFile]);
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type });
