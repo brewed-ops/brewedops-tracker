@@ -2271,7 +2271,17 @@ const getInitial = (name) => {
                     filteredEntries.map(entry => {
                       const badge = getBadgeStyle(entry.type, isDark);
                       return (
-                        <tr key={entry.id} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                        <tr 
+                          key={entry.id} 
+                          onDoubleClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})}
+                          style={{ 
+                            borderBottom: `1px solid ${theme.cardBorder}`,
+                            cursor: 'pointer',
+                            transition: 'background-color 0.15s'
+                          }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#1f1f23' : '#fafafa'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                        >
                           <td style={{ padding: '10px 8px 10px 0', verticalAlign: 'middle' }}>
                             <span style={{
                               display: 'inline-flex',
