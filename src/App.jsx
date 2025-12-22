@@ -1619,6 +1619,28 @@ const getInitial = (name) => {
           {/* Desktop Header Actions */}
           {!isMobile ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              {/* Today's Spending Quick Stat */}
+              {entries.length > 0 && (
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  backgroundColor: theme.statBg,
+                  borderRadius: '6px',
+                  marginRight: '4px'
+                }}>
+                  <span style={{ fontSize: '12px', color: theme.textMuted }}>Today:</span>
+                  <span style={{ 
+                    fontSize: '13px', 
+                    fontWeight: '600', 
+                    color: stats.today > 0 ? '#10b981' : theme.textMuted 
+                  }}>
+                    {currency}{formatAmount(stats.today)}
+                  </span>
+                </div>
+              )}
+              
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
