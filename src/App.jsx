@@ -2381,10 +2381,6 @@ const getBudgetStatus = () => {
                 <FileText style={{ width: '14px', height: '14px' }} />
                 {isSmall ? 'Manual' : 'Manual Input'}
               </button>
-              <button onClick={() => { setUploadMode('csv'); setUploadError(''); }} style={buttonStyle(uploadMode === 'csv')}>
-                <Download style={{ width: '14px', height: '14px', transform: 'rotate(180deg)' }} />
-                {isSmall ? 'CSV' : 'Import CSV'}
-              </button>
             </div>
 
             {/* Category Select - Custom Dropdown */}
@@ -2548,7 +2544,7 @@ const getBudgetStatus = () => {
                   </label>
                 )}
               </div>
-            ) : (
+            ) : uploadMode === 'manual' ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ flex: 1 }} />
                 <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : '1fr 1fr', gap: '12px' }}>
@@ -2627,107 +2623,6 @@ const getBudgetStatus = () => {
                     {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Plus style={{ width: '16px', height: '16px' }} /> Add Entry</>}
                   </button>
                 </div>
-              </div>
-            ) : uploadMode === 'csv' ? (
-              /* CSV Import Section */
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                {csvPreview ? (
-                  <div style={{
-                    border: `1px solid ${isDark ? '#065f46' : '#86efac'}`,
-                    backgroundColor: isDark ? '#022c22' : '#f0fdf4',
-                    borderRadius: '8px',
-                    padding: isSmall ? '12px' : '16px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }} />
-                      <span style={{ fontSize: '12px', fontWeight: '500', color: isDark ? '#34d399' : '#047857' }}>
-                        {csvPreview.length} entries ready to import
-                      </span>
-                    </div>
-                    
-                    {/* Preview Table */}
-                    <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '12px', borderRadius: '6px', border: `1px solid ${theme.cardBorder}` }}>
-                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
-                        <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg }}>
-                          <tr>
-                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Name</th>
-                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Category</th>
-                            <th style={{ padding: '8px', textAlign: 'right', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {csvPreview.slice(0, 5).map((entry, i) => (
-                            <tr key={i} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
-                              <td style={{ padding: '8px', color: theme.text }}>{entry.name}</td>
-                              <td style={{ padding: '8px', color: theme.textMuted, textTransform: 'capitalize' }}>{entry.type}</td>
-                              <td style={{ padding: '8px', textAlign: 'right', color: theme.text }}>{currency}{formatAmount(entry.amount)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      {csvPreview.length > 5 && (
-                        <p style={{ padding: '8px', fontSize: '11px', color: theme.textMuted, margin: 0, textAlign: 'center', backgroundColor: theme.statBg }}>
-                          +{csvPreview.length - 5} more entries...
-                        </p>
-                      )}
-                    </div>
-                    
-                    <div style={{ display: 'flex', gap: '8px', flexDirection: isSmall ? 'column' : 'row' }}>
-                      <button 
-                        onClick={handleCsvImport} 
-                        disabled={isSaving}
-                        style={{ flex: 1, height: '40px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
-                      >
-                        {isSaving ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Importing...</> : <><Check style={{ width: '14px', height: '14px' }} /> Import All</>}
-                      </button>
-                      <button 
-                        onClick={() => setCsvPreview(null)} 
-                        style={{ height: '40px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', padding: '0 12px', fontSize: '13px', color: theme.textMuted, cursor: 'pointer' }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <label style={{
-                      display: 'block',
-                      border: '2px dashed',
-                      borderColor: theme.inputBorder,
-                      borderRadius: '8px',
-                      padding: isSmall ? '30px 16px' : '40px 20px',
-                      textAlign: 'center',
-                      cursor: 'pointer'
-                    }}>
-                      <Download style={{ width: '28px', height: '28px', color: theme.textDim, margin: '0 auto 8px', transform: 'rotate(180deg)' }} />
-                      <p style={{ fontSize: '14px', color: theme.textMuted, fontWeight: '500', margin: '0 0 4px' }}>
-                        Click to upload CSV
-                      </p>
-                      <p style={{ fontSize: '12px', color: theme.textDim, margin: 0 }}>CSV file with headers</p>
-                      <input type="file" accept=".csv" onChange={handleCsvFileSelect} style={{ display: 'none' }} />
-                    </label>
-                    
-                    {/* CSV Format Info */}
-                    <div style={{
-                      padding: '12px',
-                      backgroundColor: isDark ? '#172554' : '#eff6ff',
-                      border: `1px solid ${isDark ? '#1e3a8a' : '#93c5fd'}`,
-                      borderRadius: '8px'
-                    }}>
-                      <p style={{ fontSize: '12px', fontWeight: '600', color: isDark ? '#60a5fa' : '#1d4ed8', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <AlertCircle style={{ width: '14px', height: '14px' }} />
-                        CSV Format Required
-                      </p>
-                      <p style={{ fontSize: '11px', color: isDark ? '#93c5fd' : '#1e40af', margin: '0 0 6px' }}>
-                        Headers: <code style={{ backgroundColor: isDark ? '#1e3a8a' : '#dbeafe', padding: '2px 4px', borderRadius: '3px' }}>name,amount,category,date,due_date,notes,recurring</code>
-                      </p>
-                      <p style={{ fontSize: '11px', color: isDark ? '#93c5fd' : '#1e40af', margin: 0 }}>
-                        Categories: utilities, subscription, food, shopping, healthcare, entertainment, other
-                      </p>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -3680,27 +3575,120 @@ const getBudgetStatus = () => {
                 <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>All Entries</h2>
                 <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>{entries.length} total entries</p>
               </div>
-              <button
-                onClick={exportToCSV}
-                style={{
-                  height: '36px',
-                  padding: '0 16px',
-                  backgroundColor: isDark ? '#fafafa' : '#18181b',
-                  color: isDark ? '#18181b' : '#fafafa',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontSize: '13px',
-                  fontWeight: '500',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <Download style={{ width: '14px', height: '14px' }} />
-                Export CSV
-              </button>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <label
+                  style={{
+                    height: '36px',
+                    padding: '0 16px',
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${theme.inputBorder}`,
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    color: theme.text,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <Upload style={{ width: '14px', height: '14px' }} />
+                  Import CSV
+                  <input type="file" accept=".csv" onChange={handleCsvFileSelect} style={{ display: 'none' }} />
+                </label>
+                <button
+                  onClick={exportToCSV}
+                  style={{
+                    height: '36px',
+                    padding: '0 16px',
+                    backgroundColor: isDark ? '#fafafa' : '#18181b',
+                    color: isDark ? '#18181b' : '#fafafa',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <Download style={{ width: '14px', height: '14px' }} />
+                  Export CSV
+                </button>
+              </div>
             </div>
+
+            {/* CSV Import Preview */}
+            {csvPreview && (
+              <div style={{
+                marginBottom: '20px',
+                border: `1px solid ${isDark ? '#065f46' : '#86efac'}`,
+                backgroundColor: isDark ? '#022c22' : '#f0fdf4',
+                borderRadius: '8px',
+                padding: '16px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }} />
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: isDark ? '#34d399' : '#047857' }}>
+                      {csvPreview.length} entries ready to import
+                    </span>
+                  </div>
+                  <button 
+                    onClick={() => setCsvPreview(null)} 
+                    style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '4px' }}
+                  >
+                    <X style={{ width: '16px', height: '16px' }} />
+                  </button>
+                </div>
+                
+                {/* Preview Table */}
+                <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '12px', borderRadius: '6px', border: `1px solid ${theme.cardBorder}`, backgroundColor: theme.cardBg }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                    <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg }}>
+                      <tr>
+                        <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Name</th>
+                        <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Category</th>
+                        <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Date</th>
+                        <th style={{ padding: '8px', textAlign: 'right', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {csvPreview.slice(0, 5).map((entry, i) => (
+                        <tr key={i} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                          <td style={{ padding: '8px', color: theme.text }}>{entry.name}</td>
+                          <td style={{ padding: '8px', color: theme.textMuted, textTransform: 'capitalize' }}>{entry.type}</td>
+                          <td style={{ padding: '8px', color: theme.textMuted }}>{entry.date}</td>
+                          <td style={{ padding: '8px', textAlign: 'right', color: theme.text, fontWeight: '500' }}>{currency}{formatAmount(entry.amount)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {csvPreview.length > 5 && (
+                    <p style={{ padding: '8px', fontSize: '11px', color: theme.textMuted, margin: 0, textAlign: 'center', backgroundColor: theme.statBg }}>
+                      +{csvPreview.length - 5} more entries...
+                    </p>
+                  )}
+                </div>
+                
+                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+                  <button 
+                    onClick={() => setCsvPreview(null)} 
+                    style={{ height: '36px', padding: '0 16px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '13px', color: theme.textMuted, cursor: 'pointer' }}
+                  >
+                    Cancel
+                  </button>
+                  <button 
+                    onClick={handleCsvImport} 
+                    disabled={isSaving}
+                    style={{ height: '36px', padding: '0 16px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
+                  >
+                    {isSaving ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Importing...</> : <><Check style={{ width: '14px', height: '14px' }} /> Import All</>}
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Filters */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
