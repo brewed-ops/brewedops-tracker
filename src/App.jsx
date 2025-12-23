@@ -2273,7 +2273,7 @@ const getBudgetStatus = () => {
       <header style={{
         backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
         borderBottom: `1px solid ${theme.cardBorder}`,
-        padding: isSmall ? '10px 12px' : '12px 24px',
+        padding: isSmall ? '14px 12px' : '16px 24px',
         position: 'sticky',
         top: 0,
         zIndex: 20
@@ -2436,13 +2436,13 @@ const getBudgetStatus = () => {
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   style={{
-                    width: '40px',
-                    height: '40px',
+                    width: '48px',
+                    height: '48px',
                     borderRadius: '50%',
                     backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
                     border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
                     color: '#fff',
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     display: 'flex',
@@ -2473,7 +2473,7 @@ const getBudgetStatus = () => {
                 {showProfileMenu && (
                   <div style={{
                     position: 'absolute',
-                    top: '44px',
+                    top: '54px',
                     right: 0,
                     width: '200px',
                     backgroundColor: theme.cardBg,
@@ -2531,27 +2531,71 @@ const getBudgetStatus = () => {
             </div>
           ) : (
             /* Mobile Header Actions */
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              {/* Mobile Level & XP Bar - Compact */}
+              <div 
+                onClick={() => setShowRewardsModal(true)}
                 style={{
-                  height: '32px',
-                  backgroundColor: theme.inputBg,
-                  border: `1px solid ${theme.inputBorder}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '4px 8px',
+                  backgroundColor: theme.statBg,
                   borderRadius: '6px',
-                  padding: '0 6px',
-                  fontSize: '12px',
-                  color: theme.text,
                   cursor: 'pointer',
-                  outline: 'none',
-                  width: '70px'
+                  border: `1px solid ${theme.cardBorder}`
                 }}
               >
-                {CURRENCIES.map(c => (
-                  <option key={c.symbol} value={c.symbol}>{c.symbol} {c.label.split(' ')[0]}</option>
-                ))}
-              </select>
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '22px',
+                  height: '22px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                  color: '#fff',
+                  fontSize: '10px',
+                  fontWeight: '700'
+                }}>
+                  {currentLevel}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', minWidth: '50px' }}>
+                  <div style={{
+                    height: '4px',
+                    backgroundColor: isDark ? '#27272a' : '#e4e4e7',
+                    borderRadius: '2px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${levelProgress}%`,
+                      background: 'linear-gradient(90deg, #22c55e, #10b981)',
+                      borderRadius: '2px'
+                    }} />
+                  </div>
+                  <span style={{ fontSize: '8px', color: theme.textMuted }}>{userXP} XP</span>
+                </div>
+              </div>
+
+              {/* Christmas Theme Toggle - Mobile */}
+              <button
+                onClick={() => setIsChristmasTheme(!isChristmasTheme)}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  backgroundColor: isChristmasTheme ? '#dc2626' : 'transparent',
+                  border: `1px solid ${isChristmasTheme ? '#dc2626' : theme.inputBorder}`,
+                  borderRadius: '6px',
+                  color: isChristmasTheme ? '#fff' : theme.textMuted,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+              >
+                <TreePine style={{ width: '14px', height: '14px' }} />
+              </button>
               
               <button
                 onClick={() => setIsDark(!isDark)}
@@ -2576,18 +2620,19 @@ const getBudgetStatus = () => {
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   style={{
-                    width: '32px',
-                    height: '32px',
+                    width: '40px',
+                    height: '40px',
                     borderRadius: '50%',
                     backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
-                    border: 'none',
+                    border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
                     color: '#fff',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
+                    boxShadow: currentFrame.glow !== 'none' ? currentFrame.glow : 'none',
                     overflow: 'hidden',
                     padding: 0
                   }}
@@ -2611,7 +2656,7 @@ const getBudgetStatus = () => {
                 {showProfileMenu && (
                   <div style={{
                     position: 'absolute',
-                    top: '40px',
+                    top: '46px',
                     right: 0,
                     width: '200px',
                     backgroundColor: theme.cardBg,
@@ -2625,6 +2670,32 @@ const getBudgetStatus = () => {
                       <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
                       <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
                     </div>
+                    
+                    {/* Currency Selector in Mobile Menu */}
+                    <div style={{ padding: '10px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                      <label style={{ fontSize: '12px', color: theme.textMuted, display: 'block', marginBottom: '6px' }}>Currency</label>
+                      <select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        style={{
+                          width: '100%',
+                          height: '36px',
+                          backgroundColor: theme.inputBg,
+                          border: `1px solid ${theme.inputBorder}`,
+                          borderRadius: '6px',
+                          padding: '0 10px',
+                          fontSize: '14px',
+                          color: theme.text,
+                          cursor: 'pointer',
+                          outline: 'none'
+                        }}
+                      >
+                        {CURRENCIES.map(c => (
+                          <option key={c.symbol} value={c.symbol}>{c.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
                       style={{
@@ -3281,13 +3352,13 @@ const getBudgetStatus = () => {
           marginBottom: isSmall ? '12px' : '24px' 
         }}>
           {/* Recent Entries */}
-          {entries.length > 0 && (
-            <div style={cardStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Receipt style={{ width: '18px', height: '18px', color: theme.textMuted }} />
-                  Recent Entries
-                </h2>
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Receipt style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                Recent Entries
+              </h2>
+              {entries.length > 0 && (
                 <button
                   onClick={() => setActiveTab('entries')}
                   style={{
@@ -3304,7 +3375,10 @@ const getBudgetStatus = () => {
                   View All
                   <ChevronDown style={{ width: '14px', height: '14px', transform: 'rotate(-90deg)' }} />
                 </button>
-              </div>
+              )}
+            </div>
+            
+            {entries.length > 0 ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {entries.slice(0, 4).map(entry => {
                   const badge = getBadgeStyle(entry.type, isDark);
@@ -3362,8 +3436,53 @@ const getBudgetStatus = () => {
                   );
                 })}
               </div>
-            </div>
-          )}
+            ) : (
+              <div style={{ 
+                display: 'flex', 
+                flexDirection: 'column', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                padding: '32px 16px',
+                backgroundColor: theme.statBg,
+                borderRadius: '8px',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '12px',
+                  backgroundColor: isDark ? '#27272a' : '#e4e4e7',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: '12px'
+                }}>
+                  <Receipt style={{ width: '24px', height: '24px', color: theme.textMuted }} />
+                </div>
+                <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: '0 0 4px' }}>No entries yet</p>
+                <p style={{ fontSize: '12px', color: theme.textMuted, margin: '0 0 16px' }}>Add your first expense to get started</p>
+                <button
+                  onClick={() => setDashboardSubTab('add-entry')}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#3b82f6',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Plus style={{ width: '14px', height: '14px' }} />
+                  Add Entry
+                </button>
+              </div>
+            )}
+          </div>
 
           {/* Monthly Budget Card */}
           <div style={cardStyle}>
@@ -5889,9 +6008,12 @@ const getBudgetStatus = () => {
                   left: `${Math.random() * 100}%`,
                   width: `${Math.random() * 8 + 4}px`,
                   height: `${Math.random() * 8 + 4}px`,
-                  backgroundColor: '#fff',
+                  backgroundColor: isDark ? '#fff' : '#a8d4ff',
                   borderRadius: '50%',
-                  opacity: Math.random() * 0.7 + 0.3,
+                  opacity: isDark ? (Math.random() * 0.7 + 0.3) : (Math.random() * 0.5 + 0.4),
+                  boxShadow: isDark 
+                    ? '0 0 4px rgba(255, 255, 255, 0.5)' 
+                    : '0 0 6px rgba(100, 180, 255, 0.6), 0 0 2px rgba(0, 100, 200, 0.3)',
                   animation: `snowfall ${Math.random() * 3 + 4}s linear infinite`,
                   animationDelay: `${Math.random() * 5}s`
                 }}
