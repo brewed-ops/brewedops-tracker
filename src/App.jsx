@@ -2878,118 +2878,212 @@ const getBudgetStatus = () => {
           </div>
         </div>
 
-{/* Recent Entries Quick View */}
-        {entries.length > 0 && (
-          <div style={{ ...cardStyle, marginBottom: isSmall ? '12px' : '24px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-              <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Receipt style={{ width: '18px', height: '18px', color: theme.textMuted }} />
-                Recent Entries
-              </h2>
-              <button
-                onClick={() => setActiveTab('entries')}
-                style={{
-                  fontSize: '13px',
-                  color: '#3b82f6',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '4px'
-                }}
-              >
-                View All
-                <ChevronDown style={{ width: '14px', height: '14px', transform: 'rotate(-90deg)' }} />
-              </button>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {entries.slice(0, 3).map(entry => {
-                const badge = getBadgeStyle(entry.type, isDark);
-                const categoryInfo = CATEGORIES.find(c => c.value === entry.type);
-                return (
-                  <div 
-                    key={entry.id}
-                    onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '12px',
-                      padding: '12px',
-                      backgroundColor: theme.statBg,
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      transition: 'transform 0.15s, box-shadow 0.15s'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = 'translateY(-1px)';
-                      e.currentTarget.style.boxShadow = isDark ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.08)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = 'translateY(0)';
-                      e.currentTarget.style.boxShadow = 'none';
-                    }}
-                  >
-                    <div style={{
-                      width: '40px',
-                      height: '40px',
-                      borderRadius: '10px',
-                      backgroundColor: badge.bg,
-                      border: `1px solid ${badge.border}`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}>
-                      <span style={{ fontSize: '16px' }}>
-                        {entry.type === 'utilities' && '⚡'}
-                        {entry.type === 'subscription' && '📱'}
-                        {entry.type === 'food' && '🍔'}
-                        {entry.type === 'shopping' && '🛍️'}
-                        {entry.type === 'healthcare' && '💊'}
-                        {entry.type === 'entertainment' && '🎬'}
-                        {entry.type === 'other' && '📦'}
-                      </span>
-                    </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+{/* Recent Entries and Monthly Budget Side by Side */}
+        <div style={{ 
+          display: 'grid', 
+          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
+          gap: isSmall ? '12px' : '20px', 
+          marginBottom: isSmall ? '12px' : '24px' 
+        }}>
+          {/* Recent Entries */}
+          {entries.length > 0 && (
+            <div style={cardStyle}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+                <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Receipt style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                  Recent Entries
+                </h2>
+                <button
+                  onClick={() => setActiveTab('entries')}
+                  style={{
+                    fontSize: '13px',
+                    color: '#3b82f6',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}
+                >
+                  View All
+                  <ChevronDown style={{ width: '14px', height: '14px', transform: 'rotate(-90deg)' }} />
+                </button>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                {entries.slice(0, 4).map(entry => {
+                  const badge = getBadgeStyle(entry.type, isDark);
+                  const categoryInfo = CATEGORIES.find(c => c.value === entry.type);
+                  return (
+                    <div 
+                      key={entry.id}
+                      onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '10px',
+                        backgroundColor: theme.statBg,
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        transition: 'transform 0.15s'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(2px)'}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateX(0)'}
+                    >
+                      <div style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '8px',
+                        backgroundColor: badge.bg,
+                        border: `1px solid ${badge.border}`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        flexShrink: 0
+                      }}>
+                        <span style={{ fontSize: '14px' }}>
+                          {entry.type === 'utilities' && '⚡'}
+                          {entry.type === 'subscription' && '📱'}
+                          {entry.type === 'food' && '🍔'}
+                          {entry.type === 'shopping' && '🛍️'}
+                          {entry.type === 'healthcare' && '💊'}
+                          {entry.type === 'entertainment' && '🎬'}
+                          {entry.type === 'other' && '📦'}
+                        </span>
+                      </div>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {entry.name}
                         </p>
-                        {entry.notes && (
-                          <span title={entry.notes} style={{ flexShrink: 0, cursor: 'help' }}>
-                            <MessageSquare style={{ width: '12px', height: '12px', color: theme.textMuted }} />
-                          </span>
-                        )}
+                        <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>
+                          {categoryInfo?.label} • {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                        </p>
                       </div>
-                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>
-                        {categoryInfo?.label} • {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                      </p>
-                    </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
+                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0, flexShrink: 0 }}>
                         {currency}{formatAmount(entry.amount)}
                       </p>
-                      {entry.file && (
-                        <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0', display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
-                          <FileText style={{ width: '10px', height: '10px' }} />
-                          Receipt
-                        </p>
-                      )}
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
+          )}
+
+          {/* Monthly Budget Card */}
+          <div style={cardStyle}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
+              <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Wallet style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                Monthly Budget
+              </h2>
+              {monthlyBudget > 0 && (
+                <button
+                  onClick={() => { setBudgetInput(monthlyBudget.toString()); setShowBudgetModal(true); }}
+                  style={{ fontSize: '12px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}
+                >
+                  Edit
+                </button>
+              )}
+            </div>
+            
+            {monthlyBudget > 0 && budgetStatus ? (
+              <div>
+                {/* Budget Stats */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+                  <div style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px', textTransform: 'uppercase' }}>Budget</p>
+                    <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(monthlyBudget)}</p>
+                  </div>
+                  <div style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', textAlign: 'center' }}>
+                    <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px', textTransform: 'uppercase' }}>Spent</p>
+                    <p style={{ fontSize: '18px', fontWeight: '700', color: budgetStatus.color, margin: 0 }}>{currency}{formatAmount(budgetStatus.spent)}</p>
+                  </div>
+                </div>
+                
+                {/* Progress Bar */}
+                <div style={{ marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
+                    <span style={{ fontSize: '12px', color: theme.textMuted }}>{budgetStatus.percentage.toFixed(0)}% used</span>
+                    <span style={{ fontSize: '12px', fontWeight: '500', color: budgetStatus.status === 'over' ? '#ef4444' : theme.textMuted }}>
+                      {budgetStatus.status === 'over' ? `Over by ${currency}${formatAmount(Math.abs(budgetStatus.remaining))}` : `${currency}${formatAmount(budgetStatus.remaining)} left`}
+                    </span>
+                  </div>
+                  <div style={{ 
+                    height: '10px', 
+                    backgroundColor: isDark ? '#27272a' : '#e4e4e7', 
+                    borderRadius: '5px', 
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ 
+                      height: '100%', 
+                      width: `${Math.min(budgetStatus.percentage, 100)}%`, 
+                      backgroundColor: budgetStatus.color,
+                      borderRadius: '5px',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                </div>
+                
+                {/* Status Alert */}
+                {budgetStatus.status === 'over' && (
+                  <div style={{ padding: '10px', backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <AlertTriangle style={{ width: '14px', height: '14px', color: '#ef4444', flexShrink: 0 }} />
+                    <span style={{ fontSize: '12px', color: isDark ? '#fca5a5' : '#dc2626' }}>Budget exceeded!</span>
+                  </div>
+                )}
+                {budgetStatus.status === 'warning' && (
+                  <div style={{ padding: '10px', backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <AlertCircle style={{ width: '14px', height: '14px', color: '#f59e0b', flexShrink: 0 }} />
+                    <span style={{ fontSize: '12px', color: isDark ? '#fcd34d' : '#b45309' }}>Approaching limit</span>
+                  </div>
+                )}
+                {budgetStatus.status === 'safe' && (
+                  <div style={{ padding: '10px', backgroundColor: isDark ? 'rgba(34, 197, 94, 0.15)' : '#dcfce7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Check style={{ width: '14px', height: '14px', color: '#22c55e', flexShrink: 0 }} />
+                    <span style={{ fontSize: '12px', color: isDark ? '#86efac' : '#166534' }}>On track this month</span>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '20px' }}>
+                <div style={{
+                  width: '48px',
+                  height: '48px',
+                  borderRadius: '50%',
+                  backgroundColor: theme.statBg,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 12px'
+                }}>
+                  <PiggyBank style={{ width: '24px', height: '24px', color: theme.textMuted }} />
+                </div>
+                <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 12px' }}>Set a budget to track your spending</p>
+                <button
+                  onClick={() => { setBudgetInput(''); setShowBudgetModal(true); }}
+                  style={{
+                    padding: '10px 20px',
+                    backgroundColor: isDark ? '#fafafa' : '#18181b',
+                    color: isDark ? '#18181b' : '#fafafa',
+                    border: 'none',
+                    borderRadius: '6px',
+                    fontSize: '13px',
+                    fontWeight: '500',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Set Budget
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
 
-        {/* Dashboard Section */}
-
-        {/* Dashboard Section */}
-        <div style={cardStyle}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
-            <h2 style={{ fontSize: isSmall ? '14px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Dashboard</h2>
+        {/* Insights and Chart Section */}
+        <div style={{ ...cardStyle, marginBottom: isSmall ? '12px' : '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
+            <h2 style={{ fontSize: isSmall ? '14px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Spending Overview</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', flex: isSmall ? '1 1 100%' : 'none' }}>
               {/* Category Filter */}
               <select
@@ -3027,7 +3121,6 @@ const getBudgetStatus = () => {
                       backgroundColor: dashboardView === v ? theme.toggleActive : 'transparent',
                       border: 'none',
                       borderRadius: '4px',
-                      fontSize: '13px',
                       fontWeight: '500',
                       color: dashboardView === v ? theme.text : theme.textSubtle,
                       cursor: 'pointer',
@@ -3040,108 +3133,10 @@ const getBudgetStatus = () => {
               </div>
             </div>
           </div>
-{/* Budget Progress */}
-          {monthlyBudget > 0 && budgetStatus && (
-            <div style={{ 
-              marginBottom: '20px', 
-              padding: '16px', 
-              backgroundColor: budgetStatus.status === 'over' ? (isDark ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2') : budgetStatus.status === 'warning' ? (isDark ? 'rgba(245, 158, 11, 0.1)' : '#fffbeb') : theme.statBg,
-              borderRadius: '8px',
-              border: `1px solid ${budgetStatus.status === 'over' ? '#ef4444' : budgetStatus.status === 'warning' ? '#f59e0b' : 'transparent'}`
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Wallet style={{ width: '18px', height: '18px', color: budgetStatus.color }} />
-                  <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Monthly Budget</span>
-                </div>
-                <button
-                  onClick={() => { setBudgetInput(monthlyBudget.toString()); setShowBudgetModal(true); }}
-                  style={{ fontSize: '12px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-                >
-                  Edit
-                </button>
-              </div>
-              
-              {/* Progress Bar */}
-              <div style={{ 
-                height: '8px', 
-                backgroundColor: isDark ? '#27272a' : '#e4e4e7', 
-                borderRadius: '4px', 
-                overflow: 'hidden',
-                marginBottom: '12px'
-              }}>
-                <div style={{ 
-                  height: '100%', 
-                  width: `${budgetStatus.percentage}%`, 
-                  backgroundColor: budgetStatus.color,
-                  borderRadius: '4px',
-                  transition: 'width 0.3s ease'
-                }} />
-              </div>
-              
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Spent: </span>
-                  <span style={{ fontSize: '14px', fontWeight: '600', color: budgetStatus.color }}>{currency}{formatAmount(budgetStatus.spent)}</span>
-                  <span style={{ fontSize: '13px', color: theme.textMuted }}> of {currency}{formatAmount(monthlyBudget)}</span>
-                </div>
-                <div style={{ textAlign: 'right' }}>
-                  {budgetStatus.status === 'over' ? (
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#ef4444' }}>
-                      Over by {currency}{formatAmount(Math.abs(budgetStatus.remaining))}
-                    </span>
-                  ) : (
-                    <span style={{ fontSize: '13px', color: theme.textMuted }}>
-                      {currency}{formatAmount(budgetStatus.remaining)} left
-                    </span>
-                  )}
-                </div>
-              </div>
-              
-              {budgetStatus.status === 'over' && (
-                <div style={{ marginTop: '12px', padding: '10px 12px', backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <AlertTriangle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>You've exceeded your monthly budget!</span>
-                </div>
-              )}
-              
-              {budgetStatus.status === 'warning' && (
-                <div style={{ marginTop: '12px', padding: '10px 12px', backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <AlertCircle style={{ width: '16px', height: '16px', color: '#f59e0b', flexShrink: 0 }} />
-                  <span style={{ fontSize: '13px', color: isDark ? '#fcd34d' : '#b45309' }}>You've used {budgetStatus.percentage.toFixed(0)}% of your monthly budget</span>
-                </div>
-              )}
-            </div>
-          )}
 
-          {/* Set Budget Button (if no budget set) */}
-          {monthlyBudget <= 0 && (
-            <button
-              onClick={() => { setBudgetInput(''); setShowBudgetModal(true); }}
-              style={{
-                width: '100%',
-                marginBottom: '20px',
-                padding: '14px 16px',
-                backgroundColor: 'transparent',
-                border: `2px dashed ${theme.inputBorder}`,
-                borderRadius: '8px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '8px',
-                color: theme.textMuted,
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
-            >
-              <PiggyBank style={{ width: '18px', height: '18px' }} />
-              Set Monthly Budget
-            </button>
-          )}
           {/* Stats Grid */}
           {isSmall ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
               {[
                 { label: 'Today', value: stats.today },
                 { label: 'This Month', value: stats.month },
@@ -3155,32 +3150,161 @@ const getBudgetStatus = () => {
               ))}
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: '16px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px' }}>
               {[
                 { label: 'Today', value: stats.today },
                 { label: 'This Month', value: stats.month },
                 { label: 'This Year', value: stats.year },
                 { label: 'All Time', value: stats.total },
               ].map(stat => (
-                <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: '16px' }}>
-                  <p style={{ fontSize: '13px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
-                  <p style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
+                <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: '14px' }}>
+                  <p style={{ fontSize: '12px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
+                  <p style={{ fontSize: '20px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Charts - Bar Chart Only */}
-          <div style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
-            <p style={{ fontSize: '13px', color: theme.textSubtle, margin: '0 0 16px' }}>Monthly Spending Trend</p>
-            <ResponsiveContainer width="100%" height={isSmall ? 180 : 200}>
-              <BarChart data={monthlyData}>
-                <XAxis dataKey="name" tick={{ fontSize: isSmall ? 10 : 12, fill: theme.textSubtle }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: isSmall ? 10 : 12, fill: theme.textSubtle }} axisLine={false} tickLine={false} width={isSmall ? 35 : 40} />
-                <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.text }} cursor={{ fill: 'transparent' }} />
-                <Bar dataKey="amount" fill={theme.barColor} radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          {/* Insights and Chart Side by Side */}
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr', gap: '16px' }}>
+            {/* 6-Month Insights */}
+            <div style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
+              <p style={{ fontSize: '13px', fontWeight: '600', color: theme.text, margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <TrendingUp style={{ width: '14px', height: '14px', color: theme.textMuted }} />
+                6-Month Insights
+              </p>
+              
+              {(() => {
+                const now = new Date();
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                // Get last 6 months of data
+                const monthlyTotals = [];
+                for (let i = 5; i >= 0; i--) {
+                  const targetMonth = new Date(currentYear, currentMonth - i, 1);
+                  const monthEntries = entries.filter(e => {
+                    const d = new Date(e.date);
+                    return d.getMonth() === targetMonth.getMonth() && d.getFullYear() === targetMonth.getFullYear();
+                  });
+                  const total = monthEntries.reduce((sum, e) => sum + e.amount, 0);
+                  monthlyTotals.push({
+                    month: targetMonth.toLocaleDateString('en-US', { month: 'short' }),
+                    fullMonth: targetMonth.toLocaleDateString('en-US', { month: 'long' }),
+                    total,
+                    entries: monthEntries.length
+                  });
+                }
+                
+                const thisMonth = monthlyTotals[5];
+                const lastMonth = monthlyTotals[4];
+                const monthChange = lastMonth.total > 0 ? ((thisMonth.total - lastMonth.total) / lastMonth.total * 100) : 0;
+                const avgSpending = monthlyTotals.slice(0, 5).reduce((sum, m) => sum + m.total, 0) / 5;
+                const vsAverage = avgSpending > 0 ? ((thisMonth.total - avgSpending) / avgSpending * 100) : 0;
+                
+                // Find highest and lowest months
+                const sortedMonths = [...monthlyTotals].sort((a, b) => b.total - a.total);
+                const highestMonth = sortedMonths[0];
+                const lowestMonth = sortedMonths.filter(m => m.total > 0).pop() || sortedMonths[5];
+                
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    {/* This Month vs Last Month */}
+                    <div style={{ 
+                      padding: '10px 12px', 
+                      backgroundColor: theme.cardBg, 
+                      borderRadius: '6px',
+                      border: `1px solid ${theme.cardBorder}`
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '11px', color: theme.textMuted }}>vs Last Month</span>
+                        <span style={{ 
+                          fontSize: '12px', 
+                          fontWeight: '600', 
+                          color: monthChange > 0 ? '#ef4444' : monthChange < 0 ? '#22c55e' : theme.textMuted,
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '2px'
+                        }}>
+                          {monthChange > 0 ? <TrendingUp style={{ width: '12px', height: '12px' }} /> : monthChange < 0 ? <TrendingDown style={{ width: '12px', height: '12px' }} /> : null}
+                          {monthChange > 0 ? '+' : ''}{monthChange.toFixed(1)}%
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '11px', color: theme.textSubtle }}>
+                        {thisMonth.fullMonth}: {currency}{formatAmount(thisMonth.total)} vs {lastMonth.month}: {currency}{formatAmount(lastMonth.total)}
+                      </div>
+                    </div>
+                    
+                    {/* vs 5-Month Average */}
+                    <div style={{ 
+                      padding: '10px 12px', 
+                      backgroundColor: theme.cardBg, 
+                      borderRadius: '6px',
+                      border: `1px solid ${theme.cardBorder}`
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <span style={{ fontSize: '11px', color: theme.textMuted }}>vs 5-Month Avg</span>
+                        <span style={{ 
+                          fontSize: '12px', 
+                          fontWeight: '600', 
+                          color: vsAverage > 0 ? '#ef4444' : vsAverage < 0 ? '#22c55e' : theme.textMuted 
+                        }}>
+                          {vsAverage > 0 ? '+' : ''}{vsAverage.toFixed(1)}%
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '11px', color: theme.textSubtle }}>
+                        Avg: {currency}{formatAmount(avgSpending)}/month
+                      </div>
+                    </div>
+                    
+                    {/* Highest Spending Month */}
+                    <div style={{ 
+                      padding: '10px 12px', 
+                      backgroundColor: isDark ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2', 
+                      borderRadius: '6px',
+                      border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '11px', color: isDark ? '#fca5a5' : '#dc2626' }}>📈 Highest</span>
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#ef4444' }}>{highestMonth.month}</span>
+                      </div>
+                      <div style={{ fontSize: '11px', color: theme.textSubtle, marginTop: '2px' }}>
+                        {currency}{formatAmount(highestMonth.total)} ({highestMonth.entries} entries)
+                      </div>
+                    </div>
+                    
+                    {/* Lowest Spending Month */}
+                    <div style={{ 
+                      padding: '10px 12px', 
+                      backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : '#dcfce7', 
+                      borderRadius: '6px',
+                      border: `1px solid ${isDark ? '#166534' : '#bbf7d0'}`
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '11px', color: isDark ? '#86efac' : '#166534' }}>📉 Lowest</span>
+                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#22c55e' }}>{lowestMonth.month}</span>
+                      </div>
+                      <div style={{ fontSize: '11px', color: theme.textSubtle, marginTop: '2px' }}>
+                        {currency}{formatAmount(lowestMonth.total)} ({lowestMonth.entries} entries)
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Monthly Spending Trend Chart */}
+            <div style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
+              <p style={{ fontSize: '13px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>Monthly Spending Trend</p>
+              <ResponsiveContainer width="100%" height={isSmall ? 160 : 180}>
+                <BarChart data={monthlyData}>
+                  <XAxis dataKey="name" tick={{ fontSize: isSmall ? 10 : 11, fill: theme.textSubtle }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: isSmall ? 10 : 11, fill: theme.textSubtle }} axisLine={false} tickLine={false} width={isSmall ? 35 : 45} />
+                  <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.text, fontSize: '12px' }} cursor={{ fill: 'transparent' }} />
+                  <Bar dataKey="amount" fill={theme.barColor} radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
           </>
