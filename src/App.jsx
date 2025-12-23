@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine, Camera, Trophy, Award, Flame } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3 } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 // ============================================
@@ -9030,6 +9030,18 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
   const [editingUser, setEditingUser] = useState(null);
   const [editUserForm, setEditUserForm] = useState({ nickname: '', email: '', password: '' });
   const [savingUser, setSavingUser] = useState(false);
+  
+  // New admin management states
+  const [showUserManageModal, setShowUserManageModal] = useState(null);
+  const [userProfileData, setUserProfileData] = useState(null);
+  const [userAchievements, setUserAchievements] = useState([]);
+  const [userWallets, setUserWallets] = useState([]);
+  const [loadingUserData, setLoadingUserData] = useState(false);
+  const [showCreateUserModal, setShowCreateUserModal] = useState(false);
+  const [createUserForm, setCreateUserForm] = useState({ email: '', password: '', nickname: '' });
+  const [creatingUser, setCreatingUser] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(null);
+  const [resetConfirmText, setResetConfirmText] = useState('');
 
   useEffect(() => {
     fetchUsers();
@@ -9169,6 +9181,215 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
     }
   };
 
+  // Load user profile data for management
+  const loadUserManagementData = async (userId) => {
+    setLoadingUserData(true);
+    try {
+      // Load user profile
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      
+      setUserProfileData(profile || { level: 1, xp: 0, total_xp: 0 });
+      
+      // Load user achievements
+      const { data: achievements } = await supabase
+        .from('user_achievements')
+        .select('*')
+        .eq('user_id', userId);
+      
+      setUserAchievements(achievements || []);
+      
+      // Load user wallets
+      const { data: wallets } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('user_id', userId);
+      
+      setUserWallets(wallets || []);
+    } catch (error) {
+      console.error('Error loading user data:', error);
+    } finally {
+      setLoadingUserData(false);
+    }
+  };
+
+  // Open user management modal
+  const openUserManagement = async (user) => {
+    setShowUserManageModal(user);
+    await loadUserManagementData(user.id);
+  };
+
+  // Adjust user level
+  const handleAdjustLevel = async (userId, adjustment) => {
+    if (!userProfileData) return;
+    
+    const newLevel = Math.max(1, (userProfileData.level || 1) + adjustment);
+    const newXp = newLevel > userProfileData.level ? 0 : userProfileData.xp; // Reset XP if leveling up
+    
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .upsert({
+          user_id: userId,
+          level: newLevel,
+          xp: newXp,
+          total_xp: userProfileData.total_xp || 0,
+          updated_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+      
+      if (error) throw error;
+      
+      setUserProfileData(prev => ({ ...prev, level: newLevel, xp: newXp }));
+      alert(`User level ${adjustment > 0 ? 'increased' : 'decreased'} to ${newLevel}`);
+    } catch (error) {
+      console.error('Error adjusting level:', error);
+      alert('Failed to adjust level: ' + error.message);
+    }
+  };
+
+  // Unlock achievement for user
+  const handleUnlockAchievement = async (userId, achievementId, achievementName) => {
+    // Check if already unlocked
+    if (userAchievements.some(a => a.achievement_id === achievementId)) {
+      alert('Achievement already unlocked');
+      return;
+    }
+    
+    try {
+      const { error } = await supabase
+        .from('user_achievements')
+        .insert({
+          user_id: userId,
+          achievement_id: achievementId,
+          unlocked_at: new Date().toISOString()
+        });
+      
+      if (error) throw error;
+      
+      setUserAchievements(prev => [...prev, { 
+        user_id: userId, 
+        achievement_id: achievementId, 
+        unlocked_at: new Date().toISOString() 
+      }]);
+      alert(`Achievement "${achievementName}" unlocked!`);
+    } catch (error) {
+      console.error('Error unlocking achievement:', error);
+      alert('Failed to unlock achievement: ' + error.message);
+    }
+  };
+
+  // Reset user data (entries, wallets, achievements)
+  const handleResetUserData = async (userId, resetType) => {
+    if (resetConfirmText.toLowerCase() !== 'delete') {
+      alert('Please type "delete" to confirm');
+      return;
+    }
+    
+    try {
+      if (resetType === 'all' || resetType === 'entries') {
+        await supabase.from('expenses').delete().eq('user_id', userId);
+      }
+      
+      if (resetType === 'all' || resetType === 'wallets') {
+        await supabase.from('wallet_transactions').delete().eq('user_id', userId);
+        await supabase.from('wallets').delete().eq('user_id', userId);
+        setUserWallets([]);
+      }
+      
+      if (resetType === 'all' || resetType === 'achievements') {
+        await supabase.from('user_achievements').delete().eq('user_id', userId);
+        setUserAchievements([]);
+      }
+      
+      if (resetType === 'all' || resetType === 'profile') {
+        await supabase.from('user_profiles').delete().eq('user_id', userId);
+        setUserProfileData({ level: 1, xp: 0, total_xp: 0 });
+      }
+      
+      setShowResetConfirm(null);
+      setResetConfirmText('');
+      alert(`User ${resetType} data has been reset`);
+      fetchUsers(); // Refresh user list
+    } catch (error) {
+      console.error('Error resetting user data:', error);
+      alert('Failed to reset data: ' + error.message);
+    }
+  };
+
+  // Send password reset email
+  const handleSendPasswordReset = async (email) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin
+      });
+      
+      if (error) throw error;
+      alert(`Password reset email sent to ${email}`);
+    } catch (error) {
+      console.error('Error sending password reset:', error);
+      alert('Failed to send password reset: ' + error.message);
+    }
+  };
+
+  // Create user manually (without email verification)
+  const handleCreateUser = async () => {
+    if (!createUserForm.email || !createUserForm.password) {
+      alert('Email and password are required');
+      return;
+    }
+    
+    if (createUserForm.password.length < 6) {
+      alert('Password must be at least 6 characters');
+      return;
+    }
+    
+    setCreatingUser(true);
+    try {
+      // Get the current session for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('No active session');
+      }
+
+      // Call the edge function to create user
+      const response = await fetch(
+        `${supabase.supabaseUrl}/functions/v1/admin-create-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            email: createUserForm.email,
+            password: createUserForm.password,
+            nickname: createUserForm.nickname || 'User'
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to create user');
+      }
+
+      alert(`User created successfully!\nEmail: ${createUserForm.email}`);
+      setShowCreateUserModal(false);
+      setCreateUserForm({ email: '', password: '', nickname: '' });
+      fetchUsers();
+    } catch (error) {
+      console.error('Error creating user:', error);
+      alert('Failed to create user: ' + error.message);
+    } finally {
+      setCreatingUser(false);
+    }
+  };
+
   const fetchFeedbacks = async () => {
     try {
       const { data, error } = await supabase
@@ -9304,9 +9525,31 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                   <h2 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>All Users</h2>
                   <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>Manage registered users</p>
                 </div>
-                <div style={{ position: 'relative' }}>
-                  <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: theme.textMuted }} />
-                  <input type="text" placeholder="Search..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} style={{ height: '36px', width: isSmall ? '100%' : '220px', paddingLeft: '38px', paddingRight: '12px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', color: theme.text, outline: 'none' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <button 
+                    onClick={() => setShowCreateUserModal(true)}
+                    style={{ 
+                      height: '36px', 
+                      padding: '0 16px', 
+                      backgroundColor: '#10b981', 
+                      border: 'none', 
+                      borderRadius: '6px', 
+                      color: '#fff', 
+                      cursor: 'pointer', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '6px', 
+                      fontSize: '13px', 
+                      fontWeight: '500' 
+                    }}
+                  >
+                    <Plus style={{ width: '14px', height: '14px' }} />
+                    Create User
+                  </button>
+                  <div style={{ position: 'relative' }}>
+                    <Search style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', width: '16px', height: '16px', color: theme.textMuted }} />
+                    <input type="text" placeholder="Search..." value={userSearch} onChange={(e) => setUserSearch(e.target.value)} style={{ height: '36px', width: isSmall ? '100%' : '220px', paddingLeft: '38px', paddingRight: '12px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', color: theme.text, outline: 'none' }} />
+                  </div>
                 </div>
               </div>
 
@@ -9321,7 +9564,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                 </div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '700px' }}>
                     <thead>
                       <tr style={{ backgroundColor: theme.statBg }}>
                         <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>User</th>
@@ -9345,15 +9588,22 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                             <span style={{ fontSize: '13px', padding: '4px 12px', borderRadius: '20px', backgroundColor: isDark ? '#1e3a5f' : '#dbeafe', color: isDark ? '#60a5fa' : '#1d4ed8' }}>{user.expenses.length} entries</span>
                           </td>
                           <td style={{ padding: '16px 20px', textAlign: 'center' }}>
-                            <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                              <button onClick={() => { setViewingUser(user); setExpenseSearch(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="View Expenses">
-                                <Eye style={{ width: '14px', height: '14px' }} />
+                            <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                              <button onClick={() => openUserManagement(user)} style={{ height: '28px', padding: '0 10px', backgroundColor: '#8b5cf6', border: 'none', borderRadius: '5px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '500' }} title="Manage User">
+                                <Settings style={{ width: '12px', height: '12px' }} />
+                                Manage
                               </button>
-                              <button onClick={() => handleEditUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit User">
-                                <Edit style={{ width: '14px', height: '14px' }} />
+                              <button onClick={() => { setViewingUser(user); setExpenseSearch(''); }} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '5px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="View Expenses">
+                                <Eye style={{ width: '12px', height: '12px' }} />
                               </button>
-                              <button onClick={() => setDeletingUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: '1px solid #dc2626', borderRadius: '6px', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete User">
-                                <Trash2 style={{ width: '14px', height: '14px' }} />
+                              <button onClick={() => handleEditUser(user)} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '5px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit User">
+                                <Edit style={{ width: '12px', height: '12px' }} />
+                              </button>
+                              <button onClick={() => handleSendPasswordReset(user.email)} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid #f59e0b`, borderRadius: '5px', color: '#f59e0b', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Send Password Reset">
+                                <Mail style={{ width: '12px', height: '12px' }} />
+                              </button>
+                              <button onClick={() => setDeletingUser(user)} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: '1px solid #dc2626', borderRadius: '5px', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete User">
+                                <Trash2 style={{ width: '12px', height: '12px' }} />
                               </button>
                             </div>
                           </td>
@@ -9663,6 +9913,273 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             </div>
             <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, backgroundColor: theme.statBg, display: 'flex', justifyContent: 'flex-end' }}>
               <button onClick={() => setViewingFeedback(null)} style={{ height: '38px', padding: '0 20px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>Close</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* User Management Modal */}
+      {showUserManageModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '20px' }} onClick={() => { setShowUserManageModal(null); setUserProfileData(null); }}>
+          <div style={{ width: '100%', maxWidth: '600px', maxHeight: '90vh', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '18px', fontWeight: '600' }}>{getInitial(showUserManageModal.nickname)}</div>
+                <div>
+                  <p style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{showUserManageModal.nickname || 'User'}</p>
+                  <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>{showUserManageModal.email}</p>
+                </div>
+              </div>
+              <button onClick={() => { setShowUserManageModal(null); setUserProfileData(null); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '16px', height: '16px' }} />
+              </button>
+            </div>
+            
+            <div style={{ flex: 1, overflowY: 'auto', padding: '20px' }}>
+              {loadingUserData ? (
+                <div style={{ textAlign: 'center', padding: '40px' }}>
+                  <Loader2 style={{ width: '32px', height: '32px', color: theme.textMuted, animation: 'spin 1s linear infinite' }} />
+                </div>
+              ) : (
+                <>
+                  {/* Level Management */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Award style={{ width: '16px', height: '16px', color: '#f59e0b' }} />
+                      Level Management
+                    </h4>
+                    <div style={{ padding: '16px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <div>
+                          <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 4px' }}>Current Level</p>
+                          <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>Level {userProfileData?.level || 1}</p>
+                          <p style={{ fontSize: '11px', color: theme.textMuted, margin: '4px 0 0' }}>XP: {userProfileData?.xp || 0} / {(userProfileData?.level || 1) * 100}</p>
+                        </div>
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                        <button onClick={() => handleAdjustLevel(showUserManageModal.id, -1)} style={{ height: '32px', padding: '0 12px', backgroundColor: '#ef4444', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Minus style={{ width: '12px', height: '12px' }} /> -1
+                        </button>
+                        <button onClick={() => handleAdjustLevel(showUserManageModal.id, 1)} style={{ height: '32px', padding: '0 12px', backgroundColor: '#10b981', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Plus style={{ width: '12px', height: '12px' }} /> +1
+                        </button>
+                        <button onClick={() => handleAdjustLevel(showUserManageModal.id, 5)} style={{ height: '32px', padding: '0 12px', backgroundColor: '#3b82f6', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Plus style={{ width: '12px', height: '12px' }} /> +5
+                        </button>
+                        <button onClick={() => handleAdjustLevel(showUserManageModal.id, 10)} style={{ height: '32px', padding: '0 12px', backgroundColor: '#8b5cf6', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '12px', fontWeight: '500', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <Plus style={{ width: '12px', height: '12px' }} /> +10
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Achievements */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Trophy style={{ width: '16px', height: '16px', color: '#f59e0b' }} />
+                      Achievements ({userAchievements.length} unlocked)
+                    </h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '8px' }}>
+                      {ACHIEVEMENTS.map(achievement => {
+                        const isUnlocked = userAchievements.some(a => a.achievement_id === achievement.id);
+                        return (
+                          <div key={achievement.id} style={{ 
+                            padding: '10px', 
+                            backgroundColor: isUnlocked ? (isDark ? '#14532d' : '#dcfce7') : theme.statBg, 
+                            borderRadius: '8px',
+                            border: isUnlocked ? '1px solid #22c55e' : `1px solid ${theme.cardBorder}`,
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px'
+                          }}>
+                            <span style={{ fontSize: '20px' }}>{achievement.icon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: '11px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{achievement.name}</p>
+                              <p style={{ fontSize: '9px', color: theme.textMuted, margin: 0 }}>{isUnlocked ? '✓ Unlocked' : 'Locked'}</p>
+                            </div>
+                            {!isUnlocked && (
+                              <button 
+                                onClick={() => handleUnlockAchievement(showUserManageModal.id, achievement.id, achievement.name)}
+                                style={{ width: '24px', height: '24px', backgroundColor: '#10b981', border: 'none', borderRadius: '4px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                                title="Unlock"
+                              >
+                                <Plus style={{ width: '12px', height: '12px' }} />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* User Stats */}
+                  <div style={{ marginBottom: '24px' }}>
+                    <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <BarChart3 style={{ width: '16px', height: '16px', color: '#3b82f6' }} />
+                      User Stats
+                    </h4>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                      <div style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0 }}>{showUserManageModal.expenses?.length || 0}</p>
+                        <p style={{ fontSize: '10px', color: theme.textMuted, margin: '4px 0 0' }}>Entries</p>
+                      </div>
+                      <div style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0 }}>{userWallets.length}</p>
+                        <p style={{ fontSize: '10px', color: theme.textMuted, margin: '4px 0 0' }}>Wallets</p>
+                      </div>
+                      <div style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0 }}>{userAchievements.length}</p>
+                        <p style={{ fontSize: '10px', color: theme.textMuted, margin: '4px 0 0' }}>Achievements</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Reset Actions */}
+                  <div>
+                    <h4 style={{ fontSize: '14px', fontWeight: '600', color: '#ef4444', margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <AlertTriangle style={{ width: '16px', height: '16px' }} />
+                      Danger Zone
+                    </h4>
+                    <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                      <button onClick={() => setShowResetConfirm('entries')} style={{ height: '32px', padding: '0 12px', backgroundColor: 'transparent', border: '1px solid #ef4444', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', fontSize: '11px', fontWeight: '500' }}>
+                        Reset Entries
+                      </button>
+                      <button onClick={() => setShowResetConfirm('wallets')} style={{ height: '32px', padding: '0 12px', backgroundColor: 'transparent', border: '1px solid #ef4444', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', fontSize: '11px', fontWeight: '500' }}>
+                        Reset Wallets
+                      </button>
+                      <button onClick={() => setShowResetConfirm('achievements')} style={{ height: '32px', padding: '0 12px', backgroundColor: 'transparent', border: '1px solid #ef4444', borderRadius: '6px', color: '#ef4444', cursor: 'pointer', fontSize: '11px', fontWeight: '500' }}>
+                        Reset Achievements
+                      </button>
+                      <button onClick={() => setShowResetConfirm('all')} style={{ height: '32px', padding: '0 12px', backgroundColor: '#ef4444', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', fontSize: '11px', fontWeight: '500' }}>
+                        Reset Everything
+                      </button>
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirm && showUserManageModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60, padding: '20px' }} onClick={() => { setShowResetConfirm(null); setResetConfirmText(''); }}>
+          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Reset {showResetConfirm === 'all' ? 'All Data' : showResetConfirm}?</h3>
+              <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>
+                This will permanently delete the user's {showResetConfirm === 'all' ? 'entries, wallets, achievements, and profile' : showResetConfirm}. This cannot be undone.
+              </p>
+            </div>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>
+                Type <strong style={{ color: '#ef4444' }}>delete</strong> to confirm:
+              </label>
+              <input
+                type="text"
+                value={resetConfirmText}
+                onChange={(e) => setResetConfirmText(e.target.value)}
+                placeholder="delete"
+                style={{ width: '100%', height: '40px', padding: '0 12px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={() => { setShowResetConfirm(null); setResetConfirmText(''); }} style={{ flex: 1, height: '40px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.text, cursor: 'pointer', fontSize: '13px' }}>Cancel</button>
+              <button 
+                onClick={() => handleResetUserData(showUserManageModal.id, showResetConfirm)}
+                disabled={resetConfirmText.toLowerCase() !== 'delete'}
+                style={{ 
+                  flex: 1, 
+                  height: '40px', 
+                  backgroundColor: resetConfirmText.toLowerCase() === 'delete' ? '#ef4444' : theme.statBg, 
+                  border: 'none', 
+                  borderRadius: '6px', 
+                  color: resetConfirmText.toLowerCase() === 'delete' ? '#fff' : theme.textMuted, 
+                  cursor: resetConfirmText.toLowerCase() === 'delete' ? 'pointer' : 'not-allowed', 
+                  fontSize: '13px', 
+                  fontWeight: '500' 
+                }}
+              >
+                Reset {showResetConfirm}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Create User Modal */}
+      {showCreateUserModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '20px' }} onClick={() => setShowCreateUserModal(false)}>
+          <div style={{ width: '100%', maxWidth: '420px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}` }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Create New User</h3>
+              <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>Create a user without email verification</p>
+            </div>
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Email *</label>
+                <input
+                  type="email"
+                  value={createUserForm.email}
+                  onChange={(e) => setCreateUserForm(prev => ({ ...prev, email: e.target.value }))}
+                  placeholder="user@example.com"
+                  style={{ width: '100%', height: '40px', padding: '0 12px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Password *</label>
+                <input
+                  type="password"
+                  value={createUserForm.password}
+                  onChange={(e) => setCreateUserForm(prev => ({ ...prev, password: e.target.value }))}
+                  placeholder="Min 6 characters"
+                  style={{ width: '100%', height: '40px', padding: '0 12px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Nickname</label>
+                <input
+                  type="text"
+                  value={createUserForm.nickname}
+                  onChange={(e) => setCreateUserForm(prev => ({ ...prev, nickname: e.target.value }))}
+                  placeholder="Display name"
+                  style={{ width: '100%', height: '40px', padding: '0 12px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+                />
+              </div>
+              <div style={{ padding: '12px', backgroundColor: isDark ? '#1e3a5f' : '#dbeafe', borderRadius: '8px', marginBottom: '20px' }}>
+                <p style={{ fontSize: '12px', color: isDark ? '#60a5fa' : '#1d4ed8', margin: 0 }}>
+                  ℹ️ This creates a user with a confirmed email. They can login immediately without verification.
+                </p>
+              </div>
+            </div>
+            <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, backgroundColor: theme.statBg, display: 'flex', gap: '12px' }}>
+              <button onClick={() => setShowCreateUserModal(false)} style={{ flex: 1, height: '40px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.text, cursor: 'pointer', fontSize: '14px' }}>Cancel</button>
+              <button 
+                onClick={handleCreateUser}
+                disabled={creatingUser || !createUserForm.email || !createUserForm.password}
+                style={{ 
+                  flex: 1, 
+                  height: '40px', 
+                  backgroundColor: '#10b981', 
+                  border: 'none', 
+                  borderRadius: '6px', 
+                  color: '#fff', 
+                  cursor: (creatingUser || !createUserForm.email || !createUserForm.password) ? 'not-allowed' : 'pointer', 
+                  fontSize: '14px', 
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  opacity: (creatingUser || !createUserForm.email || !createUserForm.password) ? 0.6 : 1
+                }}
+              >
+                {creatingUser ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Creating...</> : 'Create User'}
+              </button>
             </div>
           </div>
         </div>
