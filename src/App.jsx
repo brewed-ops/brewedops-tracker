@@ -4675,6 +4675,11 @@ const getBudgetStatus = () => {
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle', maxWidth: '200px' }}>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                               <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</p>
+                              {entry.file && (
+                                <span title="Has attachment" style={{ flexShrink: 0, cursor: 'pointer' }} onClick={() => setPreviewFile(entry)}>
+                                  <FileText style={{ width: '12px', height: '12px', color: '#3b82f6' }} />
+                                </span>
+                              )}
                               {entry.recurring && (
                                 <span style={{ 
                                   fontSize: '9px', 
@@ -4730,6 +4735,16 @@ const getBudgetStatus = () => {
                           </td>
                           <td style={{ padding: '10px 0 10px 8px', verticalAlign: 'middle', textAlign: 'center' }}>
                             <div style={{ display: 'flex', gap: '2px', justifyContent: 'center' }}>
+                              {entry.file && (
+                                <>
+                                  <button onClick={() => setPreviewFile(entry)} style={{ width: '24px', height: '24px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }} title="View file">
+                                    <Eye style={{ width: '13px', height: '13px' }} />
+                                  </button>
+                                  <button onClick={() => handleDownloadFile(entry)} style={{ width: '24px', height: '24px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }} title="Download file">
+                                    <Download style={{ width: '13px', height: '13px' }} />
+                                  </button>
+                                </>
+                              )}
                               <button onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})} style={{ width: '24px', height: '24px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
                                 <Edit style={{ width: '13px', height: '13px' }} />
                               </button>
