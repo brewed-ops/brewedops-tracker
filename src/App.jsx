@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine, Camera } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine, Camera, Trophy, Award, Flame } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 // ============================================
@@ -115,6 +115,150 @@ const getUnlockedFrames = (level) => {
 // Helper function to get frame by ID
 const getFrameById = (frameId) => {
   return PROFILE_FRAMES.find(f => f.id === frameId) || PROFILE_FRAMES[0];
+};
+
+// ============================================
+// ACHIEVEMENTS & BADGES SYSTEM
+// ============================================
+
+// Badge tiers with visual styling
+const BADGE_TIERS = {
+  bronze: {
+    name: 'Bronze',
+    color: '#cd7f32',
+    bgGradient: 'linear-gradient(135deg, #cd7f32, #8b4513)',
+    glow: '0 0 10px rgba(205, 127, 50, 0.5)',
+    xpReward: 50
+  },
+  silver: {
+    name: 'Silver',
+    color: '#c0c0c0',
+    bgGradient: 'linear-gradient(135deg, #e8e8e8, #a8a8a8)',
+    glow: '0 0 12px rgba(192, 192, 192, 0.6)',
+    xpReward: 100
+  },
+  gold: {
+    name: 'Gold',
+    color: '#ffd700',
+    bgGradient: 'linear-gradient(135deg, #ffd700, #ff8c00)',
+    glow: '0 0 15px rgba(255, 215, 0, 0.6)',
+    xpReward: 200
+  },
+  platinum: {
+    name: 'Platinum',
+    color: '#e5e4e2',
+    bgGradient: 'linear-gradient(135deg, #e5e4e2, #8fbcbb)',
+    glow: '0 0 18px rgba(229, 228, 226, 0.7)',
+    xpReward: 350
+  },
+  diamond: {
+    name: 'Diamond',
+    color: '#b9f2ff',
+    bgGradient: 'linear-gradient(135deg, #b9f2ff, #87ceeb, #00bfff)',
+    glow: '0 0 20px rgba(185, 242, 255, 0.8), 0 0 30px rgba(135, 206, 235, 0.4)',
+    xpReward: 500
+  },
+  legendary: {
+    name: 'Legendary',
+    color: '#ff6b35',
+    bgGradient: 'linear-gradient(135deg, #ff6b35, #f7931e, #ffd700, #ff6b35)',
+    glow: '0 0 25px rgba(255, 107, 53, 0.8), 0 0 40px rgba(247, 147, 30, 0.5)',
+    xpReward: 1000,
+    animated: true
+  }
+};
+
+// Achievement categories
+const ACHIEVEMENT_CATEGORIES = {
+  entries: { name: 'Entry Master', icon: '📝', description: 'Track your expenses' },
+  budget: { name: 'Budget Keeper', icon: '💰', description: 'Stay within budget' },
+  streaks: { name: 'Consistency', icon: '🔥', description: 'Daily dedication' },
+  milestones: { name: 'Milestones', icon: '🏆', description: 'Major achievements' },
+  explorer: { name: 'Explorer', icon: '🧭', description: 'Try new features' },
+  special: { name: 'Special', icon: '⭐', description: 'Rare achievements' }
+};
+
+// All achievements
+const ACHIEVEMENTS = [
+  // Entry achievements
+  { id: 'first_entry', name: 'First Step', description: 'Add your first expense entry', category: 'entries', tier: 'bronze', icon: '👣', requirement: { type: 'entries', count: 1 } },
+  { id: 'entries_10', name: 'Getting Started', description: 'Log 10 expense entries', category: 'entries', tier: 'bronze', icon: '📊', requirement: { type: 'entries', count: 10 } },
+  { id: 'entries_25', name: 'Tracker', description: 'Log 25 expense entries', category: 'entries', tier: 'silver', icon: '📈', requirement: { type: 'entries', count: 25 } },
+  { id: 'entries_50', name: 'Dedicated Tracker', description: 'Log 50 expense entries', category: 'entries', tier: 'silver', icon: '📋', requirement: { type: 'entries', count: 50 } },
+  { id: 'entries_100', name: 'Century Club', description: 'Log 100 expense entries', category: 'entries', tier: 'gold', icon: '💯', requirement: { type: 'entries', count: 100 } },
+  { id: 'entries_250', name: 'Expense Expert', description: 'Log 250 expense entries', category: 'entries', tier: 'platinum', icon: '🎯', requirement: { type: 'entries', count: 250 } },
+  { id: 'entries_500', name: 'Master Tracker', description: 'Log 500 expense entries', category: 'entries', tier: 'diamond', icon: '👑', requirement: { type: 'entries', count: 500 } },
+  { id: 'entries_1000', name: 'Legendary Accountant', description: 'Log 1000 expense entries', category: 'entries', tier: 'legendary', icon: '🏛️', requirement: { type: 'entries', count: 1000 } },
+  
+  // Receipt achievements
+  { id: 'first_receipt', name: 'Paper Trail', description: 'Upload your first receipt', category: 'entries', tier: 'bronze', icon: '🧾', requirement: { type: 'receipts', count: 1 } },
+  { id: 'receipts_10', name: 'Receipt Collector', description: 'Upload 10 receipts', category: 'entries', tier: 'silver', icon: '📎', requirement: { type: 'receipts', count: 10 } },
+  { id: 'receipts_50', name: 'Documentation Pro', description: 'Upload 50 receipts', category: 'entries', tier: 'gold', icon: '📁', requirement: { type: 'receipts', count: 50 } },
+  { id: 'receipts_100', name: 'Receipt Scanner Pro', description: 'Upload 100 receipts', category: 'entries', tier: 'diamond', icon: '🗄️', requirement: { type: 'receipts', count: 100 } },
+  
+  // Budget achievements
+  { id: 'first_budget', name: 'Budget Beginner', description: 'Set your first monthly budget', category: 'budget', tier: 'bronze', icon: '🎯', requirement: { type: 'budget_set', count: 1 } },
+  { id: 'under_budget_1', name: 'Budget Keeper', description: 'Stay under budget for 1 month', category: 'budget', tier: 'silver', icon: '✅', requirement: { type: 'under_budget_months', count: 1 } },
+  { id: 'under_budget_3', name: 'Budget Master', description: 'Stay under budget for 3 months straight', category: 'budget', tier: 'gold', icon: '🏅', requirement: { type: 'under_budget_months', count: 3 } },
+  { id: 'under_budget_6', name: 'Financial Discipline', description: 'Stay under budget for 6 months straight', category: 'budget', tier: 'platinum', icon: '💎', requirement: { type: 'under_budget_months', count: 6 } },
+  { id: 'under_budget_12', name: 'Year of Savings', description: 'Stay under budget for 12 months straight', category: 'budget', tier: 'legendary', icon: '🌟', requirement: { type: 'under_budget_months', count: 12 } },
+  
+  // Streak achievements
+  { id: 'streak_3', name: 'Getting Warmed Up', description: 'Log expenses 3 days in a row', category: 'streaks', tier: 'bronze', icon: '🔥', requirement: { type: 'login_streak', count: 3 } },
+  { id: 'streak_7', name: 'Week Warrior', description: 'Log expenses 7 days in a row', category: 'streaks', tier: 'silver', icon: '📅', requirement: { type: 'login_streak', count: 7 } },
+  { id: 'streak_14', name: 'Two Week Champion', description: 'Log expenses 14 days in a row', category: 'streaks', tier: 'gold', icon: '⚡', requirement: { type: 'login_streak', count: 14 } },
+  { id: 'streak_30', name: 'Monthly Master', description: 'Log expenses 30 days in a row', category: 'streaks', tier: 'platinum', icon: '🌙', requirement: { type: 'login_streak', count: 30 } },
+  { id: 'streak_60', name: 'Unstoppable', description: 'Log expenses 60 days in a row', category: 'streaks', tier: 'diamond', icon: '💫', requirement: { type: 'login_streak', count: 60 } },
+  { id: 'streak_100', name: 'Legendary Dedication', description: 'Log expenses 100 days in a row', category: 'streaks', tier: 'legendary', icon: '🔱', requirement: { type: 'login_streak', count: 100 } },
+  
+  // Category exploration
+  { id: 'all_categories', name: 'Category Explorer', description: 'Use all expense categories', category: 'explorer', tier: 'silver', icon: '🧭', requirement: { type: 'categories_used', count: 7 } },
+  { id: 'big_spender', name: 'Big Purchase', description: 'Log an expense over ₱10,000', category: 'explorer', tier: 'silver', icon: '💸', requirement: { type: 'single_expense', amount: 10000 } },
+  { id: 'whale', name: 'Whale Alert', description: 'Log an expense over ₱50,000', category: 'explorer', tier: 'gold', icon: '🐋', requirement: { type: 'single_expense', amount: 50000 } },
+  
+  // XP & Level achievements
+  { id: 'level_5', name: 'Rising Star', description: 'Reach Level 5', category: 'milestones', tier: 'silver', icon: '⭐', requirement: { type: 'level', count: 5 } },
+  { id: 'level_10', name: 'Established', description: 'Reach Level 10', category: 'milestones', tier: 'gold', icon: '🌟', requirement: { type: 'level', count: 10 } },
+  { id: 'level_15', name: 'Veteran', description: 'Reach Level 15', category: 'milestones', tier: 'platinum', icon: '✨', requirement: { type: 'level', count: 15 } },
+  { id: 'level_20', name: 'Legend', description: 'Reach Level 20', category: 'milestones', tier: 'legendary', icon: '👑', requirement: { type: 'level', count: 20 } },
+  
+  // Total spending milestones
+  { id: 'total_10k', name: 'Ten Thousand', description: 'Track ₱10,000 in total expenses', category: 'milestones', tier: 'bronze', icon: '📊', requirement: { type: 'total_spent', amount: 10000 } },
+  { id: 'total_50k', name: 'Fifty Thousand', description: 'Track ₱50,000 in total expenses', category: 'milestones', tier: 'silver', icon: '📈', requirement: { type: 'total_spent', amount: 50000 } },
+  { id: 'total_100k', name: 'Hundred Grand', description: 'Track ₱100,000 in total expenses', category: 'milestones', tier: 'gold', icon: '💰', requirement: { type: 'total_spent', amount: 100000 } },
+  { id: 'total_500k', name: 'Half Million', description: 'Track ₱500,000 in total expenses', category: 'milestones', tier: 'platinum', icon: '🏦', requirement: { type: 'total_spent', amount: 500000 } },
+  { id: 'total_1m', name: 'Millionaire Tracker', description: 'Track ₱1,000,000 in total expenses', category: 'milestones', tier: 'legendary', icon: '💎', requirement: { type: 'total_spent', amount: 1000000 } },
+  
+  // Special achievements
+  { id: 'night_owl', name: 'Night Owl', description: 'Log an expense after midnight', category: 'special', tier: 'bronze', icon: '🦉', requirement: { type: 'time_of_day', time: 'night' } },
+  { id: 'early_bird', name: 'Early Bird', description: 'Log an expense before 6 AM', category: 'special', tier: 'bronze', icon: '🐦', requirement: { type: 'time_of_day', time: 'early' } },
+  { id: 'weekend_warrior', name: 'Weekend Warrior', description: 'Log 20 expenses on weekends', category: 'special', tier: 'silver', icon: '🎉', requirement: { type: 'weekend_entries', count: 20 } },
+  { id: 'profile_complete', name: 'Looking Good', description: 'Upload a profile picture', category: 'special', tier: 'bronze', icon: '📸', requirement: { type: 'profile_picture' } },
+  { id: 'frame_collector', name: 'Frame Collector', description: 'Unlock 5 profile frames', category: 'special', tier: 'gold', icon: '🖼️', requirement: { type: 'frames_unlocked', count: 5 } },
+  { id: 'completionist', name: 'Completionist', description: 'Unlock 20 achievements', category: 'special', tier: 'diamond', icon: '🏆', requirement: { type: 'achievements_unlocked', count: 20 } },
+  { id: 'perfectionist', name: 'Perfectionist', description: 'Unlock 35 achievements', category: 'special', tier: 'legendary', icon: '👑', requirement: { type: 'achievements_unlocked', count: 35 } },
+];
+
+// Weekly challenges configuration
+const WEEKLY_CHALLENGES = [
+  { id: 'spend_under_food', name: 'Frugal Eater', description: 'Spend under ₱2,000 on food this week', category: 'food', maxAmount: 2000, xpReward: 75, icon: '🍔' },
+  { id: 'spend_under_entertainment', name: 'Budget Entertainment', description: 'Spend under ₱500 on entertainment this week', category: 'entertainment', maxAmount: 500, xpReward: 75, icon: '🎬' },
+  { id: 'spend_under_shopping', name: 'Mindful Shopping', description: 'Spend under ₱1,500 on shopping this week', category: 'shopping', maxAmount: 1500, xpReward: 75, icon: '🛍️' },
+  { id: 'log_daily', name: 'Daily Logger', description: 'Log at least one expense every day this week', type: 'daily_log', xpReward: 100, icon: '📝' },
+  { id: 'receipt_week', name: 'Receipt Week', description: 'Upload 5 receipts this week', type: 'receipts', count: 5, xpReward: 80, icon: '🧾' },
+  { id: 'budget_check', name: 'Budget Conscious', description: 'Stay under 70% of your weekly budget', type: 'budget_percentage', percentage: 70, xpReward: 100, icon: '💰' },
+  { id: 'no_entertainment', name: 'Entertainment Fast', description: 'No entertainment expenses this week', category: 'entertainment', maxAmount: 0, xpReward: 120, icon: '🎯' },
+  { id: 'track_all', name: 'Full Tracker', description: 'Log at least 15 expenses this week', type: 'entries', count: 15, xpReward: 90, icon: '📊' },
+];
+
+// Helper function to get achievement by ID
+const getAchievementById = (id) => {
+  return ACHIEVEMENTS.find(a => a.id === id);
+};
+
+// Helper function to get tier styling
+const getTierStyle = (tier) => {
+  return BADGE_TIERS[tier] || BADGE_TIERS.bronze;
 };
 
 // Admin credentials
@@ -1122,6 +1266,59 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     return saved === 'true';
   });
   
+  // Achievements & Badges System
+  const [unlockedAchievements, setUnlockedAchievements] = useState(() => {
+    const saved = localStorage.getItem(`achievements_${user.id}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [showAchievementUnlock, setShowAchievementUnlock] = useState(false);
+  const [newAchievement, setNewAchievement] = useState(null);
+  const [showAchievementsModal, setShowAchievementsModal] = useState(false);
+  
+  // Streaks & Daily Check-ins
+  const [currentStreak, setCurrentStreak] = useState(() => {
+    const saved = localStorage.getItem(`streak_${user.id}`);
+    return saved ? parseInt(saved) : 0;
+  });
+  const [lastLoginDate, setLastLoginDate] = useState(() => {
+    const saved = localStorage.getItem(`lastLogin_${user.id}`);
+    return saved || null;
+  });
+  const [todayEntryLogged, setTodayEntryLogged] = useState(() => {
+    const saved = localStorage.getItem(`todayEntry_${user.id}`);
+    const today = new Date().toDateString();
+    const savedDate = localStorage.getItem(`todayEntryDate_${user.id}`);
+    return savedDate === today && saved === 'true';
+  });
+  
+  // Weekly Challenge
+  const [weeklyChallenge, setWeeklyChallenge] = useState(() => {
+    const saved = localStorage.getItem(`weeklyChallenge_${user.id}`);
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      const challengeWeek = getWeekNumber(new Date(parsed.startDate));
+      const currentWeek = getWeekNumber(new Date());
+      if (challengeWeek === currentWeek) {
+        return parsed;
+      }
+    }
+    // Generate new weekly challenge
+    const randomChallenge = WEEKLY_CHALLENGES[Math.floor(Math.random() * WEEKLY_CHALLENGES.length)];
+    const newChallenge = {
+      ...randomChallenge,
+      startDate: new Date().toISOString(),
+      progress: 0,
+      completed: false
+    };
+    return newChallenge;
+  });
+  
+  // Budget streak tracking
+  const [budgetStreakMonths, setBudgetStreakMonths] = useState(() => {
+    const saved = localStorage.getItem(`budgetStreak_${user.id}`);
+    return saved ? parseInt(saved) : 0;
+  });
+  
   // Bulk delete states
   const [selectedEntries, setSelectedEntries] = useState([]);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
@@ -1188,6 +1385,237 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   useEffect(() => {
     localStorage.setItem('christmasTheme', isChristmasTheme.toString());
   }, [isChristmasTheme]);
+
+  // Save achievements to localStorage
+  useEffect(() => {
+    localStorage.setItem(`achievements_${user.id}`, JSON.stringify(unlockedAchievements));
+  }, [unlockedAchievements, user.id]);
+
+  // Save streak data to localStorage
+  useEffect(() => {
+    localStorage.setItem(`streak_${user.id}`, currentStreak.toString());
+  }, [currentStreak, user.id]);
+
+  useEffect(() => {
+    if (lastLoginDate) {
+      localStorage.setItem(`lastLogin_${user.id}`, lastLoginDate);
+    }
+  }, [lastLoginDate, user.id]);
+
+  useEffect(() => {
+    localStorage.setItem(`todayEntry_${user.id}`, todayEntryLogged.toString());
+    localStorage.setItem(`todayEntryDate_${user.id}`, new Date().toDateString());
+  }, [todayEntryLogged, user.id]);
+
+  // Save weekly challenge
+  useEffect(() => {
+    localStorage.setItem(`weeklyChallenge_${user.id}`, JSON.stringify(weeklyChallenge));
+  }, [weeklyChallenge, user.id]);
+
+  // Save budget streak
+  useEffect(() => {
+    localStorage.setItem(`budgetStreak_${user.id}`, budgetStreakMonths.toString());
+  }, [budgetStreakMonths, user.id]);
+
+  // Check and update daily streak on component mount
+  useEffect(() => {
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    
+    if (lastLoginDate === null) {
+      // First login ever
+      setLastLoginDate(today);
+      setCurrentStreak(1);
+      awardXP(XP_CONFIG.dailyLogin, 'for daily login');
+    } else if (lastLoginDate !== today) {
+      if (lastLoginDate === yesterday) {
+        // Consecutive day - extend streak
+        setCurrentStreak(prev => prev + 1);
+        setLastLoginDate(today);
+        awardXP(XP_CONFIG.dailyLogin, 'for daily login');
+        
+        // Check for week streak bonus
+        if ((currentStreak + 1) % 7 === 0) {
+          awardXP(XP_CONFIG.weekStreak, 'for 7-day streak bonus!');
+        }
+      } else {
+        // Streak broken
+        setCurrentStreak(1);
+        setLastLoginDate(today);
+        awardXP(XP_CONFIG.dailyLogin, 'for daily login');
+      }
+    }
+    
+    // Reset today's entry flag if it's a new day
+    const savedDate = localStorage.getItem(`todayEntryDate_${user.id}`);
+    if (savedDate !== today) {
+      setTodayEntryLogged(false);
+    }
+  }, []);
+
+  // Helper function to get week number
+  const getWeekNumber = (date) => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+  };
+
+  // Function to check and unlock achievements
+  const checkAchievements = (context = {}) => {
+    const newUnlocks = [];
+    
+    ACHIEVEMENTS.forEach(achievement => {
+      // Skip if already unlocked
+      if (unlockedAchievements.includes(achievement.id)) return;
+      
+      let isUnlocked = false;
+      const req = achievement.requirement;
+      
+      switch (req.type) {
+        case 'entries':
+          isUnlocked = entries.length >= req.count;
+          break;
+        case 'receipts':
+          isUnlocked = entries.filter(e => e.file).length >= req.count;
+          break;
+        case 'budget_set':
+          isUnlocked = monthlyBudget > 0;
+          break;
+        case 'under_budget_months':
+          isUnlocked = budgetStreakMonths >= req.count;
+          break;
+        case 'login_streak':
+          isUnlocked = currentStreak >= req.count;
+          break;
+        case 'categories_used':
+          const usedCategories = new Set(entries.map(e => e.type));
+          isUnlocked = usedCategories.size >= req.count;
+          break;
+        case 'single_expense':
+          isUnlocked = entries.some(e => e.amount >= req.amount);
+          break;
+        case 'level':
+          isUnlocked = calculateLevel(userXP) >= req.count;
+          break;
+        case 'total_spent':
+          const totalSpent = entries.reduce((sum, e) => sum + e.amount, 0);
+          isUnlocked = totalSpent >= req.amount;
+          break;
+        case 'time_of_day':
+          if (context.newEntry) {
+            const hour = new Date().getHours();
+            if (req.time === 'night') isUnlocked = hour >= 0 && hour < 5;
+            if (req.time === 'early') isUnlocked = hour >= 4 && hour < 6;
+          }
+          break;
+        case 'weekend_entries':
+          const weekendEntries = entries.filter(e => {
+            const day = new Date(e.date).getDay();
+            return day === 0 || day === 6;
+          });
+          isUnlocked = weekendEntries.length >= req.count;
+          break;
+        case 'profile_picture':
+          isUnlocked = profilePicture !== null;
+          break;
+        case 'frames_unlocked':
+          isUnlocked = getUnlockedFrames(calculateLevel(userXP)).length >= req.count;
+          break;
+        case 'achievements_unlocked':
+          isUnlocked = unlockedAchievements.length >= req.count;
+          break;
+      }
+      
+      if (isUnlocked) {
+        newUnlocks.push(achievement);
+      }
+    });
+    
+    // Process new unlocks
+    if (newUnlocks.length > 0) {
+      const newIds = newUnlocks.map(a => a.id);
+      setUnlockedAchievements(prev => [...prev, ...newIds]);
+      
+      // Award XP for each achievement
+      newUnlocks.forEach(achievement => {
+        const tier = getTierStyle(achievement.tier);
+        awardXP(tier.xpReward, `for "${achievement.name}" badge!`);
+      });
+      
+      // Show the first new achievement (can queue others)
+      setNewAchievement(newUnlocks[0]);
+      setShowAchievementUnlock(true);
+    }
+  };
+
+  // Check achievements when relevant data changes
+  useEffect(() => {
+    if (!loading && entries.length > 0) {
+      checkAchievements();
+    }
+  }, [entries.length, currentStreak, userXP, profilePicture, budgetStreakMonths]);
+
+  // Update weekly challenge progress
+  const updateWeeklyChallengeProgress = (entry) => {
+    if (weeklyChallenge.completed) return;
+    
+    let newProgress = weeklyChallenge.progress;
+    let isCompleted = false;
+    
+    // Calculate progress based on challenge type
+    if (weeklyChallenge.type === 'entries') {
+      // Count entries this week
+      const weekStart = getWeekStartDate(new Date());
+      const weekEntries = entries.filter(e => new Date(e.date) >= weekStart);
+      newProgress = weekEntries.length;
+      isCompleted = newProgress >= weeklyChallenge.count;
+    } else if (weeklyChallenge.type === 'receipts') {
+      const weekStart = getWeekStartDate(new Date());
+      const weekReceipts = entries.filter(e => e.file && new Date(e.date) >= weekStart);
+      newProgress = weekReceipts.length;
+      isCompleted = newProgress >= weeklyChallenge.count;
+    } else if (weeklyChallenge.type === 'daily_log') {
+      // Check if logged every day this week
+      const weekStart = getWeekStartDate(new Date());
+      const today = new Date();
+      const daysLogged = new Set();
+      entries.forEach(e => {
+        const entryDate = new Date(e.date);
+        if (entryDate >= weekStart) {
+          daysLogged.add(entryDate.toDateString());
+        }
+      });
+      const daysSinceWeekStart = Math.floor((today - weekStart) / 86400000) + 1;
+      newProgress = daysLogged.size;
+      isCompleted = daysLogged.size >= Math.min(daysSinceWeekStart, 7);
+    } else if (weeklyChallenge.category) {
+      // Category spending challenge
+      const weekStart = getWeekStartDate(new Date());
+      const categorySpent = entries
+        .filter(e => e.type === weeklyChallenge.category && new Date(e.date) >= weekStart)
+        .reduce((sum, e) => sum + e.amount, 0);
+      newProgress = categorySpent;
+      isCompleted = categorySpent <= weeklyChallenge.maxAmount;
+    }
+    
+    if (isCompleted && !weeklyChallenge.completed) {
+      setWeeklyChallenge(prev => ({ ...prev, progress: newProgress, completed: true }));
+      awardXP(weeklyChallenge.xpReward, `for completing weekly challenge!`);
+      showToast(`🎉 Weekly Challenge Complete! +${weeklyChallenge.xpReward} XP`, 'success');
+    } else {
+      setWeeklyChallenge(prev => ({ ...prev, progress: newProgress }));
+    }
+  };
+
+  // Helper to get week start date (Monday)
+  const getWeekStartDate = (date) => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
+  };
 
   // Handle profile picture upload to Supabase Storage
   const handleProfilePictureUpload = async (e) => {
@@ -1444,6 +1872,18 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       };
       
       setEntries(prev => [savedEntry, ...prev]);
+      
+      // Track today's entry for streak
+      if (!todayEntryLogged) {
+        setTodayEntryLogged(true);
+      }
+      
+      // Update weekly challenge progress
+      setTimeout(() => {
+        updateWeeklyChallengeProgress(savedEntry);
+        checkAchievements({ newEntry: true });
+      }, 500);
+      
       return savedEntry;
     } catch (e) {
       console.error('Failed to save:', e);
@@ -2273,25 +2713,27 @@ const getBudgetStatus = () => {
       <header style={{
         backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
         borderBottom: `1px solid ${theme.cardBorder}`,
-        padding: isSmall ? '14px 12px' : '18px 24px',
+        padding: isSmall ? '10px 8px' : '18px 24px',
         position: 'sticky',
         top: 0,
         zIndex: 20
       }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '10px' : '14px' }}>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0 4px' : '0 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '6px' : '14px' }}>
             <img 
               src="https://i.imgur.com/R52jwPv.png" 
               alt="BrewedOps Logo" 
               style={{ 
-                width: isSmall ? '36px' : '44px', 
-                height: isSmall ? '36px' : '44px', 
+                width: isSmall ? '32px' : '44px', 
+                height: isSmall ? '32px' : '44px', 
                 borderRadius: '50%', 
                 objectFit: 'cover',
                 flexShrink: 0 
               }} 
             />
-            <h1 style={{ fontSize: isSmall ? '16px' : '18px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
+            {!isSmall && (
+              <h1 style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
+            )}
           </div>
 
           {/* Desktop Header Actions */}
@@ -2352,6 +2794,45 @@ const getBudgetStatus = () => {
                 <Gift style={{ width: '18px', height: '18px', color: '#f59e0b' }} />
               </div>
               
+              {/* Achievements Button with Streak */}
+              <div 
+                onClick={() => setShowAchievementsModal(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 14px',
+                  backgroundColor: theme.statBg,
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  transition: 'transform 0.15s',
+                  border: `1px solid ${theme.cardBorder}`
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
+                <Trophy style={{ width: '20px', height: '20px', color: '#fbbf24' }} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>
+                    {unlockedAchievements.length}/{ACHIEVEMENTS.length}
+                  </span>
+                  <span style={{ fontSize: '10px', color: theme.textMuted }}>Badges</span>
+                </div>
+                {currentStreak > 0 && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px',
+                    padding: '4px 8px',
+                    backgroundColor: isDark ? '#7c2d12' : '#fed7aa',
+                    borderRadius: '12px'
+                  }}>
+                    <Flame style={{ width: '14px', height: '14px', color: '#f97316' }} />
+                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#f97316' }}>{currentStreak}</span>
+                  </div>
+                )}
+              </div>
+              
               {/* Christmas Theme Toggle */}
               <button
                 onClick={() => setIsChristmasTheme(!isChristmasTheme)}
@@ -2370,47 +2851,6 @@ const getBudgetStatus = () => {
                 title={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
               >
                 <TreePine style={{ width: '20px', height: '20px' }} />
-              </button>
-              
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                style={{
-                  height: '40px',
-                  backgroundColor: theme.inputBg,
-                  border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '8px',
-                  padding: '0 12px',
-                  fontSize: '14px',
-                  color: theme.text,
-                  cursor: 'pointer',
-                  outline: 'none'
-                }}
-              >
-                {CURRENCIES.map(c => (
-                  <option key={c.symbol} value={c.symbol}>{c.label}</option>
-                ))}
-              </select>
-
-              {/* Feedback Button */}
-              <button
-                onClick={() => setShowFeedback(true)}
-                style={{
-                  height: '40px',
-                  padding: '0 16px',
-                  backgroundColor: 'transparent',
-                  border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '8px',
-                  color: theme.textMuted,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  fontSize: '14px'
-                }}
-              >
-                <MessageSquare style={{ width: '18px', height: '18px' }} />
-                Feedback
               </button>
               
               <button
@@ -2475,54 +2915,99 @@ const getBudgetStatus = () => {
                     position: 'absolute',
                     top: '54px',
                     right: 0,
-                    width: '200px',
+                    width: '220px',
                     backgroundColor: theme.cardBg,
                     border: `1px solid ${theme.cardBorder}`,
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
                     zIndex: 50,
                     overflow: 'hidden'
                   }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
-                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
+                    <div style={{ padding: '14px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                      <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
+                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
                     </div>
+                    
+                    {/* Currency Selector */}
+                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                      <label style={{ fontSize: '12px', color: theme.textMuted, display: 'block', marginBottom: '8px' }}>Currency</label>
+                      <select
+                        value={currency}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        style={{
+                          width: '100%',
+                          height: '36px',
+                          backgroundColor: theme.inputBg,
+                          border: `1px solid ${theme.inputBorder}`,
+                          borderRadius: '6px',
+                          padding: '0 10px',
+                          fontSize: '14px',
+                          color: theme.text,
+                          cursor: 'pointer',
+                          outline: 'none'
+                        }}
+                      >
+                        {CURRENCIES.map(c => (
+                          <option key={c.symbol} value={c.symbol}>{c.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                    
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
                       style={{
                         width: '100%',
-                        padding: '10px 16px',
+                        padding: '12px 16px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px',
+                        gap: '12px',
                         cursor: 'pointer',
                         fontSize: '14px',
                         color: theme.text,
                         textAlign: 'left'
                       }}
                     >
-                      <Edit style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                      <Edit style={{ width: '18px', height: '18px', color: theme.textMuted }} />
                       Edit Profile
+                    </button>
+                    <button
+                      onClick={() => { setShowProfileMenu(false); setShowFeedback(true); }}
+                      style={{
+                        width: '100%',
+                        padding: '12px 16px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                        cursor: 'pointer',
+                        fontSize: '14px',
+                        color: theme.text,
+                        textAlign: 'left'
+                      }}
+                    >
+                      <MessageSquare style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                      Send Feedback
                     </button>
                     <button
                       onClick={() => { setShowProfileMenu(false); onLogout(); }}
                       style={{
                         width: '100%',
-                        padding: '10px 16px',
+                        padding: '12px 16px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px',
+                        gap: '12px',
                         cursor: 'pointer',
                         fontSize: '14px',
                         color: '#ef4444',
                         textAlign: 'left'
                       }}
                     >
-                      <LogOut style={{ width: '16px', height: '16px' }} />
+                      <LogOut style={{ width: '18px', height: '18px' }} />
                       Logout
                     </button>
                   </div>
@@ -2531,17 +3016,17 @@ const getBudgetStatus = () => {
             </div>
           ) : (
             /* Mobile Header Actions */
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               {/* Mobile Level & XP Bar - Compact */}
               <div 
                 onClick={() => setShowRewardsModal(true)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '6px 10px',
+                  gap: '6px',
+                  padding: '4px 8px',
                   backgroundColor: theme.statBg,
-                  borderRadius: '8px',
+                  borderRadius: '6px',
                   cursor: 'pointer',
                   border: `1px solid ${theme.cardBorder}`
                 }}
@@ -2550,43 +3035,83 @@ const getBudgetStatus = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '26px',
-                  height: '26px',
+                  width: '22px',
+                  height: '22px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
                   color: '#fff',
-                  fontSize: '11px',
+                  fontSize: '10px',
                   fontWeight: '700'
                 }}>
                   {currentLevel}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '55px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', minWidth: '40px' }}>
                   <div style={{
-                    height: '5px',
+                    height: '4px',
                     backgroundColor: isDark ? '#27272a' : '#e4e4e7',
-                    borderRadius: '3px',
+                    borderRadius: '2px',
                     overflow: 'hidden'
                   }}>
                     <div style={{
                       height: '100%',
                       width: `${levelProgress}%`,
                       background: 'linear-gradient(90deg, #22c55e, #10b981)',
-                      borderRadius: '3px'
+                      borderRadius: '2px'
                     }} />
                   </div>
-                  <span style={{ fontSize: '9px', color: theme.textMuted }}>{userXP} XP</span>
+                  <span style={{ fontSize: '8px', color: theme.textMuted }}>{userXP} XP</span>
                 </div>
               </div>
+
+              {/* Achievements Button - Mobile */}
+              <button
+                onClick={() => setShowAchievementsModal(true)}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  backgroundColor: 'transparent',
+                  border: `1px solid ${theme.inputBorder}`,
+                  borderRadius: '6px',
+                  color: theme.textMuted,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  position: 'relative'
+                }}
+              >
+                <Trophy style={{ width: '16px', height: '16px', color: '#fbbf24' }} />
+                {currentStreak > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '-3px',
+                    right: '-3px',
+                    minWidth: '14px',
+                    height: '14px',
+                    backgroundColor: '#f97316',
+                    borderRadius: '7px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '8px',
+                    fontWeight: '700',
+                    color: '#fff',
+                    padding: '0 3px'
+                  }}>
+                    {currentStreak}
+                  </div>
+                )}
+              </button>
 
               {/* Christmas Theme Toggle - Mobile */}
               <button
                 onClick={() => setIsChristmasTheme(!isChristmasTheme)}
                 style={{
-                  width: '36px',
-                  height: '36px',
+                  width: '32px',
+                  height: '32px',
                   backgroundColor: isChristmasTheme ? '#dc2626' : 'transparent',
                   border: `1px solid ${isChristmasTheme ? '#dc2626' : theme.inputBorder}`,
-                  borderRadius: '8px',
+                  borderRadius: '6px',
                   color: isChristmasTheme ? '#fff' : theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
@@ -2594,17 +3119,17 @@ const getBudgetStatus = () => {
                   justifyContent: 'center'
                 }}
               >
-                <TreePine style={{ width: '18px', height: '18px' }} />
+                <TreePine style={{ width: '16px', height: '16px' }} />
               </button>
               
               <button
                 onClick={() => setIsDark(!isDark)}
                 style={{
-                  width: '36px',
-                  height: '36px',
+                  width: '32px',
+                  height: '32px',
                   backgroundColor: 'transparent',
                   border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '8px',
+                  borderRadius: '6px',
                   color: theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
@@ -2612,7 +3137,7 @@ const getBudgetStatus = () => {
                   justifyContent: 'center'
                 }}
               >
-                {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
+                {isDark ? <Sun style={{ width: '16px', height: '16px' }} /> : <Moon style={{ width: '16px', height: '16px' }} />}
               </button>
               
               {/* Mobile Profile Avatar with Dropdown */}
@@ -2620,13 +3145,13 @@ const getBudgetStatus = () => {
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   style={{
-                    width: '44px',
-                    height: '44px',
+                    width: '36px',
+                    height: '36px',
                     borderRadius: '50%',
                     backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
                     border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
                     color: '#fff',
-                    fontSize: '16px',
+                    fontSize: '14px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     display: 'flex',
@@ -2656,7 +3181,7 @@ const getBudgetStatus = () => {
                 {showProfileMenu && (
                   <div style={{
                     position: 'absolute',
-                    top: '50px',
+                    top: '42px',
                     right: 0,
                     width: '220px',
                     backgroundColor: theme.cardBg,
@@ -5843,6 +6368,271 @@ const getBudgetStatus = () => {
         </div>
       )}
 
+      {/* Achievement Unlock Modal */}
+      {showAchievementUnlock && newAchievement && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 70 }}>
+          <div style={{ 
+            width: '100%', 
+            maxWidth: '380px', 
+            backgroundColor: theme.cardBg, 
+            borderRadius: '20px', 
+            border: `2px solid ${getTierStyle(newAchievement.tier).color}`, 
+            padding: '32px 24px',
+            textAlign: 'center',
+            boxShadow: getTierStyle(newAchievement.tier).glow,
+            animation: 'achievementPop 0.5s ease-out'
+          }}>
+            {/* Achievement Badge */}
+            <div style={{
+              width: '100px',
+              height: '100px',
+              margin: '0 auto 20px',
+              borderRadius: '50%',
+              background: getTierStyle(newAchievement.tier).bgGradient,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: getTierStyle(newAchievement.tier).glow,
+              animation: getTierStyle(newAchievement.tier).animated ? 'badgeShine 2s ease-in-out infinite' : 'none',
+              position: 'relative'
+            }}>
+              <span style={{ fontSize: '48px', filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))' }}>{newAchievement.icon}</span>
+              {/* Tier indicator */}
+              <div style={{
+                position: 'absolute',
+                bottom: '-5px',
+                right: '-5px',
+                padding: '4px 10px',
+                borderRadius: '12px',
+                background: getTierStyle(newAchievement.tier).bgGradient,
+                border: `2px solid ${theme.cardBg}`,
+                fontSize: '10px',
+                fontWeight: '700',
+                color: '#fff',
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px'
+              }}>
+                {newAchievement.tier}
+              </div>
+            </div>
+            
+            <p style={{ fontSize: '14px', fontWeight: '600', color: getTierStyle(newAchievement.tier).color, margin: '0 0 8px', textTransform: 'uppercase', letterSpacing: '2px' }}>
+              Achievement Unlocked!
+            </p>
+            <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: '0 0 8px' }}>{newAchievement.name}</h2>
+            <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 20px' }}>{newAchievement.description}</p>
+            
+            <div style={{ 
+              display: 'inline-flex', 
+              alignItems: 'center', 
+              gap: '6px', 
+              padding: '8px 16px', 
+              backgroundColor: isDark ? '#1a1a1d' : '#f0fdf4', 
+              borderRadius: '20px',
+              marginBottom: '24px'
+            }}>
+              <span style={{ fontSize: '16px' }}>✨</span>
+              <span style={{ fontSize: '16px', fontWeight: '700', color: '#22c55e' }}>+{getTierStyle(newAchievement.tier).xpReward} XP</span>
+            </div>
+            
+            <button
+              onClick={() => { setShowAchievementUnlock(false); setNewAchievement(null); }}
+              style={{
+                width: '100%',
+                height: '48px',
+                background: getTierStyle(newAchievement.tier).bgGradient,
+                border: 'none',
+                borderRadius: '12px',
+                fontSize: '16px',
+                fontWeight: '600',
+                color: '#fff',
+                cursor: 'pointer',
+                boxShadow: getTierStyle(newAchievement.tier).glow
+              }}
+            >
+              Claim Reward
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Achievements Modal */}
+      {showAchievementsModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowAchievementsModal(false)}>
+          <div style={{ width: '100%', maxWidth: '600px', backgroundColor: theme.cardBg, borderRadius: '16px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div style={{ padding: '20px 24px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '20px', fontWeight: '700', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span>🏆</span> Achievements
+                </h3>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>
+                  {unlockedAchievements.length} / {ACHIEVEMENTS.length} unlocked
+                </p>
+              </div>
+              <button onClick={() => setShowAchievementsModal(false)} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
+            
+            {/* Streak & Challenge Section */}
+            <div style={{ padding: '16px 24px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              {/* Current Streak */}
+              <div style={{ 
+                padding: '16px', 
+                background: isDark ? 'linear-gradient(135deg, #7c2d12, #9a3412)' : 'linear-gradient(135deg, #fed7aa, #fdba74)', 
+                borderRadius: '12px',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '4px' }}>🔥</div>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: isDark ? '#fff' : '#9a3412', margin: '0' }}>{currentStreak}</p>
+                <p style={{ fontSize: '12px', color: isDark ? '#fed7aa' : '#c2410c', margin: '4px 0 0', fontWeight: '500' }}>Day Streak</p>
+              </div>
+              
+              {/* Weekly Challenge */}
+              <div style={{ 
+                padding: '16px', 
+                background: weeklyChallenge.completed 
+                  ? (isDark ? 'linear-gradient(135deg, #14532d, #166534)' : 'linear-gradient(135deg, #bbf7d0, #86efac)')
+                  : (isDark ? 'linear-gradient(135deg, #1e3a5f, #1e40af)' : 'linear-gradient(135deg, #dbeafe, #bfdbfe)'), 
+                borderRadius: '12px',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '24px', marginBottom: '4px' }}>{weeklyChallenge.icon}</div>
+                <p style={{ fontSize: '13px', fontWeight: '600', color: weeklyChallenge.completed ? (isDark ? '#86efac' : '#166534') : (isDark ? '#93c5fd' : '#1e40af'), margin: '0 0 8px' }}>
+                  {weeklyChallenge.completed ? '✓ Completed!' : weeklyChallenge.name}
+                </p>
+                {!weeklyChallenge.completed && (
+                  <div style={{
+                    height: '6px',
+                    backgroundColor: 'rgba(255,255,255,0.3)',
+                    borderRadius: '3px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${Math.min((weeklyChallenge.progress / (weeklyChallenge.count || weeklyChallenge.maxAmount || 1)) * 100, 100)}%`,
+                      backgroundColor: '#fff',
+                      borderRadius: '3px'
+                    }} />
+                  </div>
+                )}
+                <p style={{ fontSize: '10px', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)', margin: '6px 0 0' }}>
+                  +{weeklyChallenge.xpReward} XP
+                </p>
+              </div>
+            </div>
+            
+            {/* Achievements List */}
+            <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1 }}>
+              {Object.entries(ACHIEVEMENT_CATEGORIES).map(([catKey, category]) => {
+                const categoryAchievements = ACHIEVEMENTS.filter(a => a.category === catKey);
+                const unlockedInCategory = categoryAchievements.filter(a => unlockedAchievements.includes(a.id)).length;
+                
+                return (
+                  <div key={catKey} style={{ marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '20px' }}>{category.icon}</span>
+                      <h4 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{category.name}</h4>
+                      <span style={{ fontSize: '12px', color: theme.textMuted, marginLeft: 'auto' }}>
+                        {unlockedInCategory}/{categoryAchievements.length}
+                      </span>
+                    </div>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '10px' }}>
+                      {categoryAchievements.map(achievement => {
+                        const isUnlocked = unlockedAchievements.includes(achievement.id);
+                        const tier = getTierStyle(achievement.tier);
+                        
+                        return (
+                          <div
+                            key={achievement.id}
+                            style={{
+                              padding: '14px',
+                              backgroundColor: isUnlocked ? (isDark ? '#1a1a1d' : '#fafafa') : theme.statBg,
+                              borderRadius: '12px',
+                              border: isUnlocked ? `2px solid ${tier.color}` : `1px solid ${theme.cardBorder}`,
+                              opacity: isUnlocked ? 1 : 0.6,
+                              position: 'relative',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            {/* Glow effect for unlocked */}
+                            {isUnlocked && (
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: '3px',
+                                background: tier.bgGradient
+                              }} />
+                            )}
+                            
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                              <div style={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
+                                background: isUnlocked ? tier.bgGradient : (isDark ? '#27272a' : '#e4e4e7'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                              }}>
+                                <span style={{ fontSize: '20px', filter: isUnlocked ? 'none' : 'grayscale(100%)' }}>
+                                  {isUnlocked ? achievement.icon : '🔒'}
+                                </span>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ 
+                                  fontSize: '13px', 
+                                  fontWeight: '600', 
+                                  color: isUnlocked ? theme.text : theme.textMuted, 
+                                  margin: '0 0 2px',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
+                                }}>
+                                  {achievement.name}
+                                </p>
+                                <p style={{ 
+                                  fontSize: '11px', 
+                                  color: theme.textMuted, 
+                                  margin: 0,
+                                  lineHeight: '1.3'
+                                }}>
+                                  {achievement.description}
+                                </p>
+                                {isUnlocked && (
+                                  <span style={{
+                                    display: 'inline-block',
+                                    marginTop: '6px',
+                                    padding: '2px 8px',
+                                    borderRadius: '10px',
+                                    background: tier.bgGradient,
+                                    fontSize: '9px',
+                                    fontWeight: '700',
+                                    color: '#fff',
+                                    textTransform: 'uppercase'
+                                  }}>
+                                    {tier.name}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Rewards Modal */}
       {showRewardsModal && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowRewardsModal(false)}>
@@ -6144,6 +6934,20 @@ const getBudgetStatus = () => {
         @keyframes legendary-pulse {
           0%, 100% { box-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00; }
           50% { box-shadow: 0 0 30px #ffd700, 0 0 50px #ff8c00, 0 0 70px #ff4500; }
+        }
+        @keyframes achievementPop {
+          0% { transform: scale(0.5); opacity: 0; }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes badgeShine {
+          0% { filter: brightness(1) saturate(1); }
+          50% { filter: brightness(1.3) saturate(1.2); }
+          100% { filter: brightness(1) saturate(1); }
+        }
+        @keyframes streakFire {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
         }
         * { box-sizing: border-box; }
         input, select, button { font-family: inherit; }
