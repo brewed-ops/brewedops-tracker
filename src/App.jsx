@@ -1293,6 +1293,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [isUploadingPicture, setIsUploadingPicture] = useState(false);
   const fileInputRef = useRef(null);
   
+  // Ref to track loaded achievements (prevents race conditions)
+  const loadedAchievementsRef = useRef([]);
+  
   // XP and Level System
   const [userXP, setUserXP] = useState(0);
   const [selectedFrame, setSelectedFrame] = useState('none');
@@ -1353,6 +1356,14 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [walletDateFrom, setWalletDateFrom] = useState('');
   const [walletDateTo, setWalletDateTo] = useState('');
   const [showWalletAdvancedFilter, setShowWalletAdvancedFilter] = useState(false);
+  
+  // Featured wallet per type (the one shown larger)
+  const [featuredWallets, setFeaturedWallets] = useState({
+    cash: null,
+    ewallet: null,
+    bank: null,
+    credit: null
+  });
   
   // Add Wallet Modal states
   const [showAddWalletModal, setShowAddWalletModal] = useState(false);
@@ -1484,7 +1495,10 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         if (achievementsError) {
           console.error('Error loading achievements:', achievementsError);
         } else if (achievementsData) {
-          setUnlockedAchievements(achievementsData.map(a => a.achievement_id));
+          const achievementIds = achievementsData.map(a => a.achievement_id);
+          setUnlockedAchievements(achievementIds);
+          // Also set ref immediately to prevent race conditions
+          loadedAchievementsRef.current = achievementIds;
         }
 
         // Load wallets
@@ -1557,6 +1571,23 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     loadUserData();
   }, [user.id]);
 
+  // Set featured wallet for each type (first wallet of each type by default)
+  useEffect(() => {
+    if (wallets.length > 0) {
+      setFeaturedWallets(prev => {
+        const newFeatured = { ...prev };
+        ['cash', 'ewallet', 'bank', 'credit'].forEach(type => {
+          const typeWallets = wallets.filter(w => w.type === type);
+          // If no featured wallet set, or current featured doesn't exist anymore, set first one
+          if (!prev[type] || !typeWallets.find(w => w.id === prev[type])) {
+            newFeatured[type] = typeWallets.length > 0 ? typeWallets[0].id : null;
+          }
+        });
+        return newFeatured;
+      });
+    }
+  }, [wallets]);
+
   // Save user profile to Supabase (debounced)
   useEffect(() => {
     if (!userDataLoaded) return;
@@ -1585,13 +1616,22 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     return () => clearTimeout(timeoutId);
   }, [userXP, selectedFrame, currentStreak, lastLoginDate, todayEntryLogged, budgetStreakMonths, weeklyChallenge, userDataLoaded, user.id]);
 
-  // Save new achievements to Supabase
+  // Save new achievements to Supabase (upsert to prevent duplicates)
   const saveAchievementToSupabase = async (achievementId) => {
     try {
-      await supabase.from('user_achievements').insert([{
-        user_id: user.id,
-        achievement_id: achievementId
-      }]);
+      const { error } = await supabase
+        .from('user_achievements')
+        .upsert([{
+          user_id: user.id,
+          achievement_id: achievementId
+        }], { 
+          onConflict: 'user_id,achievement_id',
+          ignoreDuplicates: true 
+        });
+      
+      if (error && !error.message.includes('duplicate')) {
+        console.error('Failed to save achievement:', error);
+      }
     } catch (e) {
       console.error('Failed to save achievement:', e);
     }
@@ -1672,14 +1712,21 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   };
 
   // Function to check and unlock achievements
+  // Keep ref in sync with state
+  useEffect(() => {
+    loadedAchievementsRef.current = unlockedAchievements;
+  }, [unlockedAchievements]);
+  
   const checkAchievements = (context = {}) => {
     if (!userDataLoaded) return;
     
+    // Use ref for most up-to-date achievements list
+    const currentUnlocked = loadedAchievementsRef.current;
     const newUnlocks = [];
     
     ACHIEVEMENTS.forEach(achievement => {
-      // Skip if already unlocked
-      if (unlockedAchievements.includes(achievement.id)) return;
+      // Skip if already unlocked (check both state and ref)
+      if (currentUnlocked.includes(achievement.id) || unlockedAchievements.includes(achievement.id)) return;
       
       let isUnlocked = false;
       const req = achievement.requirement;
@@ -1765,11 +1812,23 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   };
 
   // Check achievements when relevant data changes
+  // Use a ref to track if initial check has been done to prevent duplicate awards
+  const initialAchievementCheckDone = useRef(false);
+  
   useEffect(() => {
     if (!loading && entries.length > 0 && userDataLoaded) {
-      checkAchievements();
+      // Add a small delay on initial load to ensure all state is settled
+      if (!initialAchievementCheckDone.current) {
+        const timer = setTimeout(() => {
+          initialAchievementCheckDone.current = true;
+          checkAchievements();
+        }, 500);
+        return () => clearTimeout(timer);
+      } else {
+        checkAchievements();
+      }
     }
-  }, [entries.length, currentStreak, userXP, profilePicture, budgetStreakMonths, userDataLoaded]);
+  }, [entries.length, currentStreak, profilePicture, budgetStreakMonths, userDataLoaded, loading]);
 
   // Update weekly challenge progress
   const updateWeeklyChallengeProgress = (entry) => {
@@ -1934,10 +1993,17 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     setEditWalletName('');
   };
 
-  // Add new wallet
+  // Add new wallet (max 4 per type for ewallet, bank, credit)
   const handleAddWallet = async (preset = null) => {
     const walletType = selectedWalletType;
     if (!walletType) return;
+
+    // Check limit (4 max for ewallet, bank, credit)
+    const typeWallets = wallets.filter(w => w.type === walletType.type);
+    if (walletType.canAddMultiple && typeWallets.length >= 4) {
+      showToast(`Maximum 4 ${walletType.label.toLowerCase()}s allowed`, 'error');
+      return;
+    }
 
     let name, icon, color;
     
@@ -5356,170 +5422,262 @@ const getBudgetStatus = () => {
             {/* Wallet Sections by Type */}
             {WALLET_TYPES.map(walletType => {
               const typeWallets = getWalletsByType(walletType.type);
-              const showAddButton = walletType.canAddMultiple || typeWallets.length === 0;
+              const featuredId = featuredWallets[walletType.type];
+              const featuredWallet = typeWallets.find(w => w.id === featuredId) || typeWallets[0];
+              const otherWallets = typeWallets.filter(w => w.id !== featuredWallet?.id);
+              const canAddMore = walletType.canAddMultiple ? typeWallets.length < 4 : typeWallets.length === 0;
+              const maxReached = walletType.canAddMultiple && typeWallets.length >= 4;
+              
+              if (typeWallets.length === 0 && !walletType.canAddMultiple && walletType.type !== 'cash') {
+                return null; // Don't show empty sections for non-addable types
+              }
               
               return (
                 <div key={walletType.type} style={cardStyle}>
+                  {/* Section Header */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '24px' }}>{walletType.icon}</span>
+                      <span style={{ fontSize: '20px' }}>{walletType.icon}</span>
                       <div>
-                        <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{walletType.label}</h3>
-                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>
-                          {typeWallets.length} {typeWallets.length === 1 ? 'wallet' : 'wallets'}
+                        <h3 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>{walletType.label}</h3>
+                        <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>
+                          {typeWallets.length}/4 {maxReached && '(max)'}
                         </p>
                       </div>
                     </div>
-                    {showAddButton && (
-                      <button
-                        onClick={() => {
-                          setSelectedWalletType(walletType);
-                          setShowAddWalletModal(true);
-                        }}
-                        style={{
-                          height: '36px',
-                          padding: '0 16px',
-                          backgroundColor: walletType.color,
-                          color: '#fff',
-                          border: 'none',
-                          borderRadius: '8px',
-                          fontSize: '13px',
-                          fontWeight: '500',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px'
-                        }}
-                      >
-                        <Plus style={{ width: '14px', height: '14px' }} />
-                        Add {walletType.label}
-                      </button>
-                    )}
                   </div>
                   
                   {typeWallets.length === 0 ? (
-                    <div style={{ 
-                      textAlign: 'center', 
-                      padding: '30px 20px',
-                      backgroundColor: theme.statBg,
-                      borderRadius: '8px',
-                      color: theme.textMuted 
-                    }}>
-                      <p style={{ fontSize: '14px', margin: 0 }}>No {walletType.label.toLowerCase()} added yet</p>
+                    /* Empty State */
+                    <div 
+                      onClick={() => {
+                        if (canAddMore) {
+                          setSelectedWalletType(walletType);
+                          setShowAddWalletModal(true);
+                        }
+                      }}
+                      style={{ 
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '40px 20px',
+                        backgroundColor: theme.statBg,
+                        borderRadius: '12px',
+                        border: `2px dashed ${theme.cardBorder}`,
+                        cursor: canAddMore ? 'pointer' : 'default',
+                        transition: 'all 0.2s'
+                      }}
+                    >
+                      <div style={{ textAlign: 'center' }}>
+                        <Plus style={{ width: '32px', height: '32px', color: theme.textMuted, margin: '0 auto 8px' }} />
+                        <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>Add your first {walletType.label.toLowerCase()}</p>
+                      </div>
                     </div>
                   ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '12px' }}>
-                      {typeWallets.map(wallet => (
-                        <div
-                          key={wallet.id}
-                          style={{
-                            padding: '16px',
-                            borderRadius: '10px',
-                            border: `1px solid ${theme.cardBorder}`,
-                            backgroundColor: theme.statBg,
-                            position: 'relative'
-                          }}
-                        >
-                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                              <span style={{ 
-                                fontSize: '24px',
-                                width: '40px',
-                                height: '40px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                borderRadius: '10px',
-                                backgroundColor: `${wallet.color}20`
-                              }}>{wallet.icon}</span>
-                              <div>
-                                <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{wallet.name}</h4>
-                                <p style={{ 
-                                  fontSize: '18px', 
-                                  fontWeight: '700', 
-                                  color: wallet.balance >= 0 ? theme.text : '#ef4444', 
-                                  margin: '4px 0 0' 
-                                }}>
-                                  {currency}{wallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                </p>
-                              </div>
-                            </div>
-                            <div style={{ display: 'flex', gap: '4px' }}>
-                              {wallet.editable && (
-                                <button
-                                  onClick={() => {
-                                    setEditingWallet(wallet);
-                                    setEditWalletName(wallet.name);
-                                    setShowEditWalletModal(true);
-                                  }}
-                                  style={{
-                                    width: '28px',
-                                    height: '28px',
-                                    backgroundColor: 'transparent',
-                                    border: `1px solid ${theme.inputBorder}`,
-                                    borderRadius: '6px',
-                                    color: theme.textMuted,
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                  }}
-                                >
-                                  <Edit style={{ width: '12px', height: '12px' }} />
-                                </button>
-                              )}
-                              {wallet.type !== 'cash' && (
-                                <button
-                                  onClick={() => {
-                                    setWalletToDelete(wallet);
-                                    setShowDeleteWalletConfirm(true);
-                                  }}
-                                  style={{
-                                    width: '28px',
-                                    height: '28px',
-                                    backgroundColor: 'transparent',
-                                    border: `1px solid ${theme.inputBorder}`,
-                                    borderRadius: '6px',
-                                    color: theme.textMuted,
-                                    cursor: 'pointer',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center'
-                                  }}
-                                >
-                                  <Trash2 style={{ width: '12px', height: '12px' }} />
-                                </button>
-                              )}
+                    /* Wallet Display */
+                    <div style={{ display: 'flex', gap: '12px', flexDirection: isSmall ? 'column' : 'row' }}>
+                      {/* Featured Wallet (Large) */}
+                      {featuredWallet && (
+                        <div style={{ 
+                          flex: isSmall ? 'none' : '1',
+                          minWidth: isSmall ? 'auto' : '280px',
+                          padding: '20px',
+                          borderRadius: '12px',
+                          backgroundColor: `${featuredWallet.color}10`,
+                          border: `2px solid ${featuredWallet.color}40`,
+                          position: 'relative'
+                        }}>
+                          {/* Action Buttons */}
+                          <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '4px' }}>
+                            {featuredWallet.editable && (
+                              <button
+                                onClick={() => {
+                                  setEditingWallet(featuredWallet);
+                                  setEditWalletName(featuredWallet.name);
+                                  setShowEditWalletModal(true);
+                                }}
+                                style={{
+                                  width: '28px',
+                                  height: '28px',
+                                  backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.8)',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  color: theme.textMuted,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <Edit style={{ width: '12px', height: '12px' }} />
+                              </button>
+                            )}
+                            {featuredWallet.type !== 'cash' && (
+                              <button
+                                onClick={() => {
+                                  setWalletToDelete(featuredWallet);
+                                  setShowDeleteWalletConfirm(true);
+                                }}
+                                style={{
+                                  width: '28px',
+                                  height: '28px',
+                                  backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.8)',
+                                  border: 'none',
+                                  borderRadius: '6px',
+                                  color: theme.textMuted,
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <Trash2 style={{ width: '12px', height: '12px' }} />
+                              </button>
+                            )}
+                          </div>
+                          
+                          {/* Wallet Info */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                            <span style={{ 
+                              fontSize: '32px',
+                              width: '56px',
+                              height: '56px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: '12px',
+                              backgroundColor: `${featuredWallet.color}20`
+                            }}>{featuredWallet.icon}</span>
+                            <div>
+                              <h4 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{featuredWallet.name}</h4>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0', textTransform: 'capitalize' }}>{featuredWallet.type === 'ewallet' ? 'E-Wallet' : featuredWallet.type}</p>
                             </div>
                           </div>
                           
+                          {/* Balance */}
+                          <p style={{ 
+                            fontSize: '28px', 
+                            fontWeight: '700', 
+                            color: featuredWallet.balance >= 0 ? theme.text : '#ef4444', 
+                            margin: '0 0 16px',
+                            fontFamily: 'system-ui, -apple-system, sans-serif'
+                          }}>
+                            {currency}{featuredWallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </p>
+                          
+                          {/* Add Funds Button */}
                           <button
                             onClick={() => {
-                              setSelectedWalletForFunds(wallet);
+                              setSelectedWalletForFunds(featuredWallet);
                               setShowAddFundsModal(true);
                             }}
                             style={{
                               width: '100%',
-                              height: '32px',
-                              backgroundColor: wallet.color,
+                              height: '40px',
+                              backgroundColor: featuredWallet.color,
                               color: '#fff',
                               border: 'none',
-                              borderRadius: '6px',
-                              fontSize: '12px',
-                              fontWeight: '500',
+                              borderRadius: '8px',
+                              fontSize: '13px',
+                              fontWeight: '600',
                               cursor: 'pointer',
                               display: 'flex',
                               alignItems: 'center',
                               justifyContent: 'center',
-                              gap: '4px',
-                              marginTop: '12px'
+                              gap: '6px'
                             }}
                           >
-                            <Plus style={{ width: '12px', height: '12px' }} />
+                            <Plus style={{ width: '14px', height: '14px' }} />
                             Add Funds
                           </button>
                         </div>
-                      ))}
+                      )}
+                      
+                      {/* Other Wallets (Small) + Add Button */}
+                      <div style={{ 
+                        display: 'flex', 
+                        flexDirection: 'column', 
+                        gap: '8px',
+                        minWidth: isSmall ? 'auto' : '160px'
+                      }}>
+                        {otherWallets.map(wallet => (
+                          <div
+                            key={wallet.id}
+                            onClick={() => setFeaturedWallets(prev => ({ ...prev, [walletType.type]: wallet.id }))}
+                            style={{
+                              padding: '12px',
+                              borderRadius: '10px',
+                              backgroundColor: theme.statBg,
+                              border: `1px solid ${theme.cardBorder}`,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '10px'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = wallet.color;
+                              e.currentTarget.style.backgroundColor = `${wallet.color}10`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = theme.cardBorder;
+                              e.currentTarget.style.backgroundColor = theme.statBg;
+                            }}
+                          >
+                            <span style={{ 
+                              fontSize: '20px',
+                              width: '36px',
+                              height: '36px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: '8px',
+                              backgroundColor: `${wallet.color}20`,
+                              flexShrink: 0
+                            }}>{wallet.icon}</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <p style={{ fontSize: '12px', fontWeight: '600', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{wallet.name}</p>
+                              <p style={{ fontSize: '13px', fontWeight: '700', color: wallet.balance >= 0 ? theme.text : '#ef4444', margin: '2px 0 0' }}>
+                                {currency}{wallet.balance.toLocaleString()}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                        
+                        {/* Add Button (if not at max) */}
+                        {canAddMore && walletType.canAddMultiple && (
+                          <div
+                            onClick={() => {
+                              setSelectedWalletType(walletType);
+                              setShowAddWalletModal(true);
+                            }}
+                            style={{
+                              padding: '12px',
+                              borderRadius: '10px',
+                              backgroundColor: 'transparent',
+                              border: `2px dashed ${theme.cardBorder}`,
+                              cursor: 'pointer',
+                              transition: 'all 0.2s',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '6px',
+                              minHeight: '60px'
+                            }}
+                            onMouseEnter={(e) => {
+                              e.currentTarget.style.borderColor = walletType.color;
+                              e.currentTarget.style.backgroundColor = `${walletType.color}10`;
+                            }}
+                            onMouseLeave={(e) => {
+                              e.currentTarget.style.borderColor = theme.cardBorder;
+                              e.currentTarget.style.backgroundColor = 'transparent';
+                            }}
+                          >
+                            <Plus style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                            <span style={{ fontSize: '12px', color: theme.textMuted, fontWeight: '500' }}>Add</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>
