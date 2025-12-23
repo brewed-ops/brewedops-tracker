@@ -2624,7 +2624,7 @@ const getBudgetStatus = () => {
                   </button>
                 </div>
               </div>
-            )}
+            ) : null}
           </div>
 
           {/* History Card */}
