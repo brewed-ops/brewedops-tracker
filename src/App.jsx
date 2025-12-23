@@ -5248,14 +5248,36 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const { data: expenses, error } = await supabase
+      // First, try to get all profiles (users who have signed up)
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*');
+      
+      // Then get all expenses
+      const { data: expenses, error: expensesError } = await supabase
         .from('expenses')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (expensesError) throw expensesError;
 
       const userMap = {};
+      
+      // Add users from profiles table first (if available)
+      if (profiles && !profilesError) {
+        profiles.forEach(profile => {
+          userMap[profile.id] = {
+            id: profile.id,
+            email: profile.email || profile.id,
+            nickname: profile.nickname || profile.full_name || profile.username || 'User',
+            expenses: [],
+            totalSpent: 0,
+            createdAt: profile.created_at || profile.updated_at
+          };
+        });
+      }
+      
+      // Add/update users from expenses
       expenses?.forEach(expense => {
         if (!userMap[expense.user_id]) {
           userMap[expense.user_id] = {
@@ -5266,6 +5288,14 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             totalSpent: 0,
             createdAt: expense.created_at
           };
+        } else {
+          // Update email/nickname if we have better data from expenses
+          if (expense.user_email && userMap[expense.user_id].email === expense.user_id) {
+            userMap[expense.user_id].email = expense.user_email;
+          }
+          if (expense.user_nickname && userMap[expense.user_id].nickname === 'User') {
+            userMap[expense.user_id].nickname = expense.user_nickname;
+          }
         }
         userMap[expense.user_id].expenses.push(expense);
         userMap[expense.user_id].totalSpent += expense.amount;
