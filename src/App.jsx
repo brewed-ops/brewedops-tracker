@@ -1296,6 +1296,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   // Ref to track loaded achievements (prevents race conditions)
   const loadedAchievementsRef = useRef([]);
   
+  // Ref to track loaded XP (prevents race conditions)
+  const loadedXPRef = useRef(0);
+  
   // XP and Level System
   const [userXP, setUserXP] = useState(0);
   const [selectedFrame, setSelectedFrame] = useState('none');
@@ -1374,6 +1377,12 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [newWalletColor, setNewWalletColor] = useState('');
   const [showDeleteWalletConfirm, setShowDeleteWalletConfirm] = useState(false);
   const [walletToDelete, setWalletToDelete] = useState(null);
+  
+  // Withdraw Modal states
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [selectedWalletForWithdraw, setSelectedWalletForWithdraw] = useState(null);
+  const [withdrawAmount, setWithdrawAmount] = useState('');
+  const [withdrawNote, setWithdrawNote] = useState('');
   
   // Bulk delete states
   const [selectedEntries, setSelectedEntries] = useState([]);
@@ -1462,7 +1471,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         }
 
         if (profileData) {
-          setUserXP(profileData.xp || 0);
+          const loadedXP = profileData.xp || 0;
+          setUserXP(loadedXP);
+          loadedXPRef.current = loadedXP; // Set ref immediately
           setSelectedFrame(profileData.selected_frame || 'none');
           setCurrentStreak(profileData.current_streak || 0);
           setLastLoginDate(profileData.last_login_date || null);
@@ -1511,9 +1522,10 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
 
         if (walletsError) {
           console.error('Error loading wallets:', walletsError);
-        }
-
-        if (walletsData && walletsData.length > 0) {
+          // Don't create defaults on error - just use empty array
+          // User can add wallets manually
+        } else if (walletsData && walletsData.length > 0) {
+          console.log('Loaded wallets from Supabase:', walletsData);
           setWallets(walletsData.map(w => ({
             id: w.wallet_id,
             name: w.name,
@@ -1521,10 +1533,11 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
             color: w.color,
             type: w.type,
             balance: parseFloat(w.balance) || 0,
-            editable: w.editable
+            editable: w.editable !== false // default to true if not set
           })));
         } else {
-          // Create default wallets
+          // No wallets exist - create default Cash wallet only
+          console.log('No wallets found, creating default Cash wallet');
           const defaultWallets = DEFAULT_WALLETS.map(w => ({
             user_id: user.id,
             wallet_id: w.id,
@@ -1536,7 +1549,10 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
             editable: w.editable || false
           }));
           
-          await supabase.from('wallets').insert(defaultWallets);
+          const { error: insertError } = await supabase.from('wallets').insert(defaultWallets);
+          if (insertError) {
+            console.error('Error creating default wallets:', insertError);
+          }
           setWallets(DEFAULT_WALLETS.map(w => ({ ...w, balance: 0 })));
         }
 
@@ -1641,14 +1657,32 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   // Save wallet balance to Supabase
   const saveWalletToSupabase = async (walletId, balance, name = null) => {
     try {
-      const updateData = { balance };
-      if (name) updateData.name = name;
+      const wallet = wallets.find(w => w.id === walletId);
+      if (!wallet) return;
       
-      await supabase
+      // Use upsert to handle both insert and update cases
+      const walletData = {
+        user_id: user.id,
+        wallet_id: walletId,
+        name: name || wallet.name,
+        icon: wallet.icon,
+        color: wallet.color,
+        type: wallet.type,
+        balance: balance,
+        editable: wallet.editable !== false
+      };
+      
+      const { error } = await supabase
         .from('wallets')
-        .update(updateData)
-        .eq('user_id', user.id)
-        .eq('wallet_id', walletId);
+        .upsert(walletData, { 
+          onConflict: 'user_id,wallet_id'
+        });
+        
+      if (error) {
+        console.error('Error saving wallet:', error);
+      } else {
+        console.log('Wallet saved successfully:', walletId, 'Balance:', balance);
+      }
     } catch (e) {
       console.error('Failed to save wallet:', e);
     }
@@ -1745,16 +1779,21 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   };
 
   // Function to check and unlock achievements
-  // Keep ref in sync with state
+  // Keep refs in sync with state
   useEffect(() => {
     loadedAchievementsRef.current = unlockedAchievements;
   }, [unlockedAchievements]);
   
+  useEffect(() => {
+    loadedXPRef.current = userXP;
+  }, [userXP]);
+  
   const checkAchievements = (context = {}) => {
     if (!userDataLoaded) return;
     
-    // Use ref for most up-to-date achievements list
+    // Use refs for most up-to-date values
     const currentUnlocked = loadedAchievementsRef.current;
+    const currentXP = loadedXPRef.current;
     const newUnlocks = [];
     
     ACHIEVEMENTS.forEach(achievement => {
@@ -1788,7 +1827,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
           isUnlocked = entries.some(e => e.amount >= req.amount);
           break;
         case 'level':
-          isUnlocked = calculateLevel(userXP) >= req.count;
+          isUnlocked = calculateLevel(currentXP) >= req.count;
           break;
         case 'total_spent':
           const totalSpent = entries.reduce((sum, e) => sum + e.amount, 0);
@@ -1812,7 +1851,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
           isUnlocked = profilePicture !== null;
           break;
         case 'frames_unlocked':
-          isUnlocked = getUnlockedFrames(calculateLevel(userXP)).length >= req.count;
+          isUnlocked = getUnlockedFrames(calculateLevel(currentXP)).length >= req.count;
           break;
         case 'achievements_unlocked':
           isUnlocked = unlockedAchievements.length >= req.count;
@@ -1849,17 +1888,24 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const initialAchievementCheckDone = useRef(false);
   
   useEffect(() => {
-    if (!loading && entries.length > 0 && userDataLoaded) {
-      // Add a small delay on initial load to ensure all state is settled
-      if (!initialAchievementCheckDone.current) {
-        const timer = setTimeout(() => {
+    // Don't check until data is fully loaded
+    if (!userDataLoaded || loading) return;
+    
+    // Don't check if no entries yet (likely still loading)
+    if (entries.length === 0) return;
+    
+    // Add a longer delay on initial load to ensure all state is settled
+    if (!initialAchievementCheckDone.current) {
+      const timer = setTimeout(() => {
+        // Double-check that refs have been populated
+        if (loadedAchievementsRef.current.length > 0 || loadedXPRef.current > 0) {
           initialAchievementCheckDone.current = true;
           checkAchievements();
-        }, 500);
-        return () => clearTimeout(timer);
-      } else {
-        checkAchievements();
-      }
+        }
+      }, 1000); // Increased to 1 second
+      return () => clearTimeout(timer);
+    } else {
+      checkAchievements();
     }
   }, [entries.length, currentStreak, profilePicture, budgetStreakMonths, userDataLoaded, loading]);
 
@@ -1928,7 +1974,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   // ============================================
 
   // Add funds to a wallet
-  const handleAddFunds = () => {
+  const handleAddFunds = async () => {
     const amount = parseFloat(fundsAmount);
     if (isNaN(amount) || amount <= 0) {
       showToast('Please enter a valid amount', 'error');
@@ -1944,8 +1990,8 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         : w
     ));
 
-    // Save to Supabase
-    saveWalletToSupabase(selectedWalletForFunds.id, newBalance);
+    // Save to Supabase (await to ensure it's saved)
+    await saveWalletToSupabase(selectedWalletForFunds.id, newBalance);
 
     // Add transaction record
     const transaction = {
@@ -1961,7 +2007,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     setWalletTransactions(prev => [transaction, ...prev]);
     
     // Save transaction to Supabase
-    saveWalletTransactionToSupabase(transaction);
+    await saveWalletTransactionToSupabase(transaction);
 
     showToast(`${currency}${amount.toLocaleString()} added to ${selectedWalletForFunds.name}`, 'success');
     setShowAddFundsModal(false);
@@ -1970,8 +2016,56 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     setSelectedWalletForFunds(null);
   };
 
+  // Handle withdraw/cashout from wallet
+  const handleWithdraw = async () => {
+    const amount = parseFloat(withdrawAmount);
+    if (isNaN(amount) || amount <= 0) {
+      showToast('Please enter a valid amount', 'error');
+      return;
+    }
+
+    if (amount > selectedWalletForWithdraw.balance) {
+      showToast('Insufficient balance', 'error');
+      return;
+    }
+
+    // Update wallet balance
+    const newBalance = selectedWalletForWithdraw.balance - amount;
+    
+    setWallets(prev => prev.map(w => 
+      w.id === selectedWalletForWithdraw.id 
+        ? { ...w, balance: newBalance }
+        : w
+    ));
+
+    // Save to Supabase (await to ensure it's saved)
+    await saveWalletToSupabase(selectedWalletForWithdraw.id, newBalance);
+
+    // Add transaction record
+    const transaction = {
+      id: Date.now(),
+      walletId: selectedWalletForWithdraw.id,
+      walletName: selectedWalletForWithdraw.name,
+      type: 'withdraw',
+      amount: amount,
+      note: withdrawNote || 'Withdrawal',
+      date: new Date().toISOString(),
+      balance: newBalance
+    };
+    setWalletTransactions(prev => [transaction, ...prev]);
+    
+    // Save transaction to Supabase
+    await saveWalletTransactionToSupabase(transaction);
+
+    showToast(`${currency}${amount.toLocaleString()} withdrawn from ${selectedWalletForWithdraw.name}`, 'success');
+    setShowWithdrawModal(false);
+    setWithdrawAmount('');
+    setWithdrawNote('');
+    setSelectedWalletForWithdraw(null);
+  };
+
   // Deduct from wallet when expense is logged
-  const deductFromWallet = (walletId, amount, entryName) => {
+  const deductFromWallet = async (walletId, amount, entryName) => {
     const wallet = wallets.find(w => w.id === walletId);
     if (!wallet) return;
 
@@ -1985,7 +2079,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     ));
 
     // Save to Supabase
-    saveWalletToSupabase(walletId, newBalance);
+    await saveWalletToSupabase(walletId, newBalance);
 
     // Add transaction record
     const transaction = {
@@ -2001,7 +2095,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     setWalletTransactions(prev => [transaction, ...prev]);
     
     // Save transaction to Supabase
-    saveWalletTransactionToSupabase(transaction);
+    await saveWalletTransactionToSupabase(transaction);
   };
 
   // Edit wallet name (for bank accounts)
@@ -4157,6 +4251,33 @@ const getBudgetStatus = () => {
               </div>
             </div>
 
+            {/* Pay from Wallet - Upload Section */}
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>
+                Pay from Wallet
+              </label>
+              <select
+                value={manualForm.walletId}
+                onChange={(e) => setManualForm({ ...manualForm, walletId: e.target.value })}
+                style={{ ...inputStyle, cursor: 'pointer' }}
+              >
+                <option value="">No wallet (optional)</option>
+                {WALLET_TYPES.map(wt => {
+                  const typeWallets = wallets.filter(w => w.type === wt.type);
+                  if (typeWallets.length === 0) return null;
+                  return (
+                    <optgroup key={wt.type} label={`${wt.icon} ${wt.label}`}>
+                      {typeWallets.map(w => (
+                        <option key={w.id} value={w.id}>
+                          {w.name} ({currency}{w.balance.toLocaleString()})
+                        </option>
+                      ))}
+                    </optgroup>
+                  );
+                })}
+              </select>
+            </div>
+
             {uploadMode === 'file' ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
                 {pendingUpload ? (
@@ -5600,7 +5721,7 @@ const getBudgetStatus = () => {
                             }}
                           >
                             {typeWallets.map(w => (
-                              <option key={w.id} value={w.id} style={{ color: '#000' }}>
+                              <option key={w.id} value={w.id} style={{ color: '#000', backgroundColor: '#fff' }}>
                                 {w.icon} {w.name}
                               </option>
                             ))}
@@ -5648,6 +5769,30 @@ const getBudgetStatus = () => {
                             >
                               <Plus style={{ width: '12px', height: '12px' }} />
                               Add
+                            </button>
+                            <button
+                              onClick={() => {
+                                setSelectedWalletForWithdraw(selectedWallet);
+                                setShowWithdrawModal(true);
+                              }}
+                              style={{
+                                flex: 1,
+                                height: '36px',
+                                backgroundColor: 'rgba(255,255,255,0.2)',
+                                color: '#fff',
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '4px'
+                              }}
+                            >
+                              <ArrowDownRight style={{ width: '12px', height: '12px' }} />
+                              Withdraw
                             </button>
                             {selectedWallet?.editable && (
                               <button
@@ -5922,15 +6067,28 @@ const getBudgetStatus = () => {
                                   DEPOSIT
                                 </span>
                               )}
+                              {tx.type === 'withdraw' && (
+                                <span style={{ 
+                                  marginLeft: '8px',
+                                  padding: '2px 6px',
+                                  backgroundColor: isDark ? '#7f1d1d' : '#fecaca',
+                                  color: '#ef4444',
+                                  fontSize: '10px',
+                                  fontWeight: '600',
+                                  borderRadius: '4px'
+                                }}>
+                                  WITHDRAW
+                                </span>
+                              )}
                             </td>
                             <td style={{ 
                               padding: '12px 8px', 
                               fontSize: '14px', 
                               fontWeight: '600',
-                              color: tx.amount >= 0 ? '#22c55e' : '#ef4444',
+                              color: tx.type === 'deposit' ? '#22c55e' : '#ef4444',
                               textAlign: 'right'
                             }}>
-                              {tx.amount >= 0 ? '+' : ''}{currency}{Math.abs(tx.amount).toLocaleString()}
+                              {tx.type === 'deposit' ? '+' : '-'}{currency}{Math.abs(tx.amount).toLocaleString()}
                             </td>
                             <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted, textAlign: 'right' }}>
                               {currency}{tx.balance.toLocaleString()}
@@ -6859,6 +7017,108 @@ const getBudgetStatus = () => {
                 >
                   <Plus style={{ width: '16px', height: '16px' }} />
                   Add Funds
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Withdraw Modal */}
+      {showWithdrawModal && selectedWalletForWithdraw && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowWithdrawModal(false); setSelectedWalletForWithdraw(null); setWithdrawAmount(''); setWithdrawNote(''); }}>
+          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ 
+              padding: '20px', 
+              background: `linear-gradient(135deg, #ef4444, #dc2626)`,
+              color: '#fff'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '28px' }}>{selectedWalletForWithdraw.icon}</span>
+                  <div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#fff', margin: 0 }}>Withdraw / Cashout</h3>
+                    <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', margin: '2px 0 0' }}>{selectedWalletForWithdraw.name}</p>
+                  </div>
+                </div>
+                <button onClick={() => { setShowWithdrawModal(false); setSelectedWalletForWithdraw(null); setWithdrawAmount(''); setWithdrawNote(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'rgba(255,255,255,0.2)', border: 'none', borderRadius: '6px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <X style={{ width: '18px', height: '18px' }} />
+                </button>
+              </div>
+              <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.9)', margin: '12px 0 0' }}>
+                Available Balance: <span style={{ fontWeight: '600' }}>{currency}{selectedWalletForWithdraw.balance.toLocaleString()}</span>
+              </p>
+            </div>
+            
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Amount *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  style={{ ...inputStyle, width: '100%', fontSize: '18px', fontWeight: '600' }}
+                  autoFocus
+                />
+                {withdrawAmount && parseFloat(withdrawAmount) > selectedWalletForWithdraw.balance && (
+                  <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>
+                    Insufficient balance
+                  </p>
+                )}
+              </div>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Note (optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g., ATM withdrawal, Transfer to bank, etc."
+                  value={withdrawNote}
+                  onChange={(e) => setWithdrawNote(e.target.value)}
+                  style={{ ...inputStyle, width: '100%' }}
+                />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => { setShowWithdrawModal(false); setSelectedWalletForWithdraw(null); setWithdrawAmount(''); setWithdrawNote(''); }}
+                  style={{
+                    flex: 1,
+                    height: '44px',
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${theme.inputBorder}`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: theme.textMuted,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleWithdraw}
+                  disabled={!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > selectedWalletForWithdraw.balance}
+                  style={{
+                    flex: 1,
+                    height: '44px',
+                    backgroundColor: '#ef4444',
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#fff',
+                    cursor: (!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > selectedWalletForWithdraw.balance) ? 'not-allowed' : 'pointer',
+                    opacity: (!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > selectedWalletForWithdraw.balance) ? 0.5 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <ArrowDownRight style={{ width: '16px', height: '16px' }} />
+                  Withdraw
                 </button>
               </div>
             </div>
