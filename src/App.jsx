@@ -110,18 +110,23 @@ const LEVEL_THRESHOLDS = [
   60000,
 ];
 
-// Profile frame rewards - unlocked at specific levels
+// Profile frame rewards - unlocked at specific levels (Gen Z/Gen Alpha aesthetic)
 const PROFILE_FRAMES = [
-  { level: 1, id: 'none', name: 'No Frame', border: 'none', glow: 'none' },
-  { level: 2, id: 'bronze', name: 'Bronze Ring', border: '3px solid #cd7f32', glow: '0 0 8px #cd7f32' },
-  { level: 3, id: 'silver', name: 'Silver Ring', border: '3px solid #c0c0c0', glow: '0 0 10px #c0c0c0' },
-  { level: 5, id: 'gold', name: 'Golden Aura', border: '3px solid #ffd700', glow: '0 0 12px #ffd700' },
-  { level: 7, id: 'emerald', name: 'Emerald Glow', border: '3px solid #50c878', glow: '0 0 14px #50c878' },
-  { level: 10, id: 'diamond', name: 'Diamond Shine', border: '3px solid #b9f2ff', glow: '0 0 16px #b9f2ff, 0 0 24px #87ceeb' },
-  { level: 12, id: 'ruby', name: 'Ruby Blaze', border: '3px solid #e0115f', glow: '0 0 14px #e0115f, 0 0 20px #ff6b6b' },
-  { level: 15, id: 'cosmic', name: 'Cosmic Ring', border: '3px solid #9d4edd', glow: '0 0 16px #9d4edd, 0 0 24px #c77dff' },
-  { level: 18, id: 'rainbow', name: 'Rainbow Pulse', border: '3px solid transparent', glow: '0 0 20px #ff0000, 0 0 20px #00ff00, 0 0 20px #0000ff', animation: 'rainbow-border' },
-  { level: 20, id: 'legendary', name: 'Legendary Crown', border: '4px solid #ffd700', glow: '0 0 20px #ffd700, 0 0 30px #ff8c00, 0 0 40px #ff4500', animation: 'legendary-pulse' },
+  { level: 1, id: 'none', name: 'No Frame', border: 'none', glow: 'none', animation: null, gradient: null },
+  { level: 2, id: 'bronze', name: 'Bronze Pulse', border: '3px solid #cd7f32', glow: '0 0 10px #cd7f32', animation: 'pulse-bronze', gradient: null },
+  { level: 3, id: 'silver', name: 'Silver Wave', border: '3px solid #c0c0c0', glow: '0 0 12px #c0c0c0, 0 0 20px #e8e8e8', animation: 'shimmer-silver', gradient: null },
+  { level: 5, id: 'gold', name: 'Golden Drip', border: '3px solid transparent', glow: '0 0 15px #ffd700, 0 0 25px #ffaa00', animation: 'drip-gold', gradient: 'linear-gradient(135deg, #ffd700, #ffaa00, #ffd700)' },
+  { level: 7, id: 'emerald', name: 'Matrix Code', border: '3px solid #00ff41', glow: '0 0 15px #00ff41, 0 0 30px #003d00', animation: 'matrix-glow', gradient: null },
+  { level: 10, id: 'ice', name: 'Frozen Aura', border: '3px solid #00f7ff', glow: '0 0 20px #00f7ff, 0 0 40px #0080ff, 0 0 60px #00f7ff33', animation: 'ice-pulse', gradient: null },
+  { level: 12, id: 'fire', name: '🔥 Flame Ring', border: '4px solid transparent', glow: '0 0 20px #ff4500, 0 0 40px #ff6600, 0 0 60px #ff000066', animation: 'fire-border', gradient: 'linear-gradient(45deg, #ff0000, #ff4500, #ff6600, #ff4500, #ff0000)' },
+  { level: 15, id: 'neon', name: 'Cyberpunk Neon', border: '3px solid transparent', glow: '0 0 10px #ff00ff, 0 0 20px #00ffff, 0 0 30px #ff00ff', animation: 'neon-flicker', gradient: 'linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff)' },
+  { level: 18, id: 'galaxy', name: '🌌 Galaxy Swirl', border: '4px solid transparent', glow: '0 0 25px #9d4edd, 0 0 50px #4361ee, 0 0 75px #7209b7', animation: 'galaxy-rotate', gradient: 'conic-gradient(from 0deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4361ee, #3a0ca3, #7209b7)' },
+  { level: 20, id: 'rainbow', name: '🌈 RGB Gamer', border: '4px solid transparent', glow: '0 0 20px #ff0000, 0 0 40px #00ff00, 0 0 60px #0000ff', animation: 'rgb-rotate', gradient: 'conic-gradient(from 0deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0080ff, #8000ff, #ff0080, #ff0000)' },
+  { level: 25, id: 'legendary', name: '👑 Legendary', border: '5px solid transparent', glow: '0 0 30px #ffd700, 0 0 60px #ff8c00, 0 0 90px #ff4500', animation: 'legendary-crown', gradient: 'linear-gradient(45deg, #ffd700, #fff, #ffd700, #ff8c00, #ffd700)' },
+  { level: 30, id: 'void', name: '🕳️ Void Walker', border: '5px solid transparent', glow: '0 0 30px #000, 0 0 50px #1a0033, 0 0 70px #330066, inset 0 0 20px #000', animation: 'void-pulse', gradient: 'conic-gradient(from 0deg, #000000, #1a0033, #330066, #1a0033, #000000)' },
+  { level: 35, id: 'holographic', name: '✨ Holographic', border: '4px solid transparent', glow: '0 0 20px #fff, 0 0 40px #88ffff', animation: 'holo-shift', gradient: 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1, #fbc2eb, #a6c1ee, #ffecd2, #ff9a9e)' },
+  { level: 40, id: 'glitch', name: '⚡ Glitch Effect', border: '4px solid #00ff00', glow: '0 0 10px #00ff00, -3px 0 #ff0000, 3px 0 #0000ff', animation: 'glitch-border', gradient: null },
+  { level: 50, id: 'godmode', name: '⚜️ GOD MODE', border: '6px solid transparent', glow: '0 0 40px #ffd700, 0 0 80px #fff, 0 0 120px #ffd700', animation: 'godmode-aura', gradient: 'conic-gradient(from 0deg, #ffd700, #fff, #ffd700, #ffaa00, #fff, #ffd700)' },
 ];
 
 // Helper function to calculate level from XP
@@ -161,6 +166,63 @@ const getUnlockedFrames = (level) => {
 // Helper function to get frame by ID
 const getFrameById = (frameId) => {
   return PROFILE_FRAMES.find(f => f.id === frameId) || PROFILE_FRAMES[0];
+};
+
+// Helper to get avatar wrapper style with animated frame
+const getAnimatedFrameStyle = (frame, size = 48) => {
+  const baseStyle = {
+    position: 'relative',
+    width: `${size}px`,
+    height: `${size}px`,
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+  
+  if (frame.id === 'none') {
+    return { ...baseStyle };
+  }
+  
+  // For gradient borders, we use a pseudo-element approach via wrapper
+  if (frame.gradient) {
+    return {
+      ...baseStyle,
+      background: frame.gradient,
+      backgroundSize: '200% 200%',
+      padding: frame.border?.split(' ')[0] || '3px',
+      boxShadow: frame.glow !== 'none' ? frame.glow : 'none',
+      animation: frame.animation ? `${frame.animation} ${frame.animation.includes('rotate') || frame.animation.includes('holo') ? '3s' : frame.animation.includes('glitch') ? '2s' : '2s'} linear infinite` : 'none',
+    };
+  }
+  
+  // For solid borders with animations
+  return {
+    ...baseStyle,
+    border: frame.border,
+    boxShadow: frame.glow !== 'none' ? frame.glow : 'none',
+    animation: frame.animation ? `${frame.animation} 2s ease-in-out infinite` : 'none',
+  };
+};
+
+// Helper to get inner avatar style (the actual avatar circle inside the frame)
+const getAvatarInnerStyle = (frame, size = 48, bgColor = '#3b82f6') => {
+  const borderWidth = frame.gradient ? (parseInt(frame.border?.split(' ')[0]) || 3) : 0;
+  const innerSize = frame.gradient ? size - (borderWidth * 2) : size;
+  
+  return {
+    width: `${innerSize}px`,
+    height: `${innerSize}px`,
+    borderRadius: '50%',
+    backgroundColor: bgColor,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    color: '#fff',
+    fontSize: `${Math.floor(innerSize * 0.4)}px`,
+    fontWeight: '600',
+  };
 };
 
 // ============================================
@@ -3618,38 +3680,30 @@ const getBudgetStatus = () => {
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   style={{
-                    width: '48px',
-                    height: '48px',
-                    borderRadius: '50%',
-                    backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
-                    border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
-                    color: '#fff',
-                    fontSize: '18px',
-                    fontWeight: '600',
+                    ...getAnimatedFrameStyle(currentFrame, 48),
                     cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: currentFrame.glow !== 'none' ? currentFrame.glow : 'none',
-                    transition: 'all 0.3s ease',
-                    overflow: 'hidden',
-                    padding: 0
+                    border: currentFrame.gradient ? 'none' : (currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent'),
+                    backgroundColor: currentFrame.gradient ? undefined : 'transparent',
                   }}
                 >
-                  {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile" 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover',
-                        borderRadius: '50%'
-                      }} 
-                    />
-                  ) : (
-                    getInitial(user.user_metadata?.nickname)
-                  )}
+                  <div style={{
+                    ...getAvatarInnerStyle(currentFrame, 48, profilePicture ? 'transparent' : '#3b82f6'),
+                  }}>
+                    {profilePicture ? (
+                      <img 
+                        src={profilePicture} 
+                        alt="Profile" 
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: 'cover',
+                          borderRadius: '50%'
+                        }} 
+                      />
+                    ) : (
+                      getInitial(user.user_metadata?.nickname)
+                    )}
+                  </div>
                 </button>
 
                 {showProfileMenu && (
@@ -3887,37 +3941,30 @@ const getBudgetStatus = () => {
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   style={{
-                    width: '36px',
-                    height: '36px',
-                    borderRadius: '50%',
-                    backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
-                    border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
-                    color: '#fff',
-                    fontSize: '14px',
-                    fontWeight: '600',
+                    ...getAnimatedFrameStyle(currentFrame, 36),
                     cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    boxShadow: currentFrame.glow !== 'none' ? currentFrame.glow : 'none',
-                    overflow: 'hidden',
-                    padding: 0
+                    border: currentFrame.gradient ? 'none' : (currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent'),
+                    backgroundColor: currentFrame.gradient ? undefined : 'transparent',
                   }}
                 >
-                  {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile" 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover',
-                        borderRadius: '50%'
-                      }} 
-                    />
-                  ) : (
-                    getInitial(user.user_metadata?.nickname)
-                  )}
+                  <div style={{
+                    ...getAvatarInnerStyle(currentFrame, 36, profilePicture ? 'transparent' : '#3b82f6'),
+                  }}>
+                    {profilePicture ? (
+                      <img 
+                        src={profilePicture} 
+                        alt="Profile" 
+                        style={{ 
+                          width: '100%', 
+                          height: '100%', 
+                          objectFit: 'cover',
+                          borderRadius: '50%'
+                        }} 
+                      />
+                    ) : (
+                      getInitial(user.user_metadata?.nickname)
+                    )}
+                  </div>
                 </button>
 
                 {showProfileMenu && (
@@ -8784,30 +8831,38 @@ const getBudgetStatus = () => {
                         textAlign: 'center'
                       }}
                     >
+                      {/* Animated Frame Preview */}
                       <div style={{
-                        width: '50px',
-                        height: '50px',
+                        width: '56px',
+                        height: '56px',
                         margin: '0 auto 8px',
-                        borderRadius: '50%',
-                        backgroundColor: isDark ? '#27272a' : '#e4e4e7',
-                        border: frame.border,
-                        boxShadow: isUnlocked ? frame.glow : 'none',
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
                       }}>
-                        {isUnlocked ? (
-                          profilePicture ? (
-                            <img src={profilePicture} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                          ) : (
-                            <span style={{ fontSize: '16px' }}>👤</span>
-                          )
-                        ) : (
-                          <span style={{ fontSize: '14px' }}>🔒</span>
-                        )}
+                        <div style={{
+                          ...getAnimatedFrameStyle(frame, 50),
+                          border: frame.gradient ? 'none' : (frame.border !== 'none' ? frame.border : `2px solid ${theme.cardBorder}`),
+                          backgroundColor: frame.gradient ? undefined : 'transparent',
+                          opacity: isUnlocked ? 1 : 0.5,
+                        }}>
+                          <div style={{
+                            ...getAvatarInnerStyle(frame, 50, isDark ? '#27272a' : '#e4e4e7'),
+                          }}>
+                            {isUnlocked ? (
+                              profilePicture ? (
+                                <img src={profilePicture} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+                              ) : (
+                                <span style={{ fontSize: '16px' }}>👤</span>
+                              )
+                            ) : (
+                              <span style={{ fontSize: '14px' }}>🔒</span>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <p style={{ fontSize: '12px', fontWeight: '600', color: theme.text, margin: '0 0 2px' }}>{frame.name}</p>
-                      <p style={{ fontSize: '10px', color: isUnlocked ? '#22c55e' : theme.textMuted, margin: 0 }}>
+                      <p style={{ fontSize: '11px', fontWeight: '600', color: theme.text, margin: '0 0 2px' }}>{frame.name}</p>
+                      <p style={{ fontSize: '9px', color: isUnlocked ? '#22c55e' : theme.textMuted, margin: 0 }}>
                         {isUnlocked ? (isSelected ? '✓ Equipped' : 'Click to equip') : `Lvl ${frame.level}`}
                       </p>
                     </div>
@@ -8979,6 +9034,162 @@ const getBudgetStatus = () => {
           0%, 100% { box-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00; }
           50% { box-shadow: 0 0 30px #ffd700, 0 0 50px #ff8c00, 0 0 70px #ff4500; }
         }
+        
+        /* Gen Z/Gen Alpha Animated Frame Effects */
+        @keyframes pulse-bronze {
+          0%, 100% { box-shadow: 0 0 10px #cd7f32; }
+          50% { box-shadow: 0 0 20px #cd7f32, 0 0 30px #8b4513; }
+        }
+        @keyframes shimmer-silver {
+          0% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; filter: brightness(1); }
+          50% { box-shadow: 0 0 20px #ffffff, 0 0 35px #c0c0c0; filter: brightness(1.2); }
+          100% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; filter: brightness(1); }
+        }
+        @keyframes drip-gold {
+          0%, 100% { 
+            box-shadow: 0 0 15px #ffd700, 0 0 25px #ffaa00;
+            filter: hue-rotate(0deg);
+          }
+          50% { 
+            box-shadow: 0 0 25px #ffd700, 0 0 40px #ffaa00, 0 0 55px #ff8c00;
+            filter: hue-rotate(10deg);
+          }
+        }
+        @keyframes matrix-glow {
+          0%, 100% { 
+            box-shadow: 0 0 15px #00ff41, 0 0 30px #003d00;
+            text-shadow: 0 0 10px #00ff41;
+          }
+          25% { box-shadow: 0 0 25px #00ff41, 0 0 50px #00ff41, 0 0 75px #003d00; }
+          50% { box-shadow: 0 0 10px #00ff41, 0 0 20px #003d00; }
+          75% { box-shadow: 0 0 30px #00ff41, 0 0 60px #00ff41; }
+        }
+        @keyframes ice-pulse {
+          0%, 100% { 
+            box-shadow: 0 0 20px #00f7ff, 0 0 40px #0080ff, 0 0 60px #00f7ff33;
+            filter: brightness(1) saturate(1);
+          }
+          50% { 
+            box-shadow: 0 0 30px #00f7ff, 0 0 60px #0080ff, 0 0 90px #00f7ff66;
+            filter: brightness(1.3) saturate(1.3);
+          }
+        }
+        @keyframes fire-border {
+          0%, 100% { 
+            box-shadow: 0 0 20px #ff4500, 0 0 40px #ff6600, 0 0 60px #ff000066;
+            filter: hue-rotate(0deg) brightness(1);
+          }
+          25% { 
+            box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4500, 0 0 70px #ff660066;
+            filter: hue-rotate(-10deg) brightness(1.2);
+          }
+          50% { 
+            box-shadow: 0 0 25px #ff6600, 0 0 45px #ff4500, 0 0 65px #ff000066;
+            filter: hue-rotate(10deg) brightness(1.1);
+          }
+          75% { 
+            box-shadow: 0 0 35px #ff4500, 0 0 55px #ff0000, 0 0 75px #ff660099;
+            filter: hue-rotate(-5deg) brightness(1.3);
+          }
+        }
+        @keyframes neon-flicker {
+          0%, 100% { 
+            box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff, 0 0 30px #ff00ff;
+            opacity: 1;
+          }
+          5%, 15% { opacity: 0.8; }
+          10% { opacity: 0.6; }
+          50% { 
+            box-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff, 0 0 60px #00ffff;
+            opacity: 1;
+          }
+          55% { opacity: 0.9; }
+        }
+        @keyframes galaxy-rotate {
+          0% { filter: hue-rotate(0deg); }
+          100% { filter: hue-rotate(360deg); }
+        }
+        @keyframes rgb-rotate {
+          0% { filter: hue-rotate(0deg) brightness(1); }
+          50% { filter: hue-rotate(180deg) brightness(1.2); }
+          100% { filter: hue-rotate(360deg) brightness(1); }
+        }
+        @keyframes legendary-crown {
+          0%, 100% { 
+            box-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00, 0 0 90px #ff4500;
+            filter: brightness(1) saturate(1);
+          }
+          25% { 
+            box-shadow: 0 0 40px #fff, 0 0 70px #ffd700, 0 0 100px #ff8c00;
+            filter: brightness(1.3) saturate(1.2);
+          }
+          50% { 
+            box-shadow: 0 0 50px #ffd700, 0 0 80px #fff, 0 0 110px #ffd700;
+            filter: brightness(1.5) saturate(1);
+          }
+          75% { 
+            box-shadow: 0 0 35px #ff8c00, 0 0 65px #ffd700, 0 0 95px #fff;
+            filter: brightness(1.2) saturate(1.3);
+          }
+        }
+        @keyframes void-pulse {
+          0%, 100% { 
+            box-shadow: 0 0 30px #000, 0 0 50px #1a0033, 0 0 70px #330066, inset 0 0 20px #000;
+            filter: brightness(0.8);
+          }
+          50% { 
+            box-shadow: 0 0 40px #1a0033, 0 0 70px #330066, 0 0 100px #4a0080, inset 0 0 30px #1a0033;
+            filter: brightness(1);
+          }
+        }
+        @keyframes holo-shift {
+          0% { filter: hue-rotate(0deg) brightness(1.1); }
+          25% { filter: hue-rotate(90deg) brightness(1.2); }
+          50% { filter: hue-rotate(180deg) brightness(1.1); }
+          75% { filter: hue-rotate(270deg) brightness(1.2); }
+          100% { filter: hue-rotate(360deg) brightness(1.1); }
+        }
+        @keyframes glitch-border {
+          0%, 90%, 100% { 
+            box-shadow: 0 0 10px #00ff00, -3px 0 0 #ff0000, 3px 0 0 #0000ff;
+            transform: translate(0);
+          }
+          92% { 
+            box-shadow: 0 0 15px #00ff00, -5px 0 0 #ff0000, 5px 0 0 #0000ff;
+            transform: translate(-2px, 1px);
+          }
+          94% { 
+            box-shadow: 0 0 10px #ff0000, -3px 0 0 #0000ff, 3px 0 0 #00ff00;
+            transform: translate(2px, -1px);
+          }
+          96% { 
+            box-shadow: 0 0 20px #0000ff, -4px 0 0 #00ff00, 4px 0 0 #ff0000;
+            transform: translate(-1px, 2px);
+          }
+          98% { 
+            box-shadow: 0 0 10px #00ff00, -3px 0 0 #ff0000, 3px 0 0 #0000ff;
+            transform: translate(1px, -2px);
+          }
+        }
+        @keyframes godmode-aura {
+          0%, 100% { 
+            box-shadow: 0 0 40px #ffd700, 0 0 80px #fff, 0 0 120px #ffd700;
+            filter: brightness(1) saturate(1);
+          }
+          25% { 
+            box-shadow: 0 0 60px #fff, 0 0 100px #ffd700, 0 0 140px #ffaa00;
+            filter: brightness(1.5) saturate(1.2);
+          }
+          50% { 
+            box-shadow: 0 0 80px #ffd700, 0 0 120px #fff, 0 0 160px #ffd700;
+            filter: brightness(2) saturate(1);
+          }
+          75% { 
+            box-shadow: 0 0 50px #ffaa00, 0 0 90px #ffd700, 0 0 130px #fff;
+            filter: brightness(1.3) saturate(1.3);
+          }
+        }
+        
         @keyframes achievementPop {
           0% { transform: scale(0.5); opacity: 0; }
           50% { transform: scale(1.1); }
