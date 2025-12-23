@@ -5281,13 +5281,13 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       }
       
       // Add/update users from expenses - match by user_id
-      if (expenses) {
+      if (expenses && expenses.length > 0) {
         expenses.forEach(expense => {
           const userId = expense.user_id;
-          if (userMap[userId]) {
+          if (userId && userMap[userId]) {
             // User exists from profiles, add expense
             userMap[userId].expenses.push(expense);
-            userMap[userId].totalSpent += expense.amount || 0;
+            userMap[userId].totalSpent += parseFloat(expense.amount) || 0;
             // Update email/nickname if we have better data from expenses
             if (expense.user_email && (!userMap[userId].email || userMap[userId].email === userId)) {
               userMap[userId].email = expense.user_email;
@@ -5295,14 +5295,14 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             if (expense.user_nickname && userMap[userId].nickname === 'User') {
               userMap[userId].nickname = expense.user_nickname;
             }
-          } else {
+          } else if (userId) {
             // User not in profiles, create from expense
             userMap[userId] = {
               id: userId,
               email: expense.user_email || userId,
               nickname: expense.user_nickname || 'User',
               expenses: [expense],
-              totalSpent: expense.amount || 0,
+              totalSpent: parseFloat(expense.amount) || 0,
               createdAt: expense.created_at
             };
           }
@@ -5450,7 +5450,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
   const unreadCount = feedbacks.filter(f => !f.read).length;
   const totalUsers = users.length;
-  const totalEntries = users.reduce((sum, user) => sum + user.expenses.length, 0);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
@@ -5502,12 +5501,12 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               </div>
               <div style={{ padding: '20px', borderRadius: '12px', backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Total Entries</span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#10b98120', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <FileText style={{ width: '18px', height: '18px', color: '#10b981' }} />
+                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Total Feedbacks</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#8b5cf620', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <MessageSquare style={{ width: '18px', height: '18px', color: '#8b5cf6' }} />
                   </div>
                 </div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>{totalEntries}</p>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>{feedbacks.length}</p>
               </div>
             </div>
 
@@ -5539,7 +5538,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                       <tr style={{ backgroundColor: theme.statBg }}>
                         <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>User</th>
                         <th style={{ textAlign: 'center', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Entries</th>
-                        <th style={{ textAlign: 'right', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Total Spent</th>
                         <th style={{ textAlign: 'center', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Actions</th>
                       </tr>
                     </thead>
@@ -5557,9 +5555,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           </td>
                           <td style={{ padding: '16px 20px', textAlign: 'center' }}>
                             <span style={{ fontSize: '13px', padding: '4px 12px', borderRadius: '20px', backgroundColor: isDark ? '#1e3a5f' : '#dbeafe', color: isDark ? '#60a5fa' : '#1d4ed8' }}>{user.expenses.length} entries</span>
-                          </td>
-                          <td style={{ padding: '16px 20px', textAlign: 'right' }}>
-                            <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>₱{formatAmount(user.totalSpent)}</span>
                           </td>
                           <td style={{ padding: '16px 20px', textAlign: 'center' }}>
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
