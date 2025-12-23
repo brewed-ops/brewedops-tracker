@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
 import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine, Camera } from 'lucide-react';
 import { supabase } from './lib/supabase';
@@ -6,25 +6,6 @@ import { supabase } from './lib/supabase';
 // ============================================
 // CONSTANTS
 // ============================================
-
-const CATEGORIES = [
-  { value: 'utilities', label: 'Utilities', color: '#3b82f6' },
-  { value: 'subscription', label: 'Subscription', color: '#8b5cf6' },
-  { value: 'food', label: 'Food', color: '#f97316' },
-  { value: 'shopping', label: 'Shopping', color: '#ec4899' },
-  { value: 'healthcare', label: 'Healthcare', color: '#10b981' },
-  { value: 'entertainment', label: 'Entertainment', color: '#f59e0b' },
-  { value: 'other', label: 'Other', color: '#71717a' },
-];
-
-const CURRENCIES = [
-  { symbol: '₱', label: 'PHP (₱)' },
-  { symbol: '$', label: 'USD ($)' },
-  { symbol: '€', label: 'EUR (€)' },
-  { symbol: '£', label: 'GBP (£)' },
-  { symbol: '¥', label: 'JPY (¥)' },
-  { symbol: '₹', label: 'INR (₹)' },
-];
 
 // XP System Configuration
 const XP_CONFIG = {
@@ -91,6 +72,7 @@ const calculateLevel = (xp) => {
 // Helper function to get XP needed for next level
 const getXPForNextLevel = (currentLevel) => {
   if (currentLevel >= LEVEL_THRESHOLDS.length) {
+    // For levels beyond our threshold array, use exponential scaling
     const lastThreshold = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
     const extraLevels = currentLevel - LEVEL_THRESHOLDS.length;
     return Math.floor(lastThreshold * Math.pow(1.3, extraLevels + 1));
@@ -116,6 +98,25 @@ const getUnlockedFrames = (level) => {
 const getFrameById = (frameId) => {
   return PROFILE_FRAMES.find(f => f.id === frameId) || PROFILE_FRAMES[0];
 };
+
+const CATEGORIES = [
+  { value: 'utilities', label: 'Utilities', color: '#3b82f6' },
+  { value: 'subscription', label: 'Subscription', color: '#8b5cf6' },
+  { value: 'food', label: 'Food', color: '#f97316' },
+  { value: 'shopping', label: 'Shopping', color: '#ec4899' },
+  { value: 'healthcare', label: 'Healthcare', color: '#10b981' },
+  { value: 'entertainment', label: 'Entertainment', color: '#f59e0b' },
+  { value: 'other', label: 'Other', color: '#71717a' },
+];
+
+const CURRENCIES = [
+  { symbol: '₱', label: 'PHP (₱)' },
+  { symbol: '$', label: 'USD ($)' },
+  { symbol: '€', label: 'EUR (€)' },
+  { symbol: '£', label: 'GBP (£)' },
+  { symbol: '¥', label: 'JPY (¥)' },
+  { symbol: '₹', label: 'INR (₹)' },
+];
 
 // Admin credentials
 
@@ -1093,18 +1094,17 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [feedbackMessage, setFeedbackMessage] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [editNickname, setEditNickname] = useState(user.user_metadata?.nickname || '');
+  
+  // Profile Picture state
+  const [profilePicture, setProfilePicture] = useState(() => {
+    const saved = localStorage.getItem(`profilePic_${user.id}`);
+    return saved || null;
+  });
+  const [editProfilePicture, setEditProfilePicture] = useState(null);
   const [deletingEntry, setDeletingEntry] = useState(null);
   const [editingEntry, setEditingEntry] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState(null);
-  
-  // Profile Picture State
-  const [profilePicture, setProfilePicture] = useState(() => {
-    const saved = localStorage.getItem(`profilePicture_${user.id}`);
-    return saved || null;
-  });
-  const [isUploadingPicture, setIsUploadingPicture] = useState(false);
-  const fileInputRef = useRef(null);
   
   // XP and Level System
   const [userXP, setUserXP] = useState(() => {
@@ -1139,44 +1139,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     }
   }, [toast]);
 
-   // Save currency preference
-  useEffect(() => {
-    localStorage.setItem('currency', currency);
-  }, [currency]);
-// Save budget preference
-  useEffect(() => {
-    localStorage.setItem('monthlyBudget', monthlyBudget.toString());
-  }, [monthlyBudget]);
-
-// Warn before leaving with unsaved changes
-  useEffect(() => {
-    const hasUnsavedChanges = 
-      pendingUpload !== null || 
-      manualForm.name.trim() !== '' || 
-      manualForm.amount !== '' ||
-      uploadedFile !== null;
-
-    const handleBeforeUnload = (e) => {
-      if (hasUnsavedChanges) {
-        e.preventDefault();
-        e.returnValue = '';
-        return '';
-      }
-    };
-
-    if (hasUnsavedChanges) {
-      window.addEventListener('beforeunload', handleBeforeUnload);
-    }
-
-    return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
-    };
-  }, [pendingUpload, manualForm.name, manualForm.amount, uploadedFile]);
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type });
-  };
-
   // Save XP to localStorage
   useEffect(() => {
     localStorage.setItem(`userXP_${user.id}`, userXP.toString());
@@ -1191,95 +1153,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   useEffect(() => {
     localStorage.setItem('christmasTheme', isChristmasTheme.toString());
   }, [isChristmasTheme]);
-
-  // Save profile picture to localStorage
-  useEffect(() => {
-    if (profilePicture) {
-      localStorage.setItem(`profilePicture_${user.id}`, profilePicture);
-    } else {
-      localStorage.removeItem(`profilePicture_${user.id}`);
-    }
-  }, [profilePicture, user.id]);
-
-  // Handle profile picture upload
-  const handleProfilePictureUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      showToast('Please select an image file', 'error');
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      showToast('Image must be less than 2MB', 'error');
-      return;
-    }
-
-    setIsUploadingPicture(true);
-
-    try {
-      // Convert to base64
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const base64Data = event.target.result;
-        
-        // Compress/resize the image if needed
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const maxSize = 200; // Max dimension
-          let width = img.width;
-          let height = img.height;
-
-          if (width > height) {
-            if (width > maxSize) {
-              height *= maxSize / width;
-              width = maxSize;
-            }
-          } else {
-            if (height > maxSize) {
-              width *= maxSize / height;
-              height = maxSize;
-            }
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-
-          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
-          setProfilePicture(compressedBase64);
-          setIsUploadingPicture(false);
-          showToast('Profile picture updated!', 'success');
-        };
-        img.src = base64Data;
-      };
-      reader.onerror = () => {
-        setIsUploadingPicture(false);
-        showToast('Failed to read image file', 'error');
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      setIsUploadingPicture(false);
-      showToast('Failed to upload picture', 'error');
-    }
-
-    // Reset file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  // Remove profile picture
-  const handleRemoveProfilePicture = () => {
-    setProfilePicture(null);
-    showToast('Profile picture removed', 'success');
-  };
 
   // Award XP function with level up check
   const awardXP = (amount, reason = '') => {
@@ -1316,6 +1189,53 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const unlockedFrames = getUnlockedFrames(currentLevel);
   const currentFrame = getFrameById(selectedFrame);
 
+   // Save currency preference
+  useEffect(() => {
+    localStorage.setItem('currency', currency);
+  }, [currency]);
+
+  // Save profile picture to localStorage
+  useEffect(() => {
+    if (profilePicture) {
+      localStorage.setItem(`profilePic_${user.id}`, profilePicture);
+    } else {
+      localStorage.removeItem(`profilePic_${user.id}`);
+    }
+  }, [profilePicture, user.id]);
+
+// Save budget preference
+  useEffect(() => {
+    localStorage.setItem('monthlyBudget', monthlyBudget.toString());
+  }, [monthlyBudget]);
+
+// Warn before leaving with unsaved changes
+  useEffect(() => {
+    const hasUnsavedChanges = 
+      pendingUpload !== null || 
+      manualForm.name.trim() !== '' || 
+      manualForm.amount !== '' ||
+      uploadedFile !== null;
+
+    const handleBeforeUnload = (e) => {
+      if (hasUnsavedChanges) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    if (hasUnsavedChanges) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [pendingUpload, manualForm.name, manualForm.amount, uploadedFile]);
+
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type });
+  };
   // Load entries from Supabase
   useEffect(() => {
     const loadEntries = async () => {
@@ -1391,7 +1311,40 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         file: newEntry.file
       };
       
-      setEntries(prev => [savedEntry, ...prev]);
+      setEntries(prev => {
+        const newEntries = [savedEntry, ...prev];
+        
+        // Award XP for adding entry
+        let xpGained = XP_CONFIG.addEntry;
+        let reason = 'for adding entry';
+        
+        // Bonus XP for receipt
+        if (newEntry.file) {
+          xpGained += XP_CONFIG.addEntryWithReceipt;
+          reason = 'for entry with receipt';
+        }
+        
+        // Bonus XP for notes
+        if (newEntry.notes && newEntry.notes.trim().length > 0) {
+          xpGained += XP_CONFIG.addEntryWithNotes;
+        }
+        
+        // Milestone bonuses
+        if (newEntries.length === 10) {
+          xpGained += XP_CONFIG.first10Entries;
+          reason = '🎉 10 entries milestone!';
+        } else if (newEntries.length === 50) {
+          xpGained += XP_CONFIG.first50Entries;
+          reason = '🎉 50 entries milestone!';
+        } else if (newEntries.length === 100) {
+          xpGained += XP_CONFIG.first100Entries;
+          reason = '🎉 100 entries milestone!';
+        }
+        
+        awardXP(xpGained, reason);
+        
+        return newEntries;
+      });
       return savedEntry;
     } catch (e) {
       console.error('Failed to save:', e);
@@ -2403,16 +2356,7 @@ const getBudgetStatus = () => {
                   }}
                 >
                   {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile" 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover',
-                        borderRadius: '50%'
-                      }} 
-                    />
+                    <img src={profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     getInitial(user.user_metadata?.nickname)
                   )}
@@ -2423,7 +2367,7 @@ const getBudgetStatus = () => {
                     position: 'absolute',
                     top: '44px',
                     right: 0,
-                    width: '200px',
+                    width: '220px',
                     backgroundColor: theme.cardBg,
                     border: `1px solid ${theme.cardBorder}`,
                     borderRadius: '8px',
@@ -2431,12 +2375,34 @@ const getBudgetStatus = () => {
                     zIndex: 50,
                     overflow: 'hidden'
                   }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
-                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
+                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{
+                        width: '40px',
+                        height: '40px',
+                        borderRadius: '50%',
+                        backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#fff',
+                        fontSize: '16px',
+                        fontWeight: '600',
+                        overflow: 'hidden',
+                        flexShrink: 0
+                      }}>
+                        {profilePicture ? (
+                          <img src={profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          getInitial(user.user_metadata?.nickname)
+                        )}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
+                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</p>
+                      </div>
                     </div>
                     <button
-                      onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
+                      onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); setEditProfilePicture(null); }}
                       style={{
                         width: '100%',
                         padding: '10px 16px',
@@ -2541,16 +2507,7 @@ const getBudgetStatus = () => {
                   }}
                 >
                   {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile" 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover',
-                        borderRadius: '50%'
-                      }} 
-                    />
+                    <img src={profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     getInitial(user.user_metadata?.nickname)
                   )}
@@ -2561,7 +2518,7 @@ const getBudgetStatus = () => {
                     position: 'absolute',
                     top: '40px',
                     right: 0,
-                    width: '200px',
+                    width: '220px',
                     backgroundColor: theme.cardBg,
                     border: `1px solid ${theme.cardBorder}`,
                     borderRadius: '8px',
@@ -2569,12 +2526,34 @@ const getBudgetStatus = () => {
                     zIndex: 50,
                     overflow: 'hidden'
                   }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
-                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
+                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{
+                        width: '36px',
+                        height: '36px',
+                        borderRadius: '50%',
+                        backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: '#fff',
+                        fontSize: '14px',
+                        fontWeight: '600',
+                        overflow: 'hidden',
+                        flexShrink: 0
+                      }}>
+                        {profilePicture ? (
+                          <img src={profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          getInitial(user.user_metadata?.nickname)
+                        )}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
+                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</p>
+                      </div>
                     </div>
                     <button
-                      onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
+                      onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); setEditProfilePicture(null); }}
                       style={{
                         width: '100%',
                         padding: '10px 16px',
@@ -4949,23 +4928,23 @@ const getBudgetStatus = () => {
       </main>
         {/* Edit Profile Modal */}
       {showEditProfile && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowEditProfile(false)}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowEditProfile(false); setEditProfilePicture(null); }}>
           <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit Profile</h3>
-              <button onClick={() => setShowEditProfile(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button onClick={() => { setShowEditProfile(false); setEditProfilePicture(null); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <X style={{ width: '18px', height: '18px' }} />
               </button>
             </div>
             
             {/* Profile Picture Section */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
               <div style={{ position: 'relative', marginBottom: '12px' }}>
                 <div style={{ 
                   width: '100px', 
                   height: '100px', 
                   borderRadius: '50%', 
-                  backgroundColor: profilePicture ? 'transparent' : '#3b82f6', 
+                  backgroundColor: (editProfilePicture === 'remove' || (!editProfilePicture && !profilePicture)) ? '#3b82f6' : 'transparent', 
                   display: 'flex', 
                   alignItems: 'center', 
                   justifyContent: 'center', 
@@ -4973,25 +4952,18 @@ const getBudgetStatus = () => {
                   fontSize: '40px', 
                   fontWeight: '600',
                   overflow: 'hidden',
-                  border: currentFrame.border !== 'none' ? currentFrame.border : `3px solid ${theme.cardBorder}`,
-                  boxShadow: currentFrame.glow !== 'none' ? currentFrame.glow : 'none'
+                  border: `3px solid ${theme.cardBorder}`
                 }}>
-                  {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile" 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover'
-                      }} 
-                    />
+                  {editProfilePicture === 'remove' ? (
+                    getInitial(editNickname || user.user_metadata?.nickname)
+                  ) : (editProfilePicture || profilePicture) ? (
+                    <img src={editProfilePicture || profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
-                    getInitial(editNickname)
+                    getInitial(editNickname || user.user_metadata?.nickname)
                   )}
                 </div>
                 
-                {/* Camera button overlay */}
+                {/* Camera Button */}
                 <label style={{
                   position: 'absolute',
                   bottom: '0',
@@ -4999,69 +4971,52 @@ const getBudgetStatus = () => {
                   width: '32px',
                   height: '32px',
                   borderRadius: '50%',
-                  backgroundColor: isDark ? '#3b82f6' : '#2563eb',
+                  backgroundColor: isDark ? '#3f3f46' : '#e4e4e7',
                   border: `2px solid ${theme.cardBg}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s'
+                  cursor: 'pointer'
                 }}>
-                  {isUploadingPicture ? (
-                    <Loader2 style={{ width: '16px', height: '16px', color: '#fff', animation: 'spin 1s linear infinite' }} />
-                  ) : (
-                    <Camera style={{ width: '16px', height: '16px', color: '#fff' }} />
-                  )}
+                  <Camera style={{ width: '16px', height: '16px', color: theme.text }} />
                   <input
-                    ref={fileInputRef}
                     type="file"
                     accept="image/*"
-                    onChange={handleProfilePictureUpload}
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        if (file.size > 2 * 1024 * 1024) {
+                          showToast('Image must be less than 2MB', 'error');
+                          return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setEditProfilePicture(event.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
                     style={{ display: 'none' }}
-                    disabled={isUploadingPicture}
                   />
                 </label>
               </div>
               
-              {/* Upload/Remove buttons */}
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <label style={{
-                  fontSize: '13px',
-                  color: '#3b82f6',
-                  cursor: isUploadingPicture ? 'not-allowed' : 'pointer',
-                  opacity: isUploadingPicture ? 0.5 : 1
-                }}>
-                  {isUploadingPicture ? 'Uploading...' : 'Change Photo'}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfilePictureUpload}
-                    style={{ display: 'none' }}
-                    disabled={isUploadingPicture}
-                  />
-                </label>
-                {profilePicture && (
-                  <>
-                    <span style={{ color: theme.textDim }}>•</span>
-                    <button
-                      onClick={handleRemoveProfilePicture}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '13px',
-                        color: '#ef4444',
-                        cursor: 'pointer',
-                        padding: 0
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </>
-                )}
-              </div>
-              <p style={{ fontSize: '11px', color: theme.textDim, margin: '8px 0 0', textAlign: 'center' }}>
-                JPG, PNG or GIF. Max 2MB.
-              </p>
+              {/* Remove Photo Button */}
+              {(editProfilePicture || profilePicture) && editProfilePicture !== 'remove' && (
+                <button
+                  onClick={() => setEditProfilePicture('remove')}
+                  style={{
+                    fontSize: '13px',
+                    color: '#ef4444',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    padding: '4px 8px'
+                  }}
+                >
+                  Remove Photo
+                </button>
+              )}
             </div>
             
             <div style={{ marginBottom: '16px' }}>
@@ -5087,8 +5042,17 @@ const getBudgetStatus = () => {
                 try {
                   const { error } = await supabase.auth.updateUser({ data: { nickname: editNickname } });
                   if (error) throw error;
+                  
+                  // Update profile picture
+                  if (editProfilePicture === 'remove') {
+                    setProfilePicture(null);
+                  } else if (editProfilePicture) {
+                    setProfilePicture(editProfilePicture);
+                  }
+                  
                   setShowEditProfile(false);
-                  showToast('Profile updated successfully!', 'success');
+                  setEditProfilePicture(null);
+                  showToast('Profile updated successfully', 'success');
                 } catch (e) {
                   showToast('Failed to update profile', 'error');
                 }
@@ -5099,6 +5063,294 @@ const getBudgetStatus = () => {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Level Up Modal */}
+      {showLevelUp && levelUpData && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 60 }}>
+          <div style={{ 
+            width: '100%', 
+            maxWidth: '400px', 
+            backgroundColor: theme.cardBg, 
+            borderRadius: '16px', 
+            border: `2px solid #fbbf24`, 
+            padding: '32px',
+            textAlign: 'center',
+            boxShadow: '0 0 40px rgba(251, 191, 36, 0.3)'
+          }}>
+            <div style={{
+              width: '80px',
+              height: '80px',
+              margin: '0 auto 20px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 30px rgba(251, 191, 36, 0.5)',
+              animation: 'pulse 1s ease-in-out infinite'
+            }}>
+              <Star style={{ width: '40px', height: '40px', color: '#fff' }} />
+            </div>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#fbbf24', margin: '0 0 8px' }}>LEVEL UP!</h2>
+            <p style={{ fontSize: '16px', color: theme.text, margin: '0 0 20px' }}>
+              You reached <strong>Level {levelUpData.newLevel}</strong>!
+            </p>
+            
+            {levelUpData.newFrames && levelUpData.newFrames.length > 0 && (
+              <div style={{ 
+                padding: '16px', 
+                backgroundColor: isDark ? '#1a1a1d' : '#fefce8', 
+                borderRadius: '10px',
+                marginBottom: '20px',
+                border: `1px solid ${isDark ? '#fbbf24' : '#fde047'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <Gift style={{ width: '18px', height: '18px', color: '#f59e0b' }} />
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#f59e0b' }}>New Reward Unlocked!</span>
+                </div>
+                <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
+                  {levelUpData.newFrames[0].name}
+                </p>
+                <p style={{ fontSize: '12px', color: theme.textMuted, margin: '4px 0 0' }}>
+                  New profile frame available
+                </p>
+              </div>
+            )}
+            
+            <button
+              onClick={() => { setShowLevelUp(false); setLevelUpData(null); }}
+              style={{
+                width: '100%',
+                height: '44px',
+                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#fff',
+                cursor: 'pointer'
+              }}
+            >
+              Awesome!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Rewards Modal */}
+      {showRewardsModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowRewardsModal(false)}>
+          <div style={{ width: '100%', maxWidth: '500px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Level & Rewards</h3>
+                <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>Track your progress and unlock frames</p>
+              </div>
+              <button onClick={() => setShowRewardsModal(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '16px', height: '16px' }} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '20px', overflowY: 'auto' }}>
+              {/* Current Level */}
+              <div style={{ 
+                padding: '20px', 
+                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', 
+                borderRadius: '12px', 
+                marginBottom: '20px',
+                color: '#fff',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  margin: '0 auto 12px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  fontWeight: '700'
+                }}>
+                  {currentLevel}
+                </div>
+                <h4 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 4px' }}>Level {currentLevel}</h4>
+                <p style={{ fontSize: '14px', opacity: 0.9, margin: '0 0 16px' }}>{userXP} / {nextLevelXP} XP</p>
+                <div style={{
+                  height: '10px',
+                  backgroundColor: 'rgba(255,255,255,0.3)',
+                  borderRadius: '5px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${levelProgress}%`,
+                    backgroundColor: '#fff',
+                    borderRadius: '5px',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
+                <p style={{ fontSize: '12px', opacity: 0.8, margin: '8px 0 0' }}>
+                  {Math.ceil(nextLevelXP - userXP)} XP to Level {currentLevel + 1}
+                </p>
+              </div>
+              
+              {/* XP Rewards Info */}
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>How to Earn XP</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  {[
+                    { action: 'Add entry', xp: '+10 XP' },
+                    { action: 'With receipt', xp: '+20 XP' },
+                    { action: 'With notes', xp: '+5 XP' },
+                    { action: 'Set budget', xp: '+15 XP' },
+                    { action: '10 entries', xp: '+100 XP' },
+                    { action: '50 entries', xp: '+250 XP' },
+                  ].map((item, i) => (
+                    <div key={i} style={{ 
+                      padding: '8px 12px', 
+                      backgroundColor: theme.statBg, 
+                      borderRadius: '6px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <span style={{ fontSize: '12px', color: theme.textMuted }}>{item.action}</span>
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#22c55e' }}>{item.xp}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Profile Frames */}
+              <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>Profile Frames</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                {PROFILE_FRAMES.map((frame) => {
+                  const isUnlocked = currentLevel >= frame.level;
+                  const isSelected = selectedFrame === frame.id;
+                  return (
+                    <div 
+                      key={frame.id}
+                      onClick={() => isUnlocked && setSelectedFrame(frame.id)}
+                      style={{ 
+                        padding: '12px',
+                        backgroundColor: isSelected ? (isDark ? '#1e3a5f' : '#dbeafe') : theme.statBg,
+                        borderRadius: '10px',
+                        border: isSelected ? '2px solid #3b82f6' : `1px solid ${theme.cardBorder}`,
+                        cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                        opacity: isUnlocked ? 1 : 0.5,
+                        transition: 'all 0.15s',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <div style={{
+                        width: '50px',
+                        height: '50px',
+                        margin: '0 auto 8px',
+                        borderRadius: '50%',
+                        backgroundColor: isDark ? '#27272a' : '#e4e4e7',
+                        border: frame.border,
+                        boxShadow: isUnlocked ? frame.glow : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {isUnlocked ? (
+                          <span style={{ fontSize: '16px' }}>👤</span>
+                        ) : (
+                          <span style={{ fontSize: '14px' }}>🔒</span>
+                        )}
+                      </div>
+                      <p style={{ fontSize: '12px', fontWeight: '600', color: theme.text, margin: '0 0 2px' }}>{frame.name}</p>
+                      <p style={{ fontSize: '10px', color: isUnlocked ? '#22c55e' : theme.textMuted, margin: 0 }}>
+                        {isUnlocked ? (isSelected ? '✓ Equipped' : 'Click to equip') : `Lvl ${frame.level}`}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Christmas Theme Decorations */}
+      {isChristmasTheme && (
+        <>
+          {/* Snow Animation */}
+          <div style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            height: '100vh', 
+            pointerEvents: 'none', 
+            zIndex: 100,
+            overflow: 'hidden'
+          }}>
+            {[...Array(50)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  top: '-10px',
+                  left: `${Math.random() * 100}%`,
+                  width: `${Math.random() * 8 + 4}px`,
+                  height: `${Math.random() * 8 + 4}px`,
+                  backgroundColor: '#fff',
+                  borderRadius: '50%',
+                  opacity: Math.random() * 0.7 + 0.3,
+                  animation: `snowfall ${Math.random() * 3 + 4}s linear infinite`,
+                  animationDelay: `${Math.random() * 5}s`
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Christmas Lights at top */}
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            display: 'flex',
+            justifyContent: 'space-around',
+            zIndex: 101,
+            pointerEvents: 'none'
+          }}>
+            {[...Array(30)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  backgroundColor: ['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4],
+                  boxShadow: `0 0 10px ${['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4]}`,
+                  animation: `twinkle ${Math.random() * 1 + 0.5}s ease-in-out infinite alternate`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  marginTop: '2px'
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Santa on header (right side) */}
+          <div style={{
+            position: 'fixed',
+            top: '8px',
+            right: '16px',
+            fontSize: '32px',
+            zIndex: 102,
+            pointerEvents: 'none',
+            animation: 'santaBounce 2s ease-in-out infinite'
+          }}>
+            🎅
+          </div>
+        </>
       )}
 
       {/* Feedback Modal */}
@@ -5597,298 +5849,6 @@ const getBudgetStatus = () => {
             </div>
           </div>
         </div>
-      )}
-
-      {/* Level Up Modal */}
-      {showLevelUp && levelUpData && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 60 }}>
-          <div style={{ 
-            width: '100%', 
-            maxWidth: '400px', 
-            backgroundColor: theme.cardBg, 
-            borderRadius: '16px', 
-            border: `2px solid #fbbf24`, 
-            padding: '32px',
-            textAlign: 'center',
-            boxShadow: '0 0 40px rgba(251, 191, 36, 0.3)'
-          }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              margin: '0 auto 20px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 0 30px rgba(251, 191, 36, 0.5)',
-              animation: 'pulse 1s ease-in-out infinite'
-            }}>
-              <Star style={{ width: '40px', height: '40px', color: '#fff' }} />
-            </div>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#fbbf24', margin: '0 0 8px' }}>LEVEL UP!</h2>
-            <p style={{ fontSize: '16px', color: theme.text, margin: '0 0 20px' }}>
-              You reached <strong>Level {levelUpData.newLevel}</strong>!
-            </p>
-            
-            {levelUpData.newFrames && levelUpData.newFrames.length > 0 && (
-              <div style={{ 
-                padding: '16px', 
-                backgroundColor: isDark ? '#1a1a1d' : '#fefce8', 
-                borderRadius: '10px',
-                marginBottom: '20px',
-                border: `1px solid ${isDark ? '#fbbf24' : '#fde047'}`
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <Gift style={{ width: '18px', height: '18px', color: '#f59e0b' }} />
-                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#f59e0b' }}>New Reward Unlocked!</span>
-                </div>
-                <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
-                  {levelUpData.newFrames[0].name}
-                </p>
-                <p style={{ fontSize: '12px', color: theme.textMuted, margin: '4px 0 0' }}>
-                  New profile frame available
-                </p>
-              </div>
-            )}
-            
-            <button
-              onClick={() => { setShowLevelUp(false); setLevelUpData(null); }}
-              style={{
-                width: '100%',
-                height: '44px',
-                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '15px',
-                fontWeight: '600',
-                color: '#fff',
-                cursor: 'pointer'
-              }}
-            >
-              Awesome!
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Rewards Modal */}
-      {showRewardsModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowRewardsModal(false)}>
-          <div style={{ width: '100%', maxWidth: '500px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Level & Rewards</h3>
-                <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>Track your progress and unlock frames</p>
-              </div>
-              <button onClick={() => setShowRewardsModal(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X style={{ width: '16px', height: '16px' }} />
-              </button>
-            </div>
-            
-            <div style={{ padding: '20px', overflowY: 'auto' }}>
-              {/* Current Level */}
-              <div style={{ 
-                padding: '20px', 
-                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', 
-                borderRadius: '12px', 
-                marginBottom: '20px',
-                color: '#fff',
-                textAlign: 'center'
-              }}>
-                <div style={{
-                  width: '60px',
-                  height: '60px',
-                  margin: '0 auto 12px',
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  fontWeight: '700'
-                }}>
-                  {currentLevel}
-                </div>
-                <h4 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 4px' }}>Level {currentLevel}</h4>
-                <p style={{ fontSize: '14px', opacity: 0.9, margin: '0 0 16px' }}>{userXP} / {nextLevelXP} XP</p>
-                <div style={{
-                  height: '10px',
-                  backgroundColor: 'rgba(255,255,255,0.3)',
-                  borderRadius: '5px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${levelProgress}%`,
-                    backgroundColor: '#fff',
-                    borderRadius: '5px',
-                    transition: 'width 0.3s ease'
-                  }} />
-                </div>
-                <p style={{ fontSize: '12px', opacity: 0.8, margin: '8px 0 0' }}>
-                  {Math.ceil(nextLevelXP - userXP)} XP to Level {currentLevel + 1}
-                </p>
-              </div>
-              
-              {/* XP Rewards Info */}
-              <div style={{ marginBottom: '20px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>How to Earn XP</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  {[
-                    { action: 'Add entry', xp: '+10 XP' },
-                    { action: 'With receipt', xp: '+20 XP' },
-                    { action: 'With notes', xp: '+5 XP' },
-                    { action: 'Set budget', xp: '+15 XP' },
-                    { action: '10 entries', xp: '+100 XP' },
-                    { action: '50 entries', xp: '+250 XP' },
-                  ].map((item, i) => (
-                    <div key={i} style={{ 
-                      padding: '8px 12px', 
-                      backgroundColor: theme.statBg, 
-                      borderRadius: '6px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}>
-                      <span style={{ fontSize: '12px', color: theme.textMuted }}>{item.action}</span>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#22c55e' }}>{item.xp}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Profile Frames */}
-              <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>Profile Frames</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-                {PROFILE_FRAMES.map((frame) => {
-                  const isUnlocked = currentLevel >= frame.level;
-                  const isSelected = selectedFrame === frame.id;
-                  return (
-                    <div 
-                      key={frame.id}
-                      onClick={() => isUnlocked && setSelectedFrame(frame.id)}
-                      style={{ 
-                        padding: '12px',
-                        backgroundColor: isSelected ? (isDark ? '#1e3a5f' : '#dbeafe') : theme.statBg,
-                        borderRadius: '10px',
-                        border: isSelected ? '2px solid #3b82f6' : `1px solid ${theme.cardBorder}`,
-                        cursor: isUnlocked ? 'pointer' : 'not-allowed',
-                        opacity: isUnlocked ? 1 : 0.5,
-                        transition: 'all 0.15s',
-                        textAlign: 'center'
-                      }}
-                    >
-                      <div style={{
-                        width: '50px',
-                        height: '50px',
-                        margin: '0 auto 8px',
-                        borderRadius: '50%',
-                        backgroundColor: isDark ? '#27272a' : '#e4e4e7',
-                        border: frame.border,
-                        boxShadow: isUnlocked ? frame.glow : 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {isUnlocked ? (
-                          profilePicture ? (
-                            <img src={profilePicture} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
-                          ) : (
-                            <span style={{ fontSize: '16px' }}>👤</span>
-                          )
-                        ) : (
-                          <span style={{ fontSize: '14px' }}>🔒</span>
-                        )}
-                      </div>
-                      <p style={{ fontSize: '12px', fontWeight: '600', color: theme.text, margin: '0 0 2px' }}>{frame.name}</p>
-                      <p style={{ fontSize: '10px', color: isUnlocked ? '#22c55e' : theme.textMuted, margin: 0 }}>
-                        {isUnlocked ? (isSelected ? '✓ Equipped' : 'Click to equip') : `Lvl ${frame.level}`}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Christmas Theme Decorations */}
-      {isChristmasTheme && (
-        <>
-          {/* Snow Animation */}
-          <div style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            height: '100vh', 
-            pointerEvents: 'none', 
-            zIndex: 100,
-            overflow: 'hidden'
-          }}>
-            {[...Array(50)].map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  left: `${Math.random() * 100}%`,
-                  width: `${Math.random() * 8 + 4}px`,
-                  height: `${Math.random() * 8 + 4}px`,
-                  backgroundColor: '#fff',
-                  borderRadius: '50%',
-                  opacity: Math.random() * 0.7 + 0.3,
-                  animation: `snowfall ${Math.random() * 3 + 4}s linear infinite`,
-                  animationDelay: `${Math.random() * 5}s`
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Christmas Lights at top */}
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            display: 'flex',
-            justifyContent: 'space-around',
-            zIndex: 101,
-            pointerEvents: 'none'
-          }}>
-            {[...Array(30)].map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  backgroundColor: ['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4],
-                  boxShadow: `0 0 10px ${['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4]}`,
-                  animation: `twinkle ${Math.random() * 1 + 0.5}s ease-in-out infinite alternate`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  marginTop: '2px'
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Santa on header (right side) */}
-          <div style={{
-            position: 'fixed',
-            top: '8px',
-            right: '16px',
-            fontSize: '32px',
-            zIndex: 102,
-            pointerEvents: 'none',
-            animation: 'santaBounce 2s ease-in-out infinite'
-          }}>
-            🎅
-          </div>
-        </>
       )}
 
  {/* Toast Notification */}
