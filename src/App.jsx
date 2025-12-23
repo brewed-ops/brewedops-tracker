@@ -5239,6 +5239,9 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
   const [viewingFeedback, setViewingFeedback] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
   const [expenseSearch, setExpenseSearch] = useState('');
+  const [editingUser, setEditingUser] = useState(null);
+  const [editUserForm, setEditUserForm] = useState({ nickname: '', email: '', password: '' });
+  const [savingUser, setSavingUser] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -5259,7 +5262,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (expensesError) throw expensesError;
+      if (expensesError) console.error('Expenses error:', expensesError);
 
       const userMap = {};
       
@@ -5277,35 +5280,104 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         });
       }
       
-      // Add/update users from expenses
-      expenses?.forEach(expense => {
-        if (!userMap[expense.user_id]) {
-          userMap[expense.user_id] = {
-            id: expense.user_id,
-            email: expense.user_email || expense.user_id,
-            nickname: expense.user_nickname || 'User',
-            expenses: [],
-            totalSpent: 0,
-            createdAt: expense.created_at
-          };
-        } else {
-          // Update email/nickname if we have better data from expenses
-          if (expense.user_email && userMap[expense.user_id].email === expense.user_id) {
-            userMap[expense.user_id].email = expense.user_email;
+      // Add/update users from expenses - match by user_id
+      if (expenses) {
+        expenses.forEach(expense => {
+          const userId = expense.user_id;
+          if (userMap[userId]) {
+            // User exists from profiles, add expense
+            userMap[userId].expenses.push(expense);
+            userMap[userId].totalSpent += expense.amount || 0;
+            // Update email/nickname if we have better data from expenses
+            if (expense.user_email && (!userMap[userId].email || userMap[userId].email === userId)) {
+              userMap[userId].email = expense.user_email;
+            }
+            if (expense.user_nickname && userMap[userId].nickname === 'User') {
+              userMap[userId].nickname = expense.user_nickname;
+            }
+          } else {
+            // User not in profiles, create from expense
+            userMap[userId] = {
+              id: userId,
+              email: expense.user_email || userId,
+              nickname: expense.user_nickname || 'User',
+              expenses: [expense],
+              totalSpent: expense.amount || 0,
+              createdAt: expense.created_at
+            };
           }
-          if (expense.user_nickname && userMap[expense.user_id].nickname === 'User') {
-            userMap[expense.user_id].nickname = expense.user_nickname;
-          }
-        }
-        userMap[expense.user_id].expenses.push(expense);
-        userMap[expense.user_id].totalSpent += expense.amount;
-      });
+        });
+      }
 
       setUsers(Object.values(userMap));
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Handle editing user
+  const handleEditUser = (user) => {
+    setEditingUser(user);
+    setEditUserForm({
+      nickname: user.nickname || '',
+      email: user.email || '',
+      password: ''
+    });
+  };
+
+  // Save user changes via Edge Function
+  const handleSaveUser = async () => {
+    if (!editingUser) return;
+    setSavingUser(true);
+    
+    try {
+      // Get the current session for authorization
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('No active session');
+      }
+
+      // Call the edge function
+      const response = await fetch(
+        `${supabase.supabaseUrl}/functions/v1/admin-update-user`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            userId: editingUser.id,
+            email: editUserForm.email !== editingUser.email ? editUserForm.email : undefined,
+            password: editUserForm.password || undefined,
+            nickname: editUserForm.nickname
+          })
+        }
+      );
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to update user');
+      }
+
+      // Update local state
+      setUsers(prev => prev.map(u => 
+        u.id === editingUser.id 
+          ? { ...u, nickname: editUserForm.nickname, email: editUserForm.email }
+          : u
+      ));
+      
+      setEditingUser(null);
+      alert(`User updated successfully! Updated: ${result.updated.join(', ')}`);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      alert('Failed to update user: ' + error.message);
+    } finally {
+      setSavingUser(false);
     }
   };
 
@@ -5491,10 +5563,13 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           </td>
                           <td style={{ padding: '16px 20px', textAlign: 'center' }}>
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                              <button onClick={() => { setViewingUser(user); setExpenseSearch(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <button onClick={() => { setViewingUser(user); setExpenseSearch(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="View Expenses">
                                 <Eye style={{ width: '14px', height: '14px' }} />
                               </button>
-                              <button onClick={() => setDeletingUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: '1px solid #dc2626', borderRadius: '6px', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                              <button onClick={() => handleEditUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit User">
+                                <Edit style={{ width: '14px', height: '14px' }} />
+                              </button>
+                              <button onClick={() => setDeletingUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: '1px solid #dc2626', borderRadius: '6px', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete User">
                                 <Trash2 style={{ width: '14px', height: '14px' }} />
                               </button>
                             </div>
@@ -5620,6 +5695,161 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               <button onClick={() => setDeletingUser(null)} style={{ flex: 1, height: '42px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, color: theme.text, borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>Cancel</button>
               <button onClick={handleDeleteUser} style={{ flex: 1, height: '42px', backgroundColor: '#dc2626', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                 <Trash2 style={{ width: '16px', height: '16px' }} />Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '16px' }} onClick={() => setEditingUser(null)}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '18px', fontWeight: '600' }}>{getInitial(editingUser.nickname)}</div>
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit User</h3>
+                  <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>Update user information</p>
+                </div>
+              </div>
+              <button onClick={() => setEditingUser(null)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '16px', height: '16px' }} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Nickname */}
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Nickname</label>
+                <input
+                  type="text"
+                  value={editUserForm.nickname}
+                  onChange={(e) => setEditUserForm({ ...editUserForm, nickname: e.target.value })}
+                  placeholder="Enter nickname"
+                  style={{
+                    width: '100%',
+                    height: '42px',
+                    padding: '0 12px',
+                    backgroundColor: theme.inputBg,
+                    border: `1px solid ${theme.inputBorder}`,
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: theme.text,
+                    outline: 'none'
+                  }}
+                />
+              </div>
+              
+              {/* Email */}
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Email</label>
+                <input
+                  type="email"
+                  value={editUserForm.email}
+                  onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
+                  placeholder="Enter email"
+                  style={{
+                    width: '100%',
+                    height: '42px',
+                    padding: '0 12px',
+                    backgroundColor: theme.inputBg,
+                    border: `1px solid ${theme.inputBorder}`,
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: theme.text,
+                    outline: 'none'
+                  }}
+                />
+              </div>
+              
+              {/* Password */}
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>
+                  New Password <span style={{ fontWeight: '400', color: theme.textDim }}>(leave empty to keep current)</span>
+                </label>
+                <input
+                  type="password"
+                  value={editUserForm.password}
+                  onChange={(e) => setEditUserForm({ ...editUserForm, password: e.target.value })}
+                  placeholder="Enter new password"
+                  style={{
+                    width: '100%',
+                    height: '42px',
+                    padding: '0 12px',
+                    backgroundColor: theme.inputBg,
+                    border: `1px solid ${theme.inputBorder}`,
+                    borderRadius: '6px',
+                    fontSize: '14px',
+                    color: theme.text,
+                    outline: 'none'
+                  }}
+                />
+                {editUserForm.password && editUserForm.password.length < 6 && (
+                  <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>Password must be at least 6 characters</p>
+                )}
+              </div>
+              
+              {/* User ID (read-only) */}
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>User ID</label>
+                <div style={{
+                  width: '100%',
+                  height: '42px',
+                  padding: '0 12px',
+                  backgroundColor: theme.statBg,
+                  border: `1px solid ${theme.cardBorder}`,
+                  borderRadius: '6px',
+                  fontSize: '12px',
+                  color: theme.textDim,
+                  display: 'flex',
+                  alignItems: 'center',
+                  fontFamily: 'monospace',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}>
+                  {editingUser.id}
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, backgroundColor: theme.statBg, display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+              <button 
+                onClick={() => setEditingUser(null)} 
+                style={{ height: '40px', padding: '0 20px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={handleSaveUser}
+                disabled={savingUser || (editUserForm.password && editUserForm.password.length < 6)}
+                style={{ 
+                  height: '40px', 
+                  padding: '0 20px', 
+                  backgroundColor: isDark ? '#fafafa' : '#18181b', 
+                  color: isDark ? '#18181b' : '#fafafa', 
+                  border: 'none', 
+                  borderRadius: '6px', 
+                  fontSize: '14px', 
+                  fontWeight: '500', 
+                  cursor: (savingUser || (editUserForm.password && editUserForm.password.length < 6)) ? 'not-allowed' : 'pointer',
+                  opacity: (savingUser || (editUserForm.password && editUserForm.password.length < 6)) ? 0.6 : 1,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                {savingUser ? (
+                  <>
+                    <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Check style={{ width: '16px', height: '16px' }} />
+                    Save Changes
+                  </>
+                )}
               </button>
             </div>
           </div>
