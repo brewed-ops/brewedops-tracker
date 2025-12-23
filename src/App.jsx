@@ -9226,28 +9226,93 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
   const handleAdjustLevel = async (userId, adjustment) => {
     if (!userProfileData) return;
     
-    const newLevel = Math.max(1, (userProfileData.level || 1) + adjustment);
-    const newXp = newLevel > userProfileData.level ? 0 : userProfileData.xp; // Reset XP if leveling up
+    // Calculate current level from XP (how the app does it)
+    const currentXP = userProfileData.xp || 0;
+    const currentLevel = calculateLevelFromXP(currentXP);
+    const newLevel = Math.max(1, currentLevel + adjustment);
+    
+    // Get the XP required for the new level
+    const newXP = getXPForLevel(newLevel);
+    
+    console.log(`Adjusting level: ${currentLevel} -> ${newLevel}, XP: ${currentXP} -> ${newXP}`);
     
     try {
-      const { error } = await supabase
+      // First, check if user profile exists
+      const { data: existingProfile } = await supabase
         .from('user_profiles')
-        .upsert({
-          user_id: userId,
-          level: newLevel,
-          xp: newXp,
-          total_xp: userProfileData.total_xp || 0,
-          updated_at: new Date().toISOString()
-        }, { onConflict: 'user_id' });
+        .select('*')
+        .eq('user_id', userId)
+        .single();
       
-      if (error) throw error;
+      let result;
       
-      setUserProfileData(prev => ({ ...prev, level: newLevel, xp: newXp }));
-      alert(`User level ${adjustment > 0 ? 'increased' : 'decreased'} to ${newLevel}`);
+      if (existingProfile) {
+        // Update existing profile
+        result = await supabase
+          .from('user_profiles')
+          .update({
+            xp: newXP,
+            updated_at: new Date().toISOString()
+          })
+          .eq('user_id', userId)
+          .select();
+      } else {
+        // Insert new profile
+        result = await supabase
+          .from('user_profiles')
+          .insert({
+            user_id: userId,
+            xp: newXP,
+            streak: 0,
+            current_streak: 0,
+            selected_frame: 'none',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select();
+      }
+      
+      if (result.error) throw result.error;
+      
+      // Verify the update
+      const { data: verifyData } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      
+      console.log('Updated profile:', verifyData);
+      
+      setUserProfileData(prev => ({ ...prev, level: newLevel, xp: newXP }));
+      alert(`User level ${adjustment > 0 ? 'increased' : 'decreased'} to Level ${newLevel} (XP: ${newXP})`);
     } catch (error) {
       console.error('Error adjusting level:', error);
       alert('Failed to adjust level: ' + error.message);
     }
+  };
+  
+  // Helper to calculate level from XP (matches the app's logic)
+  const calculateLevelFromXP = (xp) => {
+    const thresholds = [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5500, 7500, 10000, 13000, 17000, 22000, 28000, 35000, 45000, 60000];
+    for (let i = thresholds.length - 1; i >= 0; i--) {
+      if (xp >= thresholds[i]) {
+        return i + 1;
+      }
+    }
+    return 1;
+  };
+  
+  // Helper to get minimum XP for a level
+  const getXPForLevel = (level) => {
+    const thresholds = [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5500, 7500, 10000, 13000, 17000, 22000, 28000, 35000, 45000, 60000];
+    if (level <= 0) return 0;
+    if (level <= thresholds.length) {
+      return thresholds[level - 1];
+    }
+    // For levels beyond the array, extrapolate
+    const lastThreshold = thresholds[thresholds.length - 1];
+    const extraLevels = level - thresholds.length;
+    return Math.floor(lastThreshold * Math.pow(1.3, extraLevels));
   };
 
   // Unlock achievement for user
@@ -9952,8 +10017,8 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                         <div>
                           <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 4px' }}>Current Level</p>
-                          <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>Level {userProfileData?.level || 1}</p>
-                          <p style={{ fontSize: '11px', color: theme.textMuted, margin: '4px 0 0' }}>XP: {userProfileData?.xp || 0} / {(userProfileData?.level || 1) * 100}</p>
+                          <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>Level {calculateLevelFromXP(userProfileData?.xp || 0)}</p>
+                          <p style={{ fontSize: '11px', color: theme.textMuted, margin: '4px 0 0' }}>XP: {userProfileData?.xp || 0}</p>
                         </div>
                       </div>
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
