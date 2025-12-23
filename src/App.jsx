@@ -1352,7 +1352,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [editWalletName, setEditWalletName] = useState('');
   
   // Wallet tab filters
-  const [walletFilter, setWalletFilter] = useState('cash');
+  const [walletTransactionFilter, setWalletTransactionFilter] = useState('all'); // For transaction history
   const [walletSearch, setWalletSearch] = useState('');
   const [walletDateFrom, setWalletDateFrom] = useState('');
   const [walletDateTo, setWalletDateTo] = useState('');
@@ -1692,7 +1692,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   }, [userDataLoaded, lastLoginDate]);
 
   // Handle daily check-in button click
-  const handleDailyCheckIn = () => {
+  const handleDailyCheckIn = async () => {
     if (checkedInToday) return;
     
     const today = new Date().toDateString();
@@ -1705,9 +1705,24 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       newStreak = currentStreak + 1;
     }
     
+    // Update local state
     setCurrentStreak(newStreak);
     setLastLoginDate(today);
     setCheckedInToday(true);
+    
+    // Save immediately to Supabase (don't wait for debounced save)
+    try {
+      await supabase
+        .from('user_profiles')
+        .upsert({
+          user_id: user.id,
+          current_streak: newStreak,
+          last_login_date: today
+        }, { onConflict: 'user_id' });
+    } catch (e) {
+      console.error('Failed to save check-in:', e);
+    }
+    
     awardXP(XP_CONFIG.dailyLogin, 'for daily check-in');
     
     // Check for week streak bonus
@@ -2127,8 +2142,8 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     let filtered = walletTransactions;
 
     // Filter by wallet
-    if (walletFilter !== 'all') {
-      filtered = filtered.filter(t => t.walletId === walletFilter);
+    if (walletTransactionFilter !== 'all') {
+      filtered = filtered.filter(t => t.walletId === walletTransactionFilter);
     }
 
     // Filter by search
@@ -3373,7 +3388,7 @@ const getBudgetStatus = () => {
                   </span>
                   <span style={{ fontSize: '10px', color: theme.textMuted }}>Badges</span>
                 </div>
-                {currentStreak > 0 && (
+                {(currentStreak > 0 || !checkedInToday) && (
                   <div style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -3384,7 +3399,9 @@ const getBudgetStatus = () => {
                     position: 'relative'
                   }}>
                     <Flame style={{ width: '14px', height: '14px', color: checkedInToday ? '#22c55e' : '#f97316' }} />
-                    <span style={{ fontSize: '12px', fontWeight: '700', color: checkedInToday ? '#22c55e' : '#f97316' }}>{currentStreak}</span>
+                    {currentStreak > 0 && (
+                      <span style={{ fontSize: '12px', fontWeight: '700', color: checkedInToday ? '#22c55e' : '#f97316' }}>{currentStreak}</span>
+                    )}
                     {!checkedInToday && (
                       <span style={{
                         position: 'absolute',
@@ -3397,20 +3414,6 @@ const getBudgetStatus = () => {
                         border: `2px solid ${theme.cardBg}`
                       }} />
                     )}
-                  </div>
-                )}
-                {currentStreak === 0 && !checkedInToday && (
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '3px',
-                    padding: '4px 8px',
-                    backgroundColor: isDark ? '#7c2d12' : '#fed7aa',
-                    borderRadius: '12px',
-                    position: 'relative'
-                  }}>
-                    <Flame style={{ width: '14px', height: '14px', color: '#f97316' }} />
-                    <span style={{ fontSize: '10px', fontWeight: '600', color: '#f97316' }}>Check in!</span>
                   </div>
                 )}
               </div>
@@ -4257,9 +4260,19 @@ const getBudgetStatus = () => {
                       style={{ ...inputStyle, cursor: 'pointer' }}
                     >
                       <option value="">No wallet (optional)</option>
-                      {wallets.map(w => (
-                        <option key={w.id} value={w.id}>{w.icon} {w.name} ({currency}{w.balance.toLocaleString()})</option>
-                      ))}
+                      {WALLET_TYPES.map(wt => {
+                        const typeWallets = wallets.filter(w => w.type === wt.type);
+                        if (typeWallets.length === 0) return null;
+                        return (
+                          <optgroup key={wt.type} label={`${wt.icon} ${wt.label}`}>
+                            {typeWallets.map(w => (
+                              <option key={w.id} value={w.id}>
+                                {w.name} ({currency}{w.balance.toLocaleString()})
+                              </option>
+                            ))}
+                          </optgroup>
+                        );
+                      })}
                     </select>
                   </div>
                   <div>
@@ -5464,341 +5477,253 @@ const getBudgetStatus = () => {
           /* Multi-Wallet Tab */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
-            {/* Wallet Type Tabs */}
-            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
-              {WALLET_TYPES.filter(wt => wt.canAddMultiple || wt.type === 'cash').map(walletType => {
+            {/* 4 Wallet Type Cards - Side by Side */}
+            <div style={{ 
+              display: 'grid', 
+              gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', 
+              gap: '12px' 
+            }}>
+              {WALLET_TYPES.map(walletType => {
                 const typeWallets = getWalletsByType(walletType.type);
-                const isActive = (walletFilter === 'all' && walletType.type === 'cash') || walletFilter === walletType.type;
+                const selectedId = featuredWallets[walletType.type];
+                const selectedWallet = typeWallets.find(w => w.id === selectedId) || typeWallets[0];
+                const canAddMore = walletType.canAddMultiple ? typeWallets.length < 4 : typeWallets.length === 0;
+                const typeTotal = typeWallets.reduce((sum, w) => sum + w.balance, 0);
+                
+                // Define colors for each type
+                const typeColors = {
+                  cash: '#22c55e',
+                  ewallet: '#3b82f6',
+                  bank: '#8b5cf6',
+                  credit: '#ef4444'
+                };
+                const cardColor = typeColors[walletType.type];
+                
                 return (
-                  <button
+                  <div
                     key={walletType.type}
-                    onClick={() => setWalletFilter(walletType.type)}
                     style={{
-                      padding: '10px 16px',
-                      backgroundColor: walletFilter === walletType.type ? walletType.color : theme.statBg,
-                      color: walletFilter === walletType.type ? '#fff' : theme.text,
-                      border: `1px solid ${walletFilter === walletType.type ? walletType.color : theme.cardBorder}`,
-                      borderRadius: '8px',
-                      fontSize: '13px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
+                      borderRadius: '16px',
+                      backgroundColor: cardColor,
+                      padding: '20px',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      minHeight: '180px',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      whiteSpace: 'nowrap',
-                      transition: 'all 0.2s'
+                      flexDirection: 'column'
                     }}
                   >
-                    <span>{walletType.icon}</span>
-                    {walletType.label}
-                    <span style={{ 
-                      backgroundColor: walletFilter === walletType.type ? 'rgba(255,255,255,0.2)' : theme.cardBorder,
-                      padding: '2px 6px',
-                      borderRadius: '10px',
-                      fontSize: '11px'
-                    }}>{typeWallets.length}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Active Wallet Type Section */}
-            {(() => {
-              const activeType = WALLET_TYPES.find(wt => wt.type === walletFilter) || WALLET_TYPES[0];
-              const typeWallets = getWalletsByType(activeType.type);
-              const featuredId = featuredWallets[activeType.type];
-              const featuredWallet = typeWallets.find(w => w.id === featuredId) || typeWallets[0];
-              const otherWallets = typeWallets.filter(w => w.id !== featuredWallet?.id);
-              const canAddMore = activeType.canAddMultiple ? typeWallets.length < 4 : typeWallets.length === 0;
-
-              return (
-                <>
-                  {/* Small Wallet Cards Row */}
-                  {(otherWallets.length > 0 || canAddMore) && (
-                    <div style={{ 
-                      display: 'grid', 
-                      gridTemplateColumns: isSmall ? 'repeat(2, 1fr)' : `repeat(${Math.min(otherWallets.length + (canAddMore ? 1 : 0), 4)}, 1fr)`,
-                      gap: '12px'
-                    }}>
-                      {otherWallets.map(wallet => (
-                        <div
-                          key={wallet.id}
-                          onClick={() => setFeaturedWallets(prev => ({ ...prev, [activeType.type]: wallet.id }))}
-                          style={{
-                            padding: '16px',
-                            borderRadius: '12px',
-                            backgroundColor: wallet.color,
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
-                            position: 'relative',
-                            overflow: 'hidden'
-                          }}
-                        >
-                          {/* Background decoration */}
-                          <div style={{
-                            position: 'absolute',
-                            top: '-20px',
-                            right: '-20px',
-                            width: '80px',
-                            height: '80px',
-                            borderRadius: '50%',
-                            backgroundColor: 'rgba(255,255,255,0.1)'
-                          }} />
-                          <div style={{
-                            position: 'absolute',
-                            bottom: '-30px',
-                            left: '-30px',
-                            width: '60px',
-                            height: '60px',
-                            borderRadius: '50%',
-                            backgroundColor: 'rgba(255,255,255,0.05)'
-                          }} />
-                          
-                          <div style={{ position: 'relative' }}>
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', margin: 0, fontWeight: '500' }}>{wallet.name}</p>
-                              <span style={{ 
-                                fontSize: '16px',
+                    {/* Background decorations */}
+                    <div style={{
+                      position: 'absolute',
+                      top: '-30px',
+                      right: '-30px',
+                      width: '100px',
+                      height: '100px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(255,255,255,0.1)'
+                    }} />
+                    <div style={{
+                      position: 'absolute',
+                      bottom: '-40px',
+                      left: '-40px',
+                      width: '120px',
+                      height: '120px',
+                      borderRadius: '50%',
+                      backgroundColor: 'rgba(255,255,255,0.05)'
+                    }} />
+                    
+                    <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
+                      {/* Header */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', margin: 0, fontWeight: '500' }}>
+                          {walletType.label}
+                        </p>
+                        <div style={{ display: 'flex', gap: '4px' }}>
+                          {canAddMore && (
+                            <button
+                              onClick={() => {
+                                setSelectedWalletType(walletType);
+                                setShowAddWalletModal(true);
+                              }}
+                              style={{
                                 width: '28px',
                                 height: '28px',
+                                backgroundColor: 'rgba(255,255,255,0.2)',
+                                border: 'none',
+                                borderRadius: '6px',
+                                color: '#fff',
+                                cursor: 'pointer',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}
+                            >
+                              <Plus style={{ width: '14px', height: '14px' }} />
+                            </button>
+                          )}
+                          <span style={{ 
+                            width: '28px',
+                            height: '28px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '6px',
+                            backgroundColor: 'rgba(255,255,255,0.2)',
+                            fontSize: '16px'
+                          }}>{walletType.icon}</span>
+                        </div>
+                      </div>
+                      
+                      {/* Wallet Selector Dropdown */}
+                      {typeWallets.length > 0 ? (
+                        <>
+                          <select
+                            value={selectedWallet?.id || ''}
+                            onChange={(e) => setFeaturedWallets(prev => ({ ...prev, [walletType.type]: e.target.value }))}
+                            style={{
+                              backgroundColor: 'rgba(255,255,255,0.2)',
+                              border: 'none',
+                              borderRadius: '8px',
+                              padding: '8px 12px',
+                              color: '#fff',
+                              fontSize: '13px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              marginBottom: '12px',
+                              appearance: 'none',
+                              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+                              backgroundRepeat: 'no-repeat',
+                              backgroundPosition: 'right 8px center',
+                              backgroundSize: '16px',
+                              paddingRight: '32px'
+                            }}
+                          >
+                            {typeWallets.map(w => (
+                              <option key={w.id} value={w.id} style={{ color: '#000' }}>
+                                {w.icon} {w.name}
+                              </option>
+                            ))}
+                          </select>
+                          
+                          {/* Selected Wallet Balance */}
+                          <div style={{ flex: 1 }}>
+                            <p style={{ 
+                              fontSize: '28px', 
+                              fontWeight: '700', 
+                              color: '#fff', 
+                              margin: '0 0 4px'
+                            }}>
+                              {currency}{selectedWallet?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
+                            </p>
+                            {typeWallets.length > 1 && (
+                              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+                                Total: {currency}{typeTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                              </p>
+                            )}
+                          </div>
+                          
+                          {/* Action Buttons */}
+                          <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
+                            <button
+                              onClick={() => {
+                                setSelectedWalletForFunds(selectedWallet);
+                                setShowAddFundsModal(true);
+                              }}
+                              style={{
+                                flex: 1,
+                                height: '36px',
+                                backgroundColor: 'rgba(255,255,255,0.95)',
+                                color: cardColor,
+                                border: 'none',
+                                borderRadius: '8px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                borderRadius: '6px',
-                                backgroundColor: 'rgba(255,255,255,0.2)'
-                              }}>{wallet.icon}</span>
-                            </div>
-                            <p style={{ 
-                              fontSize: '20px', 
-                              fontWeight: '700', 
-                              color: '#fff', 
-                              margin: 0
-                            }}>
-                              {currency}{wallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                            </p>
+                                gap: '4px'
+                              }}
+                            >
+                              <Plus style={{ width: '12px', height: '12px' }} />
+                              Add
+                            </button>
+                            {selectedWallet?.editable && (
+                              <button
+                                onClick={() => {
+                                  setEditingWallet(selectedWallet);
+                                  setEditWalletName(selectedWallet.name);
+                                  setShowEditWalletModal(true);
+                                }}
+                                style={{
+                                  width: '36px',
+                                  height: '36px',
+                                  backgroundColor: 'rgba(255,255,255,0.2)',
+                                  border: 'none',
+                                  borderRadius: '8px',
+                                  color: '#fff',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <Edit style={{ width: '12px', height: '12px' }} />
+                              </button>
+                            )}
+                            {selectedWallet?.type !== 'cash' && (
+                              <button
+                                onClick={() => {
+                                  setWalletToDelete(selectedWallet);
+                                  setShowDeleteWalletConfirm(true);
+                                }}
+                                style={{
+                                  width: '36px',
+                                  height: '36px',
+                                  backgroundColor: 'rgba(255,255,255,0.2)',
+                                  border: 'none',
+                                  borderRadius: '8px',
+                                  color: '#fff',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }}
+                              >
+                                <Trash2 style={{ width: '12px', height: '12px' }} />
+                              </button>
+                            )}
                           </div>
-                        </div>
-                      ))}
-                      
-                      {/* Add Card */}
-                      {canAddMore && activeType.canAddMultiple && (
-                        <div
+                        </>
+                      ) : (
+                        /* Empty State */
+                        <div 
                           onClick={() => {
-                            setSelectedWalletType(activeType);
+                            setSelectedWalletType(walletType);
                             setShowAddWalletModal(true);
                           }}
-                          style={{
-                            padding: '16px',
-                            borderRadius: '12px',
-                            backgroundColor: theme.statBg,
-                            border: `2px dashed ${theme.cardBorder}`,
-                            cursor: 'pointer',
-                            transition: 'all 0.2s',
+                          style={{ 
+                            flex: 1,
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            minHeight: '88px'
+                            cursor: 'pointer',
+                            opacity: 0.8
                           }}
                         >
-                          <Plus style={{ width: '24px', height: '24px', color: theme.textMuted, marginBottom: '4px' }} />
-                          <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>Add {activeType.label}</p>
+                          <Plus style={{ width: '32px', height: '32px', color: '#fff', marginBottom: '8px' }} />
+                          <p style={{ fontSize: '13px', color: '#fff', margin: 0, textAlign: 'center' }}>
+                            Add {walletType.label}
+                          </p>
                         </div>
                       )}
                     </div>
-                  )}
-
-                  {/* Featured Wallet (Large) */}
-                  {featuredWallet ? (
-                    <div style={{ 
-                      padding: '24px',
-                      borderRadius: '16px',
-                      backgroundColor: featuredWallet.color,
-                      position: 'relative',
-                      overflow: 'hidden'
-                    }}>
-                      {/* Background decorations */}
-                      <div style={{
-                        position: 'absolute',
-                        top: '-40px',
-                        right: '-40px',
-                        width: '150px',
-                        height: '150px',
-                        borderRadius: '50%',
-                        backgroundColor: 'rgba(255,255,255,0.1)'
-                      }} />
-                      <div style={{
-                        position: 'absolute',
-                        bottom: '-60px',
-                        left: '-60px',
-                        width: '180px',
-                        height: '180px',
-                        borderRadius: '50%',
-                        backgroundColor: 'rgba(255,255,255,0.05)'
-                      }} />
-                      <div style={{
-                        position: 'absolute',
-                        top: '50%',
-                        right: '10%',
-                        width: '100px',
-                        height: '100px',
-                        borderRadius: '50%',
-                        backgroundColor: 'rgba(255,255,255,0.05)'
-                      }} />
-                      
-                      <div style={{ position: 'relative' }}>
-                        {/* Header */}
-                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                            <span style={{ 
-                              fontSize: '32px',
-                              width: '56px',
-                              height: '56px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              borderRadius: '14px',
-                              backgroundColor: 'rgba(255,255,255,0.2)'
-                            }}>{featuredWallet.icon}</span>
-                            <div>
-                              <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#fff', margin: 0 }}>{featuredWallet.name}</h3>
-                              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', margin: '2px 0 0', textTransform: 'capitalize' }}>
-                                {featuredWallet.type === 'ewallet' ? 'E-Wallet' : featuredWallet.type}
-                              </p>
-                            </div>
-                          </div>
-                          
-                          {/* Action Buttons */}
-                          <div style={{ display: 'flex', gap: '6px' }}>
-                            {featuredWallet.editable && (
-                              <button
-                                onClick={() => {
-                                  setEditingWallet(featuredWallet);
-                                  setEditWalletName(featuredWallet.name);
-                                  setShowEditWalletModal(true);
-                                }}
-                                style={{
-                                  width: '32px',
-                                  height: '32px',
-                                  backgroundColor: 'rgba(255,255,255,0.2)',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  color: '#fff',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
-                              >
-                                <Edit style={{ width: '14px', height: '14px' }} />
-                              </button>
-                            )}
-                            {featuredWallet.type !== 'cash' && (
-                              <button
-                                onClick={() => {
-                                  setWalletToDelete(featuredWallet);
-                                  setShowDeleteWalletConfirm(true);
-                                }}
-                                style={{
-                                  width: '32px',
-                                  height: '32px',
-                                  backgroundColor: 'rgba(255,255,255,0.2)',
-                                  border: 'none',
-                                  borderRadius: '8px',
-                                  color: '#fff',
-                                  cursor: 'pointer',
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center'
-                                }}
-                              >
-                                <Trash2 style={{ width: '14px', height: '14px' }} />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                        
-                        {/* Balance */}
-                        <div style={{ marginBottom: '20px' }}>
-                          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', margin: '0 0 4px' }}>Current Balance</p>
-                          <p style={{ 
-                            fontSize: '36px', 
-                            fontWeight: '700', 
-                            color: '#fff', 
-                            margin: 0,
-                            fontFamily: 'system-ui, -apple-system, sans-serif'
-                          }}>
-                            {currency}{featuredWallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                          </p>
-                        </div>
-                        
-                        {/* Add Funds Button */}
-                        <button
-                          onClick={() => {
-                            setSelectedWalletForFunds(featuredWallet);
-                            setShowAddFundsModal(true);
-                          }}
-                          style={{
-                            width: isSmall ? '100%' : 'auto',
-                            padding: '12px 24px',
-                            backgroundColor: 'rgba(255,255,255,0.95)',
-                            color: featuredWallet.color,
-                            border: 'none',
-                            borderRadius: '10px',
-                            fontSize: '14px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            gap: '8px'
-                          }}
-                        >
-                          <Plus style={{ width: '16px', height: '16px' }} />
-                          Add Funds
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Empty State */
-                    <div 
-                      onClick={() => {
-                        if (activeType.canAddMultiple || typeWallets.length === 0) {
-                          setSelectedWalletType(activeType);
-                          setShowAddWalletModal(true);
-                        }
-                      }}
-                      style={{ 
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '60px 20px',
-                        backgroundColor: theme.statBg,
-                        borderRadius: '16px',
-                        border: `2px dashed ${theme.cardBorder}`,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      <div style={{
-                        width: '64px',
-                        height: '64px',
-                        borderRadius: '16px',
-                        backgroundColor: `${activeType.color}20`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        marginBottom: '12px'
-                      }}>
-                        <span style={{ fontSize: '32px' }}>{activeType.icon}</span>
-                      </div>
-                      <p style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 4px' }}>No {activeType.label} Yet</p>
-                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>Click to add your first {activeType.label.toLowerCase()}</p>
-                    </div>
-                  )}
-                </>
-              );
-            })()}
+                  </div>
+                );
+              })}
+            </div>
             
             {/* Total Balance Card */}
             <div style={{
@@ -5862,8 +5787,8 @@ const getBudgetStatus = () => {
                   
                   {/* Wallet Filter */}
                   <select
-                    value={walletFilter}
-                    onChange={(e) => setWalletFilter(e.target.value)}
+                    value={walletTransactionFilter}
+                    onChange={(e) => setWalletTransactionFilter(e.target.value)}
                     style={{ ...inputStyle, width: '130px', cursor: 'pointer' }}
                   >
                     <option value="all">All Wallets</option>
