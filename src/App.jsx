@@ -26,12 +26,50 @@ const CURRENCIES = [
   { symbol: '₹', label: 'INR (₹)' },
 ];
 
-// Default wallet types
+// Wallet type configurations (for adding new wallets)
+const WALLET_TYPES = [
+  { type: 'cash', label: 'Cash', icon: '💵', color: '#22c55e', canAddMultiple: false },
+  { type: 'ewallet', label: 'E-Wallet', icon: '📱', color: '#0066ff', canAddMultiple: true, 
+    presets: [
+      { name: 'GCash', icon: '📱', color: '#0066ff' },
+      { name: 'Maya', icon: '💜', color: '#7c3aed' },
+      { name: 'Coins.ph', icon: '🪙', color: '#f59e0b' },
+      { name: 'GrabPay', icon: '🚗', color: '#22c55e' },
+      { name: 'ShopeePay', icon: '🛒', color: '#f97316' },
+      { name: 'PayPal', icon: '🅿️', color: '#0070ba' },
+    ]
+  },
+  { type: 'bank', label: 'Bank Account', icon: '🏦', color: '#6366f1', canAddMultiple: true,
+    presets: [
+      { name: 'BDO', icon: '🏦', color: '#0033a0' },
+      { name: 'BPI', icon: '🏦', color: '#c8102e' },
+      { name: 'Metrobank', icon: '🏦', color: '#00529b' },
+      { name: 'UnionBank', icon: '🏦', color: '#f7931e' },
+      { name: 'Landbank', icon: '🏦', color: '#006f45' },
+      { name: 'PNB', icon: '🏦', color: '#1e3a8a' },
+      { name: 'Security Bank', icon: '🏦', color: '#e11d48' },
+      { name: 'RCBC', icon: '🏦', color: '#dc2626' },
+      { name: 'Chinabank', icon: '🏦', color: '#b91c1c' },
+      { name: 'EastWest', icon: '🏦', color: '#0ea5e9' },
+    ]
+  },
+  { type: 'credit', label: 'Credit Card', icon: '💳', color: '#ef4444', canAddMultiple: true,
+    presets: [
+      { name: 'Visa', icon: '💳', color: '#1a1f71' },
+      { name: 'Mastercard', icon: '💳', color: '#eb001b' },
+      { name: 'BDO Credit Card', icon: '💳', color: '#0033a0' },
+      { name: 'BPI Credit Card', icon: '💳', color: '#c8102e' },
+      { name: 'Metrobank Credit Card', icon: '💳', color: '#00529b' },
+      { name: 'Security Bank Credit Card', icon: '💳', color: '#e11d48' },
+      { name: 'Citi Credit Card', icon: '💳', color: '#003b70' },
+      { name: 'RCBC Credit Card', icon: '💳', color: '#dc2626' },
+    ]
+  },
+];
+
+// Default wallets for new users
 const DEFAULT_WALLETS = [
-  { id: 'cash', name: 'Cash', icon: '💵', color: '#22c55e', type: 'cash' },
-  { id: 'gcash', name: 'GCash', icon: '📱', color: '#0066ff', type: 'ewallet' },
-  { id: 'bank', name: 'Bank Account', icon: '🏦', color: '#6366f1', type: 'bank', editable: true },
-  { id: 'credit', name: 'Credit Card', icon: '💳', color: '#ef4444', type: 'credit' },
+  { id: 'cash', name: 'Cash', icon: '💵', color: '#22c55e', type: 'cash', editable: false },
 ];
 
 // XP System Configuration
@@ -1316,6 +1354,15 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [walletDateTo, setWalletDateTo] = useState('');
   const [showWalletAdvancedFilter, setShowWalletAdvancedFilter] = useState(false);
   
+  // Add Wallet Modal states
+  const [showAddWalletModal, setShowAddWalletModal] = useState(false);
+  const [selectedWalletType, setSelectedWalletType] = useState(null);
+  const [newWalletName, setNewWalletName] = useState('');
+  const [newWalletIcon, setNewWalletIcon] = useState('');
+  const [newWalletColor, setNewWalletColor] = useState('');
+  const [showDeleteWalletConfirm, setShowDeleteWalletConfirm] = useState(false);
+  const [walletToDelete, setWalletToDelete] = useState(null);
+  
   // Bulk delete states
   const [selectedEntries, setSelectedEntries] = useState([]);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
@@ -1885,6 +1932,105 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     setShowEditWalletModal(false);
     setEditingWallet(null);
     setEditWalletName('');
+  };
+
+  // Add new wallet
+  const handleAddWallet = async (preset = null) => {
+    const walletType = selectedWalletType;
+    if (!walletType) return;
+
+    let name, icon, color;
+    
+    if (preset) {
+      name = preset.name;
+      icon = preset.icon;
+      color = preset.color;
+    } else {
+      if (!newWalletName.trim()) {
+        showToast('Please enter a wallet name', 'error');
+        return;
+      }
+      name = newWalletName.trim();
+      icon = newWalletIcon || walletType.icon;
+      color = newWalletColor || walletType.color;
+    }
+
+    // Generate unique ID
+    const walletId = `${walletType.type}_${Date.now()}`;
+
+    const newWallet = {
+      id: walletId,
+      name: name,
+      icon: icon,
+      color: color,
+      type: walletType.type,
+      balance: 0,
+      editable: true
+    };
+
+    // Add to local state
+    setWallets(prev => [...prev, newWallet]);
+
+    // Save to Supabase
+    try {
+      await supabase.from('wallets').insert([{
+        user_id: user.id,
+        wallet_id: walletId,
+        name: name,
+        icon: icon,
+        color: color,
+        type: walletType.type,
+        balance: 0,
+        editable: true
+      }]);
+    } catch (e) {
+      console.error('Failed to save wallet:', e);
+    }
+
+    showToast(`${name} wallet added`, 'success');
+    setShowAddWalletModal(false);
+    setSelectedWalletType(null);
+    setNewWalletName('');
+    setNewWalletIcon('');
+    setNewWalletColor('');
+  };
+
+  // Delete wallet
+  const handleDeleteWallet = async () => {
+    if (!walletToDelete) return;
+
+    // Remove from local state
+    setWallets(prev => prev.filter(w => w.id !== walletToDelete.id));
+
+    // Delete from Supabase
+    try {
+      await supabase
+        .from('wallets')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('wallet_id', walletToDelete.id);
+      
+      // Also delete related transactions
+      await supabase
+        .from('wallet_transactions')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('wallet_id', walletToDelete.id);
+    } catch (e) {
+      console.error('Failed to delete wallet:', e);
+    }
+
+    // Remove transactions from local state
+    setWalletTransactions(prev => prev.filter(t => t.walletId !== walletToDelete.id));
+
+    showToast(`${walletToDelete.name} deleted`, 'success');
+    setShowDeleteWalletConfirm(false);
+    setWalletToDelete(null);
+  };
+
+  // Get wallets grouped by type
+  const getWalletsByType = (type) => {
+    return wallets.filter(w => w.type === type);
   };
 
   // Get total balance across all wallets
@@ -4090,12 +4236,13 @@ const getBudgetStatus = () => {
 
             {/* Table Container */}
             <div style={{ overflowX: 'auto', flex: 1, maxHeight: '280px', overflowY: filteredEntries.length > 5 ? 'auto' : 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isSmall ? '400px' : 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isSmall ? '500px' : 'auto' }}>
                 <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg, zIndex: 1 }}>
                   <tr style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
                     <th style={{ padding: '8px 8px 8px 0', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: isSmall ? '70px' : '90px' }}>Type</th>
                     <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle }}>Name</th>
                     <th style={{ padding: '8px', textAlign: 'right', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: '100px' }}>Amount</th>
+                    <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: '80px' }}>Wallet</th>
                     <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: '90px' }}>Date</th>
                     <th style={{ padding: '8px 0 8px 8px', textAlign: 'right', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: '90px' }}>Actions</th>
                   </tr>
@@ -4103,7 +4250,7 @@ const getBudgetStatus = () => {
                 <tbody>
                   {filteredEntries.length === 0 ? (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', padding: '60px 16px' }}>
+                      <td colSpan={6} style={{ textAlign: 'center', padding: '60px 16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                           <div style={{
                             width: '80px',
@@ -4190,6 +4337,32 @@ const getBudgetStatus = () => {
                           </td>
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right' }}>
                             <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(entry.amount)}</span>
+                          </td>
+                          <td style={{ padding: '10px 8px', verticalAlign: 'middle' }}>
+                            {entry.walletId ? (
+                              (() => {
+                                const wallet = wallets.find(w => w.id === entry.walletId);
+                                return wallet ? (
+                                  <span style={{ 
+                                    display: 'inline-flex', 
+                                    alignItems: 'center', 
+                                    gap: '4px',
+                                    fontSize: '11px',
+                                    padding: '3px 6px',
+                                    borderRadius: '4px',
+                                    backgroundColor: `${wallet.color}15`,
+                                    color: wallet.color
+                                  }}>
+                                    <span style={{ fontSize: '12px' }}>{wallet.icon}</span>
+                                    {!isSmall && wallet.name}
+                                  </span>
+                                ) : (
+                                  <span style={{ fontSize: '11px', color: theme.textDim }}>-</span>
+                                );
+                              })()
+                            ) : (
+                              <span style={{ fontSize: '11px', color: theme.textDim }}>-</span>
+                            )}
                           </td>
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle' }}>
                             <span style={{ fontSize: '12px', color: theme.textSubtle }}>{new Date(entry.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
@@ -5179,87 +5352,179 @@ const getBudgetStatus = () => {
         ) : activeTab === 'wallets' ? (
           /* Multi-Wallet Tab */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            {/* Wallet Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px' }}>
-              {wallets.map(wallet => (
-                <div
-                  key={wallet.id}
-                  style={{
-                    ...cardStyle,
-                    padding: '20px',
-                    borderLeft: `4px solid ${wallet.color}`,
-                    position: 'relative'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
+            
+            {/* Wallet Sections by Type */}
+            {WALLET_TYPES.map(walletType => {
+              const typeWallets = getWalletsByType(walletType.type);
+              const showAddButton = walletType.canAddMultiple || typeWallets.length === 0;
+              
+              return (
+                <div key={walletType.type} style={cardStyle}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '28px' }}>{wallet.icon}</span>
+                      <span style={{ fontSize: '24px' }}>{walletType.icon}</span>
                       <div>
-                        <h3 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>{wallet.name}</h3>
-                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', textTransform: 'capitalize' }}>{wallet.type}</p>
+                        <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{walletType.label}</h3>
+                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>
+                          {typeWallets.length} {typeWallets.length === 1 ? 'wallet' : 'wallets'}
+                        </p>
                       </div>
                     </div>
-                    {wallet.editable && (
+                    {showAddButton && (
                       <button
                         onClick={() => {
-                          setEditingWallet(wallet);
-                          setEditWalletName(wallet.name);
-                          setShowEditWalletModal(true);
+                          setSelectedWalletType(walletType);
+                          setShowAddWalletModal(true);
                         }}
                         style={{
-                          width: '28px',
-                          height: '28px',
-                          backgroundColor: 'transparent',
-                          border: `1px solid ${theme.inputBorder}`,
-                          borderRadius: '6px',
-                          color: theme.textMuted,
+                          height: '36px',
+                          padding: '0 16px',
+                          backgroundColor: walletType.color,
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '13px',
+                          fontWeight: '500',
                           cursor: 'pointer',
                           display: 'flex',
                           alignItems: 'center',
-                          justifyContent: 'center'
+                          gap: '6px'
                         }}
                       >
-                        <Edit style={{ width: '14px', height: '14px' }} />
+                        <Plus style={{ width: '14px', height: '14px' }} />
+                        Add {walletType.label}
                       </button>
                     )}
                   </div>
                   
-                  <p style={{ 
-                    fontSize: '24px', 
-                    fontWeight: '700', 
-                    color: wallet.balance >= 0 ? theme.text : '#ef4444', 
-                    margin: '0 0 16px' 
-                  }}>
-                    {currency}{wallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                  </p>
-                  
-                  <button
-                    onClick={() => {
-                      setSelectedWalletForFunds(wallet);
-                      setShowAddFundsModal(true);
-                    }}
-                    style={{
-                      width: '100%',
-                      height: '36px',
-                      backgroundColor: wallet.color,
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '6px',
-                      fontSize: '13px',
-                      fontWeight: '500',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    <Plus style={{ width: '14px', height: '14px' }} />
-                    Add Funds
-                  </button>
+                  {typeWallets.length === 0 ? (
+                    <div style={{ 
+                      textAlign: 'center', 
+                      padding: '30px 20px',
+                      backgroundColor: theme.statBg,
+                      borderRadius: '8px',
+                      color: theme.textMuted 
+                    }}>
+                      <p style={{ fontSize: '14px', margin: 0 }}>No {walletType.label.toLowerCase()} added yet</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '12px' }}>
+                      {typeWallets.map(wallet => (
+                        <div
+                          key={wallet.id}
+                          style={{
+                            padding: '16px',
+                            borderRadius: '10px',
+                            border: `1px solid ${theme.cardBorder}`,
+                            backgroundColor: theme.statBg,
+                            position: 'relative'
+                          }}
+                        >
+                          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '8px' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                              <span style={{ 
+                                fontSize: '24px',
+                                width: '40px',
+                                height: '40px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '10px',
+                                backgroundColor: `${wallet.color}20`
+                              }}>{wallet.icon}</span>
+                              <div>
+                                <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{wallet.name}</h4>
+                                <p style={{ 
+                                  fontSize: '18px', 
+                                  fontWeight: '700', 
+                                  color: wallet.balance >= 0 ? theme.text : '#ef4444', 
+                                  margin: '4px 0 0' 
+                                }}>
+                                  {currency}{wallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                </p>
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', gap: '4px' }}>
+                              {wallet.editable && (
+                                <button
+                                  onClick={() => {
+                                    setEditingWallet(wallet);
+                                    setEditWalletName(wallet.name);
+                                    setShowEditWalletModal(true);
+                                  }}
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    backgroundColor: 'transparent',
+                                    border: `1px solid ${theme.inputBorder}`,
+                                    borderRadius: '6px',
+                                    color: theme.textMuted,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                >
+                                  <Edit style={{ width: '12px', height: '12px' }} />
+                                </button>
+                              )}
+                              {wallet.type !== 'cash' && (
+                                <button
+                                  onClick={() => {
+                                    setWalletToDelete(wallet);
+                                    setShowDeleteWalletConfirm(true);
+                                  }}
+                                  style={{
+                                    width: '28px',
+                                    height: '28px',
+                                    backgroundColor: 'transparent',
+                                    border: `1px solid ${theme.inputBorder}`,
+                                    borderRadius: '6px',
+                                    color: theme.textMuted,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                  }}
+                                >
+                                  <Trash2 style={{ width: '12px', height: '12px' }} />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <button
+                            onClick={() => {
+                              setSelectedWalletForFunds(wallet);
+                              setShowAddFundsModal(true);
+                            }}
+                            style={{
+                              width: '100%',
+                              height: '32px',
+                              backgroundColor: wallet.color,
+                              color: '#fff',
+                              border: 'none',
+                              borderRadius: '6px',
+                              fontSize: '12px',
+                              fontWeight: '500',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '4px',
+                              marginTop: '12px'
+                            }}
+                          >
+                            <Plus style={{ width: '12px', height: '12px' }} />
+                            Add Funds
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
+              );
+            })}
             
             {/* Total Balance Card */}
             <div style={{
@@ -6458,6 +6723,197 @@ const getBudgetStatus = () => {
                 }}
               >
                 Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add Wallet Modal */}
+      {showAddWalletModal && selectedWalletType && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowAddWalletModal(false); setSelectedWalletType(null); setNewWalletName(''); }}>
+          <div style={{ width: '100%', maxWidth: '480px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ 
+              padding: '20px', 
+              background: `linear-gradient(135deg, ${selectedWalletType.color}22, ${selectedWalletType.color}11)`,
+              borderBottom: `1px solid ${theme.cardBorder}`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span style={{ fontSize: '32px' }}>{selectedWalletType.icon}</span>
+                  <div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Add {selectedWalletType.label}</h3>
+                    <p style={{ fontSize: '13px', color: theme.textMuted, margin: '2px 0 0' }}>Choose a preset or create custom</p>
+                  </div>
+                </div>
+                <button onClick={() => { setShowAddWalletModal(false); setSelectedWalletType(null); setNewWalletName(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <X style={{ width: '18px', height: '18px' }} />
+                </button>
+              </div>
+            </div>
+            
+            <div style={{ padding: '20px', maxHeight: '400px', overflowY: 'auto' }}>
+              {/* Preset Options */}
+              {selectedWalletType.presets && selectedWalletType.presets.length > 0 && (
+                <div style={{ marginBottom: '20px' }}>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: theme.textMuted, marginBottom: '12px' }}>Quick Add</label>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                    {selectedWalletType.presets.map((preset, idx) => {
+                      const alreadyExists = wallets.some(w => w.name === preset.name);
+                      return (
+                        <button
+                          key={idx}
+                          onClick={() => !alreadyExists && handleAddWallet(preset)}
+                          disabled={alreadyExists}
+                          style={{
+                            padding: '12px',
+                            backgroundColor: alreadyExists ? theme.statBg : 'transparent',
+                            border: `1px solid ${alreadyExists ? theme.cardBorder : preset.color}`,
+                            borderRadius: '8px',
+                            cursor: alreadyExists ? 'not-allowed' : 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            opacity: alreadyExists ? 0.5 : 1,
+                            transition: 'all 0.15s'
+                          }}
+                        >
+                          <span style={{ fontSize: '20px' }}>{preset.icon}</span>
+                          <div style={{ textAlign: 'left' }}>
+                            <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0 }}>{preset.name}</p>
+                            {alreadyExists && (
+                              <p style={{ fontSize: '10px', color: theme.textMuted, margin: '2px 0 0' }}>Already added</p>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+              
+              {/* Custom Wallet */}
+              <div style={{ 
+                padding: '16px', 
+                backgroundColor: theme.statBg, 
+                borderRadius: '8px',
+                border: `1px solid ${theme.cardBorder}`
+              }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: theme.textMuted, marginBottom: '12px' }}>
+                  {selectedWalletType.presets ? 'Or Create Custom' : 'Wallet Details'}
+                </label>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', color: theme.textMuted, marginBottom: '4px' }}>Name</label>
+                    <input
+                      type="text"
+                      placeholder={`e.g., My ${selectedWalletType.label}`}
+                      value={newWalletName}
+                      onChange={(e) => setNewWalletName(e.target.value)}
+                      style={{ ...inputStyle, width: '100%' }}
+                    />
+                  </div>
+                  <button
+                    onClick={() => handleAddWallet()}
+                    disabled={!newWalletName.trim()}
+                    style={{
+                      height: '40px',
+                      backgroundColor: selectedWalletType.color,
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      cursor: !newWalletName.trim() ? 'not-allowed' : 'pointer',
+                      opacity: !newWalletName.trim() ? 0.5 : 1,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <Plus style={{ width: '16px', height: '16px' }} />
+                    Add Custom {selectedWalletType.label}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Wallet Confirmation Modal */}
+      {showDeleteWalletConfirm && walletToDelete && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowDeleteWalletConfirm(false); setWalletToDelete(null); }}>
+          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ 
+                width: '56px', 
+                height: '56px', 
+                borderRadius: '50%', 
+                backgroundColor: '#fef2f2', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                <Trash2 style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete Wallet?</h3>
+              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
+                Are you sure you want to delete <strong>{walletToDelete.name}</strong>? 
+                This will also remove all transaction history for this wallet.
+              </p>
+              {walletToDelete.balance !== 0 && (
+                <p style={{ 
+                  fontSize: '13px', 
+                  color: '#f59e0b', 
+                  margin: '12px 0 0',
+                  padding: '8px 12px',
+                  backgroundColor: isDark ? '#422006' : '#fef3c7',
+                  borderRadius: '6px'
+                }}>
+                  ⚠️ This wallet has a balance of {currency}{walletToDelete.balance.toLocaleString()}
+                </p>
+              )}
+            </div>
+            
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => { setShowDeleteWalletConfirm(false); setWalletToDelete(null); }}
+                style={{
+                  flex: 1,
+                  height: '44px',
+                  backgroundColor: 'transparent',
+                  border: `1px solid ${theme.inputBorder}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  color: theme.textMuted,
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteWallet}
+                style={{
+                  flex: 1,
+                  height: '44px',
+                  backgroundColor: '#ef4444',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Trash2 style={{ width: '16px', height: '16px' }} />
+                Delete Wallet
               </button>
             </div>
           </div>
