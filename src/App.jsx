@@ -5702,13 +5702,13 @@ const getBudgetStatus = () => {
           </>
         ) : activeTab === 'wallets' ? (
           /* Multi-Wallet Tab */
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: isSmall ? '12px' : '20px' }}>
             
             {/* 4 Wallet Type Cards - Side by Side */}
             <div style={{ 
               display: 'grid', 
-              gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', 
-              gap: '12px' 
+              gridTemplateColumns: 'repeat(2, 1fr)', 
+              gap: isSmall ? '8px' : '12px' 
             }}>
               {WALLET_TYPES.map(walletType => {
                 const typeWallets = getWalletsByType(walletType.type);
@@ -5730,12 +5730,12 @@ const getBudgetStatus = () => {
                   <div
                     key={walletType.type}
                     style={{
-                      borderRadius: '16px',
+                      borderRadius: isSmall ? '12px' : '16px',
                       backgroundColor: cardColor,
-                      padding: '20px',
+                      padding: isSmall ? '12px' : '16px',
                       position: 'relative',
                       overflow: 'hidden',
-                      minHeight: '180px',
+                      minHeight: isSmall ? '130px' : '160px',
                       display: 'flex',
                       flexDirection: 'column'
                     }}
@@ -5743,30 +5743,21 @@ const getBudgetStatus = () => {
                     {/* Background decorations */}
                     <div style={{
                       position: 'absolute',
-                      top: '-30px',
-                      right: '-30px',
-                      width: '100px',
-                      height: '100px',
+                      top: '-20px',
+                      right: '-20px',
+                      width: isSmall ? '60px' : '80px',
+                      height: isSmall ? '60px' : '80px',
                       borderRadius: '50%',
                       backgroundColor: 'rgba(255,255,255,0.1)'
-                    }} />
-                    <div style={{
-                      position: 'absolute',
-                      bottom: '-40px',
-                      left: '-40px',
-                      width: '120px',
-                      height: '120px',
-                      borderRadius: '50%',
-                      backgroundColor: 'rgba(255,255,255,0.05)'
                     }} />
                     
                     <div style={{ position: 'relative', flex: 1, display: 'flex', flexDirection: 'column' }}>
                       {/* Header */}
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                        <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', margin: 0, fontWeight: '500' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: isSmall ? '6px' : '10px' }}>
+                        <p style={{ fontSize: isSmall ? '11px' : '12px', color: 'rgba(255,255,255,0.8)', margin: 0, fontWeight: '500' }}>
                           {walletType.label}
                         </p>
-                        <div style={{ display: 'flex', gap: '4px' }}>
+                        <div style={{ display: 'flex', gap: '3px' }}>
                           {canAddMore && (
                             <button
                               onClick={() => {
@@ -5774,11 +5765,11 @@ const getBudgetStatus = () => {
                                 setShowAddWalletModal(true);
                               }}
                               style={{
-                                width: '28px',
-                                height: '28px',
+                                width: isSmall ? '22px' : '26px',
+                                height: isSmall ? '22px' : '26px',
                                 backgroundColor: 'rgba(255,255,255,0.2)',
                                 border: 'none',
-                                borderRadius: '6px',
+                                borderRadius: '5px',
                                 color: '#fff',
                                 cursor: 'pointer',
                                 display: 'flex',
@@ -5786,18 +5777,18 @@ const getBudgetStatus = () => {
                                 justifyContent: 'center'
                               }}
                             >
-                              <Plus style={{ width: '14px', height: '14px' }} />
+                              <Plus style={{ width: isSmall ? '11px' : '13px', height: isSmall ? '11px' : '13px' }} />
                             </button>
                           )}
                           <span style={{ 
-                            width: '28px',
-                            height: '28px',
+                            width: isSmall ? '22px' : '26px',
+                            height: isSmall ? '22px' : '26px',
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center',
-                            borderRadius: '6px',
+                            borderRadius: '5px',
                             backgroundColor: 'rgba(255,255,255,0.2)',
-                            fontSize: '16px'
+                            fontSize: isSmall ? '12px' : '14px'
                           }}>{walletType.icon}</span>
                         </div>
                       </div>
@@ -5811,19 +5802,19 @@ const getBudgetStatus = () => {
                             style={{
                               backgroundColor: 'rgba(255,255,255,0.2)',
                               border: 'none',
-                              borderRadius: '8px',
-                              padding: '8px 12px',
+                              borderRadius: '6px',
+                              padding: isSmall ? '5px 8px' : '6px 10px',
                               color: '#fff',
-                              fontSize: '13px',
+                              fontSize: isSmall ? '11px' : '12px',
                               fontWeight: '500',
                               cursor: 'pointer',
-                              marginBottom: '12px',
+                              marginBottom: isSmall ? '6px' : '10px',
                               appearance: 'none',
                               backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
                               backgroundRepeat: 'no-repeat',
-                              backgroundPosition: 'right 8px center',
-                              backgroundSize: '16px',
-                              paddingRight: '32px'
+                              backgroundPosition: 'right 6px center',
+                              backgroundSize: '12px',
+                              paddingRight: '24px'
                             }}
                           >
                             {typeWallets.map(w => (
@@ -5836,45 +5827,44 @@ const getBudgetStatus = () => {
                           {/* Selected Wallet Balance */}
                           <div style={{ flex: 1 }}>
                             <p style={{ 
-                              fontSize: '28px', 
+                              fontSize: isSmall ? '18px' : '22px', 
                               fontWeight: '700', 
                               color: '#fff', 
-                              margin: '0 0 4px'
+                              margin: '0 0 2px'
                             }}>
                               {currency}{selectedWallet?.balance?.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
                             </p>
                             {typeWallets.length > 1 && (
-                              <p style={{ fontSize: '11px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
+                              <p style={{ fontSize: '9px', color: 'rgba(255,255,255,0.6)', margin: 0 }}>
                                 Total: {currency}{typeTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                               </p>
                             )}
                           </div>
                           
-                          {/* Action Buttons - Responsive */}
-                          <div style={{ display: 'flex', gap: '4px', marginTop: '12px', flexWrap: 'wrap' }}>
+                          {/* Action Buttons - Compact */}
+                          <div style={{ display: 'flex', gap: '3px', marginTop: isSmall ? '6px' : '10px' }}>
                             <button
                               onClick={() => {
                                 setSelectedWalletForFunds(selectedWallet);
                                 setShowAddFundsModal(true);
                               }}
                               style={{
-                                flex: '1 1 auto',
-                                minWidth: isSmall ? '60px' : '70px',
-                                height: '32px',
+                                flex: 1,
+                                height: isSmall ? '26px' : '30px',
                                 backgroundColor: 'rgba(255,255,255,0.95)',
                                 color: cardColor,
                                 border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '11px',
+                                borderRadius: '5px',
+                                fontSize: isSmall ? '10px' : '11px',
                                 fontWeight: '600',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '3px'
+                                gap: '2px'
                               }}
                             >
-                              <Plus style={{ width: '11px', height: '11px' }} />
+                              <Plus style={{ width: '10px', height: '10px' }} />
                               Add
                             </button>
                             <button
@@ -5883,25 +5873,28 @@ const getBudgetStatus = () => {
                                 setShowWithdrawModal(true);
                               }}
                               style={{
-                                flex: '1 1 auto',
-                                minWidth: isSmall ? '70px' : '80px',
-                                height: '32px',
+                                flex: 1,
+                                height: isSmall ? '26px' : '30px',
                                 backgroundColor: 'rgba(255,255,255,0.2)',
                                 color: '#fff',
                                 border: 'none',
-                                borderRadius: '6px',
-                                fontSize: '11px',
+                                borderRadius: '5px',
+                                fontSize: isSmall ? '10px' : '11px',
                                 fontWeight: '600',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '3px'
+                                gap: '2px'
                               }}
                             >
-                              <ArrowDownRight style={{ width: '11px', height: '11px' }} />
+                              <ArrowDownRight style={{ width: '10px', height: '10px' }} />
                               {isSmall ? 'Out' : 'Withdraw'}
                             </button>
+                          </div>
+                          
+                          {/* Edit/Delete - Small row below */}
+                          <div style={{ display: 'flex', gap: '3px', marginTop: '4px' }}>
                             {selectedWallet?.editable && (
                               <button
                                 onClick={() => {
@@ -5910,20 +5903,19 @@ const getBudgetStatus = () => {
                                   setShowEditWalletModal(true);
                                 }}
                                 style={{
-                                  width: '32px',
-                                  height: '32px',
-                                  backgroundColor: 'rgba(255,255,255,0.2)',
+                                  width: isSmall ? '24px' : '28px',
+                                  height: isSmall ? '24px' : '28px',
+                                  backgroundColor: 'rgba(255,255,255,0.15)',
                                   border: 'none',
-                                  borderRadius: '6px',
+                                  borderRadius: '5px',
                                   color: '#fff',
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
+                                  justifyContent: 'center'
                                 }}
                               >
-                                <Edit style={{ width: '11px', height: '11px' }} />
+                                <Edit style={{ width: '10px', height: '10px' }} />
                               </button>
                             )}
                             {selectedWallet?.type !== 'cash' && (
@@ -5933,20 +5925,19 @@ const getBudgetStatus = () => {
                                   setShowDeleteWalletConfirm(true);
                                 }}
                                 style={{
-                                  width: '32px',
-                                  height: '32px',
-                                  backgroundColor: 'rgba(255,255,255,0.2)',
+                                  width: isSmall ? '24px' : '28px',
+                                  height: isSmall ? '24px' : '28px',
+                                  backgroundColor: 'rgba(255,255,255,0.15)',
                                   border: 'none',
-                                  borderRadius: '6px',
+                                  borderRadius: '5px',
                                   color: '#fff',
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  justifyContent: 'center',
-                                  flexShrink: 0
+                                  justifyContent: 'center'
                                 }}
                               >
-                                <Trash2 style={{ width: '12px', height: '12px' }} />
+                                <Trash2 style={{ width: '10px', height: '10px' }} />
                               </button>
                             )}
                           </div>
@@ -5968,8 +5959,8 @@ const getBudgetStatus = () => {
                             opacity: 0.8
                           }}
                         >
-                          <Plus style={{ width: '32px', height: '32px', color: '#fff', marginBottom: '8px' }} />
-                          <p style={{ fontSize: '13px', color: '#fff', margin: 0, textAlign: 'center' }}>
+                          <Plus style={{ width: isSmall ? '24px' : '28px', height: isSmall ? '24px' : '28px', color: '#fff', marginBottom: '6px' }} />
+                          <p style={{ fontSize: isSmall ? '11px' : '12px', color: '#fff', margin: 0, textAlign: 'center' }}>
                             Add {walletType.label}
                           </p>
                         </div>
@@ -5983,17 +5974,17 @@ const getBudgetStatus = () => {
             {/* Total Balance Card */}
             <div style={{
               ...cardStyle,
-              padding: isSmall ? '16px' : '20px',
+              padding: isSmall ? '12px' : '16px',
               background: isDark 
                 ? 'linear-gradient(135deg, #1e3a5f, #0f172a)' 
                 : 'linear-gradient(135deg, #dbeafe, #eff6ff)',
               border: 'none'
             }}>
-              <div style={{ display: 'flex', flexDirection: isSmall ? 'column' : 'row', alignItems: isSmall ? 'stretch' : 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
-                <div style={{ marginBottom: isSmall ? '8px' : 0 }}>
-                  <p style={{ fontSize: '12px', color: theme.textMuted, margin: '0 0 4px' }}>Total Balance (All Wallets)</p>
+              <div style={{ display: 'flex', flexDirection: isSmall ? 'column' : 'row', alignItems: isSmall ? 'stretch' : 'flex-start', justifyContent: 'space-between', gap: isSmall ? '8px' : '12px' }}>
+                <div style={{ marginBottom: isSmall ? '4px' : 0 }}>
+                  <p style={{ fontSize: isSmall ? '10px' : '12px', color: theme.textMuted, margin: '0 0 2px' }}>Total Balance (All Wallets)</p>
                   <p style={{ 
-                    fontSize: isSmall ? '26px' : '32px', 
+                    fontSize: isSmall ? '22px' : '28px', 
                     fontWeight: '700', 
                     color: getTotalWalletBalance() >= 0 ? theme.text : '#ef4444', 
                     margin: 0 
@@ -6001,7 +5992,7 @@ const getBudgetStatus = () => {
                     {currency}{getTotalWalletBalance().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: isSmall ? 'flex-start' : 'flex-end' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', justifyContent: isSmall ? 'flex-start' : 'flex-end' }}>
                   {/* Group wallets by type */}
                   {WALLET_TYPES.map(wt => {
                     const typeWallets = wallets.filter(w => w.type === wt.type);
@@ -6011,27 +6002,16 @@ const getBudgetStatus = () => {
                       <div key={wt.type} style={{ 
                         display: 'flex', 
                         alignItems: 'center', 
-                        gap: '4px',
-                        padding: '4px 8px',
+                        gap: '3px',
+                        padding: isSmall ? '3px 6px' : '4px 8px',
                         backgroundColor: `${wt.color}20`,
                         border: `1px solid ${wt.color}40`,
-                        borderRadius: '6px'
+                        borderRadius: '5px'
                       }}>
-                        <span style={{ fontSize: '11px' }}>{wt.icon}</span>
-                        <span style={{ fontSize: '10px', fontWeight: '600', color: theme.text }}>
+                        <span style={{ fontSize: isSmall ? '10px' : '11px' }}>{wt.icon}</span>
+                        <span style={{ fontSize: isSmall ? '9px' : '10px', fontWeight: '600', color: theme.text }}>
                           {currency}{typeTotal.toLocaleString()}
                         </span>
-                        {typeWallets.length > 1 && (
-                          <span style={{ 
-                            fontSize: '8px', 
-                            color: theme.textMuted,
-                            backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-                            padding: '1px 4px',
-                            borderRadius: '3px'
-                          }}>
-                            {typeWallets.length}
-                          </span>
-                        )}
                       </div>
                     );
                   })}
@@ -6039,20 +6019,20 @@ const getBudgetStatus = () => {
                     <button
                       onClick={() => setShowClearAllWalletsConfirm(true)}
                       style={{
-                        padding: '4px 8px',
+                        padding: isSmall ? '3px 6px' : '4px 8px',
                         backgroundColor: 'transparent',
                         border: `1px solid ${isDark ? 'rgba(239,68,68,0.5)' : '#fecaca'}`,
                         borderRadius: '5px',
                         color: '#ef4444',
-                        fontSize: '10px',
+                        fontSize: isSmall ? '9px' : '10px',
                         fontWeight: '500',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '3px'
+                        gap: '2px'
                       }}
                     >
-                      <Trash2 style={{ width: '10px', height: '10px' }} />
+                      <Trash2 style={{ width: isSmall ? '9px' : '10px', height: isSmall ? '9px' : '10px' }} />
                       Clear
                     </button>
                   )}
