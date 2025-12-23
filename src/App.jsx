@@ -26,6 +26,14 @@ const CURRENCIES = [
   { symbol: '₹', label: 'INR (₹)' },
 ];
 
+// Default wallet types
+const DEFAULT_WALLETS = [
+  { id: 'cash', name: 'Cash', icon: '💵', color: '#22c55e', type: 'cash' },
+  { id: 'gcash', name: 'GCash', icon: '📱', color: '#0066ff', type: 'ewallet' },
+  { id: 'bank', name: 'Bank Account', icon: '🏦', color: '#6366f1', type: 'bank', editable: true },
+  { id: 'credit', name: 'Credit Card', icon: '💳', color: '#ef4444', type: 'credit' },
+];
+
 // XP System Configuration
 const XP_CONFIG = {
   addEntry: 10,
@@ -1202,7 +1210,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [uploadMode, setUploadMode] = useState('file');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [categoryDropdownOpen, setCategoryDropdownOpen] = useState(false);
-  const [manualForm, setManualForm] = useState({ name: '', amount: '', date: '', dueDate: '', notes: '', recurring: '' });
+  const [manualForm, setManualForm] = useState({ name: '', amount: '', date: '', dueDate: '', notes: '', recurring: '', walletId: '' });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [pendingUpload, setPendingUpload] = useState(null);
   const [csvPreview, setCsvPreview] = useState(null);
@@ -1248,76 +1256,65 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const fileInputRef = useRef(null);
   
   // XP and Level System
-  const [userXP, setUserXP] = useState(() => {
-    const saved = localStorage.getItem(`userXP_${user.id}`);
-    return saved ? parseInt(saved) : 0;
-  });
-  const [selectedFrame, setSelectedFrame] = useState(() => {
-    const saved = localStorage.getItem(`selectedFrame_${user.id}`);
-    return saved || 'none';
-  });
+  const [userXP, setUserXP] = useState(0);
+  const [selectedFrame, setSelectedFrame] = useState('none');
   const [showLevelUp, setShowLevelUp] = useState(false);
   const [levelUpData, setLevelUpData] = useState(null);
   const [showRewardsModal, setShowRewardsModal] = useState(false);
+  const [userDataLoaded, setUserDataLoaded] = useState(false);
   
-  // Christmas Theme
+  // Christmas Theme (keep in localStorage - it's a UI preference)
   const [isChristmasTheme, setIsChristmasTheme] = useState(() => {
     const saved = localStorage.getItem('christmasTheme');
     return saved === 'true';
   });
   
   // Achievements & Badges System
-  const [unlockedAchievements, setUnlockedAchievements] = useState(() => {
-    const saved = localStorage.getItem(`achievements_${user.id}`);
-    return saved ? JSON.parse(saved) : [];
-  });
+  const [unlockedAchievements, setUnlockedAchievements] = useState([]);
   const [showAchievementUnlock, setShowAchievementUnlock] = useState(false);
   const [newAchievement, setNewAchievement] = useState(null);
   const [showAchievementsModal, setShowAchievementsModal] = useState(false);
   
   // Streaks & Daily Check-ins
-  const [currentStreak, setCurrentStreak] = useState(() => {
-    const saved = localStorage.getItem(`streak_${user.id}`);
-    return saved ? parseInt(saved) : 0;
-  });
-  const [lastLoginDate, setLastLoginDate] = useState(() => {
-    const saved = localStorage.getItem(`lastLogin_${user.id}`);
-    return saved || null;
-  });
-  const [todayEntryLogged, setTodayEntryLogged] = useState(() => {
-    const saved = localStorage.getItem(`todayEntry_${user.id}`);
-    const today = new Date().toDateString();
-    const savedDate = localStorage.getItem(`todayEntryDate_${user.id}`);
-    return savedDate === today && saved === 'true';
-  });
+  const [currentStreak, setCurrentStreak] = useState(0);
+  const [lastLoginDate, setLastLoginDate] = useState(null);
+  const [todayEntryLogged, setTodayEntryLogged] = useState(false);
   
   // Weekly Challenge
   const [weeklyChallenge, setWeeklyChallenge] = useState(() => {
-    const saved = localStorage.getItem(`weeklyChallenge_${user.id}`);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      const challengeWeek = getWeekNumber(new Date(parsed.startDate));
-      const currentWeek = getWeekNumber(new Date());
-      if (challengeWeek === currentWeek) {
-        return parsed;
-      }
-    }
-    // Generate new weekly challenge
+    // Generate default weekly challenge
     const randomChallenge = WEEKLY_CHALLENGES[Math.floor(Math.random() * WEEKLY_CHALLENGES.length)];
-    const newChallenge = {
+    return {
       ...randomChallenge,
       startDate: new Date().toISOString(),
       progress: 0,
       completed: false
     };
-    return newChallenge;
   });
   
   // Budget streak tracking
-  const [budgetStreakMonths, setBudgetStreakMonths] = useState(() => {
-    const saved = localStorage.getItem(`budgetStreak_${user.id}`);
-    return saved ? parseInt(saved) : 0;
+  const [budgetStreakMonths, setBudgetStreakMonths] = useState(0);
+  
+  // Multi-Wallet System
+  const [wallets, setWallets] = useState([]);
+  const [showAddFundsModal, setShowAddFundsModal] = useState(false);
+  const [selectedWalletForFunds, setSelectedWalletForFunds] = useState(null);
+  const [fundsAmount, setFundsAmount] = useState('');
+  const [fundsNote, setFundsNote] = useState('');
+  const [walletTransactions, setWalletTransactions] = useState(() => {
+    const saved = localStorage.getItem(`walletTransactions_${user.id}`);
+    return saved ? JSON.parse(saved) : [];
   });
+  const [showEditWalletModal, setShowEditWalletModal] = useState(false);
+  const [editingWallet, setEditingWallet] = useState(null);
+  const [editWalletName, setEditWalletName] = useState('');
+  
+  // Wallet tab filters
+  const [walletFilter, setWalletFilter] = useState('all');
+  const [walletSearch, setWalletSearch] = useState('');
+  const [walletDateFrom, setWalletDateFrom] = useState('');
+  const [walletDateTo, setWalletDateTo] = useState('');
+  const [showWalletAdvancedFilter, setShowWalletAdvancedFilter] = useState(false);
   
   // Bulk delete states
   const [selectedEntries, setSelectedEntries] = useState([]);
@@ -1381,44 +1378,215 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     localStorage.setItem(`selectedFrame_${user.id}`, selectedFrame);
   }, [selectedFrame, user.id]);
 
-  // Save Christmas theme preference
+  // Save Christmas theme preference (keep in localStorage - UI preference)
   useEffect(() => {
     localStorage.setItem('christmasTheme', isChristmasTheme.toString());
   }, [isChristmasTheme]);
 
-  // Save achievements to localStorage
-  useEffect(() => {
-    localStorage.setItem(`achievements_${user.id}`, JSON.stringify(unlockedAchievements));
-  }, [unlockedAchievements, user.id]);
+  // ============================================
+  // SUPABASE DATA LOADING & SAVING
+  // ============================================
 
-  // Save streak data to localStorage
+  // Load all user data from Supabase on mount
   useEffect(() => {
-    localStorage.setItem(`streak_${user.id}`, currentStreak.toString());
-  }, [currentStreak, user.id]);
+    const loadUserData = async () => {
+      try {
+        // Load user profile
+        const { data: profileData, error: profileError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
 
+        if (profileError && profileError.code !== 'PGRST116') {
+          console.error('Error loading profile:', profileError);
+        }
+
+        if (profileData) {
+          setUserXP(profileData.xp || 0);
+          setSelectedFrame(profileData.selected_frame || 'none');
+          setCurrentStreak(profileData.current_streak || 0);
+          setLastLoginDate(profileData.last_login_date || null);
+          setTodayEntryLogged(profileData.today_entry_logged || false);
+          setBudgetStreakMonths(profileData.budget_streak_months || 0);
+          if (profileData.weekly_challenge) {
+            // Check if it's still the same week
+            const challengeWeek = getWeekNumber(new Date(profileData.weekly_challenge.startDate));
+            const currentWeek = getWeekNumber(new Date());
+            if (challengeWeek === currentWeek) {
+              setWeeklyChallenge(profileData.weekly_challenge);
+            }
+          }
+        } else {
+          // Create initial profile
+          await supabase.from('user_profiles').insert([{
+            user_id: user.id,
+            xp: 0,
+            selected_frame: 'none',
+            current_streak: 0,
+            budget_streak_months: 0
+          }]);
+        }
+
+        // Load achievements
+        const { data: achievementsData, error: achievementsError } = await supabase
+          .from('user_achievements')
+          .select('achievement_id')
+          .eq('user_id', user.id);
+
+        if (achievementsError) {
+          console.error('Error loading achievements:', achievementsError);
+        } else if (achievementsData) {
+          setUnlockedAchievements(achievementsData.map(a => a.achievement_id));
+        }
+
+        // Load wallets
+        const { data: walletsData, error: walletsError } = await supabase
+          .from('wallets')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('wallet_id');
+
+        if (walletsError) {
+          console.error('Error loading wallets:', walletsError);
+        }
+
+        if (walletsData && walletsData.length > 0) {
+          setWallets(walletsData.map(w => ({
+            id: w.wallet_id,
+            name: w.name,
+            icon: w.icon,
+            color: w.color,
+            type: w.type,
+            balance: parseFloat(w.balance) || 0,
+            editable: w.editable
+          })));
+        } else {
+          // Create default wallets
+          const defaultWallets = DEFAULT_WALLETS.map(w => ({
+            user_id: user.id,
+            wallet_id: w.id,
+            name: w.name,
+            icon: w.icon,
+            color: w.color,
+            type: w.type,
+            balance: 0,
+            editable: w.editable || false
+          }));
+          
+          await supabase.from('wallets').insert(defaultWallets);
+          setWallets(DEFAULT_WALLETS.map(w => ({ ...w, balance: 0 })));
+        }
+
+        // Load wallet transactions
+        const { data: txData, error: txError } = await supabase
+          .from('wallet_transactions')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (txError) {
+          console.error('Error loading transactions:', txError);
+        } else if (txData) {
+          setWalletTransactions(txData.map(tx => ({
+            id: tx.id,
+            walletId: tx.wallet_id,
+            walletName: tx.wallet_name,
+            type: tx.type,
+            amount: parseFloat(tx.amount),
+            note: tx.note,
+            balance: parseFloat(tx.balance),
+            date: tx.created_at
+          })));
+        }
+
+        setUserDataLoaded(true);
+      } catch (e) {
+        console.error('Failed to load user data:', e);
+        setUserDataLoaded(true);
+      }
+    };
+
+    loadUserData();
+  }, [user.id]);
+
+  // Save user profile to Supabase (debounced)
   useEffect(() => {
-    if (lastLoginDate) {
-      localStorage.setItem(`lastLogin_${user.id}`, lastLoginDate);
+    if (!userDataLoaded) return;
+    
+    const saveProfile = async () => {
+      try {
+        await supabase
+          .from('user_profiles')
+          .upsert({
+            user_id: user.id,
+            xp: userXP,
+            selected_frame: selectedFrame,
+            current_streak: currentStreak,
+            last_login_date: lastLoginDate,
+            today_entry_logged: todayEntryLogged,
+            today_entry_date: new Date().toDateString(),
+            budget_streak_months: budgetStreakMonths,
+            weekly_challenge: weeklyChallenge
+          }, { onConflict: 'user_id' });
+      } catch (e) {
+        console.error('Failed to save profile:', e);
+      }
+    };
+
+    const timeoutId = setTimeout(saveProfile, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [userXP, selectedFrame, currentStreak, lastLoginDate, todayEntryLogged, budgetStreakMonths, weeklyChallenge, userDataLoaded, user.id]);
+
+  // Save new achievements to Supabase
+  const saveAchievementToSupabase = async (achievementId) => {
+    try {
+      await supabase.from('user_achievements').insert([{
+        user_id: user.id,
+        achievement_id: achievementId
+      }]);
+    } catch (e) {
+      console.error('Failed to save achievement:', e);
     }
-  }, [lastLoginDate, user.id]);
+  };
 
-  useEffect(() => {
-    localStorage.setItem(`todayEntry_${user.id}`, todayEntryLogged.toString());
-    localStorage.setItem(`todayEntryDate_${user.id}`, new Date().toDateString());
-  }, [todayEntryLogged, user.id]);
+  // Save wallet balance to Supabase
+  const saveWalletToSupabase = async (walletId, balance, name = null) => {
+    try {
+      const updateData = { balance };
+      if (name) updateData.name = name;
+      
+      await supabase
+        .from('wallets')
+        .update(updateData)
+        .eq('user_id', user.id)
+        .eq('wallet_id', walletId);
+    } catch (e) {
+      console.error('Failed to save wallet:', e);
+    }
+  };
 
-  // Save weekly challenge
-  useEffect(() => {
-    localStorage.setItem(`weeklyChallenge_${user.id}`, JSON.stringify(weeklyChallenge));
-  }, [weeklyChallenge, user.id]);
-
-  // Save budget streak
-  useEffect(() => {
-    localStorage.setItem(`budgetStreak_${user.id}`, budgetStreakMonths.toString());
-  }, [budgetStreakMonths, user.id]);
+  // Save wallet transaction to Supabase
+  const saveWalletTransactionToSupabase = async (transaction) => {
+    try {
+      await supabase.from('wallet_transactions').insert([{
+        user_id: user.id,
+        wallet_id: transaction.walletId,
+        wallet_name: transaction.walletName,
+        type: transaction.type,
+        amount: transaction.amount,
+        note: transaction.note,
+        balance: transaction.balance
+      }]);
+    } catch (e) {
+      console.error('Failed to save transaction:', e);
+    }
+  };
 
   // Check and update daily streak on component mount
   useEffect(() => {
+    if (!userDataLoaded) return;
+    
     const today = new Date().toDateString();
     const yesterday = new Date(Date.now() - 86400000).toDateString();
     
@@ -1445,13 +1613,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         awardXP(XP_CONFIG.dailyLogin, 'for daily login');
       }
     }
-    
-    // Reset today's entry flag if it's a new day
-    const savedDate = localStorage.getItem(`todayEntryDate_${user.id}`);
-    if (savedDate !== today) {
-      setTodayEntryLogged(false);
-    }
-  }, []);
+  }, [userDataLoaded]);
 
   // Helper function to get week number
   const getWeekNumber = (date) => {
@@ -1464,6 +1626,8 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
 
   // Function to check and unlock achievements
   const checkAchievements = (context = {}) => {
+    if (!userDataLoaded) return;
+    
     const newUnlocks = [];
     
     ACHIEVEMENTS.forEach(achievement => {
@@ -1538,6 +1702,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       const newIds = newUnlocks.map(a => a.id);
       setUnlockedAchievements(prev => [...prev, ...newIds]);
       
+      // Save achievements to Supabase
+      newIds.forEach(id => saveAchievementToSupabase(id));
+      
       // Award XP for each achievement
       newUnlocks.forEach(achievement => {
         const tier = getTierStyle(achievement.tier);
@@ -1552,10 +1719,10 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
 
   // Check achievements when relevant data changes
   useEffect(() => {
-    if (!loading && entries.length > 0) {
+    if (!loading && entries.length > 0 && userDataLoaded) {
       checkAchievements();
     }
-  }, [entries.length, currentStreak, userXP, profilePicture, budgetStreakMonths]);
+  }, [entries.length, currentStreak, userXP, profilePicture, budgetStreakMonths, userDataLoaded]);
 
   // Update weekly challenge progress
   const updateWeeklyChallengeProgress = (entry) => {
@@ -1615,6 +1782,145 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     const day = d.getDay();
     const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     return new Date(d.setDate(diff));
+  };
+
+  // ============================================
+  // MULTI-WALLET FUNCTIONS
+  // ============================================
+
+  // Add funds to a wallet
+  const handleAddFunds = () => {
+    const amount = parseFloat(fundsAmount);
+    if (isNaN(amount) || amount <= 0) {
+      showToast('Please enter a valid amount', 'error');
+      return;
+    }
+
+    // Update wallet balance
+    const newBalance = selectedWalletForFunds.balance + amount;
+    
+    setWallets(prev => prev.map(w => 
+      w.id === selectedWalletForFunds.id 
+        ? { ...w, balance: newBalance }
+        : w
+    ));
+
+    // Save to Supabase
+    saveWalletToSupabase(selectedWalletForFunds.id, newBalance);
+
+    // Add transaction record
+    const transaction = {
+      id: Date.now(),
+      walletId: selectedWalletForFunds.id,
+      walletName: selectedWalletForFunds.name,
+      type: 'deposit',
+      amount: amount,
+      note: fundsNote || 'Added funds',
+      date: new Date().toISOString(),
+      balance: newBalance
+    };
+    setWalletTransactions(prev => [transaction, ...prev]);
+    
+    // Save transaction to Supabase
+    saveWalletTransactionToSupabase(transaction);
+
+    showToast(`${currency}${amount.toLocaleString()} added to ${selectedWalletForFunds.name}`, 'success');
+    setShowAddFundsModal(false);
+    setFundsAmount('');
+    setFundsNote('');
+    setSelectedWalletForFunds(null);
+  };
+
+  // Deduct from wallet when expense is logged
+  const deductFromWallet = (walletId, amount, entryName) => {
+    const wallet = wallets.find(w => w.id === walletId);
+    if (!wallet) return;
+
+    const newBalance = wallet.balance - amount;
+
+    // Update wallet balance
+    setWallets(prev => prev.map(w => 
+      w.id === walletId 
+        ? { ...w, balance: newBalance }
+        : w
+    ));
+
+    // Save to Supabase
+    saveWalletToSupabase(walletId, newBalance);
+
+    // Add transaction record
+    const transaction = {
+      id: Date.now(),
+      walletId: walletId,
+      walletName: wallet.name,
+      type: 'expense',
+      amount: -amount,
+      note: entryName,
+      date: new Date().toISOString(),
+      balance: newBalance
+    };
+    setWalletTransactions(prev => [transaction, ...prev]);
+    
+    // Save transaction to Supabase
+    saveWalletTransactionToSupabase(transaction);
+  };
+
+  // Edit wallet name (for bank accounts)
+  const handleEditWalletName = () => {
+    if (!editWalletName.trim()) {
+      showToast('Please enter a wallet name', 'error');
+      return;
+    }
+
+    setWallets(prev => prev.map(w => 
+      w.id === editingWallet.id 
+        ? { ...w, name: editWalletName.trim() }
+        : w
+    ));
+
+    // Save to Supabase
+    saveWalletToSupabase(editingWallet.id, editingWallet.balance, editWalletName.trim());
+
+    showToast('Wallet name updated', 'success');
+    setShowEditWalletModal(false);
+    setEditingWallet(null);
+    setEditWalletName('');
+  };
+
+  // Get total balance across all wallets
+  const getTotalWalletBalance = () => {
+    return wallets.reduce((sum, w) => sum + w.balance, 0);
+  };
+
+  // Get filtered wallet transactions
+  const getFilteredWalletTransactions = () => {
+    let filtered = walletTransactions;
+
+    // Filter by wallet
+    if (walletFilter !== 'all') {
+      filtered = filtered.filter(t => t.walletId === walletFilter);
+    }
+
+    // Filter by search
+    if (walletSearch.trim()) {
+      const search = walletSearch.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.note.toLowerCase().includes(search) ||
+        t.walletName.toLowerCase().includes(search)
+      );
+    }
+
+    // Filter by date range
+    if (walletDateFrom) {
+      filtered = filtered.filter(t => new Date(t.date) >= new Date(walletDateFrom));
+    }
+    if (walletDateTo) {
+      const toDate = new Date(walletDateTo);
+      toDate.setHours(23, 59, 59, 999);
+      filtered = filtered.filter(t => new Date(t.date) <= toDate);
+    }
+
+    return filtered;
   };
 
   // Handle profile picture upload to Supabase Storage
@@ -1818,6 +2124,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
           dueDate: expense.due_date,
           notes: expense.notes || '',
           recurring: expense.recurring || null,
+          walletId: expense.wallet_id || null,
           file: expense.file_name ? {
             name: expense.file_name,
             type: expense.file_type,
@@ -1850,6 +2157,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     due_date: newEntry.dueDate || null,
     notes: newEntry.notes || null,
     recurring: newEntry.recurring || null,
+    wallet_id: newEntry.walletId || null,
     file_name: newEntry.file?.name || null,
     file_type: newEntry.file?.type || null,
     file_data: newEntry.file?.data || null
@@ -1868,10 +2176,16 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         dueDate: data.due_date,
         notes: data.notes || '',
         recurring: data.recurring || null,
-        file: newEntry.file
+        file: newEntry.file,
+        walletId: newEntry.walletId || null
       };
       
       setEntries(prev => [savedEntry, ...prev]);
+      
+      // Deduct from wallet if specified
+      if (newEntry.walletId) {
+        deductFromWallet(newEntry.walletId, newEntry.amount, newEntry.name);
+      }
       
       // Track today's entry for streak
       if (!todayEntryLogged) {
@@ -2101,6 +2415,16 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       showToast('Please fill required fields', 'error');
       return;
     }
+    
+    // Check if selected wallet has enough balance
+    if (manualForm.walletId) {
+      const selectedWallet = wallets.find(w => w.id === manualForm.walletId);
+      if (selectedWallet && selectedWallet.balance < parseFloat(manualForm.amount)) {
+        showToast(`Insufficient balance in ${selectedWallet.name}`, 'error');
+        return;
+      }
+    }
+    
     setIsSaving(true);
     const newEntry = {
       type: selectedCategory,
@@ -2109,12 +2433,13 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       date: manualForm.date || new Date().toISOString().split('T')[0],
       dueDate: manualForm.dueDate || '',
       notes: manualForm.notes || '',
-      recurring: manualForm.recurring || null
+      recurring: manualForm.recurring || null,
+      walletId: manualForm.walletId || null
     };
     try {
       await saveEntry(newEntry);
       setSelectedCategory('');
-      setManualForm({ name: '', amount: '', date: '', dueDate: '', notes: '', recurring: '' });
+      setManualForm({ name: '', amount: '', date: '', dueDate: '', notes: '', recurring: '', walletId: '' });
       showToast('Entry added successfully', 'success');
     } catch (e) {
       showToast('Failed to save entry', 'error');
@@ -3292,41 +3617,65 @@ const getBudgetStatus = () => {
         borderBottom: `1px solid ${theme.cardBorder}`,
         padding: isSmall ? '0 12px' : '0 24px'
       }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', gap: '4px', padding: '0 16px' }}>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', gap: '4px', padding: '0 16px', overflowX: 'auto' }}>
           <button
             onClick={() => setActiveTab('dashboard')}
             style={{
-              padding: '14px 18px',
+              padding: isSmall ? '12px 14px' : '14px 18px',
               backgroundColor: 'transparent',
               border: 'none',
               borderBottom: activeTab === 'dashboard' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent',
-              fontSize: '15px',
+              fontSize: isSmall ? '13px' : '15px',
               fontWeight: '500',
               color: activeTab === 'dashboard' ? theme.text : theme.textMuted,
               cursor: 'pointer',
               transition: 'color 0.2s',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              whiteSpace: 'nowrap'
             }}
           >
             Dashboard
           </button>
           <button
+            onClick={() => setActiveTab('wallets')}
+            style={{
+              padding: isSmall ? '12px 14px' : '14px 18px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'wallets' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent',
+              fontSize: isSmall ? '13px' : '15px',
+              fontWeight: '500',
+              color: activeTab === 'wallets' ? theme.text : theme.textMuted,
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              whiteSpace: 'nowrap'
+            }}
+          >
+            <Wallet style={{ width: '16px', height: '16px' }} />
+            {!isSmall && 'Multi-Wallet'}
+            {isSmall && 'Wallets'}
+          </button>
+          <button
             onClick={() => setActiveTab('entries')}
             style={{
-              padding: '14px 18px',
+              padding: isSmall ? '12px 14px' : '14px 18px',
               backgroundColor: 'transparent',
               border: 'none',
               borderBottom: activeTab === 'entries' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent',
-              fontSize: '15px',
+              fontSize: isSmall ? '13px' : '15px',
               fontWeight: '500',
               color: activeTab === 'entries' ? theme.text : theme.textMuted,
               cursor: 'pointer',
               transition: 'color 0.2s',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
+              whiteSpace: 'nowrap'
             }}
           >
             All Entries
@@ -3644,14 +3993,17 @@ const getBudgetStatus = () => {
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                   <div>
-                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Notes (optional)</label>
-                    <input 
-                      type="text" 
-                      placeholder="Add a memo or note..." 
-                      value={manualForm.notes} 
-                      onChange={(e) => setManualForm({ ...manualForm, notes: e.target.value })} 
-                      style={inputStyle} 
-                    />
+                    <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Pay from Wallet</label>
+                    <select
+                      value={manualForm.walletId}
+                      onChange={(e) => setManualForm({ ...manualForm, walletId: e.target.value })}
+                      style={{ ...inputStyle, cursor: 'pointer' }}
+                    >
+                      <option value="">No wallet (optional)</option>
+                      {wallets.map(w => (
+                        <option key={w.id} value={w.id}>{w.icon} {w.name} ({currency}{w.balance.toLocaleString()})</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Recurring</label>
@@ -3667,11 +4019,21 @@ const getBudgetStatus = () => {
                     </select>
                   </div>
                 </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Notes (optional)</label>
+                  <input 
+                    type="text" 
+                    placeholder="Add a memo or note..." 
+                    value={manualForm.notes} 
+                    onChange={(e) => setManualForm({ ...manualForm, notes: e.target.value })} 
+                    style={inputStyle} 
+                  />
+                </div>
                 <div style={{ display: 'flex', gap: '8px' }}>
-                  {(manualForm.name || manualForm.amount || manualForm.date || manualForm.dueDate || manualForm.notes || manualForm.recurring || selectedCategory) && (
+                  {(manualForm.name || manualForm.amount || manualForm.date || manualForm.dueDate || manualForm.notes || manualForm.recurring || manualForm.walletId || selectedCategory) && (
                     <button 
                       onClick={() => {
-                        setManualForm({ name: '', amount: '', date: '', dueDate: '', notes: '', recurring: '' });
+                        setManualForm({ name: '', amount: '', date: '', dueDate: '', notes: '', recurring: '', walletId: '' });
                         setSelectedCategory('');
                       }}
                       style={{ 
@@ -4814,6 +5176,310 @@ const getBudgetStatus = () => {
               );
             })()}
           </>
+        ) : activeTab === 'wallets' ? (
+          /* Multi-Wallet Tab */
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Wallet Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px' }}>
+              {wallets.map(wallet => (
+                <div
+                  key={wallet.id}
+                  style={{
+                    ...cardStyle,
+                    padding: '20px',
+                    borderLeft: `4px solid ${wallet.color}`,
+                    position: 'relative'
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '28px' }}>{wallet.icon}</span>
+                      <div>
+                        <h3 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>{wallet.name}</h3>
+                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', textTransform: 'capitalize' }}>{wallet.type}</p>
+                      </div>
+                    </div>
+                    {wallet.editable && (
+                      <button
+                        onClick={() => {
+                          setEditingWallet(wallet);
+                          setEditWalletName(wallet.name);
+                          setShowEditWalletModal(true);
+                        }}
+                        style={{
+                          width: '28px',
+                          height: '28px',
+                          backgroundColor: 'transparent',
+                          border: `1px solid ${theme.inputBorder}`,
+                          borderRadius: '6px',
+                          color: theme.textMuted,
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
+                      >
+                        <Edit style={{ width: '14px', height: '14px' }} />
+                      </button>
+                    )}
+                  </div>
+                  
+                  <p style={{ 
+                    fontSize: '24px', 
+                    fontWeight: '700', 
+                    color: wallet.balance >= 0 ? theme.text : '#ef4444', 
+                    margin: '0 0 16px' 
+                  }}>
+                    {currency}{wallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                  
+                  <button
+                    onClick={() => {
+                      setSelectedWalletForFunds(wallet);
+                      setShowAddFundsModal(true);
+                    }}
+                    style={{
+                      width: '100%',
+                      height: '36px',
+                      backgroundColor: wallet.color,
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '6px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <Plus style={{ width: '14px', height: '14px' }} />
+                    Add Funds
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            {/* Total Balance Card */}
+            <div style={{
+              ...cardStyle,
+              padding: '20px',
+              background: isDark 
+                ? 'linear-gradient(135deg, #1e3a5f, #0f172a)' 
+                : 'linear-gradient(135deg, #dbeafe, #eff6ff)',
+              border: 'none'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
+                <div>
+                  <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 4px' }}>Total Balance (All Wallets)</p>
+                  <p style={{ 
+                    fontSize: '32px', 
+                    fontWeight: '700', 
+                    color: getTotalWalletBalance() >= 0 ? theme.text : '#ef4444', 
+                    margin: 0 
+                  }}>
+                    {currency}{getTotalWalletBalance().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {wallets.map(w => (
+                    <div key={w.id} style={{ 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '6px',
+                      padding: '6px 12px',
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                      borderRadius: '20px'
+                    }}>
+                      <span style={{ fontSize: '14px' }}>{w.icon}</span>
+                      <span style={{ fontSize: '12px', color: theme.textMuted }}>{currency}{w.balance.toLocaleString()}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Transaction History */}
+            <div style={cardStyle}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
+                <div>
+                  <h2 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Transaction History</h2>
+                  <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>
+                    {getFilteredWalletTransactions().length} transactions
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                  {/* Search */}
+                  <div style={{ position: 'relative' }}>
+                    <Search style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textDim }} />
+                    <input
+                      placeholder="Search..."
+                      value={walletSearch}
+                      onChange={(e) => setWalletSearch(e.target.value)}
+                      style={{ ...inputStyle, width: '150px', paddingLeft: '32px' }}
+                    />
+                  </div>
+                  
+                  {/* Wallet Filter */}
+                  <select
+                    value={walletFilter}
+                    onChange={(e) => setWalletFilter(e.target.value)}
+                    style={{ ...inputStyle, width: '130px', cursor: 'pointer' }}
+                  >
+                    <option value="all">All Wallets</option>
+                    {wallets.map(w => (
+                      <option key={w.id} value={w.id}>{w.icon} {w.name}</option>
+                    ))}
+                  </select>
+                  
+                  {/* Advanced Filter Toggle */}
+                  <button
+                    onClick={() => setShowWalletAdvancedFilter(!showWalletAdvancedFilter)}
+                    style={{
+                      height: '36px',
+                      padding: '0 12px',
+                      backgroundColor: showWalletAdvancedFilter ? (isDark ? '#3b82f6' : '#2563eb') : 'transparent',
+                      border: `1px solid ${showWalletAdvancedFilter ? 'transparent' : theme.inputBorder}`,
+                      borderRadius: '6px',
+                      color: showWalletAdvancedFilter ? '#fff' : theme.textMuted,
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '13px'
+                    }}
+                  >
+                    <ChevronDown style={{ width: '14px', height: '14px' }} />
+                    Filter
+                  </button>
+                </div>
+              </div>
+              
+              {/* Advanced Filters */}
+              {showWalletAdvancedFilter && (
+                <div style={{ 
+                  display: 'flex', 
+                  gap: '12px', 
+                  marginBottom: '16px', 
+                  padding: '12px', 
+                  backgroundColor: theme.statBg, 
+                  borderRadius: '8px',
+                  flexWrap: 'wrap'
+                }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', color: theme.textMuted, marginBottom: '4px' }}>From Date</label>
+                    <input
+                      type="date"
+                      value={walletDateFrom}
+                      onChange={(e) => setWalletDateFrom(e.target.value)}
+                      style={{ ...inputStyle, width: '150px' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '12px', color: theme.textMuted, marginBottom: '4px' }}>To Date</label>
+                    <input
+                      type="date"
+                      value={walletDateTo}
+                      onChange={(e) => setWalletDateTo(e.target.value)}
+                      style={{ ...inputStyle, width: '150px' }}
+                    />
+                  </div>
+                  {(walletDateFrom || walletDateTo) && (
+                    <button
+                      onClick={() => { setWalletDateFrom(''); setWalletDateTo(''); }}
+                      style={{
+                        height: '36px',
+                        padding: '0 12px',
+                        backgroundColor: 'transparent',
+                        border: `1px solid ${theme.inputBorder}`,
+                        borderRadius: '6px',
+                        color: theme.textMuted,
+                        cursor: 'pointer',
+                        fontSize: '12px',
+                        alignSelf: 'flex-end'
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}
+                </div>
+              )}
+              
+              {/* Transactions Table */}
+              {getFilteredWalletTransactions().length === 0 ? (
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '40px 20px',
+                  color: theme.textMuted 
+                }}>
+                  <Wallet style={{ width: '48px', height: '48px', margin: '0 auto 12px', opacity: 0.3 }} />
+                  <p style={{ fontSize: '15px', fontWeight: '500', margin: '0 0 4px' }}>No transactions yet</p>
+                  <p style={{ fontSize: '13px', margin: 0 }}>Add funds to a wallet or log expenses with a wallet selected</p>
+                </div>
+              ) : (
+                <div style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+                    <thead>
+                      <tr style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                        <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Date</th>
+                        <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Wallet</th>
+                        <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Description</th>
+                        <th style={{ textAlign: 'right', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Amount</th>
+                        <th style={{ textAlign: 'right', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Balance</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {getFilteredWalletTransactions().slice(0, 50).map(tx => {
+                        const wallet = wallets.find(w => w.id === tx.walletId);
+                        return (
+                          <tr key={tx.id} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                            <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted }}>
+                              {new Date(tx.date).toLocaleDateString()}
+                            </td>
+                            <td style={{ padding: '12px 8px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span style={{ fontSize: '16px' }}>{wallet?.icon || '💰'}</span>
+                                <span style={{ fontSize: '13px', color: theme.text }}>{tx.walletName}</span>
+                              </div>
+                            </td>
+                            <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.text }}>
+                              {tx.note}
+                              {tx.type === 'deposit' && (
+                                <span style={{ 
+                                  marginLeft: '8px',
+                                  padding: '2px 6px',
+                                  backgroundColor: isDark ? '#14532d' : '#dcfce7',
+                                  color: '#22c55e',
+                                  fontSize: '10px',
+                                  fontWeight: '600',
+                                  borderRadius: '4px'
+                                }}>
+                                  DEPOSIT
+                                </span>
+                              )}
+                            </td>
+                            <td style={{ 
+                              padding: '12px 8px', 
+                              fontSize: '14px', 
+                              fontWeight: '600',
+                              color: tx.amount >= 0 ? '#22c55e' : '#ef4444',
+                              textAlign: 'right'
+                            }}>
+                              {tx.amount >= 0 ? '+' : ''}{currency}{Math.abs(tx.amount).toLocaleString()}
+                            </td>
+                            <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted, textAlign: 'right' }}>
+                              {currency}{tx.balance.toLocaleString()}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
         ) : activeTab === 'entries' ? (
           /* All Entries Tab */
           <div style={cardStyle}>
@@ -5643,6 +6309,161 @@ const getBudgetStatus = () => {
           </>
         ) : null}
       </main>
+
+      {/* Add Funds Modal */}
+      {showAddFundsModal && selectedWalletForFunds && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowAddFundsModal(false); setSelectedWalletForFunds(null); setFundsAmount(''); setFundsNote(''); }}>
+          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ 
+              padding: '20px', 
+              background: `linear-gradient(135deg, ${selectedWalletForFunds.color}22, ${selectedWalletForFunds.color}11)`,
+              borderBottom: `1px solid ${theme.cardBorder}`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <span style={{ fontSize: '36px' }}>{selectedWalletForFunds.icon}</span>
+                <div>
+                  <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Add Funds</h3>
+                  <p style={{ fontSize: '13px', color: theme.textMuted, margin: '2px 0 0' }}>{selectedWalletForFunds.name}</p>
+                </div>
+              </div>
+              <p style={{ fontSize: '14px', color: theme.textMuted, margin: '12px 0 0' }}>
+                Current Balance: <span style={{ fontWeight: '600', color: theme.text }}>{currency}{selectedWalletForFunds.balance.toLocaleString()}</span>
+              </p>
+            </div>
+            
+            <div style={{ padding: '20px' }}>
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Amount *</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  value={fundsAmount}
+                  onChange={(e) => setFundsAmount(e.target.value)}
+                  style={{ ...inputStyle, width: '100%', fontSize: '18px', fontWeight: '600' }}
+                  autoFocus
+                />
+              </div>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Note (optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Salary, Transfer, etc."
+                  value={fundsNote}
+                  onChange={(e) => setFundsNote(e.target.value)}
+                  style={{ ...inputStyle, width: '100%' }}
+                />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <button
+                  onClick={() => { setShowAddFundsModal(false); setSelectedWalletForFunds(null); setFundsAmount(''); setFundsNote(''); }}
+                  style={{
+                    flex: 1,
+                    height: '44px',
+                    backgroundColor: 'transparent',
+                    border: `1px solid ${theme.inputBorder}`,
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: theme.textMuted,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleAddFunds}
+                  disabled={!fundsAmount || parseFloat(fundsAmount) <= 0}
+                  style={{
+                    flex: 1,
+                    height: '44px',
+                    backgroundColor: selectedWalletForFunds.color,
+                    border: 'none',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    color: '#fff',
+                    cursor: !fundsAmount || parseFloat(fundsAmount) <= 0 ? 'not-allowed' : 'pointer',
+                    opacity: !fundsAmount || parseFloat(fundsAmount) <= 0 ? 0.5 : 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <Plus style={{ width: '16px', height: '16px' }} />
+                  Add Funds
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Wallet Name Modal */}
+      {showEditWalletModal && editingWallet && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowEditWalletModal(false); setEditingWallet(null); setEditWalletName(''); }}>
+          <div style={{ width: '100%', maxWidth: '360px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit Wallet Name</h3>
+              <button onClick={() => { setShowEditWalletModal(false); setEditingWallet(null); setEditWalletName(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
+            
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Wallet Name</label>
+              <input
+                type="text"
+                placeholder="e.g., BDO Savings"
+                value={editWalletName}
+                onChange={(e) => setEditWalletName(e.target.value)}
+                style={{ ...inputStyle, width: '100%' }}
+                autoFocus
+              />
+            </div>
+            
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => { setShowEditWalletModal(false); setEditingWallet(null); setEditWalletName(''); }}
+                style={{
+                  flex: 1,
+                  height: '40px',
+                  backgroundColor: 'transparent',
+                  border: `1px solid ${theme.inputBorder}`,
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  color: theme.textMuted,
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditWalletName}
+                disabled={!editWalletName.trim()}
+                style={{
+                  flex: 1,
+                  height: '40px',
+                  backgroundColor: isDark ? '#fafafa' : '#18181b',
+                  color: isDark ? '#18181b' : '#fafafa',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: !editWalletName.trim() ? 'not-allowed' : 'pointer',
+                  opacity: !editWalletName.trim() ? 0.5 : 1
+                }}
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
         {/* Edit Profile Modal */}
       {showEditProfile && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowEditProfile(false)}>
