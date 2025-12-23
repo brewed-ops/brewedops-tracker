@@ -2116,12 +2116,122 @@ const getBudgetStatus = () => {
     );
   }
 
+  // Snow Cap Component for Christmas theme
+  const SnowCap = ({ width = '100%' }) => (
+    <div style={{ 
+      position: 'absolute', 
+      top: '-8px', 
+      left: '-4px', 
+      right: '-4px',
+      height: '20px',
+      pointerEvents: 'none',
+      zIndex: 5
+    }}>
+      {/* Main snow pile */}
+      <svg width="100%" height="20" viewBox="0 0 400 20" preserveAspectRatio="none" style={{ display: 'block' }}>
+        <defs>
+          <linearGradient id="snowGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#ffffff" />
+            <stop offset="100%" stopColor="#e8f4fc" />
+          </linearGradient>
+          <filter id="snowShadow" x="-20%" y="-20%" width="140%" height="140%">
+            <feDropShadow dx="0" dy="2" stdDeviation="2" floodColor="#000" floodOpacity="0.1"/>
+          </filter>
+        </defs>
+        <path 
+          d="M0,20 
+             L0,12 
+             Q10,8 20,10 
+             Q35,6 50,9 
+             Q70,4 90,8 
+             Q110,5 130,7 
+             Q150,3 170,6 
+             Q190,4 210,7 
+             Q230,3 250,6 
+             Q270,4 290,8 
+             Q310,5 330,7 
+             Q350,4 370,9 
+             Q385,6 395,10 
+             L400,12 
+             L400,20 Z" 
+          fill="url(#snowGradient)"
+          filter="url(#snowShadow)"
+        />
+      </svg>
+      {/* Small snow bumps on corners */}
+      <div style={{
+        position: 'absolute',
+        top: '2px',
+        left: '8px',
+        width: '16px',
+        height: '16px',
+        backgroundColor: '#fff',
+        borderRadius: '50%',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '4px',
+        left: '20px',
+        width: '10px',
+        height: '10px',
+        backgroundColor: '#fff',
+        borderRadius: '50%'
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '2px',
+        right: '8px',
+        width: '16px',
+        height: '16px',
+        backgroundColor: '#fff',
+        borderRadius: '50%',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+      }} />
+      <div style={{
+        position: 'absolute',
+        top: '4px',
+        right: '20px',
+        width: '10px',
+        height: '10px',
+        backgroundColor: '#fff',
+        borderRadius: '50%'
+      }} />
+    </div>
+  );
+
+  // Christmas Card Wrapper Component
+  const ChristmasCard = ({ children, style = {} }) => (
+    <div style={{ position: 'relative', ...style }}>
+      {isChristmasTheme && <SnowCap />}
+      <div style={{
+        ...cardStyle,
+        ...(isChristmasTheme && {
+          borderTop: '3px solid #dc2626',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+        })
+      }}>
+        {children}
+      </div>
+    </div>
+  );
+
   const cardStyle = {
     backgroundColor: theme.cardBg,
     borderRadius: '12px',
     border: `1px solid ${theme.cardBorder}`,
     padding: isSmall ? '16px' : '20px'
   };
+
+  // Christmas-styled card style
+  const getCardStyle = () => ({
+    ...cardStyle,
+    position: 'relative',
+    overflow: 'visible',
+    ...(isChristmasTheme && {
+      borderTop: '3px solid #dc2626',
+    })
+  });
 
   const inputStyle = {
     width: '100%',
@@ -2160,10 +2270,31 @@ const getBudgetStatus = () => {
         padding: isSmall ? '10px 12px' : '12px 24px',
         position: 'sticky',
         top: 0,
-        zIndex: 20
+        zIndex: 20,
+        ...(isChristmasTheme && {
+          background: isDark 
+            ? 'linear-gradient(180deg, #1a0a0a 0%, #0a0a0b 100%)'
+            : 'linear-gradient(180deg, #fef2f2 0%, #ffffff 100%)',
+          borderBottom: '2px solid #dc2626'
+        })
       }}>
+        {/* Christmas Header Garland */}
+        {isChristmasTheme && (
+          <div style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'repeating-linear-gradient(90deg, #dc2626 0px, #dc2626 20px, #22c55e 20px, #22c55e 40px)',
+            zIndex: 1
+          }} />
+        )}
         <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '8px' : '12px' }}>
+            {isChristmasTheme && !isSmall && (
+              <span style={{ fontSize: '20px', marginRight: '-4px' }}>🎄</span>
+            )}
             <img 
               src="https://i.imgur.com/R52jwPv.png" 
               alt="BrewedOps Logo" 
@@ -2172,10 +2303,16 @@ const getBudgetStatus = () => {
                 height: isSmall ? '32px' : '36px', 
                 borderRadius: '50%', 
                 objectFit: 'cover',
-                flexShrink: 0 
+                flexShrink: 0,
+                ...(isChristmasTheme && {
+                  border: '2px solid #dc2626',
+                  boxShadow: '0 0 10px rgba(220, 38, 38, 0.3)'
+                })
               }} 
             />
-            <h1 style={{ fontSize: isSmall ? '14px' : '15px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
+            <h1 style={{ fontSize: isSmall ? '14px' : '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
+              {isChristmasTheme ? '🎅 BrewedOps Tracker' : 'BrewedOps Tracker'}
+            </h1>
           </div>
 
           {/* Desktop Header Actions */}
@@ -3136,7 +3273,9 @@ const getBudgetStatus = () => {
         }}>
           {/* Recent Entries */}
           {entries.length > 0 && (
-            <div style={cardStyle}>
+            <div style={{ position: 'relative', marginTop: isChristmasTheme ? '12px' : 0 }}>
+              {isChristmasTheme && <SnowCap />}
+              <div style={{...cardStyle, ...(isChristmasTheme && { borderTop: '3px solid #dc2626' })}}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                 <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <Receipt style={{ width: '18px', height: '18px', color: theme.textMuted }} />
@@ -3217,10 +3356,13 @@ const getBudgetStatus = () => {
                 })}
               </div>
             </div>
+            </div>
           )}
 
           {/* Monthly Budget Card */}
-          <div style={cardStyle}>
+          <div style={{ position: 'relative', marginTop: isChristmasTheme ? '12px' : 0 }}>
+            {isChristmasTheme && <SnowCap />}
+            <div style={{...cardStyle, ...(isChristmasTheme && { borderTop: '3px solid #22c55e' })}}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <Wallet style={{ width: '18px', height: '18px', color: theme.textMuted }} />
@@ -3327,10 +3469,13 @@ const getBudgetStatus = () => {
               </div>
             )}
           </div>
+          </div>
         </div>
 
         {/* Insights and Chart Section */}
-        <div style={{ ...cardStyle, marginBottom: isSmall ? '12px' : '24px' }}>
+        <div style={{ position: 'relative', marginBottom: isSmall ? '12px' : '24px', marginTop: isChristmasTheme ? '12px' : 0 }}>
+          {isChristmasTheme && <SnowCap />}
+          <div style={{ ...cardStyle, ...(isChristmasTheme && { borderTop: '3px solid #dc2626' }) }}>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
             <h2 style={{ fontSize: isSmall ? '14px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Spending Overview</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', flex: isSmall ? '1 1 100%' : 'none' }}>
@@ -3555,6 +3700,7 @@ const getBudgetStatus = () => {
               </ResponsiveContainer>
             </div>
           </div>
+        </div>
         </div>
           </>
         ) : activeTab === 'dashboard' && dashboardSubTab === 'analytics' ? (
