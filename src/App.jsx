@@ -1320,6 +1320,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [currentStreak, setCurrentStreak] = useState(0);
   const [lastLoginDate, setLastLoginDate] = useState(null);
   const [todayEntryLogged, setTodayEntryLogged] = useState(false);
+  const [checkedInToday, setCheckedInToday] = useState(false);
   
   // Weekly Challenge
   const [weeklyChallenge, setWeeklyChallenge] = useState(() => {
@@ -1351,7 +1352,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [editWalletName, setEditWalletName] = useState('');
   
   // Wallet tab filters
-  const [walletFilter, setWalletFilter] = useState('all');
+  const [walletFilter, setWalletFilter] = useState('cash');
   const [walletSearch, setWalletSearch] = useState('');
   const [walletDateFrom, setWalletDateFrom] = useState('');
   const [walletDateTo, setWalletDateTo] = useState('');
@@ -1670,37 +1671,54 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     }
   };
 
-  // Check and update daily streak on component mount
+  // Check and update daily streak status on component mount
   useEffect(() => {
     if (!userDataLoaded) return;
     
     const today = new Date().toDateString();
     const yesterday = new Date(Date.now() - 86400000).toDateString();
     
-    if (lastLoginDate === null) {
-      // First login ever
-      setLastLoginDate(today);
-      setCurrentStreak(1);
-      awardXP(XP_CONFIG.dailyLogin, 'for daily login');
-    } else if (lastLoginDate !== today) {
-      if (lastLoginDate === yesterday) {
-        // Consecutive day - extend streak
-        setCurrentStreak(prev => prev + 1);
-        setLastLoginDate(today);
-        awardXP(XP_CONFIG.dailyLogin, 'for daily login');
-        
-        // Check for week streak bonus
-        if ((currentStreak + 1) % 7 === 0) {
-          awardXP(XP_CONFIG.weekStreak, 'for 7-day streak bonus!');
-        }
-      } else {
-        // Streak broken
-        setCurrentStreak(1);
-        setLastLoginDate(today);
-        awardXP(XP_CONFIG.dailyLogin, 'for daily login');
+    // Check if already checked in today
+    if (lastLoginDate === today) {
+      setCheckedInToday(true);
+    } else {
+      setCheckedInToday(false);
+      // Check if streak is broken (not yesterday and not today)
+      if (lastLoginDate !== null && lastLoginDate !== yesterday) {
+        // Streak was broken - reset to 0 (will become 1 when they check in)
+        setCurrentStreak(0);
       }
     }
-  }, [userDataLoaded]);
+  }, [userDataLoaded, lastLoginDate]);
+
+  // Handle daily check-in button click
+  const handleDailyCheckIn = () => {
+    if (checkedInToday) return;
+    
+    const today = new Date().toDateString();
+    const yesterday = new Date(Date.now() - 86400000).toDateString();
+    
+    let newStreak = 1;
+    
+    if (lastLoginDate === yesterday) {
+      // Consecutive day - extend streak
+      newStreak = currentStreak + 1;
+    }
+    
+    setCurrentStreak(newStreak);
+    setLastLoginDate(today);
+    setCheckedInToday(true);
+    awardXP(XP_CONFIG.dailyLogin, 'for daily check-in');
+    
+    // Check for week streak bonus
+    if (newStreak % 7 === 0) {
+      setTimeout(() => {
+        awardXP(XP_CONFIG.weekStreak, 'for 7-day streak bonus!');
+      }, 500);
+    }
+    
+    showToast(`🔥 Day ${newStreak} streak! +${XP_CONFIG.dailyLogin} XP`, 'success');
+  };
 
   // Helper function to get week number
   const getWeekNumber = (date) => {
@@ -3361,11 +3379,38 @@ const getBudgetStatus = () => {
                     alignItems: 'center',
                     gap: '3px',
                     padding: '4px 8px',
+                    backgroundColor: checkedInToday ? (isDark ? '#14532d' : '#dcfce7') : (isDark ? '#7c2d12' : '#fed7aa'),
+                    borderRadius: '12px',
+                    position: 'relative'
+                  }}>
+                    <Flame style={{ width: '14px', height: '14px', color: checkedInToday ? '#22c55e' : '#f97316' }} />
+                    <span style={{ fontSize: '12px', fontWeight: '700', color: checkedInToday ? '#22c55e' : '#f97316' }}>{currentStreak}</span>
+                    {!checkedInToday && (
+                      <span style={{
+                        position: 'absolute',
+                        top: '-2px',
+                        right: '-2px',
+                        width: '8px',
+                        height: '8px',
+                        backgroundColor: '#ef4444',
+                        borderRadius: '50%',
+                        border: `2px solid ${theme.cardBg}`
+                      }} />
+                    )}
+                  </div>
+                )}
+                {currentStreak === 0 && !checkedInToday && (
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '3px',
+                    padding: '4px 8px',
                     backgroundColor: isDark ? '#7c2d12' : '#fed7aa',
-                    borderRadius: '12px'
+                    borderRadius: '12px',
+                    position: 'relative'
                   }}>
                     <Flame style={{ width: '14px', height: '14px', color: '#f97316' }} />
-                    <span style={{ fontSize: '12px', fontWeight: '700', color: '#f97316' }}>{currentStreak}</span>
+                    <span style={{ fontSize: '10px', fontWeight: '600', color: '#f97316' }}>Check in!</span>
                   </div>
                 )}
               </div>
@@ -3618,14 +3663,14 @@ const getBudgetStatus = () => {
                 }}
               >
                 <Trophy style={{ width: '16px', height: '16px', color: '#fbbf24' }} />
-                {currentStreak > 0 && (
+                {(currentStreak > 0 || !checkedInToday) && (
                   <div style={{
                     position: 'absolute',
                     top: '-3px',
                     right: '-3px',
                     minWidth: '14px',
                     height: '14px',
-                    backgroundColor: '#f97316',
+                    backgroundColor: checkedInToday ? '#22c55e' : '#f97316',
                     borderRadius: '7px',
                     display: 'flex',
                     alignItems: 'center',
@@ -3635,7 +3680,7 @@ const getBudgetStatus = () => {
                     color: '#fff',
                     padding: '0 3px'
                   }}>
-                    {currentStreak}
+                    {checkedInToday ? currentStreak : '!'}
                   </div>
                 )}
               </button>
@@ -5419,76 +5464,212 @@ const getBudgetStatus = () => {
           /* Multi-Wallet Tab */
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             
-            {/* Wallet Sections by Type */}
-            {WALLET_TYPES.map(walletType => {
-              const typeWallets = getWalletsByType(walletType.type);
-              const featuredId = featuredWallets[walletType.type];
+            {/* Wallet Type Tabs */}
+            <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', paddingBottom: '4px' }}>
+              {WALLET_TYPES.filter(wt => wt.canAddMultiple || wt.type === 'cash').map(walletType => {
+                const typeWallets = getWalletsByType(walletType.type);
+                const isActive = (walletFilter === 'all' && walletType.type === 'cash') || walletFilter === walletType.type;
+                return (
+                  <button
+                    key={walletType.type}
+                    onClick={() => setWalletFilter(walletType.type)}
+                    style={{
+                      padding: '10px 16px',
+                      backgroundColor: walletFilter === walletType.type ? walletType.color : theme.statBg,
+                      color: walletFilter === walletType.type ? '#fff' : theme.text,
+                      border: `1px solid ${walletFilter === walletType.type ? walletType.color : theme.cardBorder}`,
+                      borderRadius: '8px',
+                      fontSize: '13px',
+                      fontWeight: '500',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.2s'
+                    }}
+                  >
+                    <span>{walletType.icon}</span>
+                    {walletType.label}
+                    <span style={{ 
+                      backgroundColor: walletFilter === walletType.type ? 'rgba(255,255,255,0.2)' : theme.cardBorder,
+                      padding: '2px 6px',
+                      borderRadius: '10px',
+                      fontSize: '11px'
+                    }}>{typeWallets.length}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Active Wallet Type Section */}
+            {(() => {
+              const activeType = WALLET_TYPES.find(wt => wt.type === walletFilter) || WALLET_TYPES[0];
+              const typeWallets = getWalletsByType(activeType.type);
+              const featuredId = featuredWallets[activeType.type];
               const featuredWallet = typeWallets.find(w => w.id === featuredId) || typeWallets[0];
               const otherWallets = typeWallets.filter(w => w.id !== featuredWallet?.id);
-              const canAddMore = walletType.canAddMultiple ? typeWallets.length < 4 : typeWallets.length === 0;
-              const maxReached = walletType.canAddMultiple && typeWallets.length >= 4;
-              
-              if (typeWallets.length === 0 && !walletType.canAddMultiple && walletType.type !== 'cash') {
-                return null; // Don't show empty sections for non-addable types
-              }
-              
+              const canAddMore = activeType.canAddMultiple ? typeWallets.length < 4 : typeWallets.length === 0;
+
               return (
-                <div key={walletType.type} style={cardStyle}>
-                  {/* Section Header */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '20px' }}>{walletType.icon}</span>
-                      <div>
-                        <h3 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>{walletType.label}</h3>
-                        <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>
-                          {typeWallets.length}/4 {maxReached && '(max)'}
-                        </p>
-                      </div>
+                <>
+                  {/* Small Wallet Cards Row */}
+                  {(otherWallets.length > 0 || canAddMore) && (
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: isSmall ? 'repeat(2, 1fr)' : `repeat(${Math.min(otherWallets.length + (canAddMore ? 1 : 0), 4)}, 1fr)`,
+                      gap: '12px'
+                    }}>
+                      {otherWallets.map(wallet => (
+                        <div
+                          key={wallet.id}
+                          onClick={() => setFeaturedWallets(prev => ({ ...prev, [activeType.type]: wallet.id }))}
+                          style={{
+                            padding: '16px',
+                            borderRadius: '12px',
+                            backgroundColor: wallet.color,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            position: 'relative',
+                            overflow: 'hidden'
+                          }}
+                        >
+                          {/* Background decoration */}
+                          <div style={{
+                            position: 'absolute',
+                            top: '-20px',
+                            right: '-20px',
+                            width: '80px',
+                            height: '80px',
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(255,255,255,0.1)'
+                          }} />
+                          <div style={{
+                            position: 'absolute',
+                            bottom: '-30px',
+                            left: '-30px',
+                            width: '60px',
+                            height: '60px',
+                            borderRadius: '50%',
+                            backgroundColor: 'rgba(255,255,255,0.05)'
+                          }} />
+                          
+                          <div style={{ position: 'relative' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)', margin: 0, fontWeight: '500' }}>{wallet.name}</p>
+                              <span style={{ 
+                                fontSize: '16px',
+                                width: '28px',
+                                height: '28px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                borderRadius: '6px',
+                                backgroundColor: 'rgba(255,255,255,0.2)'
+                              }}>{wallet.icon}</span>
+                            </div>
+                            <p style={{ 
+                              fontSize: '20px', 
+                              fontWeight: '700', 
+                              color: '#fff', 
+                              margin: 0
+                            }}>
+                              {currency}{wallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                      
+                      {/* Add Card */}
+                      {canAddMore && activeType.canAddMultiple && (
+                        <div
+                          onClick={() => {
+                            setSelectedWalletType(activeType);
+                            setShowAddWalletModal(true);
+                          }}
+                          style={{
+                            padding: '16px',
+                            borderRadius: '12px',
+                            backgroundColor: theme.statBg,
+                            border: `2px dashed ${theme.cardBorder}`,
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minHeight: '88px'
+                          }}
+                        >
+                          <Plus style={{ width: '24px', height: '24px', color: theme.textMuted, marginBottom: '4px' }} />
+                          <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0 }}>Add {activeType.label}</p>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  
-                  {typeWallets.length === 0 ? (
-                    /* Empty State */
-                    <div 
-                      onClick={() => {
-                        if (canAddMore) {
-                          setSelectedWalletType(walletType);
-                          setShowAddWalletModal(true);
-                        }
-                      }}
-                      style={{ 
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        padding: '40px 20px',
-                        backgroundColor: theme.statBg,
-                        borderRadius: '12px',
-                        border: `2px dashed ${theme.cardBorder}`,
-                        cursor: canAddMore ? 'pointer' : 'default',
-                        transition: 'all 0.2s'
-                      }}
-                    >
-                      <div style={{ textAlign: 'center' }}>
-                        <Plus style={{ width: '32px', height: '32px', color: theme.textMuted, margin: '0 auto 8px' }} />
-                        <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>Add your first {walletType.label.toLowerCase()}</p>
-                      </div>
-                    </div>
-                  ) : (
-                    /* Wallet Display */
-                    <div style={{ display: 'flex', gap: '12px', flexDirection: isSmall ? 'column' : 'row' }}>
-                      {/* Featured Wallet (Large) */}
-                      {featuredWallet && (
-                        <div style={{ 
-                          flex: isSmall ? 'none' : '1',
-                          minWidth: isSmall ? 'auto' : '280px',
-                          padding: '20px',
-                          borderRadius: '12px',
-                          backgroundColor: `${featuredWallet.color}10`,
-                          border: `2px solid ${featuredWallet.color}40`,
-                          position: 'relative'
-                        }}>
+                  )}
+
+                  {/* Featured Wallet (Large) */}
+                  {featuredWallet ? (
+                    <div style={{ 
+                      padding: '24px',
+                      borderRadius: '16px',
+                      backgroundColor: featuredWallet.color,
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}>
+                      {/* Background decorations */}
+                      <div style={{
+                        position: 'absolute',
+                        top: '-40px',
+                        right: '-40px',
+                        width: '150px',
+                        height: '150px',
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(255,255,255,0.1)'
+                      }} />
+                      <div style={{
+                        position: 'absolute',
+                        bottom: '-60px',
+                        left: '-60px',
+                        width: '180px',
+                        height: '180px',
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(255,255,255,0.05)'
+                      }} />
+                      <div style={{
+                        position: 'absolute',
+                        top: '50%',
+                        right: '10%',
+                        width: '100px',
+                        height: '100px',
+                        borderRadius: '50%',
+                        backgroundColor: 'rgba(255,255,255,0.05)'
+                      }} />
+                      
+                      <div style={{ position: 'relative' }}>
+                        {/* Header */}
+                        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '20px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                            <span style={{ 
+                              fontSize: '32px',
+                              width: '56px',
+                              height: '56px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              borderRadius: '14px',
+                              backgroundColor: 'rgba(255,255,255,0.2)'
+                            }}>{featuredWallet.icon}</span>
+                            <div>
+                              <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#fff', margin: 0 }}>{featuredWallet.name}</h3>
+                              <p style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)', margin: '2px 0 0', textTransform: 'capitalize' }}>
+                                {featuredWallet.type === 'ewallet' ? 'E-Wallet' : featuredWallet.type}
+                              </p>
+                            </div>
+                          </div>
+                          
                           {/* Action Buttons */}
-                          <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', gap: '4px' }}>
+                          <div style={{ display: 'flex', gap: '6px' }}>
                             {featuredWallet.editable && (
                               <button
                                 onClick={() => {
@@ -5497,19 +5678,19 @@ const getBudgetStatus = () => {
                                   setShowEditWalletModal(true);
                                 }}
                                 style={{
-                                  width: '28px',
-                                  height: '28px',
-                                  backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.8)',
+                                  width: '32px',
+                                  height: '32px',
+                                  backgroundColor: 'rgba(255,255,255,0.2)',
                                   border: 'none',
-                                  borderRadius: '6px',
-                                  color: theme.textMuted,
+                                  borderRadius: '8px',
+                                  color: '#fff',
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center'
                                 }}
                               >
-                                <Edit style={{ width: '12px', height: '12px' }} />
+                                <Edit style={{ width: '14px', height: '14px' }} />
                               </button>
                             )}
                             {featuredWallet.type !== 'cash' && (
@@ -5519,170 +5700,105 @@ const getBudgetStatus = () => {
                                   setShowDeleteWalletConfirm(true);
                                 }}
                                 style={{
-                                  width: '28px',
-                                  height: '28px',
-                                  backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.8)',
+                                  width: '32px',
+                                  height: '32px',
+                                  backgroundColor: 'rgba(255,255,255,0.2)',
                                   border: 'none',
-                                  borderRadius: '6px',
-                                  color: theme.textMuted,
+                                  borderRadius: '8px',
+                                  color: '#fff',
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center'
                                 }}
                               >
-                                <Trash2 style={{ width: '12px', height: '12px' }} />
+                                <Trash2 style={{ width: '14px', height: '14px' }} />
                               </button>
                             )}
                           </div>
-                          
-                          {/* Wallet Info */}
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                            <span style={{ 
-                              fontSize: '32px',
-                              width: '56px',
-                              height: '56px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              borderRadius: '12px',
-                              backgroundColor: `${featuredWallet.color}20`
-                            }}>{featuredWallet.icon}</span>
-                            <div>
-                              <h4 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{featuredWallet.name}</h4>
-                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0', textTransform: 'capitalize' }}>{featuredWallet.type === 'ewallet' ? 'E-Wallet' : featuredWallet.type}</p>
-                            </div>
-                          </div>
-                          
-                          {/* Balance */}
+                        </div>
+                        
+                        {/* Balance */}
+                        <div style={{ marginBottom: '20px' }}>
+                          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', margin: '0 0 4px' }}>Current Balance</p>
                           <p style={{ 
-                            fontSize: '28px', 
+                            fontSize: '36px', 
                             fontWeight: '700', 
-                            color: featuredWallet.balance >= 0 ? theme.text : '#ef4444', 
-                            margin: '0 0 16px',
+                            color: '#fff', 
+                            margin: 0,
                             fontFamily: 'system-ui, -apple-system, sans-serif'
                           }}>
                             {currency}{featuredWallet.balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                           </p>
-                          
-                          {/* Add Funds Button */}
-                          <button
-                            onClick={() => {
-                              setSelectedWalletForFunds(featuredWallet);
-                              setShowAddFundsModal(true);
-                            }}
-                            style={{
-                              width: '100%',
-                              height: '40px',
-                              backgroundColor: featuredWallet.color,
-                              color: '#fff',
-                              border: 'none',
-                              borderRadius: '8px',
-                              fontSize: '13px',
-                              fontWeight: '600',
-                              cursor: 'pointer',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px'
-                            }}
-                          >
-                            <Plus style={{ width: '14px', height: '14px' }} />
-                            Add Funds
-                          </button>
                         </div>
-                      )}
-                      
-                      {/* Other Wallets (Small) + Add Button */}
-                      <div style={{ 
-                        display: 'flex', 
-                        flexDirection: 'column', 
-                        gap: '8px',
-                        minWidth: isSmall ? 'auto' : '160px'
-                      }}>
-                        {otherWallets.map(wallet => (
-                          <div
-                            key={wallet.id}
-                            onClick={() => setFeaturedWallets(prev => ({ ...prev, [walletType.type]: wallet.id }))}
-                            style={{
-                              padding: '12px',
-                              borderRadius: '10px',
-                              backgroundColor: theme.statBg,
-                              border: `1px solid ${theme.cardBorder}`,
-                              cursor: 'pointer',
-                              transition: 'all 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '10px'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.borderColor = wallet.color;
-                              e.currentTarget.style.backgroundColor = `${wallet.color}10`;
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.borderColor = theme.cardBorder;
-                              e.currentTarget.style.backgroundColor = theme.statBg;
-                            }}
-                          >
-                            <span style={{ 
-                              fontSize: '20px',
-                              width: '36px',
-                              height: '36px',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              borderRadius: '8px',
-                              backgroundColor: `${wallet.color}20`,
-                              flexShrink: 0
-                            }}>{wallet.icon}</span>
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <p style={{ fontSize: '12px', fontWeight: '600', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{wallet.name}</p>
-                              <p style={{ fontSize: '13px', fontWeight: '700', color: wallet.balance >= 0 ? theme.text : '#ef4444', margin: '2px 0 0' }}>
-                                {currency}{wallet.balance.toLocaleString()}
-                              </p>
-                            </div>
-                          </div>
-                        ))}
                         
-                        {/* Add Button (if not at max) */}
-                        {canAddMore && walletType.canAddMultiple && (
-                          <div
-                            onClick={() => {
-                              setSelectedWalletType(walletType);
-                              setShowAddWalletModal(true);
-                            }}
-                            style={{
-                              padding: '12px',
-                              borderRadius: '10px',
-                              backgroundColor: 'transparent',
-                              border: `2px dashed ${theme.cardBorder}`,
-                              cursor: 'pointer',
-                              transition: 'all 0.2s',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              gap: '6px',
-                              minHeight: '60px'
-                            }}
-                            onMouseEnter={(e) => {
-                              e.currentTarget.style.borderColor = walletType.color;
-                              e.currentTarget.style.backgroundColor = `${walletType.color}10`;
-                            }}
-                            onMouseLeave={(e) => {
-                              e.currentTarget.style.borderColor = theme.cardBorder;
-                              e.currentTarget.style.backgroundColor = 'transparent';
-                            }}
-                          >
-                            <Plus style={{ width: '18px', height: '18px', color: theme.textMuted }} />
-                            <span style={{ fontSize: '12px', color: theme.textMuted, fontWeight: '500' }}>Add</span>
-                          </div>
-                        )}
+                        {/* Add Funds Button */}
+                        <button
+                          onClick={() => {
+                            setSelectedWalletForFunds(featuredWallet);
+                            setShowAddFundsModal(true);
+                          }}
+                          style={{
+                            width: isSmall ? '100%' : 'auto',
+                            padding: '12px 24px',
+                            backgroundColor: 'rgba(255,255,255,0.95)',
+                            color: featuredWallet.color,
+                            border: 'none',
+                            borderRadius: '10px',
+                            fontSize: '14px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '8px'
+                          }}
+                        >
+                          <Plus style={{ width: '16px', height: '16px' }} />
+                          Add Funds
+                        </button>
                       </div>
                     </div>
+                  ) : (
+                    /* Empty State */
+                    <div 
+                      onClick={() => {
+                        if (activeType.canAddMultiple || typeWallets.length === 0) {
+                          setSelectedWalletType(activeType);
+                          setShowAddWalletModal(true);
+                        }
+                      }}
+                      style={{ 
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        padding: '60px 20px',
+                        backgroundColor: theme.statBg,
+                        borderRadius: '16px',
+                        border: `2px dashed ${theme.cardBorder}`,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <div style={{
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '16px',
+                        backgroundColor: `${activeType.color}20`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: '12px'
+                      }}>
+                        <span style={{ fontSize: '32px' }}>{activeType.icon}</span>
+                      </div>
+                      <p style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 4px' }}>No {activeType.label} Yet</p>
+                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>Click to add your first {activeType.label.toLowerCase()}</p>
+                    </div>
                   )}
-                </div>
+                </>
               );
-            })}
+            })()}
             
             {/* Total Balance Card */}
             <div style={{
@@ -8125,6 +8241,89 @@ const getBudgetStatus = () => {
                 <p style={{ fontSize: '12px', opacity: 0.8, margin: '8px 0 0' }}>
                   {Math.ceil(nextLevelXP - userXP)} XP to Level {currentLevel + 1}
                 </p>
+              </div>
+              
+              {/* Daily Check-In Section */}
+              <div style={{ 
+                padding: '16px', 
+                backgroundColor: checkedInToday ? (isDark ? '#14532d' : '#dcfce7') : theme.statBg,
+                borderRadius: '12px', 
+                marginBottom: '20px',
+                border: `1px solid ${checkedInToday ? '#22c55e' : theme.cardBorder}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{
+                      width: '48px',
+                      height: '48px',
+                      borderRadius: '12px',
+                      backgroundColor: checkedInToday ? '#22c55e' : (isDark ? '#7c2d12' : '#ffedd5'),
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {checkedInToday ? (
+                        <Check style={{ width: '24px', height: '24px', color: '#fff' }} />
+                      ) : (
+                        <Flame style={{ width: '24px', height: '24px', color: '#f97316' }} />
+                      )}
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
+                        {checkedInToday ? 'Checked In!' : 'Daily Check-In'}
+                      </h4>
+                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>
+                        {checkedInToday 
+                          ? `🔥 ${currentStreak} day streak` 
+                          : currentStreak > 0 
+                            ? `Continue your ${currentStreak} day streak!`
+                            : 'Start your streak today!'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {!checkedInToday && (
+                    <button
+                      onClick={handleDailyCheckIn}
+                      style={{
+                        padding: '10px 20px',
+                        backgroundColor: '#f97316',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '8px',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      <Flame style={{ width: '14px', height: '14px' }} />
+                      Check In
+                    </button>
+                  )}
+                </div>
+                
+                {/* Streak bonus info */}
+                {currentStreak > 0 && currentStreak % 7 !== 0 && (
+                  <div style={{ 
+                    marginTop: '12px', 
+                    padding: '8px 12px', 
+                    backgroundColor: isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.05)', 
+                    borderRadius: '6px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}>
+                    <Gift style={{ width: '14px', height: '14px', color: '#f59e0b' }} />
+                    <span style={{ fontSize: '11px', color: theme.textMuted }}>
+                      {7 - (currentStreak % 7)} days until +{XP_CONFIG.weekStreak} XP bonus!
+                    </span>
+                  </div>
+                )}
               </div>
               
               {/* XP Rewards Info */}
