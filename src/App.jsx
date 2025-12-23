@@ -1006,6 +1006,12 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [editingEntry, setEditingEntry] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState(null);
+  
+  // Bulk delete states
+  const [selectedEntries, setSelectedEntries] = useState([]);
+  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
+  const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Auto-hide toast after 3 seconds
   useEffect(() => {
@@ -1147,6 +1153,84 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       setEntries(prev => prev.filter(e => e.id !== id));
     } catch (e) {
       console.error('Failed to delete:', e);
+    }
+  };
+
+  // Bulk delete selected entries
+  const handleBulkDelete = async () => {
+    if (selectedEntries.length === 0) return;
+    
+    setIsDeleting(true);
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (const id of selectedEntries) {
+      try {
+        const { error } = await supabase
+          .from('expenses')
+          .delete()
+          .eq('id', id);
+        
+        if (error) throw error;
+        successCount++;
+      } catch (e) {
+        errorCount++;
+        console.error('Failed to delete entry:', e);
+      }
+    }
+    
+    // Update local state
+    setEntries(prev => prev.filter(e => !selectedEntries.includes(e.id)));
+    setSelectedEntries([]);
+    setShowBulkDeleteConfirm(false);
+    setIsDeleting(false);
+    
+    if (errorCount === 0) {
+      showToast(`Successfully deleted ${successCount} entries`, 'success');
+    } else {
+      showToast(`Deleted ${successCount} entries, ${errorCount} failed`, 'error');
+    }
+  };
+
+  // Clear all entries
+  const handleClearAll = async () => {
+    setIsDeleting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('expenses')
+        .delete()
+        .eq('user_id', user.id);
+      
+      if (error) throw error;
+      
+      setEntries([]);
+      setSelectedEntries([]);
+      setShowClearAllConfirm(false);
+      showToast('All entries have been cleared', 'success');
+    } catch (e) {
+      console.error('Failed to clear all:', e);
+      showToast('Failed to clear entries', 'error');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Toggle entry selection
+  const toggleEntrySelection = (id) => {
+    setSelectedEntries(prev => 
+      prev.includes(id) 
+        ? prev.filter(x => x !== id) 
+        : [...prev, id]
+    );
+  };
+
+  // Toggle select all (filtered entries)
+  const toggleSelectAll = () => {
+    if (selectedEntries.length === filteredEntries.length) {
+      setSelectedEntries([]);
+    } else {
+      setSelectedEntries(filteredEntries.map(e => e.id));
     }
   };
 
@@ -3619,6 +3703,93 @@ const getBudgetStatus = () => {
               </div>
             </div>
 
+            {/* Bulk Actions Bar */}
+            {(selectedEntries.length > 0 || entries.length > 0) && (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px 16px',
+                marginBottom: '16px',
+                backgroundColor: selectedEntries.length > 0 ? (isDark ? '#1e3a5f' : '#dbeafe') : theme.statBg,
+                borderRadius: '8px',
+                border: selectedEntries.length > 0 ? `1px solid ${isDark ? '#2563eb' : '#93c5fd'}` : 'none'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  {selectedEntries.length > 0 ? (
+                    <>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: isDark ? '#60a5fa' : '#1d4ed8' }}>
+                        {selectedEntries.length} selected
+                      </span>
+                      <button
+                        onClick={() => setSelectedEntries([])}
+                        style={{
+                          fontSize: '13px',
+                          color: isDark ? '#93c5fd' : '#2563eb',
+                          background: 'none',
+                          border: 'none',
+                          cursor: 'pointer',
+                          textDecoration: 'underline'
+                        }}
+                      >
+                        Clear selection
+                      </button>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: '13px', color: theme.textMuted }}>
+                      Select entries to delete multiple at once
+                    </span>
+                  )}
+                </div>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  {selectedEntries.length > 0 && (
+                    <button
+                      onClick={() => setShowBulkDeleteConfirm(true)}
+                      style={{
+                        height: '32px',
+                        padding: '0 12px',
+                        backgroundColor: '#ef4444',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Trash2 style={{ width: '14px', height: '14px' }} />
+                      Delete Selected
+                    </button>
+                  )}
+                  {entries.length > 0 && (
+                    <button
+                      onClick={() => setShowClearAllConfirm(true)}
+                      style={{
+                        height: '32px',
+                        padding: '0 12px',
+                        backgroundColor: 'transparent',
+                        border: `1px solid #ef4444`,
+                        borderRadius: '6px',
+                        fontSize: '13px',
+                        fontWeight: '500',
+                        color: '#ef4444',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      <Trash2 style={{ width: '14px', height: '14px' }} />
+                      Clear All
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* CSV Import Preview */}
             {csvPreview && (
               <div style={{
@@ -3816,9 +3987,17 @@ const getBudgetStatus = () => {
 
             {/* Table */}
             <div style={{ overflowX: 'auto', maxHeight: '600px', overflowY: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '650px' }}>
                 <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg, zIndex: 1 }}>
                   <tr style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                    <th style={{ padding: '12px 8px', textAlign: 'center', width: '40px' }}>
+                      <input
+                        type="checkbox"
+                        checked={filteredEntries.length > 0 && selectedEntries.length === filteredEntries.length}
+                        onChange={toggleSelectAll}
+                        style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#3b82f6' }}
+                      />
+                    </th>
                     <th style={{ padding: '12px 8px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Date</th>
                     <th style={{ padding: '12px 8px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Category</th>
                     <th style={{ padding: '12px 8px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Name</th>
@@ -3829,7 +4008,7 @@ const getBudgetStatus = () => {
                 <tbody>
                   {filteredEntries.length === 0 ? (
                     <tr>
-                      <td colSpan={5} style={{ textAlign: 'center', padding: '60px 16px' }}>
+                      <td colSpan={6} style={{ textAlign: 'center', padding: '60px 16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                           <div style={{
                             width: '80px',
@@ -3861,6 +4040,7 @@ const getBudgetStatus = () => {
                     filteredEntries.map(entry => {
                       const badge = getBadgeStyle(entry.type, isDark);
                       const categoryInfo = CATEGORIES.find(c => c.value === entry.type);
+                      const isSelected = selectedEntries.includes(entry.id);
                       return (
                         <tr 
                           key={entry.id} 
@@ -3868,11 +4048,20 @@ const getBudgetStatus = () => {
                           style={{ 
                             borderBottom: `1px solid ${theme.cardBorder}`,
                             cursor: 'pointer',
-                            transition: 'background-color 0.15s'
+                            transition: 'background-color 0.15s',
+                            backgroundColor: isSelected ? (isDark ? '#1e3a5f' : '#dbeafe') : 'transparent'
                           }}
-                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#1f1f23' : '#fafafa'}
-                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                          onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = isDark ? '#1f1f23' : '#fafafa'; }}
+                          onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent'; }}
                         >
+                          <td style={{ padding: '12px 8px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+                            <input
+                              type="checkbox"
+                              checked={isSelected}
+                              onChange={() => toggleEntrySelection(entry.id)}
+                              style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#3b82f6' }}
+                            />
+                          </td>
                           <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted }}>
                             {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </td>
@@ -4526,6 +4715,102 @@ const getBudgetStatus = () => {
                 style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
               >
                 {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Delete</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Delete Confirmation Modal */}
+      {showBulkDeleteConfirm && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowBulkDeleteConfirm(false)}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete {selectedEntries.length} Entries?</h3>
+            <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 20px' }}>
+              Are you sure you want to delete <strong>{selectedEntries.length}</strong> selected entries? This action cannot be undone.
+            </p>
+            
+            <div style={{ 
+              padding: '16px', 
+              backgroundColor: isDark ? '#450a0a' : '#fef2f2', 
+              borderRadius: '8px', 
+              marginBottom: '20px',
+              border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
+                <AlertTriangle style={{ width: '16px', height: '16px', color: '#ef4444' }} />
+                <span style={{ fontSize: '13px', fontWeight: '600', color: '#ef4444' }}>
+                  Total: {currency}{formatAmount(entries.filter(e => selectedEntries.includes(e.id)).reduce((sum, e) => sum + e.amount, 0))}
+                </span>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => setShowBulkDeleteConfirm(false)}
+                style={{ flex: 1, height: '44px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={isDeleting}
+                style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isDeleting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isDeleting ? 0.7 : 1 }}
+              >
+                {isDeleting ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Delete All Selected</>}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clear All Entries Confirmation Modal */}
+      {showClearAllConfirm && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowClearAllConfirm(false)}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+            </div>
+            <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Clear All Entries?</h3>
+            <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 20px' }}>
+              This will permanently delete <strong>ALL {entries.length} entries</strong> from your account. This action cannot be undone!
+            </p>
+            
+            <div style={{ 
+              padding: '16px', 
+              backgroundColor: isDark ? '#450a0a' : '#fef2f2', 
+              borderRadius: '8px', 
+              marginBottom: '20px',
+              border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
+                <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>
+                  You will lose all expense records including:
+                </span>
+                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '12px', color: theme.textMuted }}>{entries.length} entries</span>
+                  <span style={{ fontSize: '12px', color: theme.textMuted }}>•</span>
+                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#ef4444' }}>{currency}{formatAmount(entries.reduce((sum, e) => sum + e.amount, 0))} total</span>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => setShowClearAllConfirm(false)}
+                style={{ flex: 1, height: '44px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleClearAll}
+                disabled={isDeleting}
+                style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isDeleting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isDeleting ? 0.7 : 1 }}
+              >
+                {isDeleting ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Clearing...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Clear Everything</>}
               </button>
             </div>
           </div>
