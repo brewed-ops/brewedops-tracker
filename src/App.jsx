@@ -1392,6 +1392,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [selectedEntries, setSelectedEntries] = useState([]);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
   const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
+  const [clearEntriesConfirmText, setClearEntriesConfirmText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Auto-hide toast after 3 seconds
@@ -2636,6 +2637,11 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
 
   // Clear all entries
   const handleClearAll = async () => {
+    if (clearEntriesConfirmText.toLowerCase() !== 'delete') {
+      showToast('Please type "delete" to confirm', 'error');
+      return;
+    }
+    
     setIsDeleting(true);
     
     try {
@@ -2649,6 +2655,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       setEntries([]);
       setSelectedEntries([]);
       setShowClearAllConfirm(false);
+      setClearEntriesConfirmText('');
       showToast('All entries have been cleared', 'success');
     } catch (e) {
       console.error('Failed to clear all:', e);
@@ -2843,7 +2850,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         }
         
         // Parse headers
-        const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
+        const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, '').replace(/ /g, '_'));
         const requiredHeaders = ['name', 'amount', 'category'];
         const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
         
@@ -2872,6 +2879,16 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
           let category = row.category?.toLowerCase() || 'other';
           if (!validCategories.includes(category)) category = 'other';
           
+          // Handle wallet ID from import
+          let walletId = row.wallet_id || '';
+          
+          // If wallet ID is provided but doesn't match any existing wallet, try to match by name
+          if (walletId && !wallets.find(w => w.id === walletId)) {
+            const walletName = row.wallet_name || '';
+            const matchedWallet = wallets.find(w => w.name.toLowerCase() === walletName.toLowerCase());
+            walletId = matchedWallet ? matchedWallet.id : '';
+          }
+          
           entries.push({
             name: row.name || 'Unnamed Entry',
             amount: amount,
@@ -2879,7 +2896,8 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
             date: row.date || new Date().toISOString().split('T')[0],
             dueDate: row.due_date || '',
             notes: row.notes || '',
-            recurring: ['weekly', 'monthly', 'yearly'].includes(row.recurring?.toLowerCase()) ? row.recurring.toLowerCase() : null
+            recurring: ['weekly', 'monthly', 'yearly'].includes(row.recurring?.toLowerCase()) ? row.recurring.toLowerCase() : null,
+            walletId: walletId
           });
         }
         
@@ -2929,7 +2947,8 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     
     for (const entry of csvPreview) {
       try {
-        await saveEntry(entry);
+        // Save the entry (this already handles wallet deduction via deductFromWallet)
+        const savedEntry = await saveEntry(entry);
         successCount++;
       } catch (e) {
         errorCount++;
@@ -3143,14 +3162,19 @@ const getBudgetStatus = () => {
   // Export to CSV (uses filtered entries)
   const exportToCSV = () => {
     const dataToExport = getFilteredEntries();
-    const headers = ['Date', 'Category', 'Name', 'Amount', 'Due Date'];
-    const rows = dataToExport.map(e => [
-      e.date,
-      CATEGORIES.find(c => c.value === e.type)?.label || e.type,
-      `"${e.name.replace(/"/g, '""')}"`,
-      e.amount.toFixed(2),
-      e.dueDate || ''
-    ]);
+    const headers = ['Date', 'Category', 'Name', 'Amount', 'Due Date', 'Wallet ID', 'Wallet Name'];
+    const rows = dataToExport.map(e => {
+      const wallet = wallets.find(w => w.id === e.walletId);
+      return [
+        e.date,
+        CATEGORIES.find(c => c.value === e.type)?.label || e.type,
+        `"${e.name.replace(/"/g, '""')}"`,
+        e.amount.toFixed(2),
+        e.dueDate || '',
+        e.walletId || '',
+        wallet ? `"${wallet.name}"` : ''
+      ];
+    });
     
     const csvContent = [
       headers.join(','),
@@ -4290,17 +4314,23 @@ const getBudgetStatus = () => {
               </div>
             </div>
 
-            {/* Pay from Wallet - Upload Section */}
-            <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>
-                Pay from Wallet
+            {/* Pay from Wallet - Upload Section (smaller, inline style) */}
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: '500', color: theme.textMuted, marginBottom: '4px' }}>
+                Pay from Wallet <span style={{ fontWeight: '400', opacity: 0.7 }}>(optional)</span>
               </label>
               <select
                 value={manualForm.walletId}
                 onChange={(e) => setManualForm({ ...manualForm, walletId: e.target.value })}
-                style={{ ...inputStyle, cursor: 'pointer' }}
+                style={{ 
+                  ...inputStyle, 
+                  cursor: 'pointer',
+                  height: '36px',
+                  fontSize: '13px',
+                  padding: '0 12px'
+                }}
               >
-                <option value="">No wallet (optional)</option>
+                <option value="">No wallet</option>
                 {WALLET_TYPES.map(wt => {
                   const typeWallets = wallets.filter(w => w.type === wt.type);
                   if (typeWallets.length === 0) return null;
@@ -4520,15 +4550,15 @@ const getBudgetStatus = () => {
 
             {/* Table Container */}
             <div style={{ overflowX: 'auto', flex: 1, maxHeight: '280px', overflowY: filteredEntries.length > 5 ? 'auto' : 'hidden' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: isSmall ? '500px' : 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                 <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg, zIndex: 1 }}>
                   <tr style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
-                    <th style={{ padding: '8px 8px 8px 0', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: isSmall ? '70px' : '90px' }}>Type</th>
-                    <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle }}>Name</th>
-                    <th style={{ padding: '8px', textAlign: 'right', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: '100px' }}>Amount</th>
-                    <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: '80px' }}>Wallet</th>
-                    <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: '90px' }}>Date</th>
-                    <th style={{ padding: '8px 0 8px 8px', textAlign: 'right', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: '90px' }}>Actions</th>
+                    <th style={{ padding: '8px 8px 8px 0', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: isSmall ? '65px' : '85px' }}>Type</th>
+                    <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: 'auto' }}>Name</th>
+                    <th style={{ padding: '8px', textAlign: 'right', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: isSmall ? '80px' : '90px' }}>Amount</th>
+                    <th style={{ padding: '8px', textAlign: 'center', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: isSmall ? '50px' : '70px' }}>Wallet</th>
+                    <th style={{ padding: '8px', textAlign: 'left', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: isSmall ? '75px' : '85px' }}>Date</th>
+                    <th style={{ padding: '8px 0 8px 8px', textAlign: 'center', fontSize: '12px', fontWeight: '500', color: theme.textSubtle, width: isSmall ? '55px' : '65px' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -4622,7 +4652,7 @@ const getBudgetStatus = () => {
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right' }}>
                             <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(entry.amount)}</span>
                           </td>
-                          <td style={{ padding: '10px 8px', verticalAlign: 'middle' }}>
+                          <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'center' }}>
                             {entry.walletId ? (
                               (() => {
                                 const wallet = wallets.find(w => w.id === entry.walletId);
@@ -4630,15 +4660,15 @@ const getBudgetStatus = () => {
                                   <span style={{ 
                                     display: 'inline-flex', 
                                     alignItems: 'center', 
-                                    gap: '4px',
-                                    fontSize: '11px',
-                                    padding: '3px 6px',
+                                    justifyContent: 'center',
+                                    gap: '3px',
+                                    fontSize: '10px',
+                                    padding: '2px 5px',
                                     borderRadius: '4px',
                                     backgroundColor: `${wallet.color}15`,
                                     color: wallet.color
                                   }}>
-                                    <span style={{ fontSize: '12px' }}>{wallet.icon}</span>
-                                    {!isSmall && wallet.name}
+                                    <span style={{ fontSize: '11px' }}>{wallet.icon}</span>
                                   </span>
                                 ) : (
                                   <span style={{ fontSize: '11px', color: theme.textDim }}>-</span>
@@ -4649,25 +4679,15 @@ const getBudgetStatus = () => {
                             )}
                           </td>
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle' }}>
-                            <span style={{ fontSize: '12px', color: theme.textSubtle }}>{new Date(entry.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
+                            <span style={{ fontSize: '11px', color: theme.textSubtle }}>{new Date(entry.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
                           </td>
-                          <td style={{ padding: '10px 0 10px 8px', verticalAlign: 'middle', textAlign: 'right' }}>
-                            <div style={{ display: 'flex', gap: '2px', justifyContent: 'flex-end' }}>
-                              {entry.file && (
-                                <>
-                                  <button onClick={() => setPreviewFile(entry)} style={{ width: '26px', height: '26px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-                                    <Eye style={{ width: '14px', height: '14px' }} />
-                                  </button>
-                                  <button onClick={() => handleDownloadFile(entry)} style={{ width: '26px', height: '26px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-                                    <Download style={{ width: '14px', height: '14px' }} />
-                                  </button>
-                                </>
-                              )}
-                              <button onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})} style={{ width: '26px', height: '26px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-                                <Edit style={{ width: '14px', height: '14px' }} />
+                          <td style={{ padding: '10px 0 10px 8px', verticalAlign: 'middle', textAlign: 'center' }}>
+                            <div style={{ display: 'flex', gap: '2px', justifyContent: 'center' }}>
+                              <button onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})} style={{ width: '24px', height: '24px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+                                <Edit style={{ width: '13px', height: '13px' }} />
                               </button>
-                              <button onClick={() => setDeletingEntry(entry)} style={{ width: '26px', height: '26px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-  <Trash2 style={{ width: '14px', height: '14px' }} />
+                              <button onClick={() => setDeletingEntry(entry)} style={{ width: '24px', height: '24px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+  <Trash2 style={{ width: '13px', height: '13px' }} />
 </button>
                             </div>
                           </td>
@@ -5783,30 +5803,31 @@ const getBudgetStatus = () => {
                             )}
                           </div>
                           
-                          {/* Action Buttons */}
-                          <div style={{ display: 'flex', gap: '6px', marginTop: '12px' }}>
+                          {/* Action Buttons - Responsive */}
+                          <div style={{ display: 'flex', gap: '4px', marginTop: '12px', flexWrap: 'wrap' }}>
                             <button
                               onClick={() => {
                                 setSelectedWalletForFunds(selectedWallet);
                                 setShowAddFundsModal(true);
                               }}
                               style={{
-                                flex: 1,
-                                height: '36px',
+                                flex: '1 1 auto',
+                                minWidth: isSmall ? '60px' : '70px',
+                                height: '32px',
                                 backgroundColor: 'rgba(255,255,255,0.95)',
                                 color: cardColor,
                                 border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '12px',
+                                borderRadius: '6px',
+                                fontSize: '11px',
                                 fontWeight: '600',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '4px'
+                                gap: '3px'
                               }}
                             >
-                              <Plus style={{ width: '12px', height: '12px' }} />
+                              <Plus style={{ width: '11px', height: '11px' }} />
                               Add
                             </button>
                             <button
@@ -5815,23 +5836,24 @@ const getBudgetStatus = () => {
                                 setShowWithdrawModal(true);
                               }}
                               style={{
-                                flex: 1,
-                                height: '36px',
+                                flex: '1 1 auto',
+                                minWidth: isSmall ? '70px' : '80px',
+                                height: '32px',
                                 backgroundColor: 'rgba(255,255,255,0.2)',
                                 color: '#fff',
                                 border: 'none',
-                                borderRadius: '8px',
-                                fontSize: '12px',
+                                borderRadius: '6px',
+                                fontSize: '11px',
                                 fontWeight: '600',
                                 cursor: 'pointer',
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                gap: '4px'
+                                gap: '3px'
                               }}
                             >
-                              <ArrowDownRight style={{ width: '12px', height: '12px' }} />
-                              Withdraw
+                              <ArrowDownRight style={{ width: '11px', height: '11px' }} />
+                              {isSmall ? 'Out' : 'Withdraw'}
                             </button>
                             {selectedWallet?.editable && (
                               <button
@@ -5841,19 +5863,20 @@ const getBudgetStatus = () => {
                                   setShowEditWalletModal(true);
                                 }}
                                 style={{
-                                  width: '36px',
-                                  height: '36px',
+                                  width: '32px',
+                                  height: '32px',
                                   backgroundColor: 'rgba(255,255,255,0.2)',
                                   border: 'none',
-                                  borderRadius: '8px',
+                                  borderRadius: '6px',
                                   color: '#fff',
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  justifyContent: 'center'
+                                  justifyContent: 'center',
+                                  flexShrink: 0
                                 }}
                               >
-                                <Edit style={{ width: '12px', height: '12px' }} />
+                                <Edit style={{ width: '11px', height: '11px' }} />
                               </button>
                             )}
                             {selectedWallet?.type !== 'cash' && (
@@ -5863,16 +5886,17 @@ const getBudgetStatus = () => {
                                   setShowDeleteWalletConfirm(true);
                                 }}
                                 style={{
-                                  width: '36px',
-                                  height: '36px',
+                                  width: '32px',
+                                  height: '32px',
                                   backgroundColor: 'rgba(255,255,255,0.2)',
                                   border: 'none',
-                                  borderRadius: '8px',
+                                  borderRadius: '6px',
                                   color: '#fff',
                                   cursor: 'pointer',
                                   display: 'flex',
                                   alignItems: 'center',
-                                  justifyContent: 'center'
+                                  justifyContent: 'center',
+                                  flexShrink: 0
                                 }}
                               >
                                 <Trash2 style={{ width: '12px', height: '12px' }} />
@@ -5912,17 +5936,17 @@ const getBudgetStatus = () => {
             {/* Total Balance Card */}
             <div style={{
               ...cardStyle,
-              padding: '20px',
+              padding: isSmall ? '16px' : '20px',
               background: isDark 
                 ? 'linear-gradient(135deg, #1e3a5f, #0f172a)' 
                 : 'linear-gradient(135deg, #dbeafe, #eff6ff)',
               border: 'none'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '16px' }}>
-                <div>
-                  <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 4px' }}>Total Balance (All Wallets)</p>
+              <div style={{ display: 'flex', flexDirection: isSmall ? 'column' : 'row', alignItems: isSmall ? 'stretch' : 'flex-start', justifyContent: 'space-between', gap: '12px' }}>
+                <div style={{ marginBottom: isSmall ? '8px' : 0 }}>
+                  <p style={{ fontSize: '12px', color: theme.textMuted, margin: '0 0 4px' }}>Total Balance (All Wallets)</p>
                   <p style={{ 
-                    fontSize: '32px', 
+                    fontSize: isSmall ? '26px' : '32px', 
                     fontWeight: '700', 
                     color: getTotalWalletBalance() >= 0 ? theme.text : '#ef4444', 
                     margin: 0 
@@ -5930,52 +5954,59 @@ const getBudgetStatus = () => {
                     {currency}{getTotalWalletBalance().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                    {wallets.slice(0, 5).map(w => (
-                      <div key={w.id} style={{ 
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: isSmall ? 'flex-start' : 'flex-end' }}>
+                  {/* Group wallets by type */}
+                  {WALLET_TYPES.map(wt => {
+                    const typeWallets = wallets.filter(w => w.type === wt.type);
+                    if (typeWallets.length === 0) return null;
+                    const typeTotal = typeWallets.reduce((sum, w) => sum + w.balance, 0);
+                    return (
+                      <div key={wt.type} style={{ 
                         display: 'flex', 
                         alignItems: 'center', 
-                        gap: '6px',
-                        padding: '6px 12px',
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        borderRadius: '20px'
+                        gap: '4px',
+                        padding: '4px 8px',
+                        backgroundColor: `${wt.color}20`,
+                        border: `1px solid ${wt.color}40`,
+                        borderRadius: '6px'
                       }}>
-                        <span style={{ fontSize: '14px' }}>{w.icon}</span>
-                        <span style={{ fontSize: '12px', color: theme.textMuted }}>{currency}{w.balance.toLocaleString()}</span>
+                        <span style={{ fontSize: '11px' }}>{wt.icon}</span>
+                        <span style={{ fontSize: '10px', fontWeight: '600', color: theme.text }}>
+                          {currency}{typeTotal.toLocaleString()}
+                        </span>
+                        {typeWallets.length > 1 && (
+                          <span style={{ 
+                            fontSize: '8px', 
+                            color: theme.textMuted,
+                            backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                            padding: '1px 4px',
+                            borderRadius: '3px'
+                          }}>
+                            {typeWallets.length}
+                          </span>
+                        )}
                       </div>
-                    ))}
-                    {wallets.length > 5 && (
-                      <div style={{ 
-                        padding: '6px 12px',
-                        backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        color: theme.textMuted
-                      }}>
-                        +{wallets.length - 5} more
-                      </div>
-                    )}
-                  </div>
+                    );
+                  })}
                   {wallets.length > 0 && (
                     <button
                       onClick={() => setShowClearAllWalletsConfirm(true)}
                       style={{
-                        padding: '8px 12px',
+                        padding: '4px 8px',
                         backgroundColor: 'transparent',
                         border: `1px solid ${isDark ? 'rgba(239,68,68,0.5)' : '#fecaca'}`,
-                        borderRadius: '8px',
+                        borderRadius: '5px',
                         color: '#ef4444',
-                        fontSize: '12px',
+                        fontSize: '10px',
                         fontWeight: '500',
                         cursor: 'pointer',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '4px'
+                        gap: '3px'
                       }}
                     >
-                      <Trash2 style={{ width: '12px', height: '12px' }} />
-                      Clear All
+                      <Trash2 style={{ width: '10px', height: '10px' }} />
+                      Clear
                     </button>
                   )}
                 </div>
@@ -5986,20 +6017,20 @@ const getBudgetStatus = () => {
             <div style={cardStyle}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '12px' }}>
                 <div>
-                  <h2 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Transaction History</h2>
-                  <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>
+                  <h2 style={{ fontSize: isSmall ? '14px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Transaction History</h2>
+                  <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>
                     {getFilteredWalletTransactions().length} transactions
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                   {/* Search */}
                   <div style={{ position: 'relative' }}>
-                    <Search style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textDim }} />
+                    <Search style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', width: '12px', height: '12px', color: theme.textDim }} />
                     <input
                       placeholder="Search..."
                       value={walletSearch}
                       onChange={(e) => setWalletSearch(e.target.value)}
-                      style={{ ...inputStyle, width: '150px', paddingLeft: '32px' }}
+                      style={{ ...inputStyle, width: isSmall ? '100px' : '130px', paddingLeft: '28px', height: '32px', fontSize: '12px' }}
                     />
                   </div>
                   
@@ -6007,7 +6038,7 @@ const getBudgetStatus = () => {
                   <select
                     value={walletTransactionFilter}
                     onChange={(e) => setWalletTransactionFilter(e.target.value)}
-                    style={{ ...inputStyle, width: '130px', cursor: 'pointer' }}
+                    style={{ ...inputStyle, width: isSmall ? '100px' : '120px', cursor: 'pointer', height: '32px', fontSize: '12px' }}
                   >
                     <option value="all">All Wallets</option>
                     {wallets.map(w => (
@@ -6019,8 +6050,8 @@ const getBudgetStatus = () => {
                   <button
                     onClick={() => setShowWalletAdvancedFilter(!showWalletAdvancedFilter)}
                     style={{
-                      height: '36px',
-                      padding: '0 12px',
+                      height: '32px',
+                      padding: '0 10px',
                       backgroundColor: showWalletAdvancedFilter ? (isDark ? '#3b82f6' : '#2563eb') : 'transparent',
                       border: `1px solid ${showWalletAdvancedFilter ? 'transparent' : theme.inputBorder}`,
                       borderRadius: '6px',
@@ -6028,12 +6059,12 @@ const getBudgetStatus = () => {
                       cursor: 'pointer',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '6px',
-                      fontSize: '13px'
+                      gap: '4px',
+                      fontSize: '12px'
                     }}
                   >
-                    <ChevronDown style={{ width: '14px', height: '14px' }} />
-                    Filter
+                    <ChevronDown style={{ width: '12px', height: '12px' }} />
+                    {isSmall ? '' : 'Filter'}
                   </button>
                 </div>
               </div>
@@ -6092,23 +6123,23 @@ const getBudgetStatus = () => {
               {getFilteredWalletTransactions().length === 0 ? (
                 <div style={{ 
                   textAlign: 'center', 
-                  padding: '40px 20px',
+                  padding: isSmall ? '30px 16px' : '40px 20px',
                   color: theme.textMuted 
                 }}>
-                  <Wallet style={{ width: '48px', height: '48px', margin: '0 auto 12px', opacity: 0.3 }} />
-                  <p style={{ fontSize: '15px', fontWeight: '500', margin: '0 0 4px' }}>No transactions yet</p>
-                  <p style={{ fontSize: '13px', margin: 0 }}>Add funds to a wallet or log expenses with a wallet selected</p>
+                  <Wallet style={{ width: isSmall ? '36px' : '48px', height: isSmall ? '36px' : '48px', margin: '0 auto 12px', opacity: 0.3 }} />
+                  <p style={{ fontSize: isSmall ? '13px' : '15px', fontWeight: '500', margin: '0 0 4px' }}>No transactions yet</p>
+                  <p style={{ fontSize: '12px', margin: 0 }}>Add funds or log expenses with a wallet</p>
                 </div>
               ) : (
                 <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', tableLayout: 'fixed' }}>
                     <thead>
                       <tr style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
-                        <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Date</th>
-                        <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Wallet</th>
-                        <th style={{ textAlign: 'left', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Description</th>
-                        <th style={{ textAlign: 'right', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Amount</th>
-                        <th style={{ textAlign: 'right', padding: '12px 8px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Balance</th>
+                        <th style={{ textAlign: 'left', padding: '10px 6px', fontSize: '10px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase', width: isSmall ? '70px' : '90px' }}>Date</th>
+                        <th style={{ textAlign: 'left', padding: '10px 6px', fontSize: '10px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase', width: isSmall ? '70px' : '100px' }}>Wallet</th>
+                        <th style={{ textAlign: 'left', padding: '10px 6px', fontSize: '10px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase', width: 'auto' }}>Description</th>
+                        <th style={{ textAlign: 'right', padding: '10px 6px', fontSize: '10px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase', width: isSmall ? '80px' : '90px' }}>Amount</th>
+                        <th style={{ textAlign: 'right', padding: '10px 6px', fontSize: '10px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase', width: isSmall ? '70px' : '80px' }}>Balance</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -6116,21 +6147,21 @@ const getBudgetStatus = () => {
                         const wallet = wallets.find(w => w.id === tx.walletId);
                         return (
                           <tr key={tx.id} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
-                            <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted }}>
-                              {new Date(tx.date).toLocaleDateString()}
+                            <td style={{ padding: '10px 6px', fontSize: '11px', color: theme.textMuted }}>
+                              {new Date(tx.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: '2-digit' })}
                             </td>
-                            <td style={{ padding: '12px 8px' }}>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                <span style={{ fontSize: '16px' }}>{wallet?.icon || '💰'}</span>
-                                <span style={{ fontSize: '13px', color: theme.text }}>{tx.walletName}</span>
+                            <td style={{ padding: '10px 6px' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                                <span style={{ fontSize: '12px' }}>{wallet?.icon || '💰'}</span>
+                                {!isSmall && <span style={{ fontSize: '11px', color: theme.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{tx.walletName}</span>}
                               </div>
                             </td>
-                            <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.text }}>
+                            <td style={{ padding: '10px 6px', fontSize: '12px', color: theme.text, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                               {tx.note}
                               {tx.type === 'deposit' && (
                                 <span style={{ 
-                                  marginLeft: '8px',
-                                  padding: '2px 6px',
+                                  marginLeft: '6px',
+                                  padding: '1px 5px',
                                   backgroundColor: isDark ? '#14532d' : '#dcfce7',
                                   color: '#22c55e',
                                   fontSize: '10px',
@@ -6142,28 +6173,28 @@ const getBudgetStatus = () => {
                               )}
                               {tx.type === 'withdraw' && (
                                 <span style={{ 
-                                  marginLeft: '8px',
-                                  padding: '2px 6px',
+                                  marginLeft: '6px',
+                                  padding: '1px 5px',
                                   backgroundColor: isDark ? '#7f1d1d' : '#fecaca',
                                   color: '#ef4444',
-                                  fontSize: '10px',
+                                  fontSize: '9px',
                                   fontWeight: '600',
-                                  borderRadius: '4px'
+                                  borderRadius: '3px'
                                 }}>
                                   WITHDRAW
                                 </span>
                               )}
                             </td>
                             <td style={{ 
-                              padding: '12px 8px', 
-                              fontSize: '14px', 
+                              padding: '10px 6px', 
+                              fontSize: isSmall ? '11px' : '12px', 
                               fontWeight: '600',
                               color: tx.type === 'deposit' ? '#22c55e' : '#ef4444',
                               textAlign: 'right'
                             }}>
                               {tx.type === 'deposit' ? '+' : '-'}{currency}{Math.abs(tx.amount).toLocaleString()}
                             </td>
-                            <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted, textAlign: 'right' }}>
+                            <td style={{ padding: '10px 6px', fontSize: isSmall ? '10px' : '11px', color: theme.textMuted, textAlign: 'right' }}>
                               {currency}{tx.balance.toLocaleString()}
                             </td>
                           </tr>
@@ -6698,72 +6729,72 @@ const getBudgetStatus = () => {
               <div style={{
                 ...cardStyle,
                 background: isDark 
-                  ? 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)' 
-                  : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                  ? 'linear-gradient(135deg, #374151 0%, #1f2937 100%)' 
+                  : 'linear-gradient(135deg, #4b5563 0%, #374151 100%)',
                 border: 'none'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Active Bills</span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <CreditCard style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
                 <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{getRecurringEntries().length}</p>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Recurring expenses</span>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>Recurring expenses</span>
               </div>
 
               {/* Monthly Cost */}
               <div style={{
                 ...cardStyle,
                 background: isDark 
-                  ? 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)' 
-                  : 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+                  ? 'linear-gradient(135deg, #3f3f46 0%, #27272a 100%)' 
+                  : 'linear-gradient(135deg, #52525b 0%, #3f3f46 100%)',
                 border: 'none'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Monthly Cost</span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Wallet style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
                 <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(getMonthlyRecurringCost())}</p>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Estimated monthly</span>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>Estimated monthly</span>
               </div>
 
               {/* Yearly Cost */}
               <div style={{
                 ...cardStyle,
                 background: isDark 
-                  ? 'linear-gradient(135deg, #059669 0%, #047857 100%)' 
-                  : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                  ? 'linear-gradient(135deg, #44403c 0%, #292524 100%)' 
+                  : 'linear-gradient(135deg, #57534e 0%, #44403c 100%)',
                 border: 'none'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Yearly Cost</span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <TrendingUp style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
                 <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(getYearlyRecurringCost())}</p>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Estimated yearly</span>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>Estimated yearly</span>
               </div>
 
               {/* Due Soon */}
               <div style={{
                 ...cardStyle,
                 background: isDark 
-                  ? 'linear-gradient(135deg, #dc2626 0%, #b91c1c 100%)' 
-                  : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+                  ? 'linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)' 
+                  : 'linear-gradient(135deg, #b91c1c 0%, #991b1b 100%)',
                 border: 'none'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Due This Week</span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Bell style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
                 <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{getUpcomingBills().filter(b => b.daysUntil <= 7).length}</p>
-                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>Upcoming payments</span>
+                <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.7)' }}>Upcoming payments</span>
               </div>
             </div>
 
@@ -7934,7 +7965,7 @@ const getBudgetStatus = () => {
 
       {/* Clear All Entries Confirmation Modal */}
       {showClearAllConfirm && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowClearAllConfirm(false)}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowClearAllConfirm(false); setClearEntriesConfirmText(''); }}>
           <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
@@ -7963,17 +7994,47 @@ const getBudgetStatus = () => {
               </div>
             </div>
             
+            {/* Type delete to confirm */}
+            <div style={{ textAlign: 'left', marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>
+                Type <strong style={{ color: '#ef4444' }}>delete</strong> to confirm:
+              </label>
+              <input
+                type="text"
+                value={clearEntriesConfirmText}
+                onChange={(e) => setClearEntriesConfirmText(e.target.value)}
+                placeholder="Type 'delete' here"
+                style={{ ...inputStyle, width: '100%' }}
+                autoFocus
+              />
+            </div>
+            
             <div style={{ display: 'flex', gap: '12px' }}>
               <button
-                onClick={() => setShowClearAllConfirm(false)}
+                onClick={() => { setShowClearAllConfirm(false); setClearEntriesConfirmText(''); }}
                 style={{ flex: 1, height: '44px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
               >
                 Cancel
               </button>
               <button
                 onClick={handleClearAll}
-                disabled={isDeleting}
-                style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isDeleting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isDeleting ? 0.7 : 1 }}
+                disabled={isDeleting || clearEntriesConfirmText.toLowerCase() !== 'delete'}
+                style={{ 
+                  flex: 1, 
+                  height: '44px', 
+                  backgroundColor: clearEntriesConfirmText.toLowerCase() === 'delete' ? '#ef4444' : theme.statBg, 
+                  border: 'none', 
+                  borderRadius: '8px', 
+                  fontSize: '14px', 
+                  fontWeight: '500', 
+                  color: clearEntriesConfirmText.toLowerCase() === 'delete' ? '#fff' : theme.textMuted, 
+                  cursor: (isDeleting || clearEntriesConfirmText.toLowerCase() !== 'delete') ? 'not-allowed' : 'pointer', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  gap: '6px', 
+                  opacity: isDeleting ? 0.7 : 1 
+                }}
               >
                 {isDeleting ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Clearing...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Clear Everything</>}
               </button>
