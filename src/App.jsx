@@ -1,11 +1,103 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 // ============================================
 // CONSTANTS
 // ============================================
+
+// XP System Configuration
+const XP_CONFIG = {
+  addEntry: 10,
+  addEntryWithReceipt: 20,
+  addEntryWithNotes: 5,
+  deleteEntry: -5,
+  setBudget: 15,
+  dailyLogin: 5,
+  weekStreak: 50,
+  first10Entries: 100,
+  first50Entries: 250,
+  first100Entries: 500,
+};
+
+// Level thresholds - XP needed to reach each level
+const LEVEL_THRESHOLDS = [
+  0,      // Level 1: 0 XP
+  100,    // Level 2: 100 XP
+  250,    // Level 3: 250 XP
+  500,    // Level 4: 500 XP
+  800,    // Level 5: 800 XP
+  1200,   // Level 6: 1200 XP
+  1700,   // Level 7: 1700 XP
+  2300,   // Level 8: 2300 XP
+  3000,   // Level 9: 3000 XP
+  4000,   // Level 10: 4000 XP
+  5500,   // Level 11+: continues pattern
+  7500,
+  10000,
+  13000,
+  17000,
+  22000,
+  28000,
+  35000,
+  45000,
+  60000,
+];
+
+// Profile frame rewards - unlocked at specific levels
+const PROFILE_FRAMES = [
+  { level: 1, id: 'none', name: 'No Frame', border: 'none', glow: 'none' },
+  { level: 2, id: 'bronze', name: 'Bronze Ring', border: '3px solid #cd7f32', glow: '0 0 8px #cd7f32' },
+  { level: 3, id: 'silver', name: 'Silver Ring', border: '3px solid #c0c0c0', glow: '0 0 10px #c0c0c0' },
+  { level: 5, id: 'gold', name: 'Golden Aura', border: '3px solid #ffd700', glow: '0 0 12px #ffd700' },
+  { level: 7, id: 'emerald', name: 'Emerald Glow', border: '3px solid #50c878', glow: '0 0 14px #50c878' },
+  { level: 10, id: 'diamond', name: 'Diamond Shine', border: '3px solid #b9f2ff', glow: '0 0 16px #b9f2ff, 0 0 24px #87ceeb' },
+  { level: 12, id: 'ruby', name: 'Ruby Blaze', border: '3px solid #e0115f', glow: '0 0 14px #e0115f, 0 0 20px #ff6b6b' },
+  { level: 15, id: 'cosmic', name: 'Cosmic Ring', border: '3px solid #9d4edd', glow: '0 0 16px #9d4edd, 0 0 24px #c77dff' },
+  { level: 18, id: 'rainbow', name: 'Rainbow Pulse', border: '3px solid transparent', glow: '0 0 20px #ff0000, 0 0 20px #00ff00, 0 0 20px #0000ff', animation: 'rainbow-border' },
+  { level: 20, id: 'legendary', name: 'Legendary Crown', border: '4px solid #ffd700', glow: '0 0 20px #ffd700, 0 0 30px #ff8c00, 0 0 40px #ff4500', animation: 'legendary-pulse' },
+];
+
+// Helper function to calculate level from XP
+const calculateLevel = (xp) => {
+  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (xp >= LEVEL_THRESHOLDS[i]) {
+      return i + 1;
+    }
+  }
+  return 1;
+};
+
+// Helper function to get XP needed for next level
+const getXPForNextLevel = (currentLevel) => {
+  if (currentLevel >= LEVEL_THRESHOLDS.length) {
+    // For levels beyond our threshold array, use exponential scaling
+    const lastThreshold = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
+    const extraLevels = currentLevel - LEVEL_THRESHOLDS.length;
+    return Math.floor(lastThreshold * Math.pow(1.3, extraLevels + 1));
+  }
+  return LEVEL_THRESHOLDS[currentLevel];
+};
+
+// Helper function to get current level progress percentage
+const getLevelProgress = (xp) => {
+  const level = calculateLevel(xp);
+  const currentLevelXP = LEVEL_THRESHOLDS[level - 1] || 0;
+  const nextLevelXP = getXPForNextLevel(level);
+  const progress = ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
+  return Math.min(Math.max(progress, 0), 100);
+};
+
+// Helper function to get unlocked frames for a level
+const getUnlockedFrames = (level) => {
+  return PROFILE_FRAMES.filter(frame => frame.level <= level);
+};
+
+// Helper function to get frame by ID
+const getFrameById = (frameId) => {
+  return PROFILE_FRAMES.find(f => f.id === frameId) || PROFILE_FRAMES[0];
+};
 
 const CATEGORIES = [
   { value: 'utilities', label: 'Utilities', color: '#3b82f6' },
@@ -1007,6 +1099,25 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState(null);
   
+  // XP and Level System
+  const [userXP, setUserXP] = useState(() => {
+    const saved = localStorage.getItem(`userXP_${user.id}`);
+    return saved ? parseInt(saved) : 0;
+  });
+  const [selectedFrame, setSelectedFrame] = useState(() => {
+    const saved = localStorage.getItem(`selectedFrame_${user.id}`);
+    return saved || 'none';
+  });
+  const [showLevelUp, setShowLevelUp] = useState(false);
+  const [levelUpData, setLevelUpData] = useState(null);
+  const [showRewardsModal, setShowRewardsModal] = useState(false);
+  
+  // Christmas Theme
+  const [isChristmasTheme, setIsChristmasTheme] = useState(() => {
+    const saved = localStorage.getItem('christmasTheme');
+    return saved === 'true';
+  });
+  
   // Bulk delete states
   const [selectedEntries, setSelectedEntries] = useState([]);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
@@ -1020,6 +1131,56 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       return () => clearTimeout(timer);
     }
   }, [toast]);
+
+  // Save XP to localStorage
+  useEffect(() => {
+    localStorage.setItem(`userXP_${user.id}`, userXP.toString());
+  }, [userXP, user.id]);
+
+  // Save selected frame to localStorage
+  useEffect(() => {
+    localStorage.setItem(`selectedFrame_${user.id}`, selectedFrame);
+  }, [selectedFrame, user.id]);
+
+  // Save Christmas theme preference
+  useEffect(() => {
+    localStorage.setItem('christmasTheme', isChristmasTheme.toString());
+  }, [isChristmasTheme]);
+
+  // Award XP function with level up check
+  const awardXP = (amount, reason = '') => {
+    setUserXP(prev => {
+      const newXP = Math.max(0, prev + amount);
+      const oldLevel = calculateLevel(prev);
+      const newLevel = calculateLevel(newXP);
+      
+      // Check for level up
+      if (newLevel > oldLevel) {
+        const newFrames = PROFILE_FRAMES.filter(f => f.level === newLevel);
+        setLevelUpData({
+          oldLevel,
+          newLevel,
+          newFrames: newFrames.length > 0 ? newFrames : null
+        });
+        setShowLevelUp(true);
+      }
+      
+      // Show XP toast
+      if (amount > 0) {
+        showToast(`+${amount} XP ${reason}`, 'success');
+      }
+      
+      return newXP;
+    });
+  };
+
+  // Calculate current level info
+  const currentLevel = calculateLevel(userXP);
+  const levelProgress = getLevelProgress(userXP);
+  const currentLevelXP = LEVEL_THRESHOLDS[currentLevel - 1] || 0;
+  const nextLevelXP = getXPForNextLevel(currentLevel);
+  const unlockedFrames = getUnlockedFrames(currentLevel);
+  const currentFrame = getFrameById(selectedFrame);
 
    // Save currency preference
   useEffect(() => {
@@ -1133,7 +1294,40 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         file: newEntry.file
       };
       
-      setEntries(prev => [savedEntry, ...prev]);
+      setEntries(prev => {
+        const newEntries = [savedEntry, ...prev];
+        
+        // Award XP for adding entry
+        let xpGained = XP_CONFIG.addEntry;
+        let reason = 'for adding entry';
+        
+        // Bonus XP for receipt
+        if (newEntry.file) {
+          xpGained += XP_CONFIG.addEntryWithReceipt;
+          reason = 'for entry with receipt';
+        }
+        
+        // Bonus XP for notes
+        if (newEntry.notes && newEntry.notes.trim().length > 0) {
+          xpGained += XP_CONFIG.addEntryWithNotes;
+        }
+        
+        // Milestone bonuses
+        if (newEntries.length === 10) {
+          xpGained += XP_CONFIG.first10Entries;
+          reason = '🎉 10 entries milestone!';
+        } else if (newEntries.length === 50) {
+          xpGained += XP_CONFIG.first50Entries;
+          reason = '🎉 50 entries milestone!';
+        } else if (newEntries.length === 100) {
+          xpGained += XP_CONFIG.first100Entries;
+          reason = '🎉 100 entries milestone!';
+        }
+        
+        awardXP(xpGained, reason);
+        
+        return newEntries;
+      });
       return savedEntry;
     } catch (e) {
       console.error('Failed to save:', e);
@@ -1987,27 +2181,80 @@ const getBudgetStatus = () => {
           {/* Desktop Header Actions */}
           {!isMobile ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {/* Today's Spending Quick Stat */}
-              {entries.length > 0 && (
+              {/* Level & XP Bar */}
+              <div 
+                onClick={() => setShowRewardsModal(true)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '6px 12px',
+                  backgroundColor: theme.statBg,
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  transition: 'transform 0.15s',
+                  border: `1px solid ${theme.cardBorder}`
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+              >
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  padding: '6px 12px',
-                  backgroundColor: theme.statBg,
-                  borderRadius: '6px',
-                  marginRight: '4px'
+                  justifyContent: 'center',
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                  color: '#fff',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  boxShadow: '0 2px 4px rgba(245, 158, 11, 0.3)'
                 }}>
-                  <span style={{ fontSize: '12px', color: theme.textMuted }}>Today:</span>
-                  <span style={{ 
-                    fontSize: '13px', 
-                    fontWeight: '600', 
-                    color: stats.today > 0 ? '#10b981' : theme.textMuted 
-                  }}>
-                    {currency}{formatAmount(stats.today)}
-                  </span>
+                  {currentLevel}
                 </div>
-              )}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '80px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '10px', fontWeight: '600', color: theme.text }}>Level {currentLevel}</span>
+                    <span style={{ fontSize: '9px', color: theme.textMuted }}>{userXP} XP</span>
+                  </div>
+                  <div style={{
+                    height: '6px',
+                    backgroundColor: isDark ? '#27272a' : '#e4e4e7',
+                    borderRadius: '3px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${levelProgress}%`,
+                      background: 'linear-gradient(90deg, #22c55e, #10b981)',
+                      borderRadius: '3px',
+                      transition: 'width 0.3s ease'
+                    }} />
+                  </div>
+                </div>
+                <Gift style={{ width: '14px', height: '14px', color: '#f59e0b' }} />
+              </div>
+              
+              {/* Christmas Theme Toggle */}
+              <button
+                onClick={() => setIsChristmasTheme(!isChristmasTheme)}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  backgroundColor: isChristmasTheme ? '#dc2626' : 'transparent',
+                  border: `1px solid ${isChristmasTheme ? '#dc2626' : theme.inputBorder}`,
+                  borderRadius: '6px',
+                  color: isChristmasTheme ? '#fff' : theme.textMuted,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}
+                title={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
+              >
+                <TreePine style={{ width: '16px', height: '16px' }} />
+              </button>
               
               <select
                 value={currency}
@@ -2073,18 +2320,20 @@ const getBudgetStatus = () => {
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   style={{
-                    width: '36px',
-                    height: '36px',
+                    width: '40px',
+                    height: '40px',
                     borderRadius: '50%',
                     backgroundColor: '#3b82f6',
-                    border: 'none',
+                    border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
                     color: '#fff',
                     fontSize: '14px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    boxShadow: currentFrame.glow !== 'none' ? currentFrame.glow : 'none',
+                    transition: 'all 0.3s ease'
                   }}
                 >
                   {getInitial(user.user_metadata?.nickname)}
@@ -4656,6 +4905,294 @@ const getBudgetStatus = () => {
         </div>
       )}
 
+      {/* Level Up Modal */}
+      {showLevelUp && levelUpData && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 60 }}>
+          <div style={{ 
+            width: '100%', 
+            maxWidth: '400px', 
+            backgroundColor: theme.cardBg, 
+            borderRadius: '16px', 
+            border: `2px solid #fbbf24`, 
+            padding: '32px',
+            textAlign: 'center',
+            boxShadow: '0 0 40px rgba(251, 191, 36, 0.3)'
+          }}>
+            <div style={{
+              width: '80px',
+              height: '80px',
+              margin: '0 auto 20px',
+              borderRadius: '50%',
+              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 0 30px rgba(251, 191, 36, 0.5)',
+              animation: 'pulse 1s ease-in-out infinite'
+            }}>
+              <Star style={{ width: '40px', height: '40px', color: '#fff' }} />
+            </div>
+            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#fbbf24', margin: '0 0 8px' }}>LEVEL UP!</h2>
+            <p style={{ fontSize: '16px', color: theme.text, margin: '0 0 20px' }}>
+              You reached <strong>Level {levelUpData.newLevel}</strong>!
+            </p>
+            
+            {levelUpData.newFrames && levelUpData.newFrames.length > 0 && (
+              <div style={{ 
+                padding: '16px', 
+                backgroundColor: isDark ? '#1a1a1d' : '#fefce8', 
+                borderRadius: '10px',
+                marginBottom: '20px',
+                border: `1px solid ${isDark ? '#fbbf24' : '#fde047'}`
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
+                  <Gift style={{ width: '18px', height: '18px', color: '#f59e0b' }} />
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#f59e0b' }}>New Reward Unlocked!</span>
+                </div>
+                <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
+                  {levelUpData.newFrames[0].name}
+                </p>
+                <p style={{ fontSize: '12px', color: theme.textMuted, margin: '4px 0 0' }}>
+                  New profile frame available
+                </p>
+              </div>
+            )}
+            
+            <button
+              onClick={() => { setShowLevelUp(false); setLevelUpData(null); }}
+              style={{
+                width: '100%',
+                height: '44px',
+                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '15px',
+                fontWeight: '600',
+                color: '#fff',
+                cursor: 'pointer'
+              }}
+            >
+              Awesome!
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Rewards Modal */}
+      {showRewardsModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowRewardsModal(false)}>
+          <div style={{ width: '100%', maxWidth: '500px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Level & Rewards</h3>
+                <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>Track your progress and unlock frames</p>
+              </div>
+              <button onClick={() => setShowRewardsModal(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '16px', height: '16px' }} />
+              </button>
+            </div>
+            
+            <div style={{ padding: '20px', overflowY: 'auto' }}>
+              {/* Current Level */}
+              <div style={{ 
+                padding: '20px', 
+                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', 
+                borderRadius: '12px', 
+                marginBottom: '20px',
+                color: '#fff',
+                textAlign: 'center'
+              }}>
+                <div style={{
+                  width: '60px',
+                  height: '60px',
+                  margin: '0 auto 12px',
+                  borderRadius: '50%',
+                  backgroundColor: 'rgba(255,255,255,0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '24px',
+                  fontWeight: '700'
+                }}>
+                  {currentLevel}
+                </div>
+                <h4 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 4px' }}>Level {currentLevel}</h4>
+                <p style={{ fontSize: '14px', opacity: 0.9, margin: '0 0 16px' }}>{userXP} / {nextLevelXP} XP</p>
+                <div style={{
+                  height: '10px',
+                  backgroundColor: 'rgba(255,255,255,0.3)',
+                  borderRadius: '5px',
+                  overflow: 'hidden'
+                }}>
+                  <div style={{
+                    height: '100%',
+                    width: `${levelProgress}%`,
+                    backgroundColor: '#fff',
+                    borderRadius: '5px',
+                    transition: 'width 0.3s ease'
+                  }} />
+                </div>
+                <p style={{ fontSize: '12px', opacity: 0.8, margin: '8px 0 0' }}>
+                  {Math.ceil(nextLevelXP - userXP)} XP to Level {currentLevel + 1}
+                </p>
+              </div>
+              
+              {/* XP Rewards Info */}
+              <div style={{ marginBottom: '20px' }}>
+                <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>How to Earn XP</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                  {[
+                    { action: 'Add entry', xp: '+10 XP' },
+                    { action: 'With receipt', xp: '+20 XP' },
+                    { action: 'With notes', xp: '+5 XP' },
+                    { action: 'Set budget', xp: '+15 XP' },
+                    { action: '10 entries', xp: '+100 XP' },
+                    { action: '50 entries', xp: '+250 XP' },
+                  ].map((item, i) => (
+                    <div key={i} style={{ 
+                      padding: '8px 12px', 
+                      backgroundColor: theme.statBg, 
+                      borderRadius: '6px',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center'
+                    }}>
+                      <span style={{ fontSize: '12px', color: theme.textMuted }}>{item.action}</span>
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#22c55e' }}>{item.xp}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Profile Frames */}
+              <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>Profile Frames</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
+                {PROFILE_FRAMES.map((frame) => {
+                  const isUnlocked = currentLevel >= frame.level;
+                  const isSelected = selectedFrame === frame.id;
+                  return (
+                    <div 
+                      key={frame.id}
+                      onClick={() => isUnlocked && setSelectedFrame(frame.id)}
+                      style={{ 
+                        padding: '12px',
+                        backgroundColor: isSelected ? (isDark ? '#1e3a5f' : '#dbeafe') : theme.statBg,
+                        borderRadius: '10px',
+                        border: isSelected ? '2px solid #3b82f6' : `1px solid ${theme.cardBorder}`,
+                        cursor: isUnlocked ? 'pointer' : 'not-allowed',
+                        opacity: isUnlocked ? 1 : 0.5,
+                        transition: 'all 0.15s',
+                        textAlign: 'center'
+                      }}
+                    >
+                      <div style={{
+                        width: '50px',
+                        height: '50px',
+                        margin: '0 auto 8px',
+                        borderRadius: '50%',
+                        backgroundColor: isDark ? '#27272a' : '#e4e4e7',
+                        border: frame.border,
+                        boxShadow: isUnlocked ? frame.glow : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {isUnlocked ? (
+                          <span style={{ fontSize: '16px' }}>👤</span>
+                        ) : (
+                          <span style={{ fontSize: '14px' }}>🔒</span>
+                        )}
+                      </div>
+                      <p style={{ fontSize: '12px', fontWeight: '600', color: theme.text, margin: '0 0 2px' }}>{frame.name}</p>
+                      <p style={{ fontSize: '10px', color: isUnlocked ? '#22c55e' : theme.textMuted, margin: 0 }}>
+                        {isUnlocked ? (isSelected ? '✓ Equipped' : 'Click to equip') : `Lvl ${frame.level}`}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Christmas Theme Decorations */}
+      {isChristmasTheme && (
+        <>
+          {/* Snow Animation */}
+          <div style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            right: 0, 
+            height: '100vh', 
+            pointerEvents: 'none', 
+            zIndex: 100,
+            overflow: 'hidden'
+          }}>
+            {[...Array(50)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  position: 'absolute',
+                  top: '-10px',
+                  left: `${Math.random() * 100}%`,
+                  width: `${Math.random() * 8 + 4}px`,
+                  height: `${Math.random() * 8 + 4}px`,
+                  backgroundColor: '#fff',
+                  borderRadius: '50%',
+                  opacity: Math.random() * 0.7 + 0.3,
+                  animation: `snowfall ${Math.random() * 3 + 4}s linear infinite`,
+                  animationDelay: `${Math.random() * 5}s`
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Christmas Lights at top */}
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            display: 'flex',
+            justifyContent: 'space-around',
+            zIndex: 101,
+            pointerEvents: 'none'
+          }}>
+            {[...Array(30)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  backgroundColor: ['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4],
+                  boxShadow: `0 0 10px ${['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4]}`,
+                  animation: `twinkle ${Math.random() * 1 + 0.5}s ease-in-out infinite alternate`,
+                  animationDelay: `${Math.random() * 2}s`,
+                  marginTop: '2px'
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Santa on header (right side) */}
+          <div style={{
+            position: 'fixed',
+            top: '8px',
+            right: '16px',
+            fontSize: '32px',
+            zIndex: 102,
+            pointerEvents: 'none',
+            animation: 'santaBounce 2s ease-in-out infinite'
+          }}>
+            🎅
+          </div>
+        </>
+      )}
+
       {/* Feedback Modal */}
       {showFeedback && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowFeedback(false)}>
@@ -5204,6 +5741,35 @@ const getBudgetStatus = () => {
         @keyframes slideIn {
           from { transform: translateX(100%); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+        @keyframes snowfall {
+          0% { transform: translateY(-10px) rotate(0deg); }
+          100% { transform: translateY(100vh) rotate(360deg); }
+        }
+        @keyframes twinkle {
+          0% { opacity: 0.3; transform: scale(0.8); }
+          100% { opacity: 1; transform: scale(1.2); }
+        }
+        @keyframes santaBounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-5px); }
+        }
+        @keyframes rainbow-border {
+          0% { border-color: #ff0000; }
+          17% { border-color: #ff8000; }
+          33% { border-color: #ffff00; }
+          50% { border-color: #00ff00; }
+          67% { border-color: #0080ff; }
+          83% { border-color: #8000ff; }
+          100% { border-color: #ff0000; }
+        }
+        @keyframes legendary-pulse {
+          0%, 100% { box-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00; }
+          50% { box-shadow: 0 0 30px #ffd700, 0 0 50px #ff8c00, 0 0 70px #ff4500; }
         }
         * { box-sizing: border-box; }
         input, select, button { font-family: inherit; }
