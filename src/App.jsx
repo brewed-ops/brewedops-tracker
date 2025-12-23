@@ -970,6 +970,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [manualForm, setManualForm] = useState({ name: '', amount: '', date: '', dueDate: '', notes: '', recurring: '' });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [pendingUpload, setPendingUpload] = useState(null);
+  const [csvPreview, setCsvPreview] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadError, setUploadError] = useState('');
   
@@ -1287,6 +1288,128 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       setIsSaving(false);
     }
   };
+
+  // CSV Import Handlers
+  const handleCsvFileSelect = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const text = event.target.result;
+        const lines = text.split('\n').filter(line => line.trim());
+        
+        if (lines.length < 2) {
+          showToast('CSV file is empty or has no data rows', 'error');
+          return;
+        }
+        
+        // Parse headers
+        const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
+        const requiredHeaders = ['name', 'amount', 'category'];
+        const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+        
+        if (missingHeaders.length > 0) {
+          showToast(`Missing required headers: ${missingHeaders.join(', ')}`, 'error');
+          return;
+        }
+        
+        // Parse data rows
+        const entries = [];
+        const validCategories = ['utilities', 'subscription', 'food', 'shopping', 'healthcare', 'entertainment', 'other'];
+        
+        for (let i = 1; i < lines.length; i++) {
+          const values = parseCSVLine(lines[i]);
+          if (values.length < headers.length) continue;
+          
+          const row = {};
+          headers.forEach((header, index) => {
+            row[header] = values[index]?.trim().replace(/"/g, '') || '';
+          });
+          
+          // Validate and transform
+          const amount = parseFloat(row.amount);
+          if (isNaN(amount) || amount <= 0) continue;
+          
+          let category = row.category?.toLowerCase() || 'other';
+          if (!validCategories.includes(category)) category = 'other';
+          
+          entries.push({
+            name: row.name || 'Unnamed Entry',
+            amount: amount,
+            type: category,
+            date: row.date || new Date().toISOString().split('T')[0],
+            dueDate: row.due_date || '',
+            notes: row.notes || '',
+            recurring: ['weekly', 'monthly', 'yearly'].includes(row.recurring?.toLowerCase()) ? row.recurring.toLowerCase() : null
+          });
+        }
+        
+        if (entries.length === 0) {
+          showToast('No valid entries found in CSV', 'error');
+          return;
+        }
+        
+        setCsvPreview(entries);
+        showToast(`Found ${entries.length} entries ready to import`, 'success');
+      } catch (error) {
+        console.error('CSV parse error:', error);
+        showToast('Failed to parse CSV file', 'error');
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = ''; // Reset input
+  };
+
+  // Helper to parse CSV line (handles quoted values with commas)
+  const parseCSVLine = (line) => {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current);
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    result.push(current);
+    return result;
+  };
+
+  const handleCsvImport = async () => {
+    if (!csvPreview || csvPreview.length === 0) return;
+    
+    setIsSaving(true);
+    let successCount = 0;
+    let errorCount = 0;
+    
+    for (const entry of csvPreview) {
+      try {
+        await saveEntry(entry);
+        successCount++;
+      } catch (e) {
+        errorCount++;
+        console.error('Failed to import entry:', e);
+      }
+    }
+    
+    setCsvPreview(null);
+    setIsSaving(false);
+    
+    if (errorCount === 0) {
+      showToast(`Successfully imported ${successCount} entries`, 'success');
+    } else {
+      showToast(`Imported ${successCount} entries, ${errorCount} failed`, 'error');
+    }
+  };
+
 const getInitial = (name) => {
     return name ? name.charAt(0).toUpperCase() : 'U';
   };
@@ -2249,7 +2372,7 @@ const getBudgetStatus = () => {
             <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, marginBottom: '16px', height: isMobile ? 'auto' : '36px', display: 'flex', alignItems: 'center' }}>Add New Entry</h2>
             
             {/* Mode Toggle */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
               <button onClick={() => { setUploadMode('file'); setUploadError(''); }} style={buttonStyle(uploadMode === 'file')}>
                 <Upload style={{ width: '14px', height: '14px' }} />
                 {isSmall ? 'Upload' : 'Upload File'}
@@ -2257,6 +2380,10 @@ const getBudgetStatus = () => {
               <button onClick={() => { setUploadMode('manual'); setUploadError(''); }} style={buttonStyle(uploadMode === 'manual')}>
                 <FileText style={{ width: '14px', height: '14px' }} />
                 {isSmall ? 'Manual' : 'Manual Input'}
+              </button>
+              <button onClick={() => { setUploadMode('csv'); setUploadError(''); }} style={buttonStyle(uploadMode === 'csv')}>
+                <Download style={{ width: '14px', height: '14px', transform: 'rotate(180deg)' }} />
+                {isSmall ? 'CSV' : 'Import CSV'}
               </button>
             </div>
 
@@ -2500,6 +2627,107 @@ const getBudgetStatus = () => {
                     {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Plus style={{ width: '16px', height: '16px' }} /> Add Entry</>}
                   </button>
                 </div>
+              </div>
+            ) : uploadMode === 'csv' ? (
+              /* CSV Import Section */
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                {csvPreview ? (
+                  <div style={{
+                    border: `1px solid ${isDark ? '#065f46' : '#86efac'}`,
+                    backgroundColor: isDark ? '#022c22' : '#f0fdf4',
+                    borderRadius: '8px',
+                    padding: isSmall ? '12px' : '16px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }} />
+                      <span style={{ fontSize: '12px', fontWeight: '500', color: isDark ? '#34d399' : '#047857' }}>
+                        {csvPreview.length} entries ready to import
+                      </span>
+                    </div>
+                    
+                    {/* Preview Table */}
+                    <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '12px', borderRadius: '6px', border: `1px solid ${theme.cardBorder}` }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                        <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg }}>
+                          <tr>
+                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Name</th>
+                            <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Category</th>
+                            <th style={{ padding: '8px', textAlign: 'right', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {csvPreview.slice(0, 5).map((entry, i) => (
+                            <tr key={i} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
+                              <td style={{ padding: '8px', color: theme.text }}>{entry.name}</td>
+                              <td style={{ padding: '8px', color: theme.textMuted, textTransform: 'capitalize' }}>{entry.type}</td>
+                              <td style={{ padding: '8px', textAlign: 'right', color: theme.text }}>{currency}{formatAmount(entry.amount)}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {csvPreview.length > 5 && (
+                        <p style={{ padding: '8px', fontSize: '11px', color: theme.textMuted, margin: 0, textAlign: 'center', backgroundColor: theme.statBg }}>
+                          +{csvPreview.length - 5} more entries...
+                        </p>
+                      )}
+                    </div>
+                    
+                    <div style={{ display: 'flex', gap: '8px', flexDirection: isSmall ? 'column' : 'row' }}>
+                      <button 
+                        onClick={handleCsvImport} 
+                        disabled={isSaving}
+                        style={{ flex: 1, height: '40px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
+                      >
+                        {isSaving ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Importing...</> : <><Check style={{ width: '14px', height: '14px' }} /> Import All</>}
+                      </button>
+                      <button 
+                        onClick={() => setCsvPreview(null)} 
+                        style={{ height: '40px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', padding: '0 12px', fontSize: '13px', color: theme.textMuted, cursor: 'pointer' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <label style={{
+                      display: 'block',
+                      border: '2px dashed',
+                      borderColor: theme.inputBorder,
+                      borderRadius: '8px',
+                      padding: isSmall ? '30px 16px' : '40px 20px',
+                      textAlign: 'center',
+                      cursor: 'pointer'
+                    }}>
+                      <Download style={{ width: '28px', height: '28px', color: theme.textDim, margin: '0 auto 8px', transform: 'rotate(180deg)' }} />
+                      <p style={{ fontSize: '14px', color: theme.textMuted, fontWeight: '500', margin: '0 0 4px' }}>
+                        Click to upload CSV
+                      </p>
+                      <p style={{ fontSize: '12px', color: theme.textDim, margin: 0 }}>CSV file with headers</p>
+                      <input type="file" accept=".csv" onChange={handleCsvFileSelect} style={{ display: 'none' }} />
+                    </label>
+                    
+                    {/* CSV Format Info */}
+                    <div style={{
+                      padding: '12px',
+                      backgroundColor: isDark ? '#172554' : '#eff6ff',
+                      border: `1px solid ${isDark ? '#1e3a8a' : '#93c5fd'}`,
+                      borderRadius: '8px'
+                    }}>
+                      <p style={{ fontSize: '12px', fontWeight: '600', color: isDark ? '#60a5fa' : '#1d4ed8', margin: '0 0 8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <AlertCircle style={{ width: '14px', height: '14px' }} />
+                        CSV Format Required
+                      </p>
+                      <p style={{ fontSize: '11px', color: isDark ? '#93c5fd' : '#1e40af', margin: '0 0 6px' }}>
+                        Headers: <code style={{ backgroundColor: isDark ? '#1e3a8a' : '#dbeafe', padding: '2px 4px', borderRadius: '3px' }}>name,amount,category,date,due_date,notes,recurring</code>
+                      </p>
+                      <p style={{ fontSize: '11px', color: isDark ? '#93c5fd' : '#1e40af', margin: 0 }}>
+                        Categories: utilities, subscription, food, shopping, healthcare, entertainment, other
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
