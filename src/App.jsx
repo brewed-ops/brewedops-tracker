@@ -1,103 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Camera } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 // ============================================
 // CONSTANTS
 // ============================================
-
-// XP System Configuration
-const XP_CONFIG = {
-  addEntry: 10,
-  addEntryWithReceipt: 20,
-  addEntryWithNotes: 5,
-  deleteEntry: -5,
-  setBudget: 15,
-  dailyLogin: 5,
-  weekStreak: 50,
-  first10Entries: 100,
-  first50Entries: 250,
-  first100Entries: 500,
-};
-
-// Level thresholds - XP needed to reach each level
-const LEVEL_THRESHOLDS = [
-  0,      // Level 1: 0 XP
-  100,    // Level 2: 100 XP
-  250,    // Level 3: 250 XP
-  500,    // Level 4: 500 XP
-  800,    // Level 5: 800 XP
-  1200,   // Level 6: 1200 XP
-  1700,   // Level 7: 1700 XP
-  2300,   // Level 8: 2300 XP
-  3000,   // Level 9: 3000 XP
-  4000,   // Level 10: 4000 XP
-  5500,   // Level 11+: continues pattern
-  7500,
-  10000,
-  13000,
-  17000,
-  22000,
-  28000,
-  35000,
-  45000,
-  60000,
-];
-
-// Profile frame rewards - unlocked at specific levels
-const PROFILE_FRAMES = [
-  { level: 1, id: 'none', name: 'No Frame', border: 'none', glow: 'none' },
-  { level: 2, id: 'bronze', name: 'Bronze Ring', border: '3px solid #cd7f32', glow: '0 0 8px #cd7f32' },
-  { level: 3, id: 'silver', name: 'Silver Ring', border: '3px solid #c0c0c0', glow: '0 0 10px #c0c0c0' },
-  { level: 5, id: 'gold', name: 'Golden Aura', border: '3px solid #ffd700', glow: '0 0 12px #ffd700' },
-  { level: 7, id: 'emerald', name: 'Emerald Glow', border: '3px solid #50c878', glow: '0 0 14px #50c878' },
-  { level: 10, id: 'diamond', name: 'Diamond Shine', border: '3px solid #b9f2ff', glow: '0 0 16px #b9f2ff, 0 0 24px #87ceeb' },
-  { level: 12, id: 'ruby', name: 'Ruby Blaze', border: '3px solid #e0115f', glow: '0 0 14px #e0115f, 0 0 20px #ff6b6b' },
-  { level: 15, id: 'cosmic', name: 'Cosmic Ring', border: '3px solid #9d4edd', glow: '0 0 16px #9d4edd, 0 0 24px #c77dff' },
-  { level: 18, id: 'rainbow', name: 'Rainbow Pulse', border: '3px solid transparent', glow: '0 0 20px #ff0000, 0 0 20px #00ff00, 0 0 20px #0000ff', animation: 'rainbow-border' },
-  { level: 20, id: 'legendary', name: 'Legendary Crown', border: '4px solid #ffd700', glow: '0 0 20px #ffd700, 0 0 30px #ff8c00, 0 0 40px #ff4500', animation: 'legendary-pulse' },
-];
-
-// Helper function to calculate level from XP
-const calculateLevel = (xp) => {
-  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (xp >= LEVEL_THRESHOLDS[i]) {
-      return i + 1;
-    }
-  }
-  return 1;
-};
-
-// Helper function to get XP needed for next level
-const getXPForNextLevel = (currentLevel) => {
-  if (currentLevel >= LEVEL_THRESHOLDS.length) {
-    // For levels beyond our threshold array, use exponential scaling
-    const lastThreshold = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
-    const extraLevels = currentLevel - LEVEL_THRESHOLDS.length;
-    return Math.floor(lastThreshold * Math.pow(1.3, extraLevels + 1));
-  }
-  return LEVEL_THRESHOLDS[currentLevel];
-};
-
-// Helper function to get current level progress percentage
-const getLevelProgress = (xp) => {
-  const level = calculateLevel(xp);
-  const currentLevelXP = LEVEL_THRESHOLDS[level - 1] || 0;
-  const nextLevelXP = getXPForNextLevel(level);
-  const progress = ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
-  return Math.min(Math.max(progress, 0), 100);
-};
-
-// Helper function to get unlocked frames for a level
-const getUnlockedFrames = (level) => {
-  return PROFILE_FRAMES.filter(frame => frame.level <= level);
-};
-
-// Helper function to get frame by ID
-const getFrameById = (frameId) => {
-  return PROFILE_FRAMES.find(f => f.id === frameId) || PROFILE_FRAMES[0];
-};
 
 const CATEGORIES = [
   { value: 'utilities', label: 'Utilities', color: '#3b82f6' },
@@ -1062,7 +970,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [manualForm, setManualForm] = useState({ name: '', amount: '', date: '', dueDate: '', notes: '', recurring: '' });
   const [uploadedFile, setUploadedFile] = useState(null);
   const [pendingUpload, setPendingUpload] = useState(null);
-  const [csvPreview, setCsvPreview] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadError, setUploadError] = useState('');
   
@@ -1072,7 +979,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [dashboardView, setDashboardView] = useState('Month');
   const [dashboardCategory, setDashboardCategory] = useState('all');
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [dashboardSubTab, setDashboardSubTab] = useState('add-entry');
   const [showAdvancedFilter, setShowAdvancedFilter] = useState(false);
   const [advancedDateFrom, setAdvancedDateFrom] = useState('');
   const [advancedDateTo, setAdvancedDateTo] = useState('');
@@ -1099,30 +1005,19 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [toast, setToast] = useState(null);
   
-  // XP and Level System
-  const [userXP, setUserXP] = useState(() => {
-    const saved = localStorage.getItem(`userXP_${user.id}`);
-    return saved ? parseInt(saved) : 0;
+  // Profile picture state
+  const [profilePicture, setProfilePicture] = useState(() => {
+    const saved = localStorage.getItem(`profilePic_${user.id}`);
+    return saved || null;
   });
-  const [selectedFrame, setSelectedFrame] = useState(() => {
-    const saved = localStorage.getItem(`selectedFrame_${user.id}`);
-    return saved || 'none';
-  });
-  const [showLevelUp, setShowLevelUp] = useState(false);
-  const [levelUpData, setLevelUpData] = useState(null);
-  const [showRewardsModal, setShowRewardsModal] = useState(false);
-  
-  // Christmas Theme
-  const [isChristmasTheme, setIsChristmasTheme] = useState(() => {
-    const saved = localStorage.getItem('christmasTheme');
-    return saved === 'true';
-  });
-  
-  // Bulk delete states
-  const [selectedEntries, setSelectedEntries] = useState([]);
-  const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
-  const [showClearAllConfirm, setShowClearAllConfirm] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [editProfilePicture, setEditProfilePicture] = useState(null);
+
+  // Save profile picture to localStorage
+  useEffect(() => {
+    if (profilePicture) {
+      localStorage.setItem(`profilePic_${user.id}`, profilePicture);
+    }
+  }, [profilePicture, user.id]);
 
   // Auto-hide toast after 3 seconds
   useEffect(() => {
@@ -1131,56 +1026,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       return () => clearTimeout(timer);
     }
   }, [toast]);
-
-  // Save XP to localStorage
-  useEffect(() => {
-    localStorage.setItem(`userXP_${user.id}`, userXP.toString());
-  }, [userXP, user.id]);
-
-  // Save selected frame to localStorage
-  useEffect(() => {
-    localStorage.setItem(`selectedFrame_${user.id}`, selectedFrame);
-  }, [selectedFrame, user.id]);
-
-  // Save Christmas theme preference
-  useEffect(() => {
-    localStorage.setItem('christmasTheme', isChristmasTheme.toString());
-  }, [isChristmasTheme]);
-
-  // Award XP function with level up check
-  const awardXP = (amount, reason = '') => {
-    setUserXP(prev => {
-      const newXP = Math.max(0, prev + amount);
-      const oldLevel = calculateLevel(prev);
-      const newLevel = calculateLevel(newXP);
-      
-      // Check for level up
-      if (newLevel > oldLevel) {
-        const newFrames = PROFILE_FRAMES.filter(f => f.level === newLevel);
-        setLevelUpData({
-          oldLevel,
-          newLevel,
-          newFrames: newFrames.length > 0 ? newFrames : null
-        });
-        setShowLevelUp(true);
-      }
-      
-      // Show XP toast
-      if (amount > 0) {
-        showToast(`+${amount} XP ${reason}`, 'success');
-      }
-      
-      return newXP;
-    });
-  };
-
-  // Calculate current level info
-  const currentLevel = calculateLevel(userXP);
-  const levelProgress = getLevelProgress(userXP);
-  const currentLevelXP = LEVEL_THRESHOLDS[currentLevel - 1] || 0;
-  const nextLevelXP = getXPForNextLevel(currentLevel);
-  const unlockedFrames = getUnlockedFrames(currentLevel);
-  const currentFrame = getFrameById(selectedFrame);
 
    // Save currency preference
   useEffect(() => {
@@ -1294,40 +1139,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
         file: newEntry.file
       };
       
-      setEntries(prev => {
-        const newEntries = [savedEntry, ...prev];
-        
-        // Award XP for adding entry
-        let xpGained = XP_CONFIG.addEntry;
-        let reason = 'for adding entry';
-        
-        // Bonus XP for receipt
-        if (newEntry.file) {
-          xpGained += XP_CONFIG.addEntryWithReceipt;
-          reason = 'for entry with receipt';
-        }
-        
-        // Bonus XP for notes
-        if (newEntry.notes && newEntry.notes.trim().length > 0) {
-          xpGained += XP_CONFIG.addEntryWithNotes;
-        }
-        
-        // Milestone bonuses
-        if (newEntries.length === 10) {
-          xpGained += XP_CONFIG.first10Entries;
-          reason = '🎉 10 entries milestone!';
-        } else if (newEntries.length === 50) {
-          xpGained += XP_CONFIG.first50Entries;
-          reason = '🎉 50 entries milestone!';
-        } else if (newEntries.length === 100) {
-          xpGained += XP_CONFIG.first100Entries;
-          reason = '🎉 100 entries milestone!';
-        }
-        
-        awardXP(xpGained, reason);
-        
-        return newEntries;
-      });
+      setEntries(prev => [savedEntry, ...prev]);
       return savedEntry;
     } catch (e) {
       console.error('Failed to save:', e);
@@ -1347,84 +1159,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       setEntries(prev => prev.filter(e => e.id !== id));
     } catch (e) {
       console.error('Failed to delete:', e);
-    }
-  };
-
-  // Bulk delete selected entries
-  const handleBulkDelete = async () => {
-    if (selectedEntries.length === 0) return;
-    
-    setIsDeleting(true);
-    let successCount = 0;
-    let errorCount = 0;
-    
-    for (const id of selectedEntries) {
-      try {
-        const { error } = await supabase
-          .from('expenses')
-          .delete()
-          .eq('id', id);
-        
-        if (error) throw error;
-        successCount++;
-      } catch (e) {
-        errorCount++;
-        console.error('Failed to delete entry:', e);
-      }
-    }
-    
-    // Update local state
-    setEntries(prev => prev.filter(e => !selectedEntries.includes(e.id)));
-    setSelectedEntries([]);
-    setShowBulkDeleteConfirm(false);
-    setIsDeleting(false);
-    
-    if (errorCount === 0) {
-      showToast(`Successfully deleted ${successCount} entries`, 'success');
-    } else {
-      showToast(`Deleted ${successCount} entries, ${errorCount} failed`, 'error');
-    }
-  };
-
-  // Clear all entries
-  const handleClearAll = async () => {
-    setIsDeleting(true);
-    
-    try {
-      const { error } = await supabase
-        .from('expenses')
-        .delete()
-        .eq('user_id', user.id);
-      
-      if (error) throw error;
-      
-      setEntries([]);
-      setSelectedEntries([]);
-      setShowClearAllConfirm(false);
-      showToast('All entries have been cleared', 'success');
-    } catch (e) {
-      console.error('Failed to clear all:', e);
-      showToast('Failed to clear entries', 'error');
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  // Toggle entry selection
-  const toggleEntrySelection = (id) => {
-    setSelectedEntries(prev => 
-      prev.includes(id) 
-        ? prev.filter(x => x !== id) 
-        : [...prev, id]
-    );
-  };
-
-  // Toggle select all (filtered entries)
-  const toggleSelectAll = () => {
-    if (selectedEntries.length === filteredEntries.length) {
-      setSelectedEntries([]);
-    } else {
-      setSelectedEntries(filteredEntries.map(e => e.id));
     }
   };
 
@@ -1566,128 +1300,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       setIsSaving(false);
     }
   };
-
-  // CSV Import Handlers
-  const handleCsvFileSelect = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      try {
-        const text = event.target.result;
-        const lines = text.split('\n').filter(line => line.trim());
-        
-        if (lines.length < 2) {
-          showToast('CSV file is empty or has no data rows', 'error');
-          return;
-        }
-        
-        // Parse headers
-        const headers = lines[0].toLowerCase().split(',').map(h => h.trim().replace(/"/g, ''));
-        const requiredHeaders = ['name', 'amount', 'category'];
-        const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
-        
-        if (missingHeaders.length > 0) {
-          showToast(`Missing required headers: ${missingHeaders.join(', ')}`, 'error');
-          return;
-        }
-        
-        // Parse data rows
-        const entries = [];
-        const validCategories = ['utilities', 'subscription', 'food', 'shopping', 'healthcare', 'entertainment', 'other'];
-        
-        for (let i = 1; i < lines.length; i++) {
-          const values = parseCSVLine(lines[i]);
-          if (values.length < headers.length) continue;
-          
-          const row = {};
-          headers.forEach((header, index) => {
-            row[header] = values[index]?.trim().replace(/"/g, '') || '';
-          });
-          
-          // Validate and transform
-          const amount = parseFloat(row.amount);
-          if (isNaN(amount) || amount <= 0) continue;
-          
-          let category = row.category?.toLowerCase() || 'other';
-          if (!validCategories.includes(category)) category = 'other';
-          
-          entries.push({
-            name: row.name || 'Unnamed Entry',
-            amount: amount,
-            type: category,
-            date: row.date || new Date().toISOString().split('T')[0],
-            dueDate: row.due_date || '',
-            notes: row.notes || '',
-            recurring: ['weekly', 'monthly', 'yearly'].includes(row.recurring?.toLowerCase()) ? row.recurring.toLowerCase() : null
-          });
-        }
-        
-        if (entries.length === 0) {
-          showToast('No valid entries found in CSV', 'error');
-          return;
-        }
-        
-        setCsvPreview(entries);
-        showToast(`Found ${entries.length} entries ready to import`, 'success');
-      } catch (error) {
-        console.error('CSV parse error:', error);
-        showToast('Failed to parse CSV file', 'error');
-      }
-    };
-    reader.readAsText(file);
-    e.target.value = ''; // Reset input
-  };
-
-  // Helper to parse CSV line (handles quoted values with commas)
-  const parseCSVLine = (line) => {
-    const result = [];
-    let current = '';
-    let inQuotes = false;
-    
-    for (let i = 0; i < line.length; i++) {
-      const char = line[i];
-      if (char === '"') {
-        inQuotes = !inQuotes;
-      } else if (char === ',' && !inQuotes) {
-        result.push(current);
-        current = '';
-      } else {
-        current += char;
-      }
-    }
-    result.push(current);
-    return result;
-  };
-
-  const handleCsvImport = async () => {
-    if (!csvPreview || csvPreview.length === 0) return;
-    
-    setIsSaving(true);
-    let successCount = 0;
-    let errorCount = 0;
-    
-    for (const entry of csvPreview) {
-      try {
-        await saveEntry(entry);
-        successCount++;
-      } catch (e) {
-        errorCount++;
-        console.error('Failed to import entry:', e);
-      }
-    }
-    
-    setCsvPreview(null);
-    setIsSaving(false);
-    
-    if (errorCount === 0) {
-      showToast(`Successfully imported ${successCount} entries`, 'success');
-    } else {
-      showToast(`Imported ${successCount} entries, ${errorCount} failed`, 'error');
-    }
-  };
-
 const getInitial = (name) => {
     return name ? name.charAt(0).toUpperCase() : 'U';
   };
@@ -2181,80 +1793,27 @@ const getBudgetStatus = () => {
           {/* Desktop Header Actions */}
           {!isMobile ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              {/* Level & XP Bar */}
-              <div 
-                onClick={() => setShowRewardsModal(true)}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  padding: '6px 12px',
-                  backgroundColor: theme.statBg,
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  transition: 'transform 0.15s',
-                  border: `1px solid ${theme.cardBorder}`
-                }}
-                onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
-                onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-              >
+              {/* Today's Spending Quick Stat */}
+              {entries.length > 0 && (
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  width: '28px',
-                  height: '28px',
-                  borderRadius: '50%',
-                  background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                  color: '#fff',
-                  fontSize: '12px',
-                  fontWeight: '700',
-                  boxShadow: '0 2px 4px rgba(245, 158, 11, 0.3)'
-                }}>
-                  {currentLevel}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '80px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '10px', fontWeight: '600', color: theme.text }}>Level {currentLevel}</span>
-                    <span style={{ fontSize: '9px', color: theme.textMuted }}>{userXP} XP</span>
-                  </div>
-                  <div style={{
-                    height: '6px',
-                    backgroundColor: isDark ? '#27272a' : '#e4e4e7',
-                    borderRadius: '3px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{
-                      height: '100%',
-                      width: `${levelProgress}%`,
-                      background: 'linear-gradient(90deg, #22c55e, #10b981)',
-                      borderRadius: '3px',
-                      transition: 'width 0.3s ease'
-                    }} />
-                  </div>
-                </div>
-                <Gift style={{ width: '14px', height: '14px', color: '#f59e0b' }} />
-              </div>
-              
-              {/* Christmas Theme Toggle */}
-              <button
-                onClick={() => setIsChristmasTheme(!isChristmasTheme)}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  backgroundColor: isChristmasTheme ? '#dc2626' : 'transparent',
-                  border: `1px solid ${isChristmasTheme ? '#dc2626' : theme.inputBorder}`,
+                  gap: '6px',
+                  padding: '6px 12px',
+                  backgroundColor: theme.statBg,
                   borderRadius: '6px',
-                  color: isChristmasTheme ? '#fff' : theme.textMuted,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                title={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
-              >
-                <TreePine style={{ width: '16px', height: '16px' }} />
-              </button>
+                  marginRight: '4px'
+                }}>
+                  <span style={{ fontSize: '12px', color: theme.textMuted }}>Today:</span>
+                  <span style={{ 
+                    fontSize: '13px', 
+                    fontWeight: '600', 
+                    color: stats.today > 0 ? '#10b981' : theme.textMuted 
+                  }}>
+                    {currency}{formatAmount(stats.today)}
+                  </span>
+                </div>
+              )}
               
               <select
                 value={currency}
@@ -2320,11 +1879,11 @@ const getBudgetStatus = () => {
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   style={{
-                    width: '40px',
-                    height: '40px',
+                    width: '36px',
+                    height: '36px',
                     borderRadius: '50%',
-                    backgroundColor: '#3b82f6',
-                    border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
+                    backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
+                    border: 'none',
                     color: '#fff',
                     fontSize: '14px',
                     fontWeight: '600',
@@ -2332,11 +1891,15 @@ const getBudgetStatus = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    boxShadow: currentFrame.glow !== 'none' ? currentFrame.glow : 'none',
-                    transition: 'all 0.3s ease'
+                    overflow: 'hidden',
+                    padding: 0
                   }}
                 >
-                  {getInitial(user.user_metadata?.nickname)}
+                  {profilePicture ? (
+                    <img src={profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    getInitial(user.user_metadata?.nickname)
+                  )}
                 </button>
 
                 {showProfileMenu && (
@@ -2352,9 +1915,28 @@ const getBudgetStatus = () => {
                     zIndex: 50,
                     overflow: 'hidden'
                   }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
-                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
+                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ 
+                        width: '40px', 
+                        height: '40px', 
+                        borderRadius: '50%', 
+                        backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                        flexShrink: 0
+                      }}>
+                        {profilePicture ? (
+                          <img src={profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <span style={{ color: '#fff', fontSize: '16px', fontWeight: '600' }}>{getInitial(user.user_metadata?.nickname)}</span>
+                        )}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
+                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</p>
+                      </div>
                     </div>
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
@@ -2448,7 +2030,7 @@ const getBudgetStatus = () => {
                     width: '32px',
                     height: '32px',
                     borderRadius: '50%',
-                    backgroundColor: '#3b82f6',
+                    backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
                     border: 'none',
                     color: '#fff',
                     fontSize: '13px',
@@ -2456,10 +2038,16 @@ const getBudgetStatus = () => {
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    overflow: 'hidden',
+                    padding: 0
                   }}
                 >
-                  {getInitial(user.user_metadata?.nickname)}
+                  {profilePicture ? (
+                    <img src={profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    getInitial(user.user_metadata?.nickname)
+                  )}
                 </button>
 
                 {showProfileMenu && (
@@ -2475,9 +2063,28 @@ const getBudgetStatus = () => {
                     zIndex: 50,
                     overflow: 'hidden'
                   }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
-                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
+                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ 
+                        width: '36px', 
+                        height: '36px', 
+                        borderRadius: '50%', 
+                        backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                        flexShrink: 0
+                      }}>
+                        {profilePicture ? (
+                          <img src={profilePicture} alt="Profile" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        ) : (
+                          <span style={{ color: '#fff', fontSize: '14px', fontWeight: '600' }}>{getInitial(user.user_metadata?.nickname)}</span>
+                        )}
+                      </div>
+                      <div style={{ minWidth: 0 }}>
+                        <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
+                        <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</p>
+                      </div>
                     </div>
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
@@ -2571,6 +2178,25 @@ const getBudgetStatus = () => {
             Dashboard
           </button>
           <button
+            onClick={() => setActiveTab('analytics')}
+            style={{
+              padding: '12px 16px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'analytics' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: activeTab === 'analytics' ? theme.text : theme.textMuted,
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            Analytics
+          </button>
+          <button
             onClick={() => setActiveTab('entries')}
             style={{
               padding: '12px 16px',
@@ -2603,95 +2229,46 @@ const getBudgetStatus = () => {
               </span>
             )}
           </button>
+          <button
+            onClick={() => setActiveTab('bills')}
+            style={{
+              padding: '12px 16px',
+              backgroundColor: 'transparent',
+              border: 'none',
+              borderBottom: activeTab === 'bills' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent',
+              fontSize: '14px',
+              fontWeight: '500',
+              color: activeTab === 'bills' ? theme.text : theme.textMuted,
+              cursor: 'pointer',
+              transition: 'color 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <CreditCard style={{ width: '15px', height: '15px' }} />
+            Bills
+            {entries.filter(e => e.recurring).length > 0 && (
+              <span style={{
+                backgroundColor: activeTab === 'bills' ? (isDark ? '#8b5cf6' : '#7c3aed') : (isDark ? '#3f3f46' : '#e4e4e7'),
+                color: activeTab === 'bills' ? '#fff' : theme.textMuted,
+                fontSize: '11px',
+                fontWeight: '600',
+                padding: '2px 7px',
+                borderRadius: '10px',
+                minWidth: '20px',
+                textAlign: 'center'
+              }}>
+                {entries.filter(e => e.recurring).length}
+              </span>
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Dashboard Sub-Tab Navigation */}
-      {activeTab === 'dashboard' && (
-        <div style={{
-          backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
-          borderBottom: `1px solid ${theme.cardBorder}`,
-          padding: isSmall ? '0 12px' : '0 24px'
-        }}>
-          <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '12px 16px' }}>
-            <div style={{ display: 'flex', gap: '6px', backgroundColor: theme.toggleBg, borderRadius: '8px', padding: '4px', width: 'fit-content' }}>
-              <button
-                onClick={() => setDashboardSubTab('add-entry')}
-                style={{
-                  padding: isSmall ? '8px 12px' : '8px 16px',
-                  fontSize: '13px',
-                  backgroundColor: dashboardSubTab === 'add-entry' ? theme.toggleActive : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontWeight: '500',
-                  color: dashboardSubTab === 'add-entry' ? theme.text : theme.textSubtle,
-                  cursor: 'pointer',
-                  boxShadow: dashboardSubTab === 'add-entry' && !isDark ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-                  transition: 'all 0.15s'
-                }}
-              >
-                Add Entry
-              </button>
-              <button
-                onClick={() => setDashboardSubTab('analytics')}
-                style={{
-                  padding: isSmall ? '8px 12px' : '8px 16px',
-                  fontSize: '13px',
-                  backgroundColor: dashboardSubTab === 'analytics' ? theme.toggleActive : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontWeight: '500',
-                  color: dashboardSubTab === 'analytics' ? theme.text : theme.textSubtle,
-                  cursor: 'pointer',
-                  boxShadow: dashboardSubTab === 'analytics' && !isDark ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-                  transition: 'all 0.15s'
-                }}
-              >
-                Analytics
-              </button>
-              <button
-                onClick={() => setDashboardSubTab('bills')}
-                style={{
-                  padding: isSmall ? '8px 12px' : '8px 16px',
-                  fontSize: '13px',
-                  backgroundColor: dashboardSubTab === 'bills' ? theme.toggleActive : 'transparent',
-                  border: 'none',
-                  borderRadius: '6px',
-                  fontWeight: '500',
-                  color: dashboardSubTab === 'bills' ? theme.text : theme.textSubtle,
-                  cursor: 'pointer',
-                  boxShadow: dashboardSubTab === 'bills' && !isDark ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-                  transition: 'all 0.15s',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <CreditCard style={{ width: '14px', height: '14px' }} />
-                Bills
-                {entries.filter(e => e.recurring).length > 0 && (
-                  <span style={{
-                    backgroundColor: dashboardSubTab === 'bills' ? (isDark ? '#8b5cf6' : '#7c3aed') : (isDark ? '#52525b' : '#d4d4d8'),
-                    color: dashboardSubTab === 'bills' ? '#fff' : theme.textMuted,
-                    fontSize: '10px',
-                    fontWeight: '600',
-                    padding: '2px 6px',
-                    borderRadius: '8px',
-                    minWidth: '16px',
-                    textAlign: 'center'
-                  }}>
-                    {entries.filter(e => e.recurring).length}
-                  </span>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
       <main style={{ maxWidth: '1600px', margin: '0 auto', padding: isSmall ? '8px' : '24px 40px', boxSizing: 'border-box', overflow: 'hidden' }}>
         
-        {activeTab === 'dashboard' && dashboardSubTab === 'add-entry' ? (
+        {activeTab === 'dashboard' ? (
           <>
          {/* Top Section: Add Entry + History */}
         <div style={{ 
@@ -2705,7 +2282,7 @@ const getBudgetStatus = () => {
             <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, marginBottom: '16px', height: isMobile ? 'auto' : '36px', display: 'flex', alignItems: 'center' }}>Add New Entry</h2>
             
             {/* Mode Toggle */}
-            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: '8px', marginBottom: '16px' }}>
               <button onClick={() => { setUploadMode('file'); setUploadError(''); }} style={buttonStyle(uploadMode === 'file')}>
                 <Upload style={{ width: '14px', height: '14px' }} />
                 {isSmall ? 'Upload' : 'Upload File'}
@@ -2877,7 +2454,7 @@ const getBudgetStatus = () => {
                   </label>
                 )}
               </div>
-            ) : uploadMode === 'manual' ? (
+            ) : (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 <div style={{ flex: 1 }} />
                 <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : '1fr 1fr', gap: '12px' }}>
@@ -2957,7 +2534,7 @@ const getBudgetStatus = () => {
                   </button>
                 </div>
               </div>
-            ) : null}
+            )}
           </div>
 
           {/* History Card */}
@@ -3127,212 +2704,118 @@ const getBudgetStatus = () => {
           </div>
         </div>
 
-{/* Recent Entries and Monthly Budget Side by Side */}
-        <div style={{ 
-          display: 'grid', 
-          gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', 
-          gap: isSmall ? '12px' : '20px', 
-          marginBottom: isSmall ? '12px' : '24px' 
-        }}>
-          {/* Recent Entries */}
-          {entries.length > 0 && (
-            <div style={cardStyle}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <Receipt style={{ width: '18px', height: '18px', color: theme.textMuted }} />
-                  Recent Entries
-                </h2>
-                <button
-                  onClick={() => setActiveTab('entries')}
-                  style={{
-                    fontSize: '13px',
-                    color: '#3b82f6',
-                    background: 'none',
-                    border: 'none',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  View All
-                  <ChevronDown style={{ width: '14px', height: '14px', transform: 'rotate(-90deg)' }} />
-                </button>
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                {entries.slice(0, 4).map(entry => {
-                  const badge = getBadgeStyle(entry.type, isDark);
-                  const categoryInfo = CATEGORIES.find(c => c.value === entry.type);
-                  return (
-                    <div 
-                      key={entry.id}
-                      onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '10px',
-                        padding: '10px',
-                        backgroundColor: theme.statBg,
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        transition: 'transform 0.15s'
-                      }}
-                      onMouseEnter={(e) => e.currentTarget.style.transform = 'translateX(2px)'}
-                      onMouseLeave={(e) => e.currentTarget.style.transform = 'translateX(0)'}
-                    >
-                      <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '8px',
-                        backgroundColor: badge.bg,
-                        border: `1px solid ${badge.border}`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        flexShrink: 0
-                      }}>
-                        <span style={{ fontSize: '14px' }}>
-                          {entry.type === 'utilities' && '⚡'}
-                          {entry.type === 'subscription' && '📱'}
-                          {entry.type === 'food' && '🍔'}
-                          {entry.type === 'shopping' && '🛍️'}
-                          {entry.type === 'healthcare' && '💊'}
-                          {entry.type === 'entertainment' && '🎬'}
-                          {entry.type === 'other' && '📦'}
-                        </span>
-                      </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {entry.name}
-                        </p>
-                        <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>
-                          {categoryInfo?.label} • {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </p>
-                      </div>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0, flexShrink: 0 }}>
-                        {currency}{formatAmount(entry.amount)}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Monthly Budget Card */}
-          <div style={cardStyle}>
+{/* Recent Entries Quick View */}
+        {entries.length > 0 && (
+          <div style={{ ...cardStyle, marginBottom: isSmall ? '12px' : '24px' }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
               <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Wallet style={{ width: '18px', height: '18px', color: theme.textMuted }} />
-                Monthly Budget
+                <Receipt style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                Recent Entries
               </h2>
-              {monthlyBudget > 0 && (
-                <button
-                  onClick={() => { setBudgetInput(monthlyBudget.toString()); setShowBudgetModal(true); }}
-                  style={{ fontSize: '12px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}
-                >
-                  Edit
-                </button>
-              )}
-            </div>
-            
-            {monthlyBudget > 0 && budgetStatus ? (
-              <div>
-                {/* Budget Stats */}
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
-                  <div style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', textAlign: 'center' }}>
-                    <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px', textTransform: 'uppercase' }}>Budget</p>
-                    <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(monthlyBudget)}</p>
-                  </div>
-                  <div style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', textAlign: 'center' }}>
-                    <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px', textTransform: 'uppercase' }}>Spent</p>
-                    <p style={{ fontSize: '18px', fontWeight: '700', color: budgetStatus.color, margin: 0 }}>{currency}{formatAmount(budgetStatus.spent)}</p>
-                  </div>
-                </div>
-                
-                {/* Progress Bar */}
-                <div style={{ marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                    <span style={{ fontSize: '12px', color: theme.textMuted }}>{budgetStatus.percentage.toFixed(0)}% used</span>
-                    <span style={{ fontSize: '12px', fontWeight: '500', color: budgetStatus.status === 'over' ? '#ef4444' : theme.textMuted }}>
-                      {budgetStatus.status === 'over' ? `Over by ${currency}${formatAmount(Math.abs(budgetStatus.remaining))}` : `${currency}${formatAmount(budgetStatus.remaining)} left`}
-                    </span>
-                  </div>
-                  <div style={{ 
-                    height: '10px', 
-                    backgroundColor: isDark ? '#27272a' : '#e4e4e7', 
-                    borderRadius: '5px', 
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{ 
-                      height: '100%', 
-                      width: `${Math.min(budgetStatus.percentage, 100)}%`, 
-                      backgroundColor: budgetStatus.color,
-                      borderRadius: '5px',
-                      transition: 'width 0.3s ease'
-                    }} />
-                  </div>
-                </div>
-                
-                {/* Status Alert */}
-                {budgetStatus.status === 'over' && (
-                  <div style={{ padding: '10px', backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <AlertTriangle style={{ width: '14px', height: '14px', color: '#ef4444', flexShrink: 0 }} />
-                    <span style={{ fontSize: '12px', color: isDark ? '#fca5a5' : '#dc2626' }}>Budget exceeded!</span>
-                  </div>
-                )}
-                {budgetStatus.status === 'warning' && (
-                  <div style={{ padding: '10px', backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <AlertCircle style={{ width: '14px', height: '14px', color: '#f59e0b', flexShrink: 0 }} />
-                    <span style={{ fontSize: '12px', color: isDark ? '#fcd34d' : '#b45309' }}>Approaching limit</span>
-                  </div>
-                )}
-                {budgetStatus.status === 'safe' && (
-                  <div style={{ padding: '10px', backgroundColor: isDark ? 'rgba(34, 197, 94, 0.15)' : '#dcfce7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Check style={{ width: '14px', height: '14px', color: '#22c55e', flexShrink: 0 }} />
-                    <span style={{ fontSize: '12px', color: isDark ? '#86efac' : '#166534' }}>On track this month</span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div style={{ textAlign: 'center', padding: '20px' }}>
-                <div style={{
-                  width: '48px',
-                  height: '48px',
-                  borderRadius: '50%',
-                  backgroundColor: theme.statBg,
+              <button
+                onClick={() => setActiveTab('entries')}
+                style={{
+                  fontSize: '13px',
+                  color: '#3b82f6',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
-                  margin: '0 auto 12px'
-                }}>
-                  <PiggyBank style={{ width: '24px', height: '24px', color: theme.textMuted }} />
-                </div>
-                <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 12px' }}>Set a budget to track your spending</p>
-                <button
-                  onClick={() => { setBudgetInput(''); setShowBudgetModal(true); }}
-                  style={{
-                    padding: '10px 20px',
-                    backgroundColor: isDark ? '#fafafa' : '#18181b',
-                    color: isDark ? '#18181b' : '#fafafa',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    cursor: 'pointer'
-                  }}
-                >
-                  Set Budget
-                </button>
-              </div>
-            )}
+                  gap: '4px'
+                }}
+              >
+                View All
+                <ChevronDown style={{ width: '14px', height: '14px', transform: 'rotate(-90deg)' }} />
+              </button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+              {entries.slice(0, 3).map(entry => {
+                const badge = getBadgeStyle(entry.type, isDark);
+                const categoryInfo = CATEGORIES.find(c => c.value === entry.type);
+                return (
+                  <div 
+                    key={entry.id}
+                    onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      padding: '12px',
+                      backgroundColor: theme.statBg,
+                      borderRadius: '8px',
+                      cursor: 'pointer',
+                      transition: 'transform 0.15s, box-shadow 0.15s'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.transform = 'translateY(-1px)';
+                      e.currentTarget.style.boxShadow = isDark ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.08)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.transform = 'translateY(0)';
+                      e.currentTarget.style.boxShadow = 'none';
+                    }}
+                  >
+                    <div style={{
+                      width: '40px',
+                      height: '40px',
+                      borderRadius: '10px',
+                      backgroundColor: badge.bg,
+                      border: `1px solid ${badge.border}`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
+                      <span style={{ fontSize: '16px' }}>
+                        {entry.type === 'utilities' && '⚡'}
+                        {entry.type === 'subscription' && '📱'}
+                        {entry.type === 'food' && '🍔'}
+                        {entry.type === 'shopping' && '🛍️'}
+                        {entry.type === 'healthcare' && '💊'}
+                        {entry.type === 'entertainment' && '🎬'}
+                        {entry.type === 'other' && '📦'}
+                      </span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {entry.name}
+                        </p>
+                        {entry.notes && (
+                          <span title={entry.notes} style={{ flexShrink: 0, cursor: 'help' }}>
+                            <MessageSquare style={{ width: '12px', height: '12px', color: theme.textMuted }} />
+                          </span>
+                        )}
+                      </div>
+                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>
+                        {categoryInfo?.label} • {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      </p>
+                    </div>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
+                        {currency}{formatAmount(entry.amount)}
+                      </p>
+                      {entry.file && (
+                        <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0', display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end' }}>
+                          <FileText style={{ width: '10px', height: '10px' }} />
+                          Receipt
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* Insights and Chart Section */}
-        <div style={{ ...cardStyle, marginBottom: isSmall ? '12px' : '24px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', flexWrap: 'wrap', gap: '8px' }}>
-            <h2 style={{ fontSize: isSmall ? '14px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Spending Overview</h2>
+        {/* Dashboard Section */}
+
+        {/* Dashboard Section */}
+        <div style={cardStyle}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', flexWrap: 'wrap', gap: '8px' }}>
+            <h2 style={{ fontSize: isSmall ? '14px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Dashboard</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', flex: isSmall ? '1 1 100%' : 'none' }}>
               {/* Category Filter */}
               <select
@@ -3370,6 +2853,7 @@ const getBudgetStatus = () => {
                       backgroundColor: dashboardView === v ? theme.toggleActive : 'transparent',
                       border: 'none',
                       borderRadius: '4px',
+                      fontSize: '13px',
                       fontWeight: '500',
                       color: dashboardView === v ? theme.text : theme.textSubtle,
                       cursor: 'pointer',
@@ -3382,10 +2866,108 @@ const getBudgetStatus = () => {
               </div>
             </div>
           </div>
+{/* Budget Progress */}
+          {monthlyBudget > 0 && budgetStatus && (
+            <div style={{ 
+              marginBottom: '20px', 
+              padding: '16px', 
+              backgroundColor: budgetStatus.status === 'over' ? (isDark ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2') : budgetStatus.status === 'warning' ? (isDark ? 'rgba(245, 158, 11, 0.1)' : '#fffbeb') : theme.statBg,
+              borderRadius: '8px',
+              border: `1px solid ${budgetStatus.status === 'over' ? '#ef4444' : budgetStatus.status === 'warning' ? '#f59e0b' : 'transparent'}`
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Wallet style={{ width: '18px', height: '18px', color: budgetStatus.color }} />
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Monthly Budget</span>
+                </div>
+                <button
+                  onClick={() => { setBudgetInput(monthlyBudget.toString()); setShowBudgetModal(true); }}
+                  style={{ fontSize: '12px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+                >
+                  Edit
+                </button>
+              </div>
+              
+              {/* Progress Bar */}
+              <div style={{ 
+                height: '8px', 
+                backgroundColor: isDark ? '#27272a' : '#e4e4e7', 
+                borderRadius: '4px', 
+                overflow: 'hidden',
+                marginBottom: '12px'
+              }}>
+                <div style={{ 
+                  height: '100%', 
+                  width: `${budgetStatus.percentage}%`, 
+                  backgroundColor: budgetStatus.color,
+                  borderRadius: '4px',
+                  transition: 'width 0.3s ease'
+                }} />
+              </div>
+              
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Spent: </span>
+                  <span style={{ fontSize: '14px', fontWeight: '600', color: budgetStatus.color }}>{currency}{formatAmount(budgetStatus.spent)}</span>
+                  <span style={{ fontSize: '13px', color: theme.textMuted }}> of {currency}{formatAmount(monthlyBudget)}</span>
+                </div>
+                <div style={{ textAlign: 'right' }}>
+                  {budgetStatus.status === 'over' ? (
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: '#ef4444' }}>
+                      Over by {currency}{formatAmount(Math.abs(budgetStatus.remaining))}
+                    </span>
+                  ) : (
+                    <span style={{ fontSize: '13px', color: theme.textMuted }}>
+                      {currency}{formatAmount(budgetStatus.remaining)} left
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              {budgetStatus.status === 'over' && (
+                <div style={{ marginTop: '12px', padding: '10px 12px', backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertTriangle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>You've exceeded your monthly budget!</span>
+                </div>
+              )}
+              
+              {budgetStatus.status === 'warning' && (
+                <div style={{ marginTop: '12px', padding: '10px 12px', backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <AlertCircle style={{ width: '16px', height: '16px', color: '#f59e0b', flexShrink: 0 }} />
+                  <span style={{ fontSize: '13px', color: isDark ? '#fcd34d' : '#b45309' }}>You've used {budgetStatus.percentage.toFixed(0)}% of your monthly budget</span>
+                </div>
+              )}
+            </div>
+          )}
 
+          {/* Set Budget Button (if no budget set) */}
+          {monthlyBudget <= 0 && (
+            <button
+              onClick={() => { setBudgetInput(''); setShowBudgetModal(true); }}
+              style={{
+                width: '100%',
+                marginBottom: '20px',
+                padding: '14px 16px',
+                backgroundColor: 'transparent',
+                border: `2px dashed ${theme.inputBorder}`,
+                borderRadius: '8px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                color: theme.textMuted,
+                fontSize: '14px',
+                fontWeight: '500'
+              }}
+            >
+              <PiggyBank style={{ width: '18px', height: '18px' }} />
+              Set Monthly Budget
+            </button>
+          )}
           {/* Stats Grid */}
           {isSmall ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '20px' }}>
               {[
                 { label: 'Today', value: stats.today },
                 { label: 'This Month', value: stats.month },
@@ -3399,157 +2981,50 @@ const getBudgetStatus = () => {
               ))}
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)', gap: '16px', marginBottom: '20px' }}>
               {[
                 { label: 'Today', value: stats.today },
                 { label: 'This Month', value: stats.month },
                 { label: 'This Year', value: stats.year },
                 { label: 'All Time', value: stats.total },
               ].map(stat => (
-                <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: '14px' }}>
-                  <p style={{ fontSize: '12px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
-                  <p style={{ fontSize: '20px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
+                <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: '16px' }}>
+                  <p style={{ fontSize: '13px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
+                  <p style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
                 </div>
               ))}
             </div>
           )}
 
-          {/* Insights and Chart Side by Side */}
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.5fr', gap: '16px' }}>
-            {/* 6-Month Insights */}
+          {/* Charts */}
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '16px' }}>
             <div style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
-              <p style={{ fontSize: '13px', fontWeight: '600', color: theme.text, margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <TrendingUp style={{ width: '14px', height: '14px', color: theme.textMuted }} />
-                6-Month Insights
-              </p>
-              
-              {(() => {
-                const now = new Date();
-                const currentMonth = now.getMonth();
-                const currentYear = now.getFullYear();
-                
-                // Get last 6 months of data
-                const monthlyTotals = [];
-                for (let i = 5; i >= 0; i--) {
-                  const targetMonth = new Date(currentYear, currentMonth - i, 1);
-                  const monthEntries = entries.filter(e => {
-                    const d = new Date(e.date);
-                    return d.getMonth() === targetMonth.getMonth() && d.getFullYear() === targetMonth.getFullYear();
-                  });
-                  const total = monthEntries.reduce((sum, e) => sum + e.amount, 0);
-                  monthlyTotals.push({
-                    month: targetMonth.toLocaleDateString('en-US', { month: 'short' }),
-                    fullMonth: targetMonth.toLocaleDateString('en-US', { month: 'long' }),
-                    total,
-                    entries: monthEntries.length
-                  });
-                }
-                
-                const thisMonth = monthlyTotals[5];
-                const lastMonth = monthlyTotals[4];
-                const monthChange = lastMonth.total > 0 ? ((thisMonth.total - lastMonth.total) / lastMonth.total * 100) : 0;
-                const avgSpending = monthlyTotals.slice(0, 5).reduce((sum, m) => sum + m.total, 0) / 5;
-                const vsAverage = avgSpending > 0 ? ((thisMonth.total - avgSpending) / avgSpending * 100) : 0;
-                
-                // Find highest and lowest months
-                const sortedMonths = [...monthlyTotals].sort((a, b) => b.total - a.total);
-                const highestMonth = sortedMonths[0];
-                const lowestMonth = sortedMonths.filter(m => m.total > 0).pop() || sortedMonths[5];
-                
-                return (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    {/* This Month vs Last Month */}
-                    <div style={{ 
-                      padding: '10px 12px', 
-                      backgroundColor: theme.cardBg, 
-                      borderRadius: '6px',
-                      border: `1px solid ${theme.cardBorder}`
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '11px', color: theme.textMuted }}>vs Last Month</span>
-                        <span style={{ 
-                          fontSize: '12px', 
-                          fontWeight: '600', 
-                          color: monthChange > 0 ? '#ef4444' : monthChange < 0 ? '#22c55e' : theme.textMuted,
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '2px'
-                        }}>
-                          {monthChange > 0 ? <TrendingUp style={{ width: '12px', height: '12px' }} /> : monthChange < 0 ? <TrendingDown style={{ width: '12px', height: '12px' }} /> : null}
-                          {monthChange > 0 ? '+' : ''}{monthChange.toFixed(1)}%
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '11px', color: theme.textSubtle }}>
-                        {thisMonth.fullMonth}: {currency}{formatAmount(thisMonth.total)} vs {lastMonth.month}: {currency}{formatAmount(lastMonth.total)}
-                      </div>
-                    </div>
-                    
-                    {/* vs 5-Month Average */}
-                    <div style={{ 
-                      padding: '10px 12px', 
-                      backgroundColor: theme.cardBg, 
-                      borderRadius: '6px',
-                      border: `1px solid ${theme.cardBorder}`
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '11px', color: theme.textMuted }}>vs 5-Month Avg</span>
-                        <span style={{ 
-                          fontSize: '12px', 
-                          fontWeight: '600', 
-                          color: vsAverage > 0 ? '#ef4444' : vsAverage < 0 ? '#22c55e' : theme.textMuted 
-                        }}>
-                          {vsAverage > 0 ? '+' : ''}{vsAverage.toFixed(1)}%
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '11px', color: theme.textSubtle }}>
-                        Avg: {currency}{formatAmount(avgSpending)}/month
-                      </div>
-                    </div>
-                    
-                    {/* Highest Spending Month */}
-                    <div style={{ 
-                      padding: '10px 12px', 
-                      backgroundColor: isDark ? 'rgba(239, 68, 68, 0.1)' : '#fef2f2', 
-                      borderRadius: '6px',
-                      border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '11px', color: isDark ? '#fca5a5' : '#dc2626' }}>📈 Highest</span>
-                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#ef4444' }}>{highestMonth.month}</span>
-                      </div>
-                      <div style={{ fontSize: '11px', color: theme.textSubtle, marginTop: '2px' }}>
-                        {currency}{formatAmount(highestMonth.total)} ({highestMonth.entries} entries)
-                      </div>
-                    </div>
-                    
-                    {/* Lowest Spending Month */}
-                    <div style={{ 
-                      padding: '10px 12px', 
-                      backgroundColor: isDark ? 'rgba(34, 197, 94, 0.1)' : '#dcfce7', 
-                      borderRadius: '6px',
-                      border: `1px solid ${isDark ? '#166534' : '#bbf7d0'}`
-                    }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '11px', color: isDark ? '#86efac' : '#166534' }}>📉 Lowest</span>
-                        <span style={{ fontSize: '12px', fontWeight: '600', color: '#22c55e' }}>{lowestMonth.month}</span>
-                      </div>
-                      <div style={{ fontSize: '11px', color: theme.textSubtle, marginTop: '2px' }}>
-                        {currency}{formatAmount(lowestMonth.total)} ({lowestMonth.entries} entries)
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
+              <p style={{ fontSize: '13px', color: theme.textSubtle, margin: '0 0 16px' }}>Spending by Category</p>
+              {categoryData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={isSmall ? 180 : 200}>
+                  <PieChart>
+                    <Pie data={categoryData} cx="50%" cy="50%" innerRadius={isSmall ? 40 : 50} outerRadius={isSmall ? 65 : 80} paddingAngle={2} dataKey="value">
+                      {categoryData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.color} />)}
+                    </Pie>
+                    <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.text }} />
+                    <Legend wrapperStyle={{ fontSize: '12px' }} />
+                  </PieChart>
+                </ResponsiveContainer>
+              ) : (
+                <div style={{ height: isSmall ? '180px' : '200px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <PiggyBank style={{ width: '32px', height: '32px', color: theme.textDim }} />
+                  <p style={{ fontSize: '13px', color: theme.textDim, margin: 0 }}>No spending data</p>
+                </div>
+              )}
             </div>
 
-            {/* Monthly Spending Trend Chart */}
             <div style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
-              <p style={{ fontSize: '13px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>Monthly Spending Trend</p>
-              <ResponsiveContainer width="100%" height={isSmall ? 160 : 180}>
+              <p style={{ fontSize: '13px', color: theme.textSubtle, margin: '0 0 16px' }}>Monthly Spending Trend</p>
+              <ResponsiveContainer width="100%" height={isSmall ? 180 : 200}>
                 <BarChart data={monthlyData}>
-                  <XAxis dataKey="name" tick={{ fontSize: isSmall ? 10 : 11, fill: theme.textSubtle }} axisLine={false} tickLine={false} />
-                  <YAxis tick={{ fontSize: isSmall ? 10 : 11, fill: theme.textSubtle }} axisLine={false} tickLine={false} width={isSmall ? 35 : 45} />
-                  <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.text, fontSize: '12px' }} cursor={{ fill: 'transparent' }} />
+                  <XAxis dataKey="name" tick={{ fontSize: isSmall ? 10 : 12, fill: theme.textSubtle }} axisLine={false} tickLine={false} />
+                  <YAxis tick={{ fontSize: isSmall ? 10 : 12, fill: theme.textSubtle }} axisLine={false} tickLine={false} width={isSmall ? 35 : 40} />
+                  <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.text }} cursor={{ fill: 'transparent' }} />
                   <Bar dataKey="amount" fill={theme.barColor} radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -3557,7 +3032,7 @@ const getBudgetStatus = () => {
           </div>
         </div>
           </>
-        ) : activeTab === 'dashboard' && dashboardSubTab === 'analytics' ? (
+        ) : activeTab === 'analytics' ? (
           /* Analytics Tab */
           <>
             {/* Analytics Header with Filters */}
@@ -3864,7 +3339,7 @@ const getBudgetStatus = () => {
                     </defs>
                     <XAxis dataKey="name" tick={{ fontSize: 12, fill: theme.textSubtle }} axisLine={false} tickLine={false} />
                     <YAxis tick={{ fontSize: 12, fill: theme.textSubtle }} axisLine={false} tickLine={false} width={50} tickFormatter={(v) => `${currency}${v >= 1000 ? (v/1000).toFixed(0) + 'k' : v}`} />
-                    <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} itemStyle={{ color: theme.text }} labelStyle={{ color: theme.text }} />
+                    <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} />
                     <Area type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorSpending)" />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -3891,7 +3366,7 @@ const getBudgetStatus = () => {
                         >
                           {analyticsCatData.map((entry, i) => <Cell key={`cell-${i}`} fill={entry.color} />)}
                         </Pie>
-                        <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} itemStyle={{ color: theme.text }} labelStyle={{ color: theme.text }} />
+                        <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} />
                       </PieChart>
                     </ResponsiveContainer>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
@@ -3966,7 +3441,7 @@ const getBudgetStatus = () => {
                   <BarChart data={analyticsMonthData} layout="vertical">
                     <XAxis type="number" tick={{ fontSize: 11, fill: theme.textSubtle }} axisLine={false} tickLine={false} tickFormatter={(v) => `${currency}${v >= 1000 ? (v/1000).toFixed(0) + 'k' : v}`} />
                     <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: theme.textSubtle }} axisLine={false} tickLine={false} width={35} />
-                    <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} itemStyle={{ color: theme.text }} labelStyle={{ color: theme.text }} />
+                    <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} />
                     <Bar dataKey="amount" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
@@ -4032,207 +3507,27 @@ const getBudgetStatus = () => {
                 <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0 }}>All Entries</h2>
                 <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>{entries.length} total entries</p>
               </div>
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <label
-                  style={{
-                    height: '36px',
-                    padding: '0 16px',
-                    backgroundColor: 'transparent',
-                    border: `1px solid ${theme.inputBorder}`,
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    color: theme.text,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  <Upload style={{ width: '14px', height: '14px' }} />
-                  Import CSV
-                  <input type="file" accept=".csv" onChange={handleCsvFileSelect} style={{ display: 'none' }} />
-                </label>
-                <button
-                  onClick={exportToCSV}
-                  style={{
-                    height: '36px',
-                    padding: '0 16px',
-                    backgroundColor: isDark ? '#fafafa' : '#18181b',
-                    color: isDark ? '#18181b' : '#fafafa',
-                    border: 'none',
-                    borderRadius: '6px',
-                    fontSize: '13px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px'
-                  }}
-                >
-                  <Download style={{ width: '14px', height: '14px' }} />
-                  Export CSV
-                </button>
-              </div>
+              <button
+                onClick={exportToCSV}
+                style={{
+                  height: '36px',
+                  padding: '0 16px',
+                  backgroundColor: isDark ? '#fafafa' : '#18181b',
+                  color: isDark ? '#18181b' : '#fafafa',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Download style={{ width: '14px', height: '14px' }} />
+                Export CSV
+              </button>
             </div>
-
-            {/* Bulk Actions Bar */}
-            {(selectedEntries.length > 0 || entries.length > 0) && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '12px 16px',
-                marginBottom: '16px',
-                backgroundColor: selectedEntries.length > 0 ? (isDark ? '#1e3a5f' : '#dbeafe') : theme.statBg,
-                borderRadius: '8px',
-                border: selectedEntries.length > 0 ? `1px solid ${isDark ? '#2563eb' : '#93c5fd'}` : 'none'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  {selectedEntries.length > 0 ? (
-                    <>
-                      <span style={{ fontSize: '14px', fontWeight: '600', color: isDark ? '#60a5fa' : '#1d4ed8' }}>
-                        {selectedEntries.length} selected
-                      </span>
-                      <button
-                        onClick={() => setSelectedEntries([])}
-                        style={{
-                          fontSize: '13px',
-                          color: isDark ? '#93c5fd' : '#2563eb',
-                          background: 'none',
-                          border: 'none',
-                          cursor: 'pointer',
-                          textDecoration: 'underline'
-                        }}
-                      >
-                        Clear selection
-                      </button>
-                    </>
-                  ) : (
-                    <span style={{ fontSize: '13px', color: theme.textMuted }}>
-                      Select entries to delete multiple at once
-                    </span>
-                  )}
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                  {selectedEntries.length > 0 && (
-                    <button
-                      onClick={() => setShowBulkDeleteConfirm(true)}
-                      style={{
-                        height: '32px',
-                        padding: '0 12px',
-                        backgroundColor: '#ef4444',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        fontWeight: '500',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <Trash2 style={{ width: '14px', height: '14px' }} />
-                      Delete Selected
-                    </button>
-                  )}
-                  {entries.length > 0 && (
-                    <button
-                      onClick={() => setShowClearAllConfirm(true)}
-                      style={{
-                        height: '32px',
-                        padding: '0 12px',
-                        backgroundColor: 'transparent',
-                        border: `1px solid #ef4444`,
-                        borderRadius: '6px',
-                        fontSize: '13px',
-                        fontWeight: '500',
-                        color: '#ef4444',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '6px'
-                      }}
-                    >
-                      <Trash2 style={{ width: '14px', height: '14px' }} />
-                      Clear All
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* CSV Import Preview */}
-            {csvPreview && (
-              <div style={{
-                marginBottom: '20px',
-                border: `1px solid ${isDark ? '#065f46' : '#86efac'}`,
-                backgroundColor: isDark ? '#022c22' : '#f0fdf4',
-                borderRadius: '8px',
-                padding: '16px'
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#10b981', flexShrink: 0 }} />
-                    <span style={{ fontSize: '14px', fontWeight: '600', color: isDark ? '#34d399' : '#047857' }}>
-                      {csvPreview.length} entries ready to import
-                    </span>
-                  </div>
-                  <button 
-                    onClick={() => setCsvPreview(null)} 
-                    style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '4px' }}
-                  >
-                    <X style={{ width: '16px', height: '16px' }} />
-                  </button>
-                </div>
-                
-                {/* Preview Table */}
-                <div style={{ maxHeight: '200px', overflowY: 'auto', marginBottom: '12px', borderRadius: '6px', border: `1px solid ${theme.cardBorder}`, backgroundColor: theme.cardBg }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
-                    <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg }}>
-                      <tr>
-                        <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Name</th>
-                        <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Category</th>
-                        <th style={{ padding: '8px', textAlign: 'left', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Date</th>
-                        <th style={{ padding: '8px', textAlign: 'right', borderBottom: `1px solid ${theme.cardBorder}`, color: theme.textMuted }}>Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {csvPreview.slice(0, 5).map((entry, i) => (
-                        <tr key={i} style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
-                          <td style={{ padding: '8px', color: theme.text }}>{entry.name}</td>
-                          <td style={{ padding: '8px', color: theme.textMuted, textTransform: 'capitalize' }}>{entry.type}</td>
-                          <td style={{ padding: '8px', color: theme.textMuted }}>{entry.date}</td>
-                          <td style={{ padding: '8px', textAlign: 'right', color: theme.text, fontWeight: '500' }}>{currency}{formatAmount(entry.amount)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                  {csvPreview.length > 5 && (
-                    <p style={{ padding: '8px', fontSize: '11px', color: theme.textMuted, margin: 0, textAlign: 'center', backgroundColor: theme.statBg }}>
-                      +{csvPreview.length - 5} more entries...
-                    </p>
-                  )}
-                </div>
-                
-                <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
-                  <button 
-                    onClick={() => setCsvPreview(null)} 
-                    style={{ height: '36px', padding: '0 16px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '13px', color: theme.textMuted, cursor: 'pointer' }}
-                  >
-                    Cancel
-                  </button>
-                  <button 
-                    onClick={handleCsvImport} 
-                    disabled={isSaving}
-                    style={{ height: '36px', padding: '0 16px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
-                  >
-                    {isSaving ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Importing...</> : <><Check style={{ width: '14px', height: '14px' }} /> Import All</>}
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Filters */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
@@ -4360,17 +3655,9 @@ const getBudgetStatus = () => {
 
             {/* Table */}
             <div style={{ overflowX: 'auto', maxHeight: '600px', overflowY: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '650px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
                 <thead style={{ position: 'sticky', top: 0, backgroundColor: theme.cardBg, zIndex: 1 }}>
                   <tr style={{ borderBottom: `1px solid ${theme.cardBorder}` }}>
-                    <th style={{ padding: '12px 8px', textAlign: 'center', width: '40px' }}>
-                      <input
-                        type="checkbox"
-                        checked={filteredEntries.length > 0 && selectedEntries.length === filteredEntries.length}
-                        onChange={toggleSelectAll}
-                        style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#3b82f6' }}
-                      />
-                    </th>
                     <th style={{ padding: '12px 8px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Date</th>
                     <th style={{ padding: '12px 8px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Category</th>
                     <th style={{ padding: '12px 8px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: theme.textSubtle, textTransform: 'uppercase' }}>Name</th>
@@ -4381,7 +3668,7 @@ const getBudgetStatus = () => {
                 <tbody>
                   {filteredEntries.length === 0 ? (
                     <tr>
-                      <td colSpan={6} style={{ textAlign: 'center', padding: '60px 16px' }}>
+                      <td colSpan={5} style={{ textAlign: 'center', padding: '60px 16px' }}>
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px' }}>
                           <div style={{
                             width: '80px',
@@ -4413,7 +3700,6 @@ const getBudgetStatus = () => {
                     filteredEntries.map(entry => {
                       const badge = getBadgeStyle(entry.type, isDark);
                       const categoryInfo = CATEGORIES.find(c => c.value === entry.type);
-                      const isSelected = selectedEntries.includes(entry.id);
                       return (
                         <tr 
                           key={entry.id} 
@@ -4421,20 +3707,11 @@ const getBudgetStatus = () => {
                           style={{ 
                             borderBottom: `1px solid ${theme.cardBorder}`,
                             cursor: 'pointer',
-                            transition: 'background-color 0.15s',
-                            backgroundColor: isSelected ? (isDark ? '#1e3a5f' : '#dbeafe') : 'transparent'
+                            transition: 'background-color 0.15s'
                           }}
-                          onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = isDark ? '#1f1f23' : '#fafafa'; }}
-                          onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.backgroundColor = 'transparent'; }}
+                          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#1f1f23' : '#fafafa'}
+                          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                         >
-                          <td style={{ padding: '12px 8px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
-                            <input
-                              type="checkbox"
-                              checked={isSelected}
-                              onChange={() => toggleEntrySelection(entry.id)}
-                              style={{ width: '16px', height: '16px', cursor: 'pointer', accentColor: '#3b82f6' }}
-                            />
-                          </td>
                           <td style={{ padding: '12px 8px', fontSize: '13px', color: theme.textMuted }}>
                             {new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                           </td>
@@ -4533,7 +3810,7 @@ const getBudgetStatus = () => {
               </span>
             </div>
           </div>
-        ) : activeTab === 'dashboard' && dashboardSubTab === 'bills' ? (
+        ) : activeTab === 'bills' ? (
           /* Bills & Subscriptions Tab */
           <>
             {/* Bills Header Stats */}
@@ -4624,7 +3901,7 @@ const getBudgetStatus = () => {
                   <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>Your next payments sorted by due date</p>
                 </div>
                 <button
-                  onClick={() => { setDashboardSubTab('add-entry'); setUploadMode('manual'); }}
+                  onClick={() => { setActiveTab('dashboard'); setUploadMode('manual'); }}
                   style={{
                     height: '36px',
                     padding: '0 14px',
@@ -4850,24 +4127,161 @@ const getBudgetStatus = () => {
                 </div>
               </div>
             )}
+
+            {/* Monthly Breakdown Chart */}
+            {getRecurringEntries().length > 0 && (
+              <div style={{ ...cardStyle, marginTop: '24px' }}>
+                <h2 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 20px' }}>Recurring Cost Breakdown</h2>
+                <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '24px' }}>
+                  <div>
+                    <ResponsiveContainer width="100%" height={220}>
+                      <PieChart>
+                        <Pie 
+                          data={CATEGORIES.map(cat => {
+                            const bills = getRecurringEntries().filter(e => e.type === cat.value);
+                            const monthlyTotal = bills.reduce((total, entry) => {
+                              if (entry.recurring === 'weekly') return total + (entry.amount * 4.33);
+                              if (entry.recurring === 'monthly') return total + entry.amount;
+                              if (entry.recurring === 'yearly') return total + (entry.amount / 12);
+                              return total;
+                            }, 0);
+                            return { name: cat.label, value: monthlyTotal, color: cat.color };
+                          }).filter(c => c.value > 0)}
+                          cx="50%" 
+                          cy="50%" 
+                          innerRadius={50} 
+                          outerRadius={80} 
+                          paddingAngle={3} 
+                          dataKey="value"
+                        >
+                          {CATEGORIES.map(cat => {
+                            const bills = getRecurringEntries().filter(e => e.type === cat.value);
+                            if (bills.length === 0) return null;
+                            return <Cell key={cat.value} fill={cat.color} />;
+                          })}
+                        </Pie>
+                        <Tooltip formatter={(v) => `${currency}${formatAmount(v)}/mo`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '16px' }}>
+                    <div style={{ padding: '16px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 4px' }}>Daily average</p>
+                      <p style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: 0 }}>
+                        {currency}{formatAmount(getMonthlyRecurringCost() / 30)}
+                      </p>
+                    </div>
+                    <div style={{ padding: '16px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: '0 0 4px' }}>% of monthly budget</p>
+                      <p style={{ fontSize: '24px', fontWeight: '700', color: monthlyBudget > 0 && (getMonthlyRecurringCost() / monthlyBudget * 100) > 80 ? '#ef4444' : theme.text, margin: 0 }}>
+                        {monthlyBudget > 0 ? `${(getMonthlyRecurringCost() / monthlyBudget * 100).toFixed(1)}%` : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </>
         ) : null}
       </main>
         {/* Edit Profile Modal */}
       {showEditProfile && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowEditProfile(false)}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowEditProfile(false); setEditProfilePicture(null); }}>
           <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
               <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit Profile</h3>
-              <button onClick={() => setShowEditProfile(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <button onClick={() => { setShowEditProfile(false); setEditProfilePicture(null); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <X style={{ width: '18px', height: '18px' }} />
               </button>
             </div>
+            
+            {/* Profile Picture Upload */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
-              <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '32px', fontWeight: '600', marginBottom: '12px' }}>
-                {getInitial(editNickname)}
+              <div style={{ position: 'relative' }}>
+                <div style={{ 
+                  width: '100px', 
+                  height: '100px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#3b82f6', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  color: '#fff', 
+                  fontSize: '36px', 
+                  fontWeight: '600',
+                  overflow: 'hidden',
+                  border: `3px solid ${theme.cardBorder}`
+                }}>
+                  {editProfilePicture || profilePicture ? (
+                    <img 
+                      src={editProfilePicture || profilePicture} 
+                      alt="Profile" 
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                    />
+                  ) : (
+                    getInitial(editNickname)
+                  )}
+                </div>
+                <label style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  right: '0',
+                  width: '32px',
+                  height: '32px',
+                  backgroundColor: isDark ? '#fafafa' : '#18181b',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  border: `2px solid ${theme.cardBg}`,
+                  transition: 'transform 0.15s'
+                }}>
+                  <Camera style={{ width: '16px', height: '16px', color: isDark ? '#18181b' : '#fafafa' }} />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 2 * 1024 * 1024) {
+                          alert('Image must be less than 2MB');
+                          return;
+                        }
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          setEditProfilePicture(event.target.result);
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                </label>
               </div>
+              <p style={{ fontSize: '12px', color: theme.textMuted, margin: '8px 0 0' }}>Click camera to upload photo</p>
+              {(editProfilePicture || profilePicture) && (
+                <button
+                  onClick={() => {
+                    setEditProfilePicture('remove');
+                  }}
+                  style={{
+                    marginTop: '8px',
+                    padding: '4px 12px',
+                    backgroundColor: 'transparent',
+                    border: `1px solid #ef4444`,
+                    borderRadius: '4px',
+                    color: '#ef4444',
+                    fontSize: '12px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Remove Photo
+                </button>
+              )}
             </div>
+            
             <div style={{ marginBottom: '16px' }}>
               <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Nickname</label>
               <input
@@ -4891,8 +4305,18 @@ const getBudgetStatus = () => {
                 try {
                   const { error } = await supabase.auth.updateUser({ data: { nickname: editNickname } });
                   if (error) throw error;
+                  
+                  // Update profile picture
+                  if (editProfilePicture === 'remove') {
+                    setProfilePicture(null);
+                    localStorage.removeItem(`profilePic_${user.id}`);
+                  } else if (editProfilePicture) {
+                    setProfilePicture(editProfilePicture);
+                  }
+                  
+                  setEditProfilePicture(null);
                   setShowEditProfile(false);
-                  window.location.reload();
+                  showToast('Profile updated successfully', 'success');
                 } catch (e) {
                   alert('Failed to update profile');
                 }
@@ -4903,294 +4327,6 @@ const getBudgetStatus = () => {
             </button>
           </div>
         </div>
-      )}
-
-      {/* Level Up Modal */}
-      {showLevelUp && levelUpData && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 60 }}>
-          <div style={{ 
-            width: '100%', 
-            maxWidth: '400px', 
-            backgroundColor: theme.cardBg, 
-            borderRadius: '16px', 
-            border: `2px solid #fbbf24`, 
-            padding: '32px',
-            textAlign: 'center',
-            boxShadow: '0 0 40px rgba(251, 191, 36, 0.3)'
-          }}>
-            <div style={{
-              width: '80px',
-              height: '80px',
-              margin: '0 auto 20px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              boxShadow: '0 0 30px rgba(251, 191, 36, 0.5)',
-              animation: 'pulse 1s ease-in-out infinite'
-            }}>
-              <Star style={{ width: '40px', height: '40px', color: '#fff' }} />
-            </div>
-            <h2 style={{ fontSize: '28px', fontWeight: '700', color: '#fbbf24', margin: '0 0 8px' }}>LEVEL UP!</h2>
-            <p style={{ fontSize: '16px', color: theme.text, margin: '0 0 20px' }}>
-              You reached <strong>Level {levelUpData.newLevel}</strong>!
-            </p>
-            
-            {levelUpData.newFrames && levelUpData.newFrames.length > 0 && (
-              <div style={{ 
-                padding: '16px', 
-                backgroundColor: isDark ? '#1a1a1d' : '#fefce8', 
-                borderRadius: '10px',
-                marginBottom: '20px',
-                border: `1px solid ${isDark ? '#fbbf24' : '#fde047'}`
-              }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '8px' }}>
-                  <Gift style={{ width: '18px', height: '18px', color: '#f59e0b' }} />
-                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#f59e0b' }}>New Reward Unlocked!</span>
-                </div>
-                <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>
-                  {levelUpData.newFrames[0].name}
-                </p>
-                <p style={{ fontSize: '12px', color: theme.textMuted, margin: '4px 0 0' }}>
-                  New profile frame available
-                </p>
-              </div>
-            )}
-            
-            <button
-              onClick={() => { setShowLevelUp(false); setLevelUpData(null); }}
-              style={{
-                width: '100%',
-                height: '44px',
-                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '15px',
-                fontWeight: '600',
-                color: '#fff',
-                cursor: 'pointer'
-              }}
-            >
-              Awesome!
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Rewards Modal */}
-      {showRewardsModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowRewardsModal(false)}>
-          <div style={{ width: '100%', maxWidth: '500px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Level & Rewards</h3>
-                <p style={{ fontSize: '13px', color: theme.textMuted, margin: '4px 0 0' }}>Track your progress and unlock frames</p>
-              </div>
-              <button onClick={() => setShowRewardsModal(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X style={{ width: '16px', height: '16px' }} />
-              </button>
-            </div>
-            
-            <div style={{ padding: '20px', overflowY: 'auto' }}>
-              {/* Current Level */}
-              <div style={{ 
-                padding: '20px', 
-                background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', 
-                borderRadius: '12px', 
-                marginBottom: '20px',
-                color: '#fff',
-                textAlign: 'center'
-              }}>
-                <div style={{
-                  width: '60px',
-                  height: '60px',
-                  margin: '0 auto 12px',
-                  borderRadius: '50%',
-                  backgroundColor: 'rgba(255,255,255,0.2)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '24px',
-                  fontWeight: '700'
-                }}>
-                  {currentLevel}
-                </div>
-                <h4 style={{ fontSize: '20px', fontWeight: '700', margin: '0 0 4px' }}>Level {currentLevel}</h4>
-                <p style={{ fontSize: '14px', opacity: 0.9, margin: '0 0 16px' }}>{userXP} / {nextLevelXP} XP</p>
-                <div style={{
-                  height: '10px',
-                  backgroundColor: 'rgba(255,255,255,0.3)',
-                  borderRadius: '5px',
-                  overflow: 'hidden'
-                }}>
-                  <div style={{
-                    height: '100%',
-                    width: `${levelProgress}%`,
-                    backgroundColor: '#fff',
-                    borderRadius: '5px',
-                    transition: 'width 0.3s ease'
-                  }} />
-                </div>
-                <p style={{ fontSize: '12px', opacity: 0.8, margin: '8px 0 0' }}>
-                  {Math.ceil(nextLevelXP - userXP)} XP to Level {currentLevel + 1}
-                </p>
-              </div>
-              
-              {/* XP Rewards Info */}
-              <div style={{ marginBottom: '20px' }}>
-                <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>How to Earn XP</h4>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                  {[
-                    { action: 'Add entry', xp: '+10 XP' },
-                    { action: 'With receipt', xp: '+20 XP' },
-                    { action: 'With notes', xp: '+5 XP' },
-                    { action: 'Set budget', xp: '+15 XP' },
-                    { action: '10 entries', xp: '+100 XP' },
-                    { action: '50 entries', xp: '+250 XP' },
-                  ].map((item, i) => (
-                    <div key={i} style={{ 
-                      padding: '8px 12px', 
-                      backgroundColor: theme.statBg, 
-                      borderRadius: '6px',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center'
-                    }}>
-                      <span style={{ fontSize: '12px', color: theme.textMuted }}>{item.action}</span>
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#22c55e' }}>{item.xp}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Profile Frames */}
-              <h4 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>Profile Frames</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-                {PROFILE_FRAMES.map((frame) => {
-                  const isUnlocked = currentLevel >= frame.level;
-                  const isSelected = selectedFrame === frame.id;
-                  return (
-                    <div 
-                      key={frame.id}
-                      onClick={() => isUnlocked && setSelectedFrame(frame.id)}
-                      style={{ 
-                        padding: '12px',
-                        backgroundColor: isSelected ? (isDark ? '#1e3a5f' : '#dbeafe') : theme.statBg,
-                        borderRadius: '10px',
-                        border: isSelected ? '2px solid #3b82f6' : `1px solid ${theme.cardBorder}`,
-                        cursor: isUnlocked ? 'pointer' : 'not-allowed',
-                        opacity: isUnlocked ? 1 : 0.5,
-                        transition: 'all 0.15s',
-                        textAlign: 'center'
-                      }}
-                    >
-                      <div style={{
-                        width: '50px',
-                        height: '50px',
-                        margin: '0 auto 8px',
-                        borderRadius: '50%',
-                        backgroundColor: isDark ? '#27272a' : '#e4e4e7',
-                        border: frame.border,
-                        boxShadow: isUnlocked ? frame.glow : 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {isUnlocked ? (
-                          <span style={{ fontSize: '16px' }}>👤</span>
-                        ) : (
-                          <span style={{ fontSize: '14px' }}>🔒</span>
-                        )}
-                      </div>
-                      <p style={{ fontSize: '12px', fontWeight: '600', color: theme.text, margin: '0 0 2px' }}>{frame.name}</p>
-                      <p style={{ fontSize: '10px', color: isUnlocked ? '#22c55e' : theme.textMuted, margin: 0 }}>
-                        {isUnlocked ? (isSelected ? '✓ Equipped' : 'Click to equip') : `Lvl ${frame.level}`}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Christmas Theme Decorations */}
-      {isChristmasTheme && (
-        <>
-          {/* Snow Animation */}
-          <div style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            height: '100vh', 
-            pointerEvents: 'none', 
-            zIndex: 100,
-            overflow: 'hidden'
-          }}>
-            {[...Array(50)].map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  left: `${Math.random() * 100}%`,
-                  width: `${Math.random() * 8 + 4}px`,
-                  height: `${Math.random() * 8 + 4}px`,
-                  backgroundColor: '#fff',
-                  borderRadius: '50%',
-                  opacity: Math.random() * 0.7 + 0.3,
-                  animation: `snowfall ${Math.random() * 3 + 4}s linear infinite`,
-                  animationDelay: `${Math.random() * 5}s`
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Christmas Lights at top */}
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            display: 'flex',
-            justifyContent: 'space-around',
-            zIndex: 101,
-            pointerEvents: 'none'
-          }}>
-            {[...Array(30)].map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  backgroundColor: ['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4],
-                  boxShadow: `0 0 10px ${['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4]}`,
-                  animation: `twinkle ${Math.random() * 1 + 0.5}s ease-in-out infinite alternate`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  marginTop: '2px'
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Santa on header (right side) */}
-          <div style={{
-            position: 'fixed',
-            top: '8px',
-            right: '16px',
-            fontSize: '32px',
-            zIndex: 102,
-            pointerEvents: 'none',
-            animation: 'santaBounce 2s ease-in-out infinite'
-          }}>
-            🎅
-          </div>
-        </>
       )}
 
       {/* Feedback Modal */}
@@ -5376,102 +4512,6 @@ const getBudgetStatus = () => {
                 style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
               >
                 {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Delete</>}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Bulk Delete Confirmation Modal */}
-      {showBulkDeleteConfirm && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowBulkDeleteConfirm(false)}>
-          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete {selectedEntries.length} Entries?</h3>
-            <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 20px' }}>
-              Are you sure you want to delete <strong>{selectedEntries.length}</strong> selected entries? This action cannot be undone.
-            </p>
-            
-            <div style={{ 
-              padding: '16px', 
-              backgroundColor: isDark ? '#450a0a' : '#fef2f2', 
-              borderRadius: '8px', 
-              marginBottom: '20px',
-              border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`
-            }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
-                <AlertTriangle style={{ width: '16px', height: '16px', color: '#ef4444' }} />
-                <span style={{ fontSize: '13px', fontWeight: '600', color: '#ef4444' }}>
-                  Total: {currency}{formatAmount(entries.filter(e => selectedEntries.includes(e.id)).reduce((sum, e) => sum + e.amount, 0))}
-                </span>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={() => setShowBulkDeleteConfirm(false)}
-                style={{ flex: 1, height: '44px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleBulkDelete}
-                disabled={isDeleting}
-                style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isDeleting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isDeleting ? 0.7 : 1 }}
-              >
-                {isDeleting ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Delete All Selected</>}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Clear All Entries Confirmation Modal */}
-      {showClearAllConfirm && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowClearAllConfirm(false)}>
-          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
-            </div>
-            <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Clear All Entries?</h3>
-            <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 20px' }}>
-              This will permanently delete <strong>ALL {entries.length} entries</strong> from your account. This action cannot be undone!
-            </p>
-            
-            <div style={{ 
-              padding: '16px', 
-              backgroundColor: isDark ? '#450a0a' : '#fef2f2', 
-              borderRadius: '8px', 
-              marginBottom: '20px',
-              border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`
-            }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', alignItems: 'center' }}>
-                <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>
-                  You will lose all expense records including:
-                </span>
-                <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '12px', color: theme.textMuted }}>{entries.length} entries</span>
-                  <span style={{ fontSize: '12px', color: theme.textMuted }}>•</span>
-                  <span style={{ fontSize: '12px', fontWeight: '600', color: '#ef4444' }}>{currency}{formatAmount(entries.reduce((sum, e) => sum + e.amount, 0))} total</span>
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={() => setShowClearAllConfirm(false)}
-                style={{ flex: 1, height: '44px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleClearAll}
-                disabled={isDeleting}
-                style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isDeleting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isDeleting ? 0.7 : 1 }}
-              >
-                {isDeleting ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Clearing...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Clear Everything</>}
               </button>
             </div>
           </div>
@@ -5742,35 +4782,6 @@ const getBudgetStatus = () => {
           from { transform: translateX(100%); opacity: 0; }
           to { transform: translateX(0); opacity: 1; }
         }
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-        @keyframes snowfall {
-          0% { transform: translateY(-10px) rotate(0deg); }
-          100% { transform: translateY(100vh) rotate(360deg); }
-        }
-        @keyframes twinkle {
-          0% { opacity: 0.3; transform: scale(0.8); }
-          100% { opacity: 1; transform: scale(1.2); }
-        }
-        @keyframes santaBounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
-        }
-        @keyframes rainbow-border {
-          0% { border-color: #ff0000; }
-          17% { border-color: #ff8000; }
-          33% { border-color: #ffff00; }
-          50% { border-color: #00ff00; }
-          67% { border-color: #0080ff; }
-          83% { border-color: #8000ff; }
-          100% { border-color: #ff0000; }
-        }
-        @keyframes legendary-pulse {
-          0%, 100% { box-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00; }
-          50% { box-shadow: 0 0 30px #ffd700, 0 0 50px #ff8c00, 0 0 70px #ff4500; }
-        }
         * { box-sizing: border-box; }
         input, select, button { font-family: inherit; }
         input::placeholder { color: ${theme.textDim}; }
@@ -5805,9 +4816,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
   const [viewingFeedback, setViewingFeedback] = useState(null);
   const [deletingUser, setDeletingUser] = useState(null);
   const [expenseSearch, setExpenseSearch] = useState('');
-  const [editingUser, setEditingUser] = useState(null);
-  const [editUserForm, setEditUserForm] = useState({ nickname: '', email: '', password: '' });
-  const [savingUser, setSavingUser] = useState(false);
 
   useEffect(() => {
     fetchUsers();
@@ -5817,133 +4825,34 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      // First, try to get all profiles (users who have signed up)
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*');
-      
-      // Then get all expenses
-      const { data: expenses, error: expensesError } = await supabase
+      const { data: expenses, error } = await supabase
         .from('expenses')
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (expensesError) console.error('Expenses error:', expensesError);
+      if (error) throw error;
 
       const userMap = {};
-      
-      // Add users from profiles table first (if available)
-      if (profiles && !profilesError) {
-        profiles.forEach(profile => {
-          userMap[profile.id] = {
-            id: profile.id,
-            email: profile.email || profile.id,
-            nickname: profile.nickname || profile.full_name || profile.username || 'User',
+      expenses?.forEach(expense => {
+        if (!userMap[expense.user_id]) {
+          userMap[expense.user_id] = {
+            id: expense.user_id,
+            email: expense.user_email || expense.user_id,
+            nickname: expense.user_nickname || 'User',
             expenses: [],
             totalSpent: 0,
-            createdAt: profile.created_at || profile.updated_at
+            createdAt: expense.created_at
           };
-        });
-      }
-      
-      // Add/update users from expenses - match by user_id
-      if (expenses && expenses.length > 0) {
-        expenses.forEach(expense => {
-          const userId = expense.user_id;
-          if (userId && userMap[userId]) {
-            // User exists from profiles, add expense
-            userMap[userId].expenses.push(expense);
-            userMap[userId].totalSpent += parseFloat(expense.amount) || 0;
-            // Update email/nickname if we have better data from expenses
-            if (expense.user_email && (!userMap[userId].email || userMap[userId].email === userId)) {
-              userMap[userId].email = expense.user_email;
-            }
-            if (expense.user_nickname && userMap[userId].nickname === 'User') {
-              userMap[userId].nickname = expense.user_nickname;
-            }
-          } else if (userId) {
-            // User not in profiles, create from expense
-            userMap[userId] = {
-              id: userId,
-              email: expense.user_email || userId,
-              nickname: expense.user_nickname || 'User',
-              expenses: [expense],
-              totalSpent: parseFloat(expense.amount) || 0,
-              createdAt: expense.created_at
-            };
-          }
-        });
-      }
+        }
+        userMap[expense.user_id].expenses.push(expense);
+        userMap[expense.user_id].totalSpent += expense.amount;
+      });
 
       setUsers(Object.values(userMap));
     } catch (error) {
       console.error('Error fetching users:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Handle editing user
-  const handleEditUser = (user) => {
-    setEditingUser(user);
-    setEditUserForm({
-      nickname: user.nickname || '',
-      email: user.email || '',
-      password: ''
-    });
-  };
-
-  // Save user changes via Edge Function
-  const handleSaveUser = async () => {
-    if (!editingUser) return;
-    setSavingUser(true);
-    
-    try {
-      // Get the current session for authorization
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        throw new Error('No active session');
-      }
-
-      // Call the edge function
-      const response = await fetch(
-        `${supabase.supabaseUrl}/functions/v1/admin-update-user`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({
-            userId: editingUser.id,
-            email: editUserForm.email !== editingUser.email ? editUserForm.email : undefined,
-            password: editUserForm.password || undefined,
-            nickname: editUserForm.nickname
-          })
-        }
-      );
-
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to update user');
-      }
-
-      // Update local state
-      setUsers(prev => prev.map(u => 
-        u.id === editingUser.id 
-          ? { ...u, nickname: editUserForm.nickname, email: editUserForm.email }
-          : u
-      ));
-      
-      setEditingUser(null);
-      alert(`User updated successfully! Updated: ${result.updated.join(', ')}`);
-    } catch (error) {
-      console.error('Error updating user:', error);
-      alert('Failed to update user: ' + error.message);
-    } finally {
-      setSavingUser(false);
     }
   };
 
@@ -6016,6 +4925,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
   const unreadCount = feedbacks.filter(f => !f.read).length;
   const totalUsers = users.length;
+  const totalEntries = users.reduce((sum, user) => sum + user.expenses.length, 0);
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
@@ -6067,12 +4977,12 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               </div>
               <div style={{ padding: '20px', borderRadius: '12px', backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Total Feedbacks</span>
-                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#8b5cf620', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <MessageSquare style={{ width: '18px', height: '18px', color: '#8b5cf6' }} />
+                  <span style={{ fontSize: '13px', color: theme.textMuted }}>Total Entries</span>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: '#10b98120', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <FileText style={{ width: '18px', height: '18px', color: '#10b981' }} />
                   </div>
                 </div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>{feedbacks.length}</p>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: theme.text, margin: 0 }}>{totalEntries}</p>
               </div>
             </div>
 
@@ -6104,6 +5014,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                       <tr style={{ backgroundColor: theme.statBg }}>
                         <th style={{ textAlign: 'left', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>User</th>
                         <th style={{ textAlign: 'center', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Entries</th>
+                        <th style={{ textAlign: 'right', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Total Spent</th>
                         <th style={{ textAlign: 'center', padding: '14px 20px', fontSize: '12px', fontWeight: '600', color: theme.textMuted, textTransform: 'uppercase' }}>Actions</th>
                       </tr>
                     </thead>
@@ -6122,15 +5033,15 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           <td style={{ padding: '16px 20px', textAlign: 'center' }}>
                             <span style={{ fontSize: '13px', padding: '4px 12px', borderRadius: '20px', backgroundColor: isDark ? '#1e3a5f' : '#dbeafe', color: isDark ? '#60a5fa' : '#1d4ed8' }}>{user.expenses.length} entries</span>
                           </td>
+                          <td style={{ padding: '16px 20px', textAlign: 'right' }}>
+                            <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>₱{formatAmount(user.totalSpent)}</span>
+                          </td>
                           <td style={{ padding: '16px 20px', textAlign: 'center' }}>
                             <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                              <button onClick={() => { setViewingUser(user); setExpenseSearch(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="View Expenses">
+                              <button onClick={() => { setViewingUser(user); setExpenseSearch(''); }} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Eye style={{ width: '14px', height: '14px' }} />
                               </button>
-                              <button onClick={() => handleEditUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit User">
-                                <Edit style={{ width: '14px', height: '14px' }} />
-                              </button>
-                              <button onClick={() => setDeletingUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: '1px solid #dc2626', borderRadius: '6px', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Delete User">
+                              <button onClick={() => setDeletingUser(user)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: '1px solid #dc2626', borderRadius: '6px', color: '#dc2626', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Trash2 style={{ width: '14px', height: '14px' }} />
                               </button>
                             </div>
@@ -6256,161 +5167,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               <button onClick={() => setDeletingUser(null)} style={{ flex: 1, height: '42px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, color: theme.text, borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>Cancel</button>
               <button onClick={handleDeleteUser} style={{ flex: 1, height: '42px', backgroundColor: '#dc2626', color: '#fff', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                 <Trash2 style={{ width: '16px', height: '16px' }} />Delete
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Edit User Modal */}
-      {editingUser && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '16px' }} onClick={() => setEditingUser(null)}>
-          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <div style={{ width: '44px', height: '44px', borderRadius: '50%', backgroundColor: '#3b82f6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '18px', fontWeight: '600' }}>{getInitial(editingUser.nickname)}</div>
-                <div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit User</h3>
-                  <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0' }}>Update user information</p>
-                </div>
-              </div>
-              <button onClick={() => setEditingUser(null)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X style={{ width: '16px', height: '16px' }} />
-              </button>
-            </div>
-            
-            <div style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Nickname */}
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Nickname</label>
-                <input
-                  type="text"
-                  value={editUserForm.nickname}
-                  onChange={(e) => setEditUserForm({ ...editUserForm, nickname: e.target.value })}
-                  placeholder="Enter nickname"
-                  style={{
-                    width: '100%',
-                    height: '42px',
-                    padding: '0 12px',
-                    backgroundColor: theme.inputBg,
-                    border: `1px solid ${theme.inputBorder}`,
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: theme.text,
-                    outline: 'none'
-                  }}
-                />
-              </div>
-              
-              {/* Email */}
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Email</label>
-                <input
-                  type="email"
-                  value={editUserForm.email}
-                  onChange={(e) => setEditUserForm({ ...editUserForm, email: e.target.value })}
-                  placeholder="Enter email"
-                  style={{
-                    width: '100%',
-                    height: '42px',
-                    padding: '0 12px',
-                    backgroundColor: theme.inputBg,
-                    border: `1px solid ${theme.inputBorder}`,
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: theme.text,
-                    outline: 'none'
-                  }}
-                />
-              </div>
-              
-              {/* Password */}
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>
-                  New Password <span style={{ fontWeight: '400', color: theme.textDim }}>(leave empty to keep current)</span>
-                </label>
-                <input
-                  type="password"
-                  value={editUserForm.password}
-                  onChange={(e) => setEditUserForm({ ...editUserForm, password: e.target.value })}
-                  placeholder="Enter new password"
-                  style={{
-                    width: '100%',
-                    height: '42px',
-                    padding: '0 12px',
-                    backgroundColor: theme.inputBg,
-                    border: `1px solid ${theme.inputBorder}`,
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                    color: theme.text,
-                    outline: 'none'
-                  }}
-                />
-                {editUserForm.password && editUserForm.password.length < 6 && (
-                  <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>Password must be at least 6 characters</p>
-                )}
-              </div>
-              
-              {/* User ID (read-only) */}
-              <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>User ID</label>
-                <div style={{
-                  width: '100%',
-                  height: '42px',
-                  padding: '0 12px',
-                  backgroundColor: theme.statBg,
-                  border: `1px solid ${theme.cardBorder}`,
-                  borderRadius: '6px',
-                  fontSize: '12px',
-                  color: theme.textDim,
-                  display: 'flex',
-                  alignItems: 'center',
-                  fontFamily: 'monospace',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
-                }}>
-                  {editingUser.id}
-                </div>
-              </div>
-            </div>
-            
-            <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, backgroundColor: theme.statBg, display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
-              <button 
-                onClick={() => setEditingUser(null)} 
-                style={{ height: '40px', padding: '0 20px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', fontSize: '14px', fontWeight: '500', color: theme.text, cursor: 'pointer' }}
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={handleSaveUser}
-                disabled={savingUser || (editUserForm.password && editUserForm.password.length < 6)}
-                style={{ 
-                  height: '40px', 
-                  padding: '0 20px', 
-                  backgroundColor: isDark ? '#fafafa' : '#18181b', 
-                  color: isDark ? '#18181b' : '#fafafa', 
-                  border: 'none', 
-                  borderRadius: '6px', 
-                  fontSize: '14px', 
-                  fontWeight: '500', 
-                  cursor: (savingUser || (editUserForm.password && editUserForm.password.length < 6)) ? 'not-allowed' : 'pointer',
-                  opacity: (savingUser || (editUserForm.password && editUserForm.password.length < 6)) ? 0.6 : 1,
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                {savingUser ? (
-                  <>
-                    <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Check style={{ width: '16px', height: '16px' }} />
-                    Save Changes
-                  </>
-                )}
               </button>
             </div>
           </div>
