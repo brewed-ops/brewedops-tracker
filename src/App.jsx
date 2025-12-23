@@ -2273,40 +2273,40 @@ const getBudgetStatus = () => {
       <header style={{
         backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
         borderBottom: `1px solid ${theme.cardBorder}`,
-        padding: isSmall ? '14px 12px' : '16px 24px',
+        padding: isSmall ? '14px 12px' : '18px 24px',
         position: 'sticky',
         top: 0,
         zIndex: 20
       }}>
         <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '8px' : '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '10px' : '14px' }}>
             <img 
               src="https://i.imgur.com/R52jwPv.png" 
               alt="BrewedOps Logo" 
               style={{ 
-                width: isSmall ? '32px' : '36px', 
-                height: isSmall ? '32px' : '36px', 
+                width: isSmall ? '36px' : '44px', 
+                height: isSmall ? '36px' : '44px', 
                 borderRadius: '50%', 
                 objectFit: 'cover',
                 flexShrink: 0 
               }} 
             />
-            <h1 style={{ fontSize: isSmall ? '14px' : '15px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
+            <h1 style={{ fontSize: isSmall ? '16px' : '18px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
           </div>
 
           {/* Desktop Header Actions */}
           {!isMobile ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
               {/* Level & XP Bar */}
               <div 
                 onClick={() => setShowRewardsModal(true)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
-                  padding: '6px 12px',
+                  gap: '10px',
+                  padding: '8px 14px',
                   backgroundColor: theme.statBg,
-                  borderRadius: '8px',
+                  borderRadius: '10px',
                   cursor: 'pointer',
                   transition: 'transform 0.15s',
                   border: `1px solid ${theme.cardBorder}`
@@ -2318,49 +2318,49 @@ const getBudgetStatus = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '28px',
-                  height: '28px',
+                  width: '34px',
+                  height: '34px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
                   color: '#fff',
-                  fontSize: '12px',
+                  fontSize: '14px',
                   fontWeight: '700',
-                  boxShadow: '0 2px 4px rgba(245, 158, 11, 0.3)'
+                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.3)'
                 }}>
                   {currentLevel}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '80px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', minWidth: '90px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '10px', fontWeight: '600', color: theme.text }}>Level {currentLevel}</span>
-                    <span style={{ fontSize: '9px', color: theme.textMuted }}>{userXP} XP</span>
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>Level {currentLevel}</span>
+                    <span style={{ fontSize: '11px', color: theme.textMuted }}>{userXP} XP</span>
                   </div>
                   <div style={{
-                    height: '6px',
+                    height: '7px',
                     backgroundColor: isDark ? '#27272a' : '#e4e4e7',
-                    borderRadius: '3px',
+                    borderRadius: '4px',
                     overflow: 'hidden'
                   }}>
                     <div style={{
                       height: '100%',
                       width: `${levelProgress}%`,
                       background: 'linear-gradient(90deg, #22c55e, #10b981)',
-                      borderRadius: '3px',
+                      borderRadius: '4px',
                       transition: 'width 0.3s ease'
                     }} />
                   </div>
                 </div>
-                <Gift style={{ width: '14px', height: '14px', color: '#f59e0b' }} />
+                <Gift style={{ width: '18px', height: '18px', color: '#f59e0b' }} />
               </div>
               
               {/* Christmas Theme Toggle */}
               <button
                 onClick={() => setIsChristmasTheme(!isChristmasTheme)}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '40px',
+                  height: '40px',
                   backgroundColor: isChristmasTheme ? '#dc2626' : 'transparent',
                   border: `1px solid ${isChristmasTheme ? '#dc2626' : theme.inputBorder}`,
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   color: isChristmasTheme ? '#fff' : theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
@@ -2369,19 +2369,19 @@ const getBudgetStatus = () => {
                 }}
                 title={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
               >
-                <TreePine style={{ width: '16px', height: '16px' }} />
+                <TreePine style={{ width: '20px', height: '20px' }} />
               </button>
               
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
                 style={{
-                  height: '32px',
+                  height: '40px',
                   backgroundColor: theme.inputBg,
                   border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '6px',
-                  padding: '0 8px',
-                  fontSize: '13px',
+                  borderRadius: '8px',
+                  padding: '0 12px',
+                  fontSize: '14px',
                   color: theme.text,
                   cursor: 'pointer',
                   outline: 'none'
@@ -2396,31 +2396,31 @@ const getBudgetStatus = () => {
               <button
                 onClick={() => setShowFeedback(true)}
                 style={{
-                  height: '32px',
-                  padding: '0 12px',
+                  height: '40px',
+                  padding: '0 16px',
                   backgroundColor: 'transparent',
                   border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   color: theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  fontSize: '13px'
+                  gap: '8px',
+                  fontSize: '14px'
                 }}
               >
-                <MessageSquare style={{ width: '14px', height: '14px' }} />
+                <MessageSquare style={{ width: '18px', height: '18px' }} />
                 Feedback
               </button>
               
               <button
                 onClick={() => setIsDark(!isDark)}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '40px',
+                  height: '40px',
                   backgroundColor: 'transparent',
                   border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   color: theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
@@ -2428,7 +2428,7 @@ const getBudgetStatus = () => {
                   justifyContent: 'center'
                 }}
               >
-                {isDark ? <Sun style={{ width: '16px', height: '16px' }} /> : <Moon style={{ width: '16px', height: '16px' }} />}
+                {isDark ? <Sun style={{ width: '20px', height: '20px' }} /> : <Moon style={{ width: '20px', height: '20px' }} />}
               </button>
 
               {/* Profile Avatar with Dropdown */}
@@ -2442,7 +2442,7 @@ const getBudgetStatus = () => {
                     backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
                     border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
                     color: '#fff',
-                    fontSize: '16px',
+                    fontSize: '18px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     display: 'flex',
@@ -2531,17 +2531,17 @@ const getBudgetStatus = () => {
             </div>
           ) : (
             /* Mobile Header Actions */
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {/* Mobile Level & XP Bar - Compact */}
               <div 
                 onClick={() => setShowRewardsModal(true)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  padding: '4px 8px',
+                  gap: '8px',
+                  padding: '6px 10px',
                   backgroundColor: theme.statBg,
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
                   border: `1px solid ${theme.cardBorder}`
                 }}
@@ -2550,31 +2550,31 @@ const getBudgetStatus = () => {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  width: '22px',
-                  height: '22px',
+                  width: '26px',
+                  height: '26px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
                   color: '#fff',
-                  fontSize: '10px',
+                  fontSize: '11px',
                   fontWeight: '700'
                 }}>
                   {currentLevel}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px', minWidth: '50px' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: '55px' }}>
                   <div style={{
-                    height: '4px',
+                    height: '5px',
                     backgroundColor: isDark ? '#27272a' : '#e4e4e7',
-                    borderRadius: '2px',
+                    borderRadius: '3px',
                     overflow: 'hidden'
                   }}>
                     <div style={{
                       height: '100%',
                       width: `${levelProgress}%`,
                       background: 'linear-gradient(90deg, #22c55e, #10b981)',
-                      borderRadius: '2px'
+                      borderRadius: '3px'
                     }} />
                   </div>
-                  <span style={{ fontSize: '8px', color: theme.textMuted }}>{userXP} XP</span>
+                  <span style={{ fontSize: '9px', color: theme.textMuted }}>{userXP} XP</span>
                 </div>
               </div>
 
@@ -2582,11 +2582,11 @@ const getBudgetStatus = () => {
               <button
                 onClick={() => setIsChristmasTheme(!isChristmasTheme)}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '36px',
+                  height: '36px',
                   backgroundColor: isChristmasTheme ? '#dc2626' : 'transparent',
                   border: `1px solid ${isChristmasTheme ? '#dc2626' : theme.inputBorder}`,
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   color: isChristmasTheme ? '#fff' : theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
@@ -2594,17 +2594,17 @@ const getBudgetStatus = () => {
                   justifyContent: 'center'
                 }}
               >
-                <TreePine style={{ width: '14px', height: '14px' }} />
+                <TreePine style={{ width: '18px', height: '18px' }} />
               </button>
               
               <button
                 onClick={() => setIsDark(!isDark)}
                 style={{
-                  width: '32px',
-                  height: '32px',
+                  width: '36px',
+                  height: '36px',
                   backgroundColor: 'transparent',
                   border: `1px solid ${theme.inputBorder}`,
-                  borderRadius: '6px',
+                  borderRadius: '8px',
                   color: theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
@@ -2612,7 +2612,7 @@ const getBudgetStatus = () => {
                   justifyContent: 'center'
                 }}
               >
-                {isDark ? <Sun style={{ width: '14px', height: '14px' }} /> : <Moon style={{ width: '14px', height: '14px' }} />}
+                {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
               </button>
               
               {/* Mobile Profile Avatar with Dropdown */}
@@ -2620,13 +2620,13 @@ const getBudgetStatus = () => {
                 <button
                   onClick={() => setShowProfileMenu(!showProfileMenu)}
                   style={{
-                    width: '40px',
-                    height: '40px',
+                    width: '44px',
+                    height: '44px',
                     borderRadius: '50%',
                     backgroundColor: profilePicture ? 'transparent' : '#3b82f6',
                     border: currentFrame.border !== 'none' ? currentFrame.border : '2px solid transparent',
                     color: '#fff',
-                    fontSize: '14px',
+                    fontSize: '16px',
                     fontWeight: '600',
                     cursor: 'pointer',
                     display: 'flex',
@@ -2656,24 +2656,24 @@ const getBudgetStatus = () => {
                 {showProfileMenu && (
                   <div style={{
                     position: 'absolute',
-                    top: '46px',
+                    top: '50px',
                     right: 0,
-                    width: '200px',
+                    width: '220px',
                     backgroundColor: theme.cardBg,
                     border: `1px solid ${theme.cardBorder}`,
-                    borderRadius: '8px',
+                    borderRadius: '10px',
                     boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
                     zIndex: 50,
                     overflow: 'hidden'
                   }}>
-                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                      <p style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
-                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
+                    <div style={{ padding: '14px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                      <p style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>{user.user_metadata?.nickname || 'User'}</p>
+                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: '2px 0 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.email}</p>
                     </div>
                     
                     {/* Currency Selector in Mobile Menu */}
-                    <div style={{ padding: '10px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                      <label style={{ fontSize: '12px', color: theme.textMuted, display: 'block', marginBottom: '6px' }}>Currency</label>
+                    <div style={{ padding: '12px 16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
+                      <label style={{ fontSize: '13px', color: theme.textMuted, display: 'block', marginBottom: '8px' }}>Currency</label>
                       <select
                         value={currency}
                         onChange={(e) => setCurrency(e.target.value)}
@@ -2700,57 +2700,57 @@ const getBudgetStatus = () => {
                       onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
                       style={{
                         width: '100%',
-                        padding: '10px 16px',
+                        padding: '12px 16px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px',
+                        gap: '12px',
                         cursor: 'pointer',
-                        fontSize: '14px',
+                        fontSize: '15px',
                         color: theme.text,
                         textAlign: 'left'
                       }}
                     >
-                      <Edit style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                      <Edit style={{ width: '18px', height: '18px', color: theme.textMuted }} />
                       Edit Profile
                     </button>
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowFeedback(true); }}
                       style={{
                         width: '100%',
-                        padding: '10px 16px',
+                        padding: '12px 16px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px',
+                        gap: '12px',
                         cursor: 'pointer',
-                        fontSize: '14px',
+                        fontSize: '15px',
                         color: theme.text,
                         textAlign: 'left'
                       }}
                     >
-                      <MessageSquare style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                      <MessageSquare style={{ width: '18px', height: '18px', color: theme.textMuted }} />
                       Send Feedback
                     </button>
                     <button
                       onClick={() => { setShowProfileMenu(false); onLogout(); }}
                       style={{
                         width: '100%',
-                        padding: '10px 16px',
+                        padding: '12px 16px',
                         backgroundColor: 'transparent',
                         border: 'none',
                         display: 'flex',
                         alignItems: 'center',
-                        gap: '10px',
+                        gap: '12px',
                         cursor: 'pointer',
-                        fontSize: '14px',
+                        fontSize: '15px',
                         color: '#ef4444',
                         textAlign: 'left'
                       }}
                     >
-                      <LogOut style={{ width: '16px', height: '16px' }} />
+                      <LogOut style={{ width: '18px', height: '18px' }} />
                       Logout
                     </button>
                   </div>
@@ -2771,11 +2771,11 @@ const getBudgetStatus = () => {
           <button
             onClick={() => setActiveTab('dashboard')}
             style={{
-              padding: '12px 16px',
+              padding: '14px 18px',
               backgroundColor: 'transparent',
               border: 'none',
               borderBottom: activeTab === 'dashboard' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent',
-              fontSize: '14px',
+              fontSize: '15px',
               fontWeight: '500',
               color: activeTab === 'dashboard' ? theme.text : theme.textMuted,
               cursor: 'pointer',
@@ -2790,11 +2790,11 @@ const getBudgetStatus = () => {
           <button
             onClick={() => setActiveTab('entries')}
             style={{
-              padding: '12px 16px',
+              padding: '14px 18px',
               backgroundColor: 'transparent',
               border: 'none',
               borderBottom: activeTab === 'entries' ? `2px solid ${isDark ? '#fafafa' : '#18181b'}` : '2px solid transparent',
-              fontSize: '14px',
+              fontSize: '15px',
               fontWeight: '500',
               color: activeTab === 'entries' ? theme.text : theme.textMuted,
               cursor: 'pointer',
@@ -2809,11 +2809,11 @@ const getBudgetStatus = () => {
               <span style={{
                 backgroundColor: activeTab === 'entries' ? (isDark ? '#3b82f6' : '#2563eb') : (isDark ? '#3f3f46' : '#e4e4e7'),
                 color: activeTab === 'entries' ? '#fff' : theme.textMuted,
-                fontSize: '11px',
+                fontSize: '12px',
                 fontWeight: '600',
-                padding: '2px 7px',
+                padding: '3px 8px',
                 borderRadius: '10px',
-                minWidth: '20px',
+                minWidth: '22px',
                 textAlign: 'center'
               }}>
                 {entries.length}
