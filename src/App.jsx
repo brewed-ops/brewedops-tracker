@@ -1384,6 +1384,10 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [withdrawAmount, setWithdrawAmount] = useState('');
   const [withdrawNote, setWithdrawNote] = useState('');
   
+  // Clear all wallets state
+  const [showClearAllWalletsConfirm, setShowClearAllWalletsConfirm] = useState(false);
+  const [clearWalletsConfirmText, setClearWalletsConfirmText] = useState('');
+  
   // Bulk delete states
   const [selectedEntries, setSelectedEntries] = useState([]);
   const [showBulkDeleteConfirm, setShowBulkDeleteConfirm] = useState(false);
@@ -2219,6 +2223,41 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     showToast(`${walletToDelete.name} deleted`, 'success');
     setShowDeleteWalletConfirm(false);
     setWalletToDelete(null);
+  };
+
+  // Clear all wallets and transactions
+  const handleClearAllWallets = async () => {
+    if (clearWalletsConfirmText.toLowerCase() !== 'delete') {
+      showToast('Please type "delete" to confirm', 'error');
+      return;
+    }
+
+    try {
+      // Delete all wallet transactions
+      await supabase
+        .from('wallet_transactions')
+        .delete()
+        .eq('user_id', user.id);
+
+      // Delete all wallets
+      await supabase
+        .from('wallets')
+        .delete()
+        .eq('user_id', user.id);
+
+      // Clear local state
+      setWallets([]);
+      setWalletTransactions([]);
+      setFeaturedWallets({ cash: null, ewallet: null, bank: null, credit: null });
+
+      showToast('All wallets and transactions cleared', 'success');
+    } catch (e) {
+      console.error('Failed to clear wallets:', e);
+      showToast('Failed to clear wallets', 'error');
+    }
+
+    setShowClearAllWalletsConfirm(false);
+    setClearWalletsConfirmText('');
   };
 
   // Get wallets grouped by type
@@ -5891,20 +5930,54 @@ const getBudgetStatus = () => {
                     {currency}{getTotalWalletBalance().toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                  {wallets.map(w => (
-                    <div key={w.id} style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '6px',
-                      padding: '6px 12px',
-                      backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                      borderRadius: '20px'
-                    }}>
-                      <span style={{ fontSize: '14px' }}>{w.icon}</span>
-                      <span style={{ fontSize: '12px', color: theme.textMuted }}>{currency}{w.balance.toLocaleString()}</span>
-                    </div>
-                  ))}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                    {wallets.slice(0, 5).map(w => (
+                      <div key={w.id} style={{ 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        gap: '6px',
+                        padding: '6px 12px',
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                        borderRadius: '20px'
+                      }}>
+                        <span style={{ fontSize: '14px' }}>{w.icon}</span>
+                        <span style={{ fontSize: '12px', color: theme.textMuted }}>{currency}{w.balance.toLocaleString()}</span>
+                      </div>
+                    ))}
+                    {wallets.length > 5 && (
+                      <div style={{ 
+                        padding: '6px 12px',
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+                        borderRadius: '20px',
+                        fontSize: '12px',
+                        color: theme.textMuted
+                      }}>
+                        +{wallets.length - 5} more
+                      </div>
+                    )}
+                  </div>
+                  {wallets.length > 0 && (
+                    <button
+                      onClick={() => setShowClearAllWalletsConfirm(true)}
+                      style={{
+                        padding: '8px 12px',
+                        backgroundColor: 'transparent',
+                        border: `1px solid ${isDark ? 'rgba(239,68,68,0.5)' : '#fecaca'}`,
+                        borderRadius: '8px',
+                        color: '#ef4444',
+                        fontSize: '12px',
+                        fontWeight: '500',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <Trash2 style={{ width: '12px', height: '12px' }} />
+                      Clear All
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -7373,6 +7446,97 @@ const getBudgetStatus = () => {
               >
                 <Trash2 style={{ width: '16px', height: '16px' }} />
                 Delete Wallet
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Clear All Wallets Confirmation Modal */}
+      {showClearAllWalletsConfirm && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowClearAllWalletsConfirm(false); setClearWalletsConfirmText(''); }}>
+          <div style={{ width: '100%', maxWidth: '420px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+              <div style={{ 
+                width: '56px', 
+                height: '56px', 
+                borderRadius: '50%', 
+                backgroundColor: '#fef2f2', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                margin: '0 auto 16px'
+              }}>
+                <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+              </div>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Clear All Wallets?</h3>
+              <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>
+                This will permanently delete <strong>all {wallets.length} wallets</strong> and <strong>all {walletTransactions.length} transactions</strong>. This action cannot be undone.
+              </p>
+              
+              <div style={{ 
+                padding: '12px', 
+                backgroundColor: isDark ? '#422006' : '#fef3c7', 
+                borderRadius: '8px',
+                marginBottom: '16px'
+              }}>
+                <p style={{ fontSize: '13px', color: isDark ? '#fcd34d' : '#92400e', margin: 0 }}>
+                  ⚠️ Total balance to be deleted: <strong>{currency}{getTotalWalletBalance().toLocaleString()}</strong>
+                </p>
+              </div>
+              
+              <div style={{ textAlign: 'left' }}>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>
+                  Type <strong style={{ color: '#ef4444' }}>delete</strong> to confirm:
+                </label>
+                <input
+                  type="text"
+                  value={clearWalletsConfirmText}
+                  onChange={(e) => setClearWalletsConfirmText(e.target.value)}
+                  placeholder="Type 'delete' here"
+                  style={{ ...inputStyle, width: '100%' }}
+                  autoFocus
+                />
+              </div>
+            </div>
+            
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button
+                onClick={() => { setShowClearAllWalletsConfirm(false); setClearWalletsConfirmText(''); }}
+                style={{
+                  flex: 1,
+                  height: '44px',
+                  backgroundColor: 'transparent',
+                  border: `1px solid ${theme.inputBorder}`,
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  color: theme.textMuted,
+                  cursor: 'pointer'
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleClearAllWallets}
+                disabled={clearWalletsConfirmText.toLowerCase() !== 'delete'}
+                style={{
+                  flex: 1,
+                  height: '44px',
+                  backgroundColor: clearWalletsConfirmText.toLowerCase() === 'delete' ? '#ef4444' : theme.statBg,
+                  color: clearWalletsConfirmText.toLowerCase() === 'delete' ? '#fff' : theme.textMuted,
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: clearWalletsConfirmText.toLowerCase() === 'delete' ? 'pointer' : 'not-allowed',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                <Trash2 style={{ width: '16px', height: '16px' }} />
+                Clear Everything
               </button>
             </div>
           </div>
