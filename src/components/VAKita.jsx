@@ -98,6 +98,8 @@ const VAKita = ({ user, isDark }) => {
   const [prospects, setProspects] = useState([]);
   const [taxSettings, setTaxSettings] = useState({ taxOption: '8percent', tinNumber: '' });
   const [liveRate, setLiveRate] = useState(null);
+  const [lastRateUpdate, setLastRateUpdate] = useState(null);
+  const [showRateTooltip, setShowRateTooltip] = useState(false);
 
   const [showIncomeForm, setShowIncomeForm] = useState(false);
   const [showClientForm, setShowClientForm] = useState(false);
@@ -125,7 +127,10 @@ const VAKita = ({ user, isDark }) => {
       try {
         const res = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
         const data = await res.json();
-        if (data?.rates?.PHP) setLiveRate(data.rates.PHP);
+        if (data?.rates?.PHP) {
+          setLiveRate(data.rates.PHP);
+          setLastRateUpdate(new Date());
+        }
       } catch (err) { console.log('Could not fetch exchange rate'); }
     };
     fetchRate();
@@ -251,7 +256,77 @@ const VAKita = ({ user, isDark }) => {
           <button onClick={() => setActiveTab('invoices')} style={tab(activeTab === 'invoices')}><FileText style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Invoices'}</button>
           <button onClick={() => setActiveTab('timezone')} style={tab(activeTab === 'timezone')}><Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clock'}</button>
           <button onClick={() => setActiveTab('tax')} style={tab(activeTab === 'tax')}><Calculator style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Tax'}</button>
-          {liveRate && !isSmall && <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#22c55e', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', backgroundColor: isDark ? '#22c55e15' : '#22c55e10', borderRadius: '8px', fontWeight: '600' }}>$1 = ₱{liveRate.toFixed(2)}</span>}
+          {liveRate && !isSmall && (
+            <div 
+              style={{ marginLeft: 'auto', position: 'relative' }}
+              onMouseEnter={() => setShowRateTooltip(true)}
+              onMouseLeave={() => setShowRateTooltip(false)}
+            >
+              <span style={{ 
+                fontSize: '12px', 
+                color: '#22c55e', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px', 
+                padding: '6px 12px', 
+                backgroundColor: isDark ? '#22c55e15' : '#22c55e10', 
+                borderRadius: '8px', 
+                fontWeight: '600',
+                cursor: 'help',
+                border: '1px solid ' + (isDark ? '#22c55e30' : '#22c55e25')
+              }}>
+                <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
+                $1 = ₱{liveRate.toFixed(2)}
+              </span>
+              {showRateTooltip && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  right: 0,
+                  marginTop: '8px',
+                  padding: '12px 14px',
+                  backgroundColor: theme.cardBg,
+                  border: '1px solid ' + theme.cardBorder,
+                  borderRadius: '10px',
+                  boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
+                  zIndex: 50,
+                  minWidth: '200px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                    <span style={{ width: '8px', height: '8px', backgroundColor: '#22c55e', borderRadius: '50%' }} />
+                    <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>Live Exchange Rate</span>
+                  </div>
+                  <div style={{ fontSize: '12px', color: theme.textMuted, marginBottom: '6px' }}>
+                    <span style={{ fontWeight: '500' }}>Rate:</span> $1 USD = ₱{liveRate.toFixed(4)} PHP
+                  </div>
+                  {lastRateUpdate && (
+                    <div style={{ fontSize: '11px', color: theme.textMuted, marginBottom: '8px' }}>
+                      <span style={{ fontWeight: '500' }}>Updated:</span> {lastRateUpdate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                    </div>
+                  )}
+                  <div style={{ 
+                    fontSize: '10px', 
+                    color: theme.textMuted, 
+                    paddingTop: '8px', 
+                    borderTop: '1px solid ' + theme.cardBorder,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <Info style={{ width: '10px', height: '10px' }} />
+                    Source: ExchangeRate-API.com
+                  </div>
+                </div>
+              )}
+              <style>{`
+                @keyframes pulse {
+                  0%, 100% { opacity: 1; }
+                  50% { opacity: 0.5; }
+                }
+              `}</style>
+            </div>
+          )}
           {saving && <span style={{ marginLeft: liveRate && !isSmall ? '8px' : 'auto', fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px' }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />{isSmall ? '' : 'Saving...'}</span>}
         </div>
       </div>
