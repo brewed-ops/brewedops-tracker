@@ -6849,200 +6849,6 @@ const getBudgetStatus = () => {
         </div>
       )}
 
-        {/* Edit Profile Modal */}
-      {showEditProfile && console.log('[App] Rendering Edit Profile Modal')}
-      {showEditProfile && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 200 }} onClick={() => setShowEditProfile(false)}>
-          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit Profile</h3>
-              <button onClick={() => setShowEditProfile(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X style={{ width: '18px', height: '18px' }} />
-              </button>
-            </div>
-            
-            {/* Profile Picture Section */}
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
-              <div style={{ position: 'relative', marginBottom: '12px' }}>
-                <div style={{ 
-                  width: '100px', 
-                  height: '100px', 
-                  borderRadius: '50%', 
-                  backgroundColor: profilePicture ? 'transparent' : '#3b82f6', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center', 
-                  color: '#fff', 
-                  fontSize: '40px', 
-                  fontWeight: '600',
-                  overflow: 'hidden',
-                  border: currentFrame.border !== 'none' ? currentFrame.border : `3px solid ${theme.cardBorder}`,
-                  boxShadow: currentFrame.glow !== 'none' ? currentFrame.glow : 'none'
-                }}>
-                  {profilePicture ? (
-                    <img 
-                      src={profilePicture} 
-                      alt="Profile" 
-                      style={{ 
-                        width: '100%', 
-                        height: '100%', 
-                        objectFit: 'cover'
-                      }} 
-                    />
-                  ) : (
-                    getInitial(editNickname)
-                  )}
-                </div>
-                
-                {/* Camera button overlay */}
-                <label style={{
-                  position: 'absolute',
-                  bottom: '0',
-                  right: '0',
-                  width: '32px',
-                  height: '32px',
-                  borderRadius: '50%',
-                  backgroundColor: isDark ? '#3b82f6' : '#2563eb',
-                  border: `2px solid ${theme.cardBg}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  cursor: 'pointer',
-                  transition: 'transform 0.2s'
-                }}>
-                  {isUploadingPicture ? (
-                    <Loader2 style={{ width: '16px', height: '16px', color: '#fff', animation: 'spin 1s linear infinite' }} />
-                  ) : (
-                    <Camera style={{ width: '16px', height: '16px', color: '#fff' }} />
-                  )}
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfilePictureUpload}
-                    style={{ display: 'none' }}
-                    disabled={isUploadingPicture}
-                  />
-                </label>
-              </div>
-              
-              {/* Upload/Remove buttons */}
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <label style={{
-                  fontSize: '13px',
-                  color: '#3b82f6',
-                  cursor: isUploadingPicture ? 'not-allowed' : 'pointer',
-                  opacity: isUploadingPicture ? 0.5 : 1
-                }}>
-                  {isUploadingPicture ? 'Uploading...' : 'Change Photo'}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleProfilePictureUpload}
-                    style={{ display: 'none' }}
-                    disabled={isUploadingPicture}
-                  />
-                </label>
-                {profilePicture && (
-                  <>
-                    <span style={{ color: theme.textDim }}>•</span>
-                    <button
-                      onClick={handleRemoveProfilePicture}
-                      style={{
-                        background: 'none',
-                        border: 'none',
-                        fontSize: '13px',
-                        color: '#ef4444',
-                        cursor: 'pointer',
-                        padding: 0
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </>
-                )}
-              </div>
-              <p style={{ fontSize: '11px', color: theme.textDim, margin: '8px 0 0', textAlign: 'center' }}>
-                JPG, PNG or GIF. Max 2MB.
-              </p>
-            </div>
-            
-            <div style={{ marginBottom: '16px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Nickname</label>
-              <input
-                type="text"
-                value={editNickname}
-                onChange={(e) => setEditNickname(e.target.value)}
-                style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
-              />
-            </div>
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Email</label>
-              <input
-                type="email"
-                value={user.email}
-                disabled
-                style={{ width: '100%', height: '44px', backgroundColor: theme.statBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.textMuted, outline: 'none', boxSizing: 'border-box' }}
-              />
-            </div>
-            <button
-              onClick={async () => {
-                try {
-                  const { error } = await supabase.auth.updateUser({ data: { nickname: editNickname } });
-                  if (error) throw error;
-                  setShowEditProfile(false);
-                  showToast('Profile updated successfully!', 'success');
-                } catch (e) {
-                  showToast('Failed to update profile', 'error');
-                }
-              }}
-              style={{ width: '100%', height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '500', cursor: 'pointer' }}
-            >
-              Save Changes
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Feedback Modal */}
-      {showFeedback && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 200 }} onClick={() => setShowFeedback(false)}>
-          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
-            {feedbackSent ? (
-              <div style={{ textAlign: 'center', padding: '20px 0' }}>
-                <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-                  <Check style={{ width: '32px', height: '32px', color: '#fff' }} />
-                </div>
-                <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Thank You!</h3>
-                <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>Your feedback has been submitted.</p>
-              </div>
-            ) : (
-              <>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Send Feedback</h3>
-                  <button onClick={() => setShowFeedback(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <X style={{ width: '18px', height: '18px' }} />
-                  </button>
-                </div>
-                <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>We'd love to hear your thoughts, suggestions, or issues.</p>
-                <textarea
-                  value={feedbackMessage}
-                  onChange={(e) => setFeedbackMessage(e.target.value)}
-                  placeholder="Write your feedback here..."
-                  style={{ width: '100%', height: '120px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '12px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box', resize: 'none', fontFamily: 'inherit' }}
-                />
-                <button
-                  onClick={handleSubmitFeedback}
-                  disabled={!feedbackMessage.trim()}
-                  style={{ width: '100%', height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '500', cursor: feedbackMessage.trim() ? 'pointer' : 'not-allowed', marginTop: '16px', opacity: feedbackMessage.trim() ? 1 : 0.5 }}
-                >
-                  Submit Feedback
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-      )}
 {/* Edit Entry Modal */}
       {editingEntry && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setEditingEntry(null)}>
@@ -7956,6 +7762,200 @@ const getBudgetStatus = () => {
         }
       `}</style>
       </>
+      )}
+
+      {/* Edit Profile Modal - Outside conditional so it works in VAKita too */}
+      {showEditProfile && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 200 }} onClick={() => setShowEditProfile(false)}>
+          <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Edit Profile</h3>
+              <button onClick={() => setShowEditProfile(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
+            
+            {/* Profile Picture Section */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '24px' }}>
+              <div style={{ position: 'relative', marginBottom: '12px' }}>
+                <div style={{ 
+                  width: '100px', 
+                  height: '100px', 
+                  borderRadius: '50%', 
+                  backgroundColor: profilePicture ? 'transparent' : '#3b82f6', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center', 
+                  color: '#fff', 
+                  fontSize: '40px', 
+                  fontWeight: '600',
+                  overflow: 'hidden',
+                  border: currentFrame.border !== 'none' ? currentFrame.border : `3px solid ${theme.cardBorder}`,
+                  boxShadow: currentFrame.glow !== 'none' ? currentFrame.glow : 'none'
+                }}>
+                  {profilePicture ? (
+                    <img 
+                      src={profilePicture} 
+                      alt="Profile" 
+                      style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        objectFit: 'cover'
+                      }} 
+                    />
+                  ) : (
+                    getInitial(editNickname)
+                  )}
+                </div>
+                
+                {/* Camera button overlay */}
+                <label style={{
+                  position: 'absolute',
+                  bottom: '0',
+                  right: '0',
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: isDark ? '#3b82f6' : '#2563eb',
+                  border: `2px solid ${theme.cardBg}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'transform 0.2s'
+                }}>
+                  {isUploadingPicture ? (
+                    <Loader2 style={{ width: '16px', height: '16px', color: '#fff', animation: 'spin 1s linear infinite' }} />
+                  ) : (
+                    <Camera style={{ width: '16px', height: '16px', color: '#fff' }} />
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePictureUpload}
+                    style={{ display: 'none' }}
+                    disabled={isUploadingPicture}
+                  />
+                </label>
+              </div>
+              
+              {/* Upload/Remove buttons */}
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <label style={{
+                  fontSize: '13px',
+                  color: '#3b82f6',
+                  cursor: isUploadingPicture ? 'not-allowed' : 'pointer',
+                  opacity: isUploadingPicture ? 0.5 : 1
+                }}>
+                  {isUploadingPicture ? 'Uploading...' : 'Change Photo'}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleProfilePictureUpload}
+                    style={{ display: 'none' }}
+                    disabled={isUploadingPicture}
+                  />
+                </label>
+                {profilePicture && (
+                  <>
+                    <span style={{ color: theme.textDim }}>•</span>
+                    <button
+                      onClick={handleRemoveProfilePicture}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '13px',
+                        color: '#ef4444',
+                        cursor: 'pointer',
+                        padding: 0
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </>
+                )}
+              </div>
+              <p style={{ fontSize: '11px', color: theme.textDim, margin: '8px 0 0', textAlign: 'center' }}>
+                JPG, PNG or GIF. Max 2MB.
+              </p>
+            </div>
+            
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Nickname</label>
+              <input
+                type="text"
+                value={editNickname}
+                onChange={(e) => setEditNickname(e.target.value)}
+                style={{ width: '100%', height: '44px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.text, outline: 'none', boxSizing: 'border-box' }}
+              />
+            </div>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>Email</label>
+              <input
+                type="email"
+                value={user.email}
+                disabled
+                style={{ width: '100%', height: '44px', backgroundColor: theme.statBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '0 12px', fontSize: '16px', color: theme.textMuted, outline: 'none', boxSizing: 'border-box' }}
+              />
+            </div>
+            <button
+              onClick={async () => {
+                try {
+                  const { error } = await supabase.auth.updateUser({ data: { nickname: editNickname } });
+                  if (error) throw error;
+                  setShowEditProfile(false);
+                  showToast('Profile updated successfully!', 'success');
+                } catch (e) {
+                  showToast('Failed to update profile', 'error');
+                }
+              }}
+              style={{ width: '100%', height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '500', cursor: 'pointer' }}
+            >
+              Save Changes
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Feedback Modal - Outside conditional so it works in VAKita too */}
+      {showFeedback && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 200 }} onClick={() => setShowFeedback(false)}>
+          <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            {feedbackSent ? (
+              <div style={{ textAlign: 'center', padding: '20px 0' }}>
+                <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#10b981', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+                  <Check style={{ width: '32px', height: '32px', color: '#fff' }} />
+                </div>
+                <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Thank You!</h3>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>Your feedback has been submitted.</p>
+              </div>
+            ) : (
+              <>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
+                  <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: 0 }}>Send Feedback</h3>
+                  <button onClick={() => setShowFeedback(false)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: 'none', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <X style={{ width: '18px', height: '18px' }} />
+                  </button>
+                </div>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>We'd love to hear your thoughts, suggestions, or issues.</p>
+                <textarea
+                  value={feedbackMessage}
+                  onChange={(e) => setFeedbackMessage(e.target.value)}
+                  placeholder="Write your feedback here..."
+                  style={{ width: '100%', height: '120px', backgroundColor: theme.inputBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', padding: '12px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box', resize: 'none', fontFamily: 'inherit' }}
+                />
+                <button
+                  onClick={handleSubmitFeedback}
+                  disabled={!feedbackMessage.trim()}
+                  style={{ width: '100%', height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '15px', fontWeight: '500', cursor: feedbackMessage.trim() ? 'pointer' : 'not-allowed', marginTop: '16px', opacity: feedbackMessage.trim() ? 1 : 0.5 }}
+                >
+                  Submit Feedback
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       )}
 
       {/* Rewards Modal */}
