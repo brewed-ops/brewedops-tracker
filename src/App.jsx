@@ -569,7 +569,17 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   
   // Sidebar State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeSection, setActiveSection] = useState('tracker'); // 'tracker' or 'vakita'
+  const [activeSection, setActiveSection] = useState(() => {
+    try { 
+      const saved = localStorage.getItem('brewedops_active_section');
+      return saved === 'vakita' ? 'vakita' : 'tracker'; 
+    } catch { return 'tracker'; }
+  });
+  
+  // Save activeSection to localStorage
+  useEffect(() => {
+    try { localStorage.setItem('brewedops_active_section', activeSection); } catch {}
+  }, [activeSection]);
   
   // Multi-Wallet System
   const [wallets, setWallets] = useState([]);
@@ -7660,182 +7670,6 @@ const getBudgetStatus = () => {
         </div>
       )}
 
-      {/* Achievements Modal */}
-      {showAchievementsModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowAchievementsModal(false)}>
-          <div style={{ width: '100%', maxWidth: '600px', backgroundColor: theme.cardBg, borderRadius: '16px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
-            {/* Header */}
-            <div style={{ padding: '20px 24px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div>
-                <h3 style={{ fontSize: '20px', fontWeight: '700', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                  <span>🏆</span> Achievements
-                </h3>
-                <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>
-                  {unlockedAchievements.length} / {ACHIEVEMENTS.length} unlocked
-                </p>
-              </div>
-              <button onClick={() => setShowAchievementsModal(false)} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <X style={{ width: '18px', height: '18px' }} />
-              </button>
-            </div>
-            
-            {/* Streak & Challenge Section */}
-            <div style={{ padding: '16px 24px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              {/* Current Streak */}
-              <div style={{ 
-                padding: '16px', 
-                background: isDark ? 'linear-gradient(135deg, #7c2d12, #9a3412)' : 'linear-gradient(135deg, #fed7aa, #fdba74)', 
-                borderRadius: '12px',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: '32px', marginBottom: '4px' }}>🔥</div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: isDark ? '#fff' : '#9a3412', margin: '0' }}>{currentStreak}</p>
-                <p style={{ fontSize: '12px', color: isDark ? '#fed7aa' : '#c2410c', margin: '4px 0 0', fontWeight: '500' }}>Day Streak</p>
-              </div>
-              
-              {/* Weekly Challenge */}
-              <div style={{ 
-                padding: '16px', 
-                background: weeklyChallenge.completed 
-                  ? (isDark ? 'linear-gradient(135deg, #14532d, #166534)' : 'linear-gradient(135deg, #bbf7d0, #86efac)')
-                  : (isDark ? 'linear-gradient(135deg, #1e3a5f, #1e40af)' : 'linear-gradient(135deg, #dbeafe, #bfdbfe)'), 
-                borderRadius: '12px',
-                textAlign: 'center'
-              }}>
-                <div style={{ fontSize: '24px', marginBottom: '4px' }}>{weeklyChallenge.icon}</div>
-                <p style={{ fontSize: '13px', fontWeight: '600', color: weeklyChallenge.completed ? (isDark ? '#86efac' : '#166534') : (isDark ? '#93c5fd' : '#1e40af'), margin: '0 0 8px' }}>
-                  {weeklyChallenge.completed ? '✓ Completed!' : weeklyChallenge.name}
-                </p>
-                {!weeklyChallenge.completed && (
-                  <div style={{
-                    height: '6px',
-                    backgroundColor: 'rgba(255,255,255,0.3)',
-                    borderRadius: '3px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{
-                      height: '100%',
-                      width: `${Math.min((weeklyChallenge.progress / (weeklyChallenge.count || weeklyChallenge.maxAmount || 1)) * 100, 100)}%`,
-                      backgroundColor: '#fff',
-                      borderRadius: '3px'
-                    }} />
-                  </div>
-                )}
-                <p style={{ fontSize: '10px', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)', margin: '6px 0 0' }}>
-                  +{weeklyChallenge.xpReward} XP
-                </p>
-              </div>
-            </div>
-            
-            {/* Achievements List */}
-            <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1 }}>
-              {Object.entries(ACHIEVEMENT_CATEGORIES).map(([catKey, category]) => {
-                const categoryAchievements = ACHIEVEMENTS.filter(a => a.category === catKey);
-                const unlockedInCategory = categoryAchievements.filter(a => unlockedAchievements.includes(a.id)).length;
-                
-                return (
-                  <div key={catKey} style={{ marginBottom: '24px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                      <span style={{ fontSize: '20px' }}>{category.icon}</span>
-                      <h4 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{category.name}</h4>
-                      <span style={{ fontSize: '12px', color: theme.textMuted, marginLeft: 'auto' }}>
-                        {unlockedInCategory}/{categoryAchievements.length}
-                      </span>
-                    </div>
-                    
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '10px' }}>
-                      {categoryAchievements.map(achievement => {
-                        const isUnlocked = unlockedAchievements.includes(achievement.id);
-                        const tier = getTierStyle(achievement.tier);
-                        
-                        return (
-                          <div
-                            key={achievement.id}
-                            style={{
-                              padding: '14px',
-                              backgroundColor: isUnlocked ? (isDark ? '#1a1a1d' : '#fafafa') : theme.statBg,
-                              borderRadius: '12px',
-                              border: isUnlocked ? `2px solid ${tier.color}` : `1px solid ${theme.cardBorder}`,
-                              opacity: isUnlocked ? 1 : 0.6,
-                              position: 'relative',
-                              overflow: 'hidden'
-                            }}
-                          >
-                            {/* Glow effect for unlocked */}
-                            {isUnlocked && (
-                              <div style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                right: 0,
-                                height: '3px',
-                                background: tier.bgGradient
-                              }} />
-                            )}
-                            
-                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                              <div style={{
-                                width: '40px',
-                                height: '40px',
-                                borderRadius: '10px',
-                                background: isUnlocked ? tier.bgGradient : (isDark ? '#27272a' : '#e4e4e7'),
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0
-                              }}>
-                                <span style={{ fontSize: '20px', filter: isUnlocked ? 'none' : 'grayscale(100%)' }}>
-                                  {isUnlocked ? achievement.icon : '🔒'}
-                                </span>
-                              </div>
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ 
-                                  fontSize: '13px', 
-                                  fontWeight: '600', 
-                                  color: isUnlocked ? theme.text : theme.textMuted, 
-                                  margin: '0 0 2px',
-                                  overflow: 'hidden',
-                                  textOverflow: 'ellipsis',
-                                  whiteSpace: 'nowrap'
-                                }}>
-                                  {achievement.name}
-                                </p>
-                                <p style={{ 
-                                  fontSize: '11px', 
-                                  color: theme.textMuted, 
-                                  margin: 0,
-                                  lineHeight: '1.3'
-                                }}>
-                                  {achievement.description}
-                                </p>
-                                {isUnlocked && (
-                                  <span style={{
-                                    display: 'inline-block',
-                                    marginTop: '6px',
-                                    padding: '2px 8px',
-                                    borderRadius: '10px',
-                                    background: tier.bgGradient,
-                                    fontSize: '9px',
-                                    fontWeight: '700',
-                                    color: '#fff',
-                                    textTransform: 'uppercase'
-                                  }}>
-                                    {tier.name}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
 
       <style>{`
         @keyframes spin {
@@ -8103,7 +7937,7 @@ const getBudgetStatus = () => {
 
       {/* Rewards Modal */}
       {showRewardsModal && (
-        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowRewardsModal(false)}>
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 60 }} onClick={() => setShowRewardsModal(false)}>
           <div style={{ width: '100%', maxWidth: '500px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ padding: '20px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div>
@@ -8373,6 +8207,182 @@ const getBudgetStatus = () => {
           >
             <X style={{ width: '16px', height: '16px' }} />
           </button>
+        </div>
+      )}
+      {/* Achievements Modal */}
+      {showAchievementsModal && (
+        <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 60 }} onClick={() => setShowAchievementsModal(false)}>
+          <div style={{ width: '100%', maxWidth: '600px', backgroundColor: theme.cardBg, borderRadius: '16px', border: `1px solid ${theme.cardBorder}`, overflow: 'hidden', maxHeight: '90vh', display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
+            {/* Header */}
+            <div style={{ padding: '20px 24px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+              <div>
+                <h3 style={{ fontSize: '20px', fontWeight: '700', color: theme.text, margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span>🏆</span> Achievements
+                </h3>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>
+                  {unlockedAchievements.length} / {ACHIEVEMENTS.length} unlocked
+                </p>
+              </div>
+              <button onClick={() => setShowAchievementsModal(false)} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <X style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
+            
+            {/* Streak & Challenge Section */}
+            <div style={{ padding: '16px 24px', borderBottom: `1px solid ${theme.cardBorder}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              {/* Current Streak */}
+              <div style={{ 
+                padding: '16px', 
+                background: isDark ? 'linear-gradient(135deg, #7c2d12, #9a3412)' : 'linear-gradient(135deg, #fed7aa, #fdba74)', 
+                borderRadius: '12px',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '32px', marginBottom: '4px' }}>🔥</div>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: isDark ? '#fff' : '#9a3412', margin: '0' }}>{currentStreak}</p>
+                <p style={{ fontSize: '12px', color: isDark ? '#fed7aa' : '#c2410c', margin: '4px 0 0', fontWeight: '500' }}>Day Streak</p>
+              </div>
+              
+              {/* Weekly Challenge */}
+              <div style={{ 
+                padding: '16px', 
+                background: weeklyChallenge.completed 
+                  ? (isDark ? 'linear-gradient(135deg, #14532d, #166534)' : 'linear-gradient(135deg, #bbf7d0, #86efac)')
+                  : (isDark ? 'linear-gradient(135deg, #1e3a5f, #1e40af)' : 'linear-gradient(135deg, #dbeafe, #bfdbfe)'), 
+                borderRadius: '12px',
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '24px', marginBottom: '4px' }}>{weeklyChallenge.icon}</div>
+                <p style={{ fontSize: '13px', fontWeight: '600', color: weeklyChallenge.completed ? (isDark ? '#86efac' : '#166534') : (isDark ? '#93c5fd' : '#1e40af'), margin: '0 0 8px' }}>
+                  {weeklyChallenge.completed ? '✓ Completed!' : weeklyChallenge.name}
+                </p>
+                {!weeklyChallenge.completed && (
+                  <div style={{
+                    height: '6px',
+                    backgroundColor: 'rgba(255,255,255,0.3)',
+                    borderRadius: '3px',
+                    overflow: 'hidden'
+                  }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${Math.min((weeklyChallenge.progress / (weeklyChallenge.count || weeklyChallenge.maxAmount || 1)) * 100, 100)}%`,
+                      backgroundColor: '#fff',
+                      borderRadius: '3px'
+                    }} />
+                  </div>
+                )}
+                <p style={{ fontSize: '10px', color: isDark ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.5)', margin: '6px 0 0' }}>
+                  +{weeklyChallenge.xpReward} XP
+                </p>
+              </div>
+            </div>
+            
+            {/* Achievements List */}
+            <div style={{ padding: '20px 24px', overflowY: 'auto', flex: 1 }}>
+              {Object.entries(ACHIEVEMENT_CATEGORIES).map(([catKey, category]) => {
+                const categoryAchievements = ACHIEVEMENTS.filter(a => a.category === catKey);
+                const unlockedInCategory = categoryAchievements.filter(a => unlockedAchievements.includes(a.id)).length;
+                
+                return (
+                  <div key={catKey} style={{ marginBottom: '24px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+                      <span style={{ fontSize: '20px' }}>{category.icon}</span>
+                      <h4 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>{category.name}</h4>
+                      <span style={{ fontSize: '12px', color: theme.textMuted, marginLeft: 'auto' }}>
+                        {unlockedInCategory}/{categoryAchievements.length}
+                      </span>
+                    </div>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))', gap: '10px' }}>
+                      {categoryAchievements.map(achievement => {
+                        const isUnlocked = unlockedAchievements.includes(achievement.id);
+                        const tier = getTierStyle(achievement.tier);
+                        
+                        return (
+                          <div
+                            key={achievement.id}
+                            style={{
+                              padding: '14px',
+                              backgroundColor: isUnlocked ? (isDark ? '#1a1a1d' : '#fafafa') : theme.statBg,
+                              borderRadius: '12px',
+                              border: isUnlocked ? `2px solid ${tier.color}` : `1px solid ${theme.cardBorder}`,
+                              opacity: isUnlocked ? 1 : 0.6,
+                              position: 'relative',
+                              overflow: 'hidden'
+                            }}
+                          >
+                            {/* Glow effect for unlocked */}
+                            {isUnlocked && (
+                              <div style={{
+                                position: 'absolute',
+                                top: 0,
+                                left: 0,
+                                right: 0,
+                                height: '3px',
+                                background: tier.bgGradient
+                              }} />
+                            )}
+                            
+                            <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                              <div style={{
+                                width: '40px',
+                                height: '40px',
+                                borderRadius: '10px',
+                                background: isUnlocked ? tier.bgGradient : (isDark ? '#27272a' : '#e4e4e7'),
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                flexShrink: 0
+                              }}>
+                                <span style={{ fontSize: '20px', filter: isUnlocked ? 'none' : 'grayscale(100%)' }}>
+                                  {isUnlocked ? achievement.icon : '🔒'}
+                                </span>
+                              </div>
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ 
+                                  fontSize: '13px', 
+                                  fontWeight: '600', 
+                                  color: isUnlocked ? theme.text : theme.textMuted, 
+                                  margin: '0 0 2px',
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap'
+                                }}>
+                                  {achievement.name}
+                                </p>
+                                <p style={{ 
+                                  fontSize: '11px', 
+                                  color: theme.textMuted, 
+                                  margin: 0,
+                                  lineHeight: '1.3'
+                                }}>
+                                  {achievement.description}
+                                </p>
+                                {isUnlocked && (
+                                  <span style={{
+                                    display: 'inline-block',
+                                    marginTop: '6px',
+                                    padding: '2px 8px',
+                                    borderRadius: '10px',
+                                    background: tier.bgGradient,
+                                    fontSize: '9px',
+                                    fontWeight: '700',
+                                    color: '#fff',
+                                    textTransform: 'uppercase'
+                                  }}>
+                                    {tier.name}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
 
