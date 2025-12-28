@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 // Extracted components and utilities
@@ -540,12 +540,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [showRewardsModal, setShowRewardsModal] = useState(false);
   const [userDataLoaded, setUserDataLoaded] = useState(false);
   
-  // Christmas Theme (keep in localStorage - it's a UI preference)
-  const [isChristmasTheme, setIsChristmasTheme] = useState(() => {
-    const saved = localStorage.getItem('christmasTheme');
-    return saved === 'true';
-  });
-  
   // Achievements & Badges System
   const [unlockedAchievements, setUnlockedAchievements] = useState([]);
   const [showAchievementUnlock, setShowAchievementUnlock] = useState(false);
@@ -687,11 +681,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   useEffect(() => {
     localStorage.setItem(`selectedFrame_${user.id}`, selectedFrame);
   }, [selectedFrame, user.id]);
-
-  // Save Christmas theme preference (keep in localStorage - UI preference)
-  useEffect(() => {
-    localStorage.setItem('christmasTheme', isChristmasTheme.toString());
-  }, [isChristmasTheme]);
 
   // ============================================
   // SUPABASE DATA LOADING & SAVING
@@ -2692,32 +2681,62 @@ const getBudgetStatus = () => {
       <header style={{
         backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
         borderBottom: `1px solid ${theme.cardBorder}`,
-        padding: '0 24px',
+        padding: isSmall ? '0 12px' : '0 24px',
         position: 'sticky',
         top: 0,
         zIndex: 20,
-        height: '72px',
+        height: isSmall ? '60px' : '72px',
         display: 'flex',
         alignItems: 'center',
       }}>
         <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
-          {/* Show logo only on mobile (sidebar hidden) */}
+          {/* Show logo and section switcher on mobile */}
           {isMobile && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '6px' : '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <img 
                 src="https://i.imgur.com/R52jwPv.png" 
                 alt="BrewedOps Logo" 
                 style={{ 
-                  width: isSmall ? '32px' : '44px', 
-                  height: isSmall ? '32px' : '44px', 
+                  width: '32px', 
+                  height: '32px', 
                   borderRadius: '50%', 
                   objectFit: 'cover',
                   flexShrink: 0 
                 }} 
               />
-              {!isSmall && (
-                <h1 style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
-              )}
+              {/* Mobile Section Switcher */}
+              <div style={{ display: 'flex', backgroundColor: theme.statBg, borderRadius: '8px', padding: '3px', border: '1px solid ' + theme.cardBorder }}>
+                <button 
+                  onClick={() => setActiveSection('tracker')} 
+                  style={{ 
+                    padding: '6px 10px', 
+                    fontSize: '12px', 
+                    fontWeight: '600', 
+                    border: 'none', 
+                    borderRadius: '6px', 
+                    cursor: 'pointer',
+                    backgroundColor: activeSection === 'tracker' ? '#22c55e' : 'transparent',
+                    color: activeSection === 'tracker' ? '#fff' : theme.textMuted
+                  }}
+                >
+                  💰 Finance
+                </button>
+                <button 
+                  onClick={() => setActiveSection('vakita')} 
+                  style={{ 
+                    padding: '6px 10px', 
+                    fontSize: '12px', 
+                    fontWeight: '600', 
+                    border: 'none', 
+                    borderRadius: '6px', 
+                    cursor: 'pointer',
+                    backgroundColor: activeSection === 'vakita' ? '#8b5cf6' : 'transparent',
+                    color: activeSection === 'vakita' ? '#fff' : theme.textMuted
+                  }}
+                >
+                  📊 VAKita
+                </button>
+              </div>
             </div>
           )}
 
@@ -2832,26 +2851,6 @@ const getBudgetStatus = () => {
                   </div>
                 )}
               </div>
-              
-              {/* Christmas Theme Toggle */}
-              <button
-                onClick={() => setIsChristmasTheme(!isChristmasTheme)}
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  backgroundColor: isChristmasTheme ? '#dc2626' : 'transparent',
-                  border: `1px solid ${isChristmasTheme ? '#dc2626' : theme.inputBorder}`,
-                  borderRadius: '8px',
-                  color: isChristmasTheme ? '#fff' : theme.textMuted,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-                title={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
-              >
-                <TreePine style={{ width: '20px', height: '20px' }} />
-              </button>
               
               <button
                 onClick={() => setIsDark(!isDark)}
@@ -3093,25 +3092,6 @@ const getBudgetStatus = () => {
                     {checkedInToday ? currentStreak : '!'}
                   </div>
                 )}
-              </button>
-
-              {/* Christmas Theme Toggle - Mobile */}
-              <button
-                onClick={() => setIsChristmasTheme(!isChristmasTheme)}
-                style={{
-                  width: '32px',
-                  height: '32px',
-                  backgroundColor: isChristmasTheme ? '#dc2626' : 'transparent',
-                  border: `1px solid ${isChristmasTheme ? '#dc2626' : theme.inputBorder}`,
-                  borderRadius: '6px',
-                  color: isChristmasTheme ? '#fff' : theme.textMuted,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}
-              >
-                <TreePine style={{ width: '16px', height: '16px' }} />
               </button>
               
               <button
@@ -7857,6 +7837,270 @@ const getBudgetStatus = () => {
         </div>
       )}
 
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes pulse {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.05); }
+        }
+        @keyframes rainbow-border {
+          0% { border-color: #ff0000; }
+          17% { border-color: #ff8000; }
+          33% { border-color: #ffff00; }
+          50% { border-color: #00ff00; }
+          67% { border-color: #0080ff; }
+          83% { border-color: #8000ff; }
+          100% { border-color: #ff0000; }
+        }
+        @keyframes legendary-pulse {
+          0%, 100% { box-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00; }
+          50% { box-shadow: 0 0 30px #ffd700, 0 0 50px #ff8c00, 0 0 70px #ff4500; }
+        }
+        
+        /* Gen Z/Gen Alpha Animated Frame Effects */
+        @keyframes pulse-bronze {
+          0%, 100% { box-shadow: 0 0 10px #cd7f32; }
+          50% { box-shadow: 0 0 20px #cd7f32, 0 0 30px #8b4513; }
+        }
+        @keyframes shimmer-silver {
+          0% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; filter: brightness(1); }
+          50% { box-shadow: 0 0 20px #ffffff, 0 0 35px #c0c0c0; filter: brightness(1.2); }
+          100% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; filter: brightness(1); }
+        }
+        @keyframes glow-gold {
+          0%, 100% { box-shadow: 0 0 15px #ffd700, 0 0 30px #daa520; filter: brightness(1); }
+          50% { box-shadow: 0 0 25px #ffd700, 0 0 50px #ffec8b; filter: brightness(1.3); }
+        }
+        @keyframes mythic-glow {
+          0%, 100% { 
+            box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+            filter: hue-rotate(0deg);
+          }
+          50% { 
+            box-shadow: 0 0 40px #ff00ff, 0 0 60px #00ffff;
+            filter: hue-rotate(30deg);
+          }
+        }
+        @keyframes neon-flash {
+          0%, 100% { 
+            box-shadow: 0 0 15px #00ff00, 0 0 30px #00ff00, 0 0 45px #00ff00;
+            filter: brightness(1);
+          }
+          50% { 
+            box-shadow: 0 0 25px #00ff00, 0 0 50px #00ff00, 0 0 75px #00ff00;
+            filter: brightness(1.5);
+          }
+        }
+        @keyframes cosmic-swirl {
+          0% { 
+            box-shadow: 0 0 20px #4a0080, 0 0 40px #800080, 0 0 60px #ff00ff;
+            filter: hue-rotate(0deg) brightness(1);
+          }
+          33% { 
+            box-shadow: 0 0 25px #0000ff, 0 0 50px #4a0080, 0 0 75px #800080;
+            filter: hue-rotate(120deg) brightness(1.2);
+          }
+          66% { 
+            box-shadow: 0 0 30px #ff00ff, 0 0 55px #0000ff, 0 0 80px #4a0080;
+            filter: hue-rotate(240deg) brightness(1.1);
+          }
+          100% { 
+            box-shadow: 0 0 20px #4a0080, 0 0 40px #800080, 0 0 60px #ff00ff;
+            filter: hue-rotate(360deg) brightness(1);
+          }
+        }
+        @keyframes fire-border {
+          0%, 100% { 
+            box-shadow: 0 0 15px #ff4500, 0 0 30px #ff6600, 0 0 45px #ff8800;
+            filter: brightness(1);
+          }
+          25% { 
+            box-shadow: 0 0 20px #ff6600, 0 0 40px #ff8800, 0 0 55px #ffaa00;
+            filter: brightness(1.2);
+          }
+          50% { 
+            box-shadow: 0 0 25px #ff8800, 0 0 50px #ffaa00, 0 0 70px #ffcc00;
+            filter: brightness(1.4);
+          }
+          75% { 
+            box-shadow: 0 0 20px #ffaa00, 0 0 40px #ff8800, 0 0 55px #ff6600;
+            filter: brightness(1.1);
+          }
+        }
+        @keyframes ice-shimmer {
+          0%, 100% { 
+            box-shadow: 0 0 15px #00bfff, 0 0 30px #87ceeb, 0 0 45px #e0ffff;
+            filter: brightness(1) saturate(1);
+          }
+          50% { 
+            box-shadow: 0 0 25px #87ceeb, 0 0 50px #e0ffff, 0 0 70px #ffffff;
+            filter: brightness(1.3) saturate(0.8);
+          }
+        }
+        @keyframes electric-zap {
+          0%, 100% { 
+            box-shadow: 0 0 15px #ffff00, 0 0 30px #00ffff;
+            filter: brightness(1);
+          }
+          25% { 
+            box-shadow: 0 0 25px #00ffff, 0 0 50px #ffff00;
+            filter: brightness(1.5);
+          }
+          50% { 
+            box-shadow: 0 0 20px #ffff00, 0 0 40px #ffffff;
+            filter: brightness(1.2);
+          }
+          75% { 
+            box-shadow: 0 0 30px #ffffff, 0 0 55px #00ffff;
+            filter: brightness(1.4);
+          }
+        }
+        @keyframes shadow-pulse {
+          0%, 100% { 
+            box-shadow: 0 0 20px #1a1a2e, 0 0 40px #16213e, 0 0 60px #0f3460, inset 0 0 15px rgba(0,0,0,0.5);
+            filter: brightness(0.9);
+          }
+          50% { 
+            box-shadow: 0 0 30px #0f3460, 0 0 50px #1a1a2e, 0 0 70px #16213e, inset 0 0 25px rgba(0,0,0,0.3);
+            filter: brightness(1.1);
+          }
+        }
+        @keyframes diamond-sparkle {
+          0% { filter: brightness(1) hue-rotate(0deg); opacity: 1; }
+          25% { filter: brightness(1.5) hue-rotate(90deg); opacity: 0.95; }
+          50% { filter: brightness(2) hue-rotate(180deg); opacity: 0.9; }
+          75% { filter: brightness(1.5) hue-rotate(270deg); opacity: 0.95; }
+          100% { filter: brightness(1) hue-rotate(360deg); opacity: 1; }
+        }
+        @keyframes aurora-flow {
+          0% { 
+            box-shadow: 0 0 20px #00ff88, 0 0 40px #00ffcc, 0 0 60px #00ccff;
+            filter: hue-rotate(0deg);
+          }
+          33% { 
+            box-shadow: 0 0 25px #ff00cc, 0 0 50px #ff0088, 0 0 70px #ff0044;
+            filter: hue-rotate(120deg);
+          }
+          66% { 
+            box-shadow: 0 0 30px #ffcc00, 0 0 55px #ff8800, 0 0 80px #ff4400;
+            filter: hue-rotate(240deg);
+          }
+          100% { 
+            box-shadow: 0 0 20px #00ff88, 0 0 40px #00ffcc, 0 0 60px #00ccff;
+            filter: hue-rotate(360deg);
+          }
+        }
+        @keyframes glitch-effect {
+          0%, 100% { 
+            transform: translate(0); 
+            filter: hue-rotate(0deg);
+            opacity: 1;
+          }
+          10% { transform: translate(-2px, 2px); filter: hue-rotate(90deg); }
+          20% { transform: translate(2px, -2px); filter: hue-rotate(180deg); }
+          30% { transform: translate(-1px, -1px); filter: hue-rotate(270deg); opacity: 0.8; }
+          40% { transform: translate(1px, 1px); filter: hue-rotate(360deg); }
+          50% { transform: translate(-2px, 0); filter: hue-rotate(45deg); opacity: 0.9; }
+          55% { opacity: 0.9; }
+        }
+        @keyframes galaxy-rotate {
+          0% { filter: hue-rotate(0deg); }
+          100% { filter: hue-rotate(360deg); }
+        }
+        @keyframes rgb-rotate {
+          0% { filter: hue-rotate(0deg) brightness(1); }
+          50% { filter: hue-rotate(180deg) brightness(1.2); }
+          100% { filter: hue-rotate(360deg) brightness(1); }
+        }
+        @keyframes legendary-crown {
+          0%, 100% { 
+            box-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00, 0 0 90px #ff4500;
+            filter: brightness(1) saturate(1);
+          }
+          25% { 
+            box-shadow: 0 0 40px #fff, 0 0 70px #ffd700, 0 0 100px #ff8c00;
+            filter: brightness(1.3) saturate(1.2);
+          }
+          50% { 
+            box-shadow: 0 0 50px #ffd700, 0 0 80px #fff, 0 0 110px #ffd700;
+            filter: brightness(1.5) saturate(1);
+          }
+          75% { 
+            box-shadow: 0 0 35px #ff8c00, 0 0 65px #ffd700, 0 0 95px #fff;
+            filter: brightness(1.2) saturate(1.3);
+          }
+        }
+        @keyframes void-pulse {
+          0%, 100% { 
+            box-shadow: 0 0 30px #000, 0 0 50px #1a0033, 0 0 70px #330066, inset 0 0 20px #000;
+            filter: brightness(0.8);
+          }
+          50% { 
+            box-shadow: 0 0 40px #1a0033, 0 0 70px #330066, 0 0 100px #4a0080, inset 0 0 30px #1a0033;
+            filter: brightness(1);
+          }
+        }
+        @keyframes holo-shift {
+          0% { filter: hue-rotate(0deg) brightness(1.1); }
+          25% { filter: hue-rotate(90deg) brightness(1.3); }
+          50% { filter: hue-rotate(180deg) brightness(1.1); }
+          75% { filter: hue-rotate(270deg) brightness(1.3); }
+          100% { filter: hue-rotate(360deg) brightness(1.1); }
+        }
+        @keyframes celestial-glow {
+          0%, 100% { 
+            box-shadow: 0 0 40px #ffd700, 0 0 80px #fff, 0 0 120px #ffd700;
+            filter: brightness(1) saturate(1);
+          }
+          25% { 
+            box-shadow: 0 0 60px #fff, 0 0 100px #ffd700, 0 0 140px #ffaa00;
+            filter: brightness(1.5) saturate(1.2);
+          }
+          50% { 
+            box-shadow: 0 0 80px #ffd700, 0 0 120px #fff, 0 0 160px #ffd700;
+            filter: brightness(2) saturate(1);
+          }
+          75% { 
+            box-shadow: 0 0 50px #ffaa00, 0 0 90px #ffd700, 0 0 130px #fff;
+            filter: brightness(1.3) saturate(1.3);
+          }
+        }
+        
+        @keyframes achievementPop {
+          0% { transform: scale(0.5); opacity: 0; }
+          50% { transform: scale(1.1); }
+          100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes badgeShine {
+          0% { filter: brightness(1) saturate(1); }
+          50% { filter: brightness(1.3) saturate(1.2); }
+          100% { filter: brightness(1) saturate(1); }
+        }
+        @keyframes streakFire {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.1); }
+        }
+        * { box-sizing: border-box; }
+        input, select, button { font-family: inherit; }
+        input::placeholder { color: ${theme.textDim}; }
+        select option { background: ${theme.cardBg}; color: ${theme.text}; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: ${theme.inputBorder}; border-radius: 3px; }
+        @media (max-width: 480px) {
+          input, select { font-size: 16px !important; }
+        }
+      `}</style>
+      </>
+      )}
+
       {/* Rewards Modal */}
       {showRewardsModal && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowRewardsModal(false)}>
@@ -8090,86 +8334,6 @@ const getBudgetStatus = () => {
         </div>
       )}
 
-      {/* Christmas Theme Decorations */}
-      {isChristmasTheme && (
-        <>
-          {/* Snow Animation */}
-          <div style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            right: 0, 
-            height: '100vh', 
-            pointerEvents: 'none', 
-            zIndex: 100,
-            overflow: 'hidden'
-          }}>
-            {[...Array(50)].map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  position: 'absolute',
-                  top: '-10px',
-                  left: `${Math.random() * 100}%`,
-                  width: `${Math.random() * 8 + 4}px`,
-                  height: `${Math.random() * 8 + 4}px`,
-                  backgroundColor: isDark ? '#fff' : '#a8d4ff',
-                  borderRadius: '50%',
-                  opacity: isDark ? (Math.random() * 0.7 + 0.3) : (Math.random() * 0.5 + 0.4),
-                  boxShadow: isDark 
-                    ? '0 0 4px rgba(255, 255, 255, 0.5)' 
-                    : '0 0 6px rgba(100, 180, 255, 0.6), 0 0 2px rgba(0, 100, 200, 0.3)',
-                  animation: `snowfall ${Math.random() * 3 + 4}s linear infinite`,
-                  animationDelay: `${Math.random() * 5}s`
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Christmas Lights at top */}
-          <div style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: '4px',
-            display: 'flex',
-            justifyContent: 'space-around',
-            zIndex: 101,
-            pointerEvents: 'none'
-          }}>
-            {[...Array(30)].map((_, i) => (
-              <div
-                key={i}
-                style={{
-                  width: '10px',
-                  height: '10px',
-                  borderRadius: '50%',
-                  backgroundColor: ['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4],
-                  boxShadow: `0 0 10px ${['#ef4444', '#22c55e', '#fbbf24', '#3b82f6'][i % 4]}`,
-                  animation: `twinkle ${Math.random() * 1 + 0.5}s ease-in-out infinite alternate`,
-                  animationDelay: `${Math.random() * 2}s`,
-                  marginTop: '2px'
-                }}
-              />
-            ))}
-          </div>
-          
-          {/* Santa on header (right side) */}
-          <div style={{
-            position: 'fixed',
-            top: '8px',
-            right: '16px',
-            fontSize: '32px',
-            zIndex: 102,
-            pointerEvents: 'none',
-            animation: 'santaBounce 2s ease-in-out infinite'
-          }}>
-            🎅
-          </div>
-        </>
-      )}
-
  {/* Toast Notification */}
       {toast && (
         <div style={{
@@ -8212,227 +8376,6 @@ const getBudgetStatus = () => {
         </div>
       )}
 
-      <style>{`
-        @keyframes spin {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-        @keyframes slideIn {
-          from { transform: translateX(100%); opacity: 0; }
-          to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-        }
-        @keyframes snowfall {
-          0% { transform: translateY(-10px) rotate(0deg); }
-          100% { transform: translateY(100vh) rotate(360deg); }
-        }
-        @keyframes twinkle {
-          0% { opacity: 0.3; transform: scale(0.8); }
-          100% { opacity: 1; transform: scale(1.2); }
-        }
-        @keyframes santaBounce {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-5px); }
-        }
-        @keyframes rainbow-border {
-          0% { border-color: #ff0000; }
-          17% { border-color: #ff8000; }
-          33% { border-color: #ffff00; }
-          50% { border-color: #00ff00; }
-          67% { border-color: #0080ff; }
-          83% { border-color: #8000ff; }
-          100% { border-color: #ff0000; }
-        }
-        @keyframes legendary-pulse {
-          0%, 100% { box-shadow: 0 0 20px #ffd700, 0 0 30px #ff8c00; }
-          50% { box-shadow: 0 0 30px #ffd700, 0 0 50px #ff8c00, 0 0 70px #ff4500; }
-        }
-        
-        /* Gen Z/Gen Alpha Animated Frame Effects */
-        @keyframes pulse-bronze {
-          0%, 100% { box-shadow: 0 0 10px #cd7f32; }
-          50% { box-shadow: 0 0 20px #cd7f32, 0 0 30px #8b4513; }
-        }
-        @keyframes shimmer-silver {
-          0% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; filter: brightness(1); }
-          50% { box-shadow: 0 0 20px #ffffff, 0 0 35px #c0c0c0; filter: brightness(1.2); }
-          100% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; filter: brightness(1); }
-        }
-        @keyframes drip-gold {
-          0%, 100% { 
-            box-shadow: 0 0 15px #ffd700, 0 0 25px #ffaa00;
-            filter: hue-rotate(0deg);
-          }
-          50% { 
-            box-shadow: 0 0 25px #ffd700, 0 0 40px #ffaa00, 0 0 55px #ff8c00;
-            filter: hue-rotate(10deg);
-          }
-        }
-        @keyframes matrix-glow {
-          0%, 100% { 
-            box-shadow: 0 0 15px #00ff41, 0 0 30px #003d00;
-            text-shadow: 0 0 10px #00ff41;
-          }
-          25% { box-shadow: 0 0 25px #00ff41, 0 0 50px #00ff41, 0 0 75px #003d00; }
-          50% { box-shadow: 0 0 10px #00ff41, 0 0 20px #003d00; }
-          75% { box-shadow: 0 0 30px #00ff41, 0 0 60px #00ff41; }
-        }
-        @keyframes ice-pulse {
-          0%, 100% { 
-            box-shadow: 0 0 20px #00f7ff, 0 0 40px #0080ff, 0 0 60px #00f7ff33;
-            filter: brightness(1) saturate(1);
-          }
-          50% { 
-            box-shadow: 0 0 30px #00f7ff, 0 0 60px #0080ff, 0 0 90px #00f7ff66;
-            filter: brightness(1.3) saturate(1.3);
-          }
-        }
-        @keyframes fire-border {
-          0%, 100% { 
-            box-shadow: 0 0 20px #ff4500, 0 0 40px #ff6600, 0 0 60px #ff000066;
-            filter: hue-rotate(0deg) brightness(1);
-          }
-          25% { 
-            box-shadow: 0 0 30px #ff0000, 0 0 50px #ff4500, 0 0 70px #ff660066;
-            filter: hue-rotate(-10deg) brightness(1.2);
-          }
-          50% { 
-            box-shadow: 0 0 25px #ff6600, 0 0 45px #ff4500, 0 0 65px #ff000066;
-            filter: hue-rotate(10deg) brightness(1.1);
-          }
-          75% { 
-            box-shadow: 0 0 35px #ff4500, 0 0 55px #ff0000, 0 0 75px #ff660099;
-            filter: hue-rotate(-5deg) brightness(1.3);
-          }
-        }
-        @keyframes neon-flicker {
-          0%, 100% { 
-            box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff, 0 0 30px #ff00ff;
-            opacity: 1;
-          }
-          5%, 15% { opacity: 0.8; }
-          10% { opacity: 0.6; }
-          50% { 
-            box-shadow: 0 0 20px #00ffff, 0 0 40px #ff00ff, 0 0 60px #00ffff;
-            opacity: 1;
-          }
-          55% { opacity: 0.9; }
-        }
-        @keyframes galaxy-rotate {
-          0% { filter: hue-rotate(0deg); }
-          100% { filter: hue-rotate(360deg); }
-        }
-        @keyframes rgb-rotate {
-          0% { filter: hue-rotate(0deg) brightness(1); }
-          50% { filter: hue-rotate(180deg) brightness(1.2); }
-          100% { filter: hue-rotate(360deg) brightness(1); }
-        }
-        @keyframes legendary-crown {
-          0%, 100% { 
-            box-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00, 0 0 90px #ff4500;
-            filter: brightness(1) saturate(1);
-          }
-          25% { 
-            box-shadow: 0 0 40px #fff, 0 0 70px #ffd700, 0 0 100px #ff8c00;
-            filter: brightness(1.3) saturate(1.2);
-          }
-          50% { 
-            box-shadow: 0 0 50px #ffd700, 0 0 80px #fff, 0 0 110px #ffd700;
-            filter: brightness(1.5) saturate(1);
-          }
-          75% { 
-            box-shadow: 0 0 35px #ff8c00, 0 0 65px #ffd700, 0 0 95px #fff;
-            filter: brightness(1.2) saturate(1.3);
-          }
-        }
-        @keyframes void-pulse {
-          0%, 100% { 
-            box-shadow: 0 0 30px #000, 0 0 50px #1a0033, 0 0 70px #330066, inset 0 0 20px #000;
-            filter: brightness(0.8);
-          }
-          50% { 
-            box-shadow: 0 0 40px #1a0033, 0 0 70px #330066, 0 0 100px #4a0080, inset 0 0 30px #1a0033;
-            filter: brightness(1);
-          }
-        }
-        @keyframes holo-shift {
-          0% { filter: hue-rotate(0deg) brightness(1.1); }
-          25% { filter: hue-rotate(90deg) brightness(1.2); }
-          50% { filter: hue-rotate(180deg) brightness(1.1); }
-          75% { filter: hue-rotate(270deg) brightness(1.2); }
-          100% { filter: hue-rotate(360deg) brightness(1.1); }
-        }
-        @keyframes glitch-border {
-          0%, 90%, 100% { 
-            box-shadow: 0 0 10px #00ff00, -3px 0 0 #ff0000, 3px 0 0 #0000ff;
-            transform: translate(0);
-          }
-          92% { 
-            box-shadow: 0 0 15px #00ff00, -5px 0 0 #ff0000, 5px 0 0 #0000ff;
-            transform: translate(-2px, 1px);
-          }
-          94% { 
-            box-shadow: 0 0 10px #ff0000, -3px 0 0 #0000ff, 3px 0 0 #00ff00;
-            transform: translate(2px, -1px);
-          }
-          96% { 
-            box-shadow: 0 0 20px #0000ff, -4px 0 0 #00ff00, 4px 0 0 #ff0000;
-            transform: translate(-1px, 2px);
-          }
-          98% { 
-            box-shadow: 0 0 10px #00ff00, -3px 0 0 #ff0000, 3px 0 0 #0000ff;
-            transform: translate(1px, -2px);
-          }
-        }
-        @keyframes godmode-aura {
-          0%, 100% { 
-            box-shadow: 0 0 40px #ffd700, 0 0 80px #fff, 0 0 120px #ffd700;
-            filter: brightness(1) saturate(1);
-          }
-          25% { 
-            box-shadow: 0 0 60px #fff, 0 0 100px #ffd700, 0 0 140px #ffaa00;
-            filter: brightness(1.5) saturate(1.2);
-          }
-          50% { 
-            box-shadow: 0 0 80px #ffd700, 0 0 120px #fff, 0 0 160px #ffd700;
-            filter: brightness(2) saturate(1);
-          }
-          75% { 
-            box-shadow: 0 0 50px #ffaa00, 0 0 90px #ffd700, 0 0 130px #fff;
-            filter: brightness(1.3) saturate(1.3);
-          }
-        }
-        
-        @keyframes achievementPop {
-          0% { transform: scale(0.5); opacity: 0; }
-          50% { transform: scale(1.1); }
-          100% { transform: scale(1); opacity: 1; }
-        }
-        @keyframes badgeShine {
-          0% { filter: brightness(1) saturate(1); }
-          50% { filter: brightness(1.3) saturate(1.2); }
-          100% { filter: brightness(1) saturate(1); }
-        }
-        @keyframes streakFire {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-        }
-        * { box-sizing: border-box; }
-        input, select, button { font-family: inherit; }
-        input::placeholder { color: ${theme.textDim}; }
-        select option { background: ${theme.cardBg}; color: ${theme.text}; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: ${theme.inputBorder}; border-radius: 3px; }
-        @media (max-width: 480px) {
-          input, select { font-size: 16px !important; }
-        }
-      `}</style>
-      </>
-      )}
       </div>{/* End Main Content Wrapper */}
     </div>
   );

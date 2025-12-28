@@ -234,7 +234,7 @@ const VAKita = ({ user, isDark }) => {
   const btnOutline = { ...btnPrimary, backgroundColor: 'transparent', color: theme.text, border: '1px solid ' + theme.cardBorder };
   const btnGhost = { height: '36px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', borderRadius: '6px', fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' };
   const btnSuccess = { ...btnPrimary, backgroundColor: '#22c55e' };
-  const tab = (a) => ({ padding: isSmall ? '10px 8px' : '14px 18px', backgroundColor: 'transparent', border: 'none', borderBottom: a ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent', fontSize: isSmall ? '12px' : '15px', fontWeight: '500', color: a ? theme.text : theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: isSmall ? '4px' : '8px', whiteSpace: 'nowrap', flexShrink: 0 });
+  const tab = (a) => ({ padding: isSmall ? '12px 10px' : '14px 18px', backgroundColor: 'transparent', border: 'none', borderBottom: a ? '2px solid #8b5cf6' : '2px solid transparent', fontSize: isSmall ? '11px' : '15px', fontWeight: '500', color: a ? (isDark ? '#fff' : '#18181b') : theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isSmall ? '0' : '8px', whiteSpace: 'nowrap', flexShrink: 0, minWidth: isSmall ? '44px' : 'auto' });
   const label = { display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' };
   const statusStyle = (s) => { const st = STATUSES.find(x => x.id === s) || STATUSES[0]; return { backgroundColor: isDark ? st.color + '20' : st.color + '15', color: st.color }; };
   const prospectStatusStyle = (s) => { const st = PROSPECT_STATUSES.find(x => x.id === s) || PROSPECT_STATUSES[0]; return { backgroundColor: isDark ? st.color + '20' : st.color + '15', color: st.color }; };
@@ -243,16 +243,16 @@ const VAKita = ({ user, isDark }) => {
 
   return (
     <>
-      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 8px' : '0 24px' }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', gap: isSmall ? '0' : '4px', padding: isSmall ? '0 4px' : '0 16px', overflowX: 'auto', alignItems: 'center', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <button onClick={() => setActiveTab('prospecting')} style={tab(activeTab === 'prospecting')}><Target style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? 'Leads' : 'Prospecting'}</button>
-          <button onClick={() => setActiveTab('clients')} style={tab(activeTab === 'clients')}><Users style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />Clients</button>
-          <button onClick={() => setActiveTab('dashboard')} style={tab(activeTab === 'dashboard')}><BarChart3 style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? 'Income' : 'Dashboard'}</button>
-          <button onClick={() => setActiveTab('invoices')} style={tab(activeTab === 'invoices')}><FileText style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />Invoices</button>
-          <button onClick={() => setActiveTab('timezone')} style={tab(activeTab === 'timezone')}><Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? 'Clock' : 'ClientClock'}</button>
-          <button onClick={() => setActiveTab('tax')} style={tab(activeTab === 'tax')}><Calculator style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? 'Tax' : 'BIR Tax'}</button>
-          {liveRate && <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#22c55e', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', backgroundColor: isDark ? '#22c55e15' : '#22c55e10', borderRadius: '8px', fontWeight: '600' }}>$1 = ₱{liveRate.toFixed(2)}</span>}
-          {saving && <span style={{ marginLeft: liveRate ? '8px' : 'auto', fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px' }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />Saving...</span>}
+      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 4px' : '0 24px' }}>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', gap: '0', padding: isSmall ? '0' : '0 16px', overflowX: 'auto', alignItems: 'center', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <button onClick={() => setActiveTab('prospecting')} style={tab(activeTab === 'prospecting')}><Target style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Leads'}</button>
+          <button onClick={() => setActiveTab('clients')} style={tab(activeTab === 'clients')}><Users style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clients'}</button>
+          <button onClick={() => setActiveTab('dashboard')} style={tab(activeTab === 'dashboard')}><BarChart3 style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Income'}</button>
+          <button onClick={() => setActiveTab('invoices')} style={tab(activeTab === 'invoices')}><FileText style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Invoices'}</button>
+          <button onClick={() => setActiveTab('timezone')} style={tab(activeTab === 'timezone')}><Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clock'}</button>
+          <button onClick={() => setActiveTab('tax')} style={tab(activeTab === 'tax')}><Calculator style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Tax'}</button>
+          {liveRate && !isSmall && <span style={{ marginLeft: 'auto', fontSize: '12px', color: '#22c55e', display: 'flex', alignItems: 'center', gap: '4px', padding: '6px 12px', backgroundColor: isDark ? '#22c55e15' : '#22c55e10', borderRadius: '8px', fontWeight: '600' }}>$1 = ₱{liveRate.toFixed(2)}</span>}
+          {saving && <span style={{ marginLeft: liveRate && !isSmall ? '8px' : 'auto', fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px' }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />{isSmall ? '' : 'Saving...'}</span>}
         </div>
       </div>
 
