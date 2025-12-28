@@ -23,23 +23,23 @@ const TIMEZONES = [
 ];
 
 const PLATFORMS = [
-  { id: 'wise', name: 'Wise', icon: 'https://cdn.simpleicons.org/wise', emoji: '💸' },
-  { id: 'payoneer', name: 'Payoneer', icon: 'https://cdn.simpleicons.org/payoneer', emoji: '🔵' },
-  { id: 'paypal', name: 'PayPal', icon: 'https://cdn.simpleicons.org/paypal', emoji: '🅿️' },
+  { id: 'wise', name: 'Wise', icon: 'https://cdn.simpleicons.org/wise/9FE870', emoji: '💸' },
+  { id: 'payoneer', name: 'Payoneer', icon: 'https://cdn.simpleicons.org/payoneer/FF4800', emoji: '🔵' },
+  { id: 'paypal', name: 'PayPal', icon: 'https://cdn.simpleicons.org/paypal/00457C', emoji: '🅿️' },
   { id: 'gcash', name: 'GCash', icon: '📱', emoji: '📱' },  // Replace icon with custom logo URL later
   { id: 'maya', name: 'Maya', icon: '💜', emoji: '💜' },    // Replace icon with custom logo URL later
   { id: 'bank', name: 'Bank', icon: '🏦', emoji: '🏦' },
 ];
 
 const LEAD_SOURCES = [
-  { id: 'linkedin', name: 'LinkedIn', icon: 'https://cdn.simpleicons.org/linkedin', emoji: '💼' },
+  { id: 'linkedin', name: 'LinkedIn', icon: 'https://cdn.simpleicons.org/linkedin/0A66C2', emoji: '💼' },
   { id: 'onlinejobsph', name: 'OnlineJobsPH', icon: '🇵🇭', emoji: '🇵🇭' },
-  { id: 'upwork', name: 'Upwork', icon: 'https://cdn.simpleicons.org/upwork', emoji: '🟢' },
-  { id: 'facebook', name: 'Facebook', icon: 'https://cdn.simpleicons.org/facebook', emoji: '📘' },
-  { id: 'tiktok', name: 'TikTok', icon: 'https://cdn.simpleicons.org/tiktok', emoji: '🎵' },
-  { id: 'instagram', name: 'Instagram', icon: 'https://cdn.simpleicons.org/instagram', emoji: '📸' },
-  { id: 'twitter', name: 'Twitter/X', icon: 'https://cdn.simpleicons.org/x', emoji: '🐦' },
-  { id: 'fiverr', name: 'Fiverr', icon: 'https://cdn.simpleicons.org/fiverr', emoji: '🟩' },
+  { id: 'upwork', name: 'Upwork', icon: 'https://cdn.simpleicons.org/upwork/14A800', emoji: '🟢' },
+  { id: 'facebook', name: 'Facebook', icon: 'https://cdn.simpleicons.org/facebook/0866FF', emoji: '📘' },
+  { id: 'tiktok', name: 'TikTok', icon: 'https://cdn.simpleicons.org/tiktok/ffffff', emoji: '🎵' },
+  { id: 'instagram', name: 'Instagram', icon: 'https://cdn.simpleicons.org/instagram/E4405F', emoji: '📸' },
+  { id: 'twitter', name: 'Twitter/X', icon: 'https://cdn.simpleicons.org/x/ffffff', emoji: '🐦' },
+  { id: 'fiverr', name: 'Fiverr', icon: 'https://cdn.simpleicons.org/fiverr/1DBF73', emoji: '🟩' },
   { id: 'referral', name: 'Referral', icon: '🤝', emoji: '🤝' },
   { id: 'coldoutreach', name: 'Cold Outreach', icon: '📧', emoji: '📧' },
   { id: 'other', name: 'Other', icon: '🌐', emoji: '🌐' },
@@ -81,11 +81,18 @@ const TAX_BRACKETS = [
 ];
 
 // Helper to render icon - if it's a URL, render as img; otherwise render as text/emoji
-const renderIcon = (icon, size = 20) => {
+const renderIcon = (icon, size = 20, fallback = '🌐') => {
   if (icon && icon.startsWith('http')) {
-    return <img src={icon} alt="" style={{ width: size, height: size, objectFit: 'contain' }} />;
+    return (
+      <img 
+        src={icon} 
+        alt="" 
+        style={{ width: size, height: size, objectFit: 'contain' }} 
+        onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling && (e.target.nextSibling.style.display = 'inline'); }}
+      />
+    );
   }
-  return <span style={{ fontSize: size }}>{icon}</span>;
+  return <span style={{ fontSize: size }}>{icon || fallback}</span>;
 };
 
 const VAKita = ({ user, isDark }) => {
