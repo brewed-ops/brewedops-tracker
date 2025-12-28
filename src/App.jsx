@@ -2771,7 +2771,9 @@ const getBudgetStatus = () => {
                   borderRadius: '10px',
                   cursor: 'pointer',
                   transition: 'transform 0.15s',
-                  border: `1px solid ${theme.cardBorder}`
+                  border: `1px solid ${theme.cardBorder}`,
+                  height: '50px',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
@@ -2826,7 +2828,9 @@ const getBudgetStatus = () => {
                   borderRadius: '10px',
                   cursor: 'pointer',
                   transition: 'transform 0.15s',
-                  border: `1px solid ${theme.cardBorder}`
+                  border: `1px solid ${theme.cardBorder}`,
+                  height: '50px',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.02)'}
                 onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
