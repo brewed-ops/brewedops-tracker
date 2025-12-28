@@ -1,7 +1,7 @@
 // VAKita.jsx - Income & Client Manager for Filipino VAs
 // Renders INSIDE App.jsx main content area - App.jsx handles header with level/XP/achievements
 // Data stored in Supabase for persistence
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { FileText, Clock, Plus, Trash2, Edit, Eye, X, Sun, Moon as MoonIcon, Coffee, Zap, Users, Bell, PiggyBank, Calculator, Receipt, BarChart3, Loader2, Target, UserPlus, CheckCircle, Info, Mail, Copy, Send, Settings } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getTheme } from '../lib/theme';
@@ -165,6 +165,7 @@ const VAKita = ({ user, isDark }) => {
   }, []);
 
   const [dataLoaded, setDataLoaded] = useState(false);
+  const isInitialMount = useRef(true);
 
   useEffect(() => {
     if (!user?.id) return;
@@ -182,29 +183,38 @@ const VAKita = ({ user, isDark }) => {
           setVakitaProfile(data.vakita_profile || { name: '', email: '', businessName: '' });
           setActivities(data.vakita_activities || []);
         }
-        setDataLoaded(true);
       } catch (err) { console.error('Error loading VAKita data:', err); }
-      finally { setLoading(false); }
+      finally { 
+        setLoading(false);
+        // Use setTimeout to ensure state updates have propagated before allowing saves
+        setTimeout(() => {
+          isInitialMount.current = false;
+          setDataLoaded(true);
+        }, 100);
+      }
     };
     loadData();
   }, [user?.id]);
 
   const saveToSupabase = useCallback(async (field, value) => {
-    if (!user?.id) return;
+    if (!user?.id || isInitialMount.current) return;
     setSaving(true);
-    try { const { error } = await supabase.from('user_profiles').update({ [field]: value }).eq('user_id', user.id); if (error) console.error('Error saving ' + field + ':', error); }
+    try { 
+      const { error } = await supabase.from('user_profiles').update({ [field]: value }).eq('user_id', user.id); 
+      if (error) console.error('Error saving ' + field + ':', error); 
+    }
     catch (err) { console.error('Error saving ' + field + ':', err); }
     finally { setSaving(false); }
   }, [user?.id]);
 
-  // Only save AFTER initial data has been loaded (dataLoaded = true)
-  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_clients', clients), 500); return () => clearTimeout(t); }, [clients, dataLoaded, user?.id, saveToSupabase]);
-  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_income', incomeEntries), 500); return () => clearTimeout(t); }, [incomeEntries, dataLoaded, user?.id, saveToSupabase]);
-  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_invoices', invoices), 500); return () => clearTimeout(t); }, [invoices, dataLoaded, user?.id, saveToSupabase]);
-  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_prospects', prospects), 500); return () => clearTimeout(t); }, [prospects, dataLoaded, user?.id, saveToSupabase]);
-  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_tax_settings', taxSettings), 500); return () => clearTimeout(t); }, [taxSettings, dataLoaded, user?.id, saveToSupabase]);
-  useEffect(() => { if (!dataLoaded || !user?.id || !vakitaProfile.name) return; const t = setTimeout(() => saveToSupabase('vakita_profile', vakitaProfile), 500); return () => clearTimeout(t); }, [vakitaProfile, dataLoaded, user?.id, saveToSupabase]);
-  useEffect(() => { if (!dataLoaded || !user?.id || activities.length === 0) return; const t = setTimeout(() => saveToSupabase('vakita_activities', activities), 500); return () => clearTimeout(t); }, [activities, dataLoaded, user?.id, saveToSupabase]);
+  // Only save AFTER initial data has been loaded (dataLoaded = true AND isInitialMount = false)
+  useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_clients', clients), 500); return () => clearTimeout(t); }, [clients, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_income', incomeEntries), 500); return () => clearTimeout(t); }, [incomeEntries, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_invoices', invoices), 500); return () => clearTimeout(t); }, [invoices, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_prospects', prospects), 500); return () => clearTimeout(t); }, [prospects, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_tax_settings', taxSettings), 500); return () => clearTimeout(t); }, [taxSettings, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current || !vakitaProfile.name) return; const t = setTimeout(() => saveToSupabase('vakita_profile', vakitaProfile), 500); return () => clearTimeout(t); }, [vakitaProfile, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current || activities.length === 0) return; const t = setTimeout(() => saveToSupabase('vakita_activities', activities), 500); return () => clearTimeout(t); }, [activities, dataLoaded, user?.id, saveToSupabase]);
   useEffect(() => { if(showInvoiceForm && !editingInvoice) setInvoiceForm(p => ({...p, invoiceNumber: 'INV-' + new Date().getFullYear() + '-' + String(invoices.length+1).padStart(4,'0')})); }, [showInvoiceForm, editingInvoice, invoices.length]);
 
   const getRate = (c) => CURRENCIES.find(x => x.code === c)?.rate || 1;
