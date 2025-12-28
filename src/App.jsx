@@ -5,6 +5,7 @@ import { supabase } from './lib/supabase';
 
 // Extracted components and utilities
 import Sidebar from './components/layout/Sidebar';
+import VAKita from './components/VAKita';
 import {
   CATEGORIES,
   CURRENCIES,
@@ -3270,6 +3271,11 @@ const getBudgetStatus = () => {
         </div>
       </header>
 
+      {/* Conditional Content based on activeSection */}
+      {activeSection === 'vakita' ? (
+        <VAKita user={user} isDark={isDark} />
+      ) : (
+      <>
       {/* Tab Navigation */}
       <div style={{
         backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
@@ -8425,6 +8431,8 @@ const getBudgetStatus = () => {
           input, select { font-size: 16px !important; }
         }
       `}</style>
+      </>
+      )}
       </div>{/* End Main Content Wrapper */}
     </div>
   );
