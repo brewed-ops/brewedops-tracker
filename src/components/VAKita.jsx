@@ -249,16 +249,21 @@ const VAKita = ({ user, isDark }) => {
   return (
     <>
       <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 4px' : '0 24px' }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', gap: '0', padding: isSmall ? '0' : '0 16px', overflowX: 'auto', alignItems: 'center', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <button onClick={() => setActiveTab('prospecting')} style={tab(activeTab === 'prospecting')}><Target style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Leads'}</button>
-          <button onClick={() => setActiveTab('clients')} style={tab(activeTab === 'clients')}><Users style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clients'}</button>
-          <button onClick={() => setActiveTab('dashboard')} style={tab(activeTab === 'dashboard')}><BarChart3 style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Income'}</button>
-          <button onClick={() => setActiveTab('invoices')} style={tab(activeTab === 'invoices')}><FileText style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Invoices'}</button>
-          <button onClick={() => setActiveTab('timezone')} style={tab(activeTab === 'timezone')}><Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clock'}</button>
-          <button onClick={() => setActiveTab('tax')} style={tab(activeTab === 'tax')}><Calculator style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Tax'}</button>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '0', padding: isSmall ? '0' : '0 16px' }}>
+          {/* Scrollable tabs */}
+          <div style={{ display: 'flex', gap: '0', overflowX: 'auto', alignItems: 'center', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1 }}>
+            <button onClick={() => setActiveTab('prospecting')} style={tab(activeTab === 'prospecting')}><Target style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Leads'}</button>
+            <button onClick={() => setActiveTab('clients')} style={tab(activeTab === 'clients')}><Users style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clients'}</button>
+            <button onClick={() => setActiveTab('dashboard')} style={tab(activeTab === 'dashboard')}><BarChart3 style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Income'}</button>
+            <button onClick={() => setActiveTab('invoices')} style={tab(activeTab === 'invoices')}><FileText style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Invoices'}</button>
+            <button onClick={() => setActiveTab('timezone')} style={tab(activeTab === 'timezone')}><Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clock'}</button>
+            <button onClick={() => setActiveTab('tax')} style={tab(activeTab === 'tax')}><Calculator style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Tax'}</button>
+          </div>
+          
+          {/* Exchange rate - outside scrollable area */}
           {liveRate && !isSmall && (
             <div 
-              style={{ marginLeft: 'auto', position: 'relative' }}
+              style={{ marginLeft: 'auto', position: 'relative', flexShrink: 0, paddingLeft: '12px' }}
               onMouseEnter={() => setShowRateTooltip(true)}
               onMouseLeave={() => setShowRateTooltip(false)}
             >
@@ -272,7 +277,7 @@ const VAKita = ({ user, isDark }) => {
                 backgroundColor: isDark ? '#22c55e15' : '#22c55e10', 
                 borderRadius: '8px', 
                 fontWeight: '600',
-                cursor: 'help',
+                cursor: 'pointer',
                 border: '1px solid ' + (isDark ? '#22c55e30' : '#22c55e25')
               }}>
                 <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
@@ -281,40 +286,39 @@ const VAKita = ({ user, isDark }) => {
               {showRateTooltip && (
                 <div style={{
                   position: 'absolute',
-                  top: '100%',
+                  top: 'calc(100% + 8px)',
                   right: 0,
-                  marginTop: '8px',
                   padding: '12px 14px',
                   backgroundColor: theme.cardBg,
                   border: '1px solid ' + theme.cardBorder,
                   borderRadius: '10px',
-                  boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.4)' : '0 4px 12px rgba(0,0,0,0.1)',
-                  zIndex: 50,
-                  minWidth: '200px',
+                  boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.15)',
+                  zIndex: 100,
+                  minWidth: '220px',
                   whiteSpace: 'nowrap'
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
                     <span style={{ width: '8px', height: '8px', backgroundColor: '#22c55e', borderRadius: '50%' }} />
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>Live Exchange Rate</span>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Live Exchange Rate</span>
                   </div>
-                  <div style={{ fontSize: '12px', color: theme.textMuted, marginBottom: '6px' }}>
-                    <span style={{ fontWeight: '500' }}>Rate:</span> $1 USD = ₱{liveRate.toFixed(4)} PHP
+                  <div style={{ fontSize: '13px', color: theme.text, marginBottom: '6px' }}>
+                    <span style={{ color: theme.textMuted }}>Rate:</span> $1 USD = ₱{liveRate.toFixed(4)} PHP
                   </div>
                   {lastRateUpdate && (
-                    <div style={{ fontSize: '11px', color: theme.textMuted, marginBottom: '8px' }}>
+                    <div style={{ fontSize: '12px', color: theme.textMuted, marginBottom: '10px' }}>
                       <span style={{ fontWeight: '500' }}>Updated:</span> {lastRateUpdate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   )}
                   <div style={{ 
-                    fontSize: '10px', 
+                    fontSize: '11px', 
                     color: theme.textMuted, 
-                    paddingTop: '8px', 
+                    paddingTop: '10px', 
                     borderTop: '1px solid ' + theme.cardBorder,
                     display: 'flex',
                     alignItems: 'center',
                     gap: '4px'
                   }}>
-                    <Info style={{ width: '10px', height: '10px' }} />
+                    <Info style={{ width: '12px', height: '12px' }} />
                     Source: ExchangeRate-API.com
                   </div>
                 </div>
@@ -327,7 +331,7 @@ const VAKita = ({ user, isDark }) => {
               `}</style>
             </div>
           )}
-          {saving && <span style={{ marginLeft: liveRate && !isSmall ? '8px' : 'auto', fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px' }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />{isSmall ? '' : 'Saving...'}</span>}
+          {saving && <span style={{ marginLeft: '8px', fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />{isSmall ? '' : 'Saving...'}</span>}
         </div>
       </div>
 
