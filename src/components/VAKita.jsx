@@ -322,6 +322,7 @@ const VAKita = ({ user, isDark }) => {
     const client = clients.find(c => c.id === inv.clientId);
     const clientFirstName = inv.clientName?.split(' ')[0] || 'there';
     const currencySymbol = getSymbol(inv.currency);
+    const senderName = vakitaProfile.name || '[Your Name]';
     
     // Build line items description
     const itemsList = inv.items?.map(item => {
@@ -351,7 +352,7 @@ Please let me know if you have any questions about this invoice or if you'd like
 Thank you so much for the opportunity to work with you. I truly appreciate your trust and look forward to continuing our collaboration!
 
 Warm regards,
-[Your Name]`;
+${senderName}`;
     
     return email;
   };
@@ -1267,19 +1268,30 @@ Warm regards,
               }}>
                 {generateInvoiceEmail(emailModal.invoice)}
               </div>
-              <div style={{marginTop:'16px',padding:'12px',backgroundColor:isDark?'#3b82f615':'#3b82f610',borderRadius:'8px',border:'1px solid #3b82f640'}}>
-                <div style={{display:'flex',alignItems:'flex-start',gap:'10px'}}>
-                  <Info style={{width:'16px',height:'16px',color:'#3b82f6',flexShrink:0,marginTop:'2px'}}/>
-                  <p style={{fontSize:'13px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
-                    Copy this email template and paste it into your email client. Don't forget to replace <strong style={{color:theme.text}}>[Your Name]</strong> with your actual name before sending!
-                  </p>
+              {!vakitaProfile.name ? (
+                <div style={{marginTop:'16px',padding:'12px',backgroundColor:isDark?'#f59e0b15':'#f59e0b10',borderRadius:'8px',border:'1px solid #f59e0b40'}}>
+                  <div style={{display:'flex',alignItems:'flex-start',gap:'10px'}}>
+                    <Info style={{width:'16px',height:'16px',color:'#f59e0b',flexShrink:0,marginTop:'2px'}}/>
+                    <p style={{fontSize:'13px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
+                      <strong style={{color:'#f59e0b'}}>Tip:</strong> Set up your <button onClick={()=>{setEmailModal({show:false,invoice:null});setShowProfileModal(true);}} style={{background:'none',border:'none',color:'#3b82f6',cursor:'pointer',padding:0,fontSize:'13px',textDecoration:'underline'}}>VAKita profile</button> to auto-fill your name in emails!
+                    </p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div style={{marginTop:'16px',padding:'12px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'8px',border:'1px solid #22c55e40'}}>
+                  <div style={{display:'flex',alignItems:'flex-start',gap:'10px'}}>
+                    <CheckCircle style={{width:'16px',height:'16px',color:'#22c55e',flexShrink:0,marginTop:'2px'}}/>
+                    <p style={{fontSize:'13px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
+                      Email signed as <strong style={{color:theme.text}}>{vakitaProfile.name}</strong>. Ready to send!
+                    </p>
+                  </div>
+                </div>
+              )}
             </div>
             <div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end',flexWrap:'wrap'}}>
               <button onClick={()=>{setEmailModal({show:false,invoice:null});setEmailCopied(false);}} style={btnOutline}>Close</button>
               <button 
-                onClick={()=>copyEmailToClipboard(generateInvoiceEmail(emailModal.invoice).replace('[Your Name]', vakitaProfile.name || '[Your Name]'))} 
+                onClick={()=>copyEmailToClipboard(generateInvoiceEmail(emailModal.invoice))} 
                 style={{
                   ...btnPrimary,
                   backgroundColor: emailCopied ? '#22c55e' : '#6b7280',
