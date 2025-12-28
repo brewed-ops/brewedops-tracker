@@ -171,10 +171,14 @@ const VAKita = ({ user, isDark }) => {
     if (!user?.id) return;
     const loadData = async () => {
       setLoading(true);
+      console.log('[VAKita] Loading data for user:', user.id);
       try {
         const { data, error } = await supabase.from('user_profiles').select('vakita_clients, vakita_income, vakita_invoices, vakita_tax_settings, vakita_prospects, vakita_profile, vakita_activities').eq('user_id', user.id).single();
+        console.log('[VAKita] Loaded data:', data);
+        console.log('[VAKita] Load error:', error);
         if (error && error.code !== 'PGRST116') console.error('Error loading VAKita data:', error);
         if (data) {
+          console.log('[VAKita] Setting clients:', data.vakita_clients);
           setClients(data.vakita_clients || []);
           setIncomeEntries(data.vakita_income || []);
           setInvoices(data.vakita_invoices || []);
@@ -188,27 +192,49 @@ const VAKita = ({ user, isDark }) => {
         setLoading(false);
         // Use setTimeout to ensure state updates have propagated before allowing saves
         setTimeout(() => {
+          console.log('[VAKita] Enabling saves after initial load');
           isInitialMount.current = false;
           setDataLoaded(true);
-        }, 100);
+        }, 500);
       }
     };
     loadData();
   }, [user?.id]);
 
   const saveToSupabase = useCallback(async (field, value) => {
-    if (!user?.id || isInitialMount.current) return;
+    if (!user?.id) {
+      console.log('[VAKita] Save blocked - no user id');
+      return;
+    }
+    if (isInitialMount.current) {
+      console.log('[VAKita] Save blocked - initial mount for field:', field);
+      return;
+    }
+    console.log('[VAKita] Saving', field, ':', value);
     setSaving(true);
     try { 
       const { error } = await supabase.from('user_profiles').update({ [field]: value }).eq('user_id', user.id); 
-      if (error) console.error('Error saving ' + field + ':', error); 
+      if (error) {
+        console.error('[VAKita] Error saving ' + field + ':', error);
+      } else {
+        console.log('[VAKita] Successfully saved', field);
+      }
     }
-    catch (err) { console.error('Error saving ' + field + ':', err); }
+    catch (err) { console.error('[VAKita] Error saving ' + field + ':', err); }
     finally { setSaving(false); }
   }, [user?.id]);
 
   // Only save AFTER initial data has been loaded (dataLoaded = true AND isInitialMount = false)
-  useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_clients', clients), 500); return () => clearTimeout(t); }, [clients, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { 
+    if (!dataLoaded || !user?.id || isInitialMount.current) {
+      console.log('[VAKita] Clients save skipped - dataLoaded:', dataLoaded, 'isInitialMount:', isInitialMount.current);
+      return;
+    }
+    console.log('[VAKita] Scheduling clients save:', clients);
+    const t = setTimeout(() => saveToSupabase('vakita_clients', clients), 500); 
+    return () => clearTimeout(t); 
+  }, [clients, dataLoaded, user?.id, saveToSupabase]);
+  
   useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_income', incomeEntries), 500); return () => clearTimeout(t); }, [incomeEntries, dataLoaded, user?.id, saveToSupabase]);
   useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_invoices', invoices), 500); return () => clearTimeout(t); }, [invoices, dataLoaded, user?.id, saveToSupabase]);
   useEffect(() => { if (!dataLoaded || !user?.id || isInitialMount.current) return; const t = setTimeout(() => saveToSupabase('vakita_prospects', prospects), 500); return () => clearTimeout(t); }, [prospects, dataLoaded, user?.id, saveToSupabase]);
