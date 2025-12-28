@@ -1,378 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3 } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Snowflake, TreePine, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
-// ============================================
-// CONSTANTS
-// ============================================
-
-const CATEGORIES = [
-  { value: 'utilities', label: 'Utilities', color: '#3b82f6' },
-  { value: 'subscription', label: 'Subscription', color: '#8b5cf6' },
-  { value: 'food', label: 'Food', color: '#f97316' },
-  { value: 'shopping', label: 'Shopping', color: '#ec4899' },
-  { value: 'healthcare', label: 'Healthcare', color: '#10b981' },
-  { value: 'entertainment', label: 'Entertainment', color: '#f59e0b' },
-  { value: 'other', label: 'Other', color: '#71717a' },
-];
-
-const CURRENCIES = [
-  { symbol: '₱', label: 'PHP (₱)' },
-  { symbol: '$', label: 'USD ($)' },
-  { symbol: '€', label: 'EUR (€)' },
-  { symbol: '£', label: 'GBP (£)' },
-  { symbol: '¥', label: 'JPY (¥)' },
-  { symbol: '₹', label: 'INR (₹)' },
-];
-
-// Wallet type configurations (for adding new wallets)
-const WALLET_TYPES = [
-  { type: 'cash', label: 'Cash', icon: '💵', color: '#22c55e', canAddMultiple: false },
-  { type: 'ewallet', label: 'E-Wallet', icon: '📱', color: '#0066ff', canAddMultiple: true, 
-    presets: [
-      { name: 'GCash', icon: '📱', color: '#0066ff' },
-      { name: 'Maya', icon: '💜', color: '#7c3aed' },
-      { name: 'Coins.ph', icon: '🪙', color: '#f59e0b' },
-      { name: 'GrabPay', icon: '🚗', color: '#22c55e' },
-      { name: 'ShopeePay', icon: '🛒', color: '#f97316' },
-      { name: 'PayPal', icon: '🅿️', color: '#0070ba' },
-    ]
-  },
-  { type: 'bank', label: 'Bank Account', icon: '🏦', color: '#6366f1', canAddMultiple: true,
-    presets: [
-      { name: 'BDO', icon: '🏦', color: '#0033a0' },
-      { name: 'BPI', icon: '🏦', color: '#c8102e' },
-      { name: 'Metrobank', icon: '🏦', color: '#00529b' },
-      { name: 'UnionBank', icon: '🏦', color: '#f7931e' },
-      { name: 'Landbank', icon: '🏦', color: '#006f45' },
-      { name: 'PNB', icon: '🏦', color: '#1e3a8a' },
-      { name: 'Security Bank', icon: '🏦', color: '#e11d48' },
-      { name: 'RCBC', icon: '🏦', color: '#dc2626' },
-      { name: 'Chinabank', icon: '🏦', color: '#b91c1c' },
-      { name: 'EastWest', icon: '🏦', color: '#0ea5e9' },
-    ]
-  },
-  { type: 'credit', label: 'Credit Card', icon: '💳', color: '#ef4444', canAddMultiple: true,
-    presets: [
-      { name: 'Visa', icon: '💳', color: '#1a1f71' },
-      { name: 'Mastercard', icon: '💳', color: '#eb001b' },
-      { name: 'BDO Credit Card', icon: '💳', color: '#0033a0' },
-      { name: 'BPI Credit Card', icon: '💳', color: '#c8102e' },
-      { name: 'Metrobank Credit Card', icon: '💳', color: '#00529b' },
-      { name: 'Security Bank Credit Card', icon: '💳', color: '#e11d48' },
-      { name: 'Citi Credit Card', icon: '💳', color: '#003b70' },
-      { name: 'RCBC Credit Card', icon: '💳', color: '#dc2626' },
-    ]
-  },
-];
-
-// Default wallets for new users
-const DEFAULT_WALLETS = [
-  { id: 'cash', name: 'Cash', icon: '💵', color: '#22c55e', type: 'cash', editable: false },
-];
-
-// XP System Configuration
-const XP_CONFIG = {
-  addEntry: 10,
-  addEntryWithReceipt: 20,
-  addEntryWithNotes: 5,
-  deleteEntry: -5,
-  setBudget: 15,
-  dailyLogin: 5,
-  weekStreak: 50,
-  first10Entries: 100,
-  first50Entries: 250,
-  first100Entries: 500,
-};
-
-// Level thresholds - XP needed to reach each level
-const LEVEL_THRESHOLDS = [
-  0,      // Level 1: 0 XP
-  100,    // Level 2: 100 XP
-  250,    // Level 3: 250 XP
-  500,    // Level 4: 500 XP
-  800,    // Level 5: 800 XP
-  1200,   // Level 6: 1200 XP
-  1700,   // Level 7: 1700 XP
-  2300,   // Level 8: 2300 XP
-  3000,   // Level 9: 3000 XP
-  4000,   // Level 10: 4000 XP
-  5500,   // Level 11+: continues pattern
-  7500,
-  10000,
-  13000,
-  17000,
-  22000,
-  28000,
-  35000,
-  45000,
-  60000,
-];
-
-// Profile frame rewards - unlocked at specific levels (Gen Z/Gen Alpha aesthetic)
-const PROFILE_FRAMES = [
-  { level: 1, id: 'none', name: 'No Frame', border: 'none', glow: 'none', animation: null, gradient: null },
-  { level: 2, id: 'bronze', name: 'Bronze Pulse', border: '3px solid #cd7f32', glow: '0 0 10px #cd7f32', animation: 'pulse-bronze', gradient: null },
-  { level: 3, id: 'silver', name: 'Silver Wave', border: '3px solid #c0c0c0', glow: '0 0 12px #c0c0c0, 0 0 20px #e8e8e8', animation: 'shimmer-silver', gradient: null },
-  { level: 5, id: 'gold', name: 'Golden Drip', border: '3px solid transparent', glow: '0 0 15px #ffd700, 0 0 25px #ffaa00', animation: 'drip-gold', gradient: 'linear-gradient(135deg, #ffd700, #ffaa00, #ffd700)' },
-  { level: 7, id: 'emerald', name: 'Matrix Code', border: '3px solid #00ff41', glow: '0 0 15px #00ff41, 0 0 30px #003d00', animation: 'matrix-glow', gradient: null },
-  { level: 10, id: 'ice', name: 'Frozen Aura', border: '3px solid #00f7ff', glow: '0 0 20px #00f7ff, 0 0 40px #0080ff, 0 0 60px #00f7ff33', animation: 'ice-pulse', gradient: null },
-  { level: 12, id: 'fire', name: '🔥 Flame Ring', border: '4px solid transparent', glow: '0 0 20px #ff4500, 0 0 40px #ff6600, 0 0 60px #ff000066', animation: 'fire-border', gradient: 'linear-gradient(45deg, #ff0000, #ff4500, #ff6600, #ff4500, #ff0000)' },
-  { level: 15, id: 'neon', name: 'Cyberpunk Neon', border: '3px solid transparent', glow: '0 0 10px #ff00ff, 0 0 20px #00ffff, 0 0 30px #ff00ff', animation: 'neon-flicker', gradient: 'linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff)' },
-  { level: 18, id: 'galaxy', name: '🌌 Galaxy Swirl', border: '4px solid transparent', glow: '0 0 25px #9d4edd, 0 0 50px #4361ee, 0 0 75px #7209b7', animation: 'galaxy-rotate', gradient: 'conic-gradient(from 0deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4361ee, #3a0ca3, #7209b7)' },
-  { level: 20, id: 'rainbow', name: '🌈 RGB Gamer', border: '4px solid transparent', glow: '0 0 20px #ff0000, 0 0 40px #00ff00, 0 0 60px #0000ff', animation: 'rgb-rotate', gradient: 'conic-gradient(from 0deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0080ff, #8000ff, #ff0080, #ff0000)' },
-  { level: 25, id: 'legendary', name: '👑 Legendary', border: '5px solid transparent', glow: '0 0 30px #ffd700, 0 0 60px #ff8c00, 0 0 90px #ff4500', animation: 'legendary-crown', gradient: 'linear-gradient(45deg, #ffd700, #fff, #ffd700, #ff8c00, #ffd700)' },
-  { level: 30, id: 'void', name: '🕳️ Void Walker', border: '5px solid transparent', glow: '0 0 30px #000, 0 0 50px #1a0033, 0 0 70px #330066, inset 0 0 20px #000', animation: 'void-pulse', gradient: 'conic-gradient(from 0deg, #000000, #1a0033, #330066, #1a0033, #000000)' },
-  { level: 35, id: 'holographic', name: '✨ Holographic', border: '4px solid transparent', glow: '0 0 20px #fff, 0 0 40px #88ffff', animation: 'holo-shift', gradient: 'linear-gradient(135deg, #ff9a9e, #fecfef, #a18cd1, #fbc2eb, #a6c1ee, #ffecd2, #ff9a9e)' },
-  { level: 40, id: 'glitch', name: '⚡ Glitch Effect', border: '4px solid #00ff00', glow: '0 0 10px #00ff00, -3px 0 #ff0000, 3px 0 #0000ff', animation: 'glitch-border', gradient: null },
-  { level: 50, id: 'godmode', name: '⚜️ GOD MODE', border: '6px solid transparent', glow: '0 0 40px #ffd700, 0 0 80px #fff, 0 0 120px #ffd700', animation: 'godmode-aura', gradient: 'conic-gradient(from 0deg, #ffd700, #fff, #ffd700, #ffaa00, #fff, #ffd700)' },
-];
-
-// Helper function to calculate level from XP
-const calculateLevel = (xp) => {
-  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
-    if (xp >= LEVEL_THRESHOLDS[i]) {
-      return i + 1;
-    }
-  }
-  return 1;
-};
-
-// Helper function to get XP needed for next level
-const getXPForNextLevel = (currentLevel) => {
-  if (currentLevel >= LEVEL_THRESHOLDS.length) {
-    const lastThreshold = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
-    const extraLevels = currentLevel - LEVEL_THRESHOLDS.length;
-    return Math.floor(lastThreshold * Math.pow(1.3, extraLevels + 1));
-  }
-  return LEVEL_THRESHOLDS[currentLevel];
-};
-
-// Helper function to get current level progress percentage
-const getLevelProgress = (xp) => {
-  const level = calculateLevel(xp);
-  const currentLevelXP = LEVEL_THRESHOLDS[level - 1] || 0;
-  const nextLevelXP = getXPForNextLevel(level);
-  const progress = ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
-  return Math.min(Math.max(progress, 0), 100);
-};
-
-// Helper function to get unlocked frames for a level
-const getUnlockedFrames = (level) => {
-  return PROFILE_FRAMES.filter(frame => frame.level <= level);
-};
-
-// Helper function to get frame by ID
-const getFrameById = (frameId) => {
-  return PROFILE_FRAMES.find(f => f.id === frameId) || PROFILE_FRAMES[0];
-};
-
-// Helper to get avatar wrapper style with animated frame
-const getAnimatedFrameStyle = (frame, size = 48) => {
-  const baseStyle = {
-    position: 'relative',
-    width: `${size}px`,
-    height: `${size}px`,
-    borderRadius: '50%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-  };
-  
-  if (frame.id === 'none') {
-    return { ...baseStyle };
-  }
-  
-  // For gradient borders, we use a pseudo-element approach via wrapper
-  if (frame.gradient) {
-    return {
-      ...baseStyle,
-      background: frame.gradient,
-      backgroundSize: '200% 200%',
-      padding: frame.border?.split(' ')[0] || '3px',
-      boxShadow: frame.glow !== 'none' ? frame.glow : 'none',
-      animation: frame.animation ? `${frame.animation} ${frame.animation.includes('rotate') || frame.animation.includes('holo') ? '3s' : frame.animation.includes('glitch') ? '2s' : '2s'} linear infinite` : 'none',
-    };
-  }
-  
-  // For solid borders with animations
-  return {
-    ...baseStyle,
-    border: frame.border,
-    boxShadow: frame.glow !== 'none' ? frame.glow : 'none',
-    animation: frame.animation ? `${frame.animation} 2s ease-in-out infinite` : 'none',
-  };
-};
-
-// Helper to get inner avatar style (the actual avatar circle inside the frame)
-const getAvatarInnerStyle = (frame, size = 48, bgColor = '#3b82f6') => {
-  const borderWidth = frame.gradient ? (parseInt(frame.border?.split(' ')[0]) || 3) : 0;
-  const innerSize = frame.gradient ? size - (borderWidth * 2) : size;
-  
-  return {
-    width: `${innerSize}px`,
-    height: `${innerSize}px`,
-    borderRadius: '50%',
-    backgroundColor: bgColor,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    overflow: 'hidden',
-    color: '#fff',
-    fontSize: `${Math.floor(innerSize * 0.4)}px`,
-    fontWeight: '600',
-  };
-};
-
-// ============================================
-// ACHIEVEMENTS & BADGES SYSTEM
-// ============================================
-
-// Badge tiers with visual styling
-const BADGE_TIERS = {
-  bronze: {
-    name: 'Bronze',
-    color: '#cd7f32',
-    bgGradient: 'linear-gradient(135deg, #cd7f32, #8b4513)',
-    glow: '0 0 10px rgba(205, 127, 50, 0.5)',
-    xpReward: 50
-  },
-  silver: {
-    name: 'Silver',
-    color: '#c0c0c0',
-    bgGradient: 'linear-gradient(135deg, #e8e8e8, #a8a8a8)',
-    glow: '0 0 12px rgba(192, 192, 192, 0.6)',
-    xpReward: 100
-  },
-  gold: {
-    name: 'Gold',
-    color: '#ffd700',
-    bgGradient: 'linear-gradient(135deg, #ffd700, #ff8c00)',
-    glow: '0 0 15px rgba(255, 215, 0, 0.6)',
-    xpReward: 200
-  },
-  platinum: {
-    name: 'Platinum',
-    color: '#e5e4e2',
-    bgGradient: 'linear-gradient(135deg, #e5e4e2, #8fbcbb)',
-    glow: '0 0 18px rgba(229, 228, 226, 0.7)',
-    xpReward: 350
-  },
-  diamond: {
-    name: 'Diamond',
-    color: '#b9f2ff',
-    bgGradient: 'linear-gradient(135deg, #b9f2ff, #87ceeb, #00bfff)',
-    glow: '0 0 20px rgba(185, 242, 255, 0.8), 0 0 30px rgba(135, 206, 235, 0.4)',
-    xpReward: 500
-  },
-  legendary: {
-    name: 'Legendary',
-    color: '#ff6b35',
-    bgGradient: 'linear-gradient(135deg, #ff6b35, #f7931e, #ffd700, #ff6b35)',
-    glow: '0 0 25px rgba(255, 107, 53, 0.8), 0 0 40px rgba(247, 147, 30, 0.5)',
-    xpReward: 1000,
-    animated: true
-  }
-};
-
-// Achievement categories
-const ACHIEVEMENT_CATEGORIES = {
-  entries: { name: 'Entry Master', icon: '📝', description: 'Track your expenses' },
-  budget: { name: 'Budget Keeper', icon: '💰', description: 'Stay within budget' },
-  streaks: { name: 'Consistency', icon: '🔥', description: 'Daily dedication' },
-  milestones: { name: 'Milestones', icon: '🏆', description: 'Major achievements' },
-  explorer: { name: 'Explorer', icon: '🧭', description: 'Try new features' },
-  special: { name: 'Special', icon: '⭐', description: 'Rare achievements' }
-};
-
-// All achievements
-const ACHIEVEMENTS = [
-  // Entry achievements
-  { id: 'first_entry', name: 'First Step', description: 'Add your first expense entry', category: 'entries', tier: 'bronze', icon: '👣', requirement: { type: 'entries', count: 1 } },
-  { id: 'entries_10', name: 'Getting Started', description: 'Log 10 expense entries', category: 'entries', tier: 'bronze', icon: '📊', requirement: { type: 'entries', count: 10 } },
-  { id: 'entries_25', name: 'Tracker', description: 'Log 25 expense entries', category: 'entries', tier: 'silver', icon: '📈', requirement: { type: 'entries', count: 25 } },
-  { id: 'entries_50', name: 'Dedicated Tracker', description: 'Log 50 expense entries', category: 'entries', tier: 'silver', icon: '📋', requirement: { type: 'entries', count: 50 } },
-  { id: 'entries_100', name: 'Century Club', description: 'Log 100 expense entries', category: 'entries', tier: 'gold', icon: '💯', requirement: { type: 'entries', count: 100 } },
-  { id: 'entries_250', name: 'Expense Expert', description: 'Log 250 expense entries', category: 'entries', tier: 'platinum', icon: '🎯', requirement: { type: 'entries', count: 250 } },
-  { id: 'entries_500', name: 'Master Tracker', description: 'Log 500 expense entries', category: 'entries', tier: 'diamond', icon: '👑', requirement: { type: 'entries', count: 500 } },
-  { id: 'entries_1000', name: 'Legendary Accountant', description: 'Log 1000 expense entries', category: 'entries', tier: 'legendary', icon: '🏛️', requirement: { type: 'entries', count: 1000 } },
-  
-  // Receipt achievements
-  { id: 'first_receipt', name: 'Paper Trail', description: 'Upload your first receipt', category: 'entries', tier: 'bronze', icon: '🧾', requirement: { type: 'receipts', count: 1 } },
-  { id: 'receipts_10', name: 'Receipt Collector', description: 'Upload 10 receipts', category: 'entries', tier: 'silver', icon: '📎', requirement: { type: 'receipts', count: 10 } },
-  { id: 'receipts_50', name: 'Documentation Pro', description: 'Upload 50 receipts', category: 'entries', tier: 'gold', icon: '📁', requirement: { type: 'receipts', count: 50 } },
-  { id: 'receipts_100', name: 'Receipt Scanner Pro', description: 'Upload 100 receipts', category: 'entries', tier: 'diamond', icon: '🗄️', requirement: { type: 'receipts', count: 100 } },
-  
-  // Budget achievements
-  { id: 'first_budget', name: 'Budget Beginner', description: 'Set your first monthly budget', category: 'budget', tier: 'bronze', icon: '🎯', requirement: { type: 'budget_set', count: 1 } },
-  { id: 'under_budget_1', name: 'Budget Keeper', description: 'Stay under budget for 1 month', category: 'budget', tier: 'silver', icon: '✅', requirement: { type: 'under_budget_months', count: 1 } },
-  { id: 'under_budget_3', name: 'Budget Master', description: 'Stay under budget for 3 months straight', category: 'budget', tier: 'gold', icon: '🏅', requirement: { type: 'under_budget_months', count: 3 } },
-  { id: 'under_budget_6', name: 'Financial Discipline', description: 'Stay under budget for 6 months straight', category: 'budget', tier: 'platinum', icon: '💎', requirement: { type: 'under_budget_months', count: 6 } },
-  { id: 'under_budget_12', name: 'Year of Savings', description: 'Stay under budget for 12 months straight', category: 'budget', tier: 'legendary', icon: '🌟', requirement: { type: 'under_budget_months', count: 12 } },
-  
-  // Streak achievements
-  { id: 'streak_3', name: 'Getting Warmed Up', description: 'Log expenses 3 days in a row', category: 'streaks', tier: 'bronze', icon: '🔥', requirement: { type: 'login_streak', count: 3 } },
-  { id: 'streak_7', name: 'Week Warrior', description: 'Log expenses 7 days in a row', category: 'streaks', tier: 'silver', icon: '📅', requirement: { type: 'login_streak', count: 7 } },
-  { id: 'streak_14', name: 'Two Week Champion', description: 'Log expenses 14 days in a row', category: 'streaks', tier: 'gold', icon: '⚡', requirement: { type: 'login_streak', count: 14 } },
-  { id: 'streak_30', name: 'Monthly Master', description: 'Log expenses 30 days in a row', category: 'streaks', tier: 'platinum', icon: '🌙', requirement: { type: 'login_streak', count: 30 } },
-  { id: 'streak_60', name: 'Unstoppable', description: 'Log expenses 60 days in a row', category: 'streaks', tier: 'diamond', icon: '💫', requirement: { type: 'login_streak', count: 60 } },
-  { id: 'streak_100', name: 'Legendary Dedication', description: 'Log expenses 100 days in a row', category: 'streaks', tier: 'legendary', icon: '🔱', requirement: { type: 'login_streak', count: 100 } },
-  
-  // Category exploration
-  { id: 'all_categories', name: 'Category Explorer', description: 'Use all expense categories', category: 'explorer', tier: 'silver', icon: '🧭', requirement: { type: 'categories_used', count: 7 } },
-  { id: 'big_spender', name: 'Big Purchase', description: 'Log an expense over ₱10,000', category: 'explorer', tier: 'silver', icon: '💸', requirement: { type: 'single_expense', amount: 10000 } },
-  { id: 'whale', name: 'Whale Alert', description: 'Log an expense over ₱50,000', category: 'explorer', tier: 'gold', icon: '🐋', requirement: { type: 'single_expense', amount: 50000 } },
-  
-  // XP & Level achievements
-  { id: 'level_5', name: 'Rising Star', description: 'Reach Level 5', category: 'milestones', tier: 'silver', icon: '⭐', requirement: { type: 'level', count: 5 } },
-  { id: 'level_10', name: 'Established', description: 'Reach Level 10', category: 'milestones', tier: 'gold', icon: '🌟', requirement: { type: 'level', count: 10 } },
-  { id: 'level_15', name: 'Veteran', description: 'Reach Level 15', category: 'milestones', tier: 'platinum', icon: '✨', requirement: { type: 'level', count: 15 } },
-  { id: 'level_20', name: 'Legend', description: 'Reach Level 20', category: 'milestones', tier: 'legendary', icon: '👑', requirement: { type: 'level', count: 20 } },
-  
-  // Total spending milestones
-  { id: 'total_10k', name: 'Ten Thousand', description: 'Track ₱10,000 in total expenses', category: 'milestones', tier: 'bronze', icon: '📊', requirement: { type: 'total_spent', amount: 10000 } },
-  { id: 'total_50k', name: 'Fifty Thousand', description: 'Track ₱50,000 in total expenses', category: 'milestones', tier: 'silver', icon: '📈', requirement: { type: 'total_spent', amount: 50000 } },
-  { id: 'total_100k', name: 'Hundred Grand', description: 'Track ₱100,000 in total expenses', category: 'milestones', tier: 'gold', icon: '💰', requirement: { type: 'total_spent', amount: 100000 } },
-  { id: 'total_500k', name: 'Half Million', description: 'Track ₱500,000 in total expenses', category: 'milestones', tier: 'platinum', icon: '🏦', requirement: { type: 'total_spent', amount: 500000 } },
-  { id: 'total_1m', name: 'Millionaire Tracker', description: 'Track ₱1,000,000 in total expenses', category: 'milestones', tier: 'legendary', icon: '💎', requirement: { type: 'total_spent', amount: 1000000 } },
-  
-  // Special achievements
-  { id: 'night_owl', name: 'Night Owl', description: 'Log an expense after midnight', category: 'special', tier: 'bronze', icon: '🦉', requirement: { type: 'time_of_day', time: 'night' } },
-  { id: 'early_bird', name: 'Early Bird', description: 'Log an expense before 6 AM', category: 'special', tier: 'bronze', icon: '🐦', requirement: { type: 'time_of_day', time: 'early' } },
-  { id: 'weekend_warrior', name: 'Weekend Warrior', description: 'Log 20 expenses on weekends', category: 'special', tier: 'silver', icon: '🎉', requirement: { type: 'weekend_entries', count: 20 } },
-  { id: 'profile_complete', name: 'Looking Good', description: 'Upload a profile picture', category: 'special', tier: 'bronze', icon: '📸', requirement: { type: 'profile_picture' } },
-  { id: 'frame_collector', name: 'Frame Collector', description: 'Unlock 5 profile frames', category: 'special', tier: 'gold', icon: '🖼️', requirement: { type: 'frames_unlocked', count: 5 } },
-  { id: 'completionist', name: 'Completionist', description: 'Unlock 20 achievements', category: 'special', tier: 'diamond', icon: '🏆', requirement: { type: 'achievements_unlocked', count: 20 } },
-  { id: 'perfectionist', name: 'Perfectionist', description: 'Unlock 35 achievements', category: 'special', tier: 'legendary', icon: '👑', requirement: { type: 'achievements_unlocked', count: 35 } },
-];
-
-// Weekly challenges configuration
-const WEEKLY_CHALLENGES = [
-  { id: 'spend_under_food', name: 'Frugal Eater', description: 'Spend under ₱2,000 on food this week', category: 'food', maxAmount: 2000, xpReward: 75, icon: '🍔' },
-  { id: 'spend_under_entertainment', name: 'Budget Entertainment', description: 'Spend under ₱500 on entertainment this week', category: 'entertainment', maxAmount: 500, xpReward: 75, icon: '🎬' },
-  { id: 'spend_under_shopping', name: 'Mindful Shopping', description: 'Spend under ₱1,500 on shopping this week', category: 'shopping', maxAmount: 1500, xpReward: 75, icon: '🛍️' },
-  { id: 'log_daily', name: 'Daily Logger', description: 'Log at least one expense every day this week', type: 'daily_log', xpReward: 100, icon: '📝' },
-  { id: 'receipt_week', name: 'Receipt Week', description: 'Upload 5 receipts this week', type: 'receipts', count: 5, xpReward: 80, icon: '🧾' },
-  { id: 'budget_check', name: 'Budget Conscious', description: 'Stay under 70% of your weekly budget', type: 'budget_percentage', percentage: 70, xpReward: 100, icon: '💰' },
-  { id: 'no_entertainment', name: 'Entertainment Fast', description: 'No entertainment expenses this week', category: 'entertainment', maxAmount: 0, xpReward: 120, icon: '🎯' },
-  { id: 'track_all', name: 'Full Tracker', description: 'Log at least 15 expenses this week', type: 'entries', count: 15, xpReward: 90, icon: '📊' },
-];
-
-// Helper function to get achievement by ID
-const getAchievementById = (id) => {
-  return ACHIEVEMENTS.find(a => a.id === id);
-};
-
-// Helper function to get tier styling
-const getTierStyle = (tier) => {
-  return BADGE_TIERS[tier] || BADGE_TIERS.bronze;
-};
-
-// Admin credentials
+// Extracted components and utilities
+import Sidebar from './components/layout/Sidebar';
+import {
+  CATEGORIES,
+  CURRENCIES,
+  WALLET_TYPES,
+  DEFAULT_WALLETS,
+  XP_CONFIG,
+  LEVEL_THRESHOLDS,
+  PROFILE_FRAMES,
+  BADGE_TIERS,
+  ACHIEVEMENT_CATEGORIES,
+  ACHIEVEMENTS,
+  WEEKLY_CHALLENGES,
+} from './lib/constants';
+import { getTheme } from './lib/theme';
+import {
+  calculateLevel,
+  getXPForNextLevel,
+  getLevelProgress,
+  getUnlockedFrames,
+  getFrameById,
+  getAnimatedFrameStyle,
+  getAvatarInnerStyle,
+  getTierStyle,
+} from './lib/gamification';
+import { useWindowSize } from './lib/hooks';
+import { formatAmount, getInitial } from './lib/utils';
 
 
-// Badge colors for light and dark mode
+// Badge colors for light and dark mode (kept here as it's UI-specific styling)
 const getBadgeStyle = (type, isDark) => {
   const darkStyles = {
     utilities: { bg: '#1e3a5f', color: '#60a5fa', border: '#2563eb' },
@@ -397,47 +58,6 @@ const getBadgeStyle = (type, isDark) => {
 };
 
 // ============================================
-// THEME HOOK
-// ============================================
-const getTheme = (isDark) => ({
-  bg: isDark ? '#0a0a0b' : '#f4f4f5',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  inputBg: isDark ? '#27272a' : '#ffffff',
-  inputBorder: isDark ? '#3f3f46' : '#d4d4d8',
-  text: isDark ? '#fafafa' : '#18181b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
-  textSubtle: isDark ? '#71717a' : '#a1a1aa',
-  textDim: isDark ? '#52525b' : '#d4d4d8',
-  statBg: isDark ? '#27272a' : '#f4f4f5',
-  toggleBg: isDark ? '#27272a' : '#e4e4e7',
-  toggleActive: isDark ? '#3f3f46' : '#ffffff',
-  barColor: isDark ? '#71717a' : '#a1a1aa',
-});
-
-// ============================================
-// RESPONSIVE HOOK
-// ============================================
-const useWindowSize = () => {
-  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  
-  useEffect(() => {
-    const handleResize = () => setSize({ width: window.innerWidth, height: window.innerHeight });
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-  
-  return size;
-};
-
-// ============================================
-// FORMAT AMOUNT WITH COMMAS
-// ============================================
-const formatAmount = (amount) => {
-  return amount.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-};
-
-// ============================================
 // HOME PAGE (Landing) - shadcn inspired
 // ============================================
 
@@ -447,357 +67,159 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   const isMobile = width < 768;
   const isSmall = width < 480;
 
-  const features = [
-    { Icon: Upload, title: 'Smart Receipt Scanning', desc: 'Upload receipts and let AI extract the details automatically' },
-    { Icon: FileText, title: 'Smart Categories', desc: 'Organize expenses by utilities, food, shopping & more' },
-    { Icon: Check, title: 'Cloud Sync', desc: 'Your data is securely stored and accessible anywhere' },
-  ];
-
-  // shadcn-style button
-  const buttonPrimary = {
-    height: '40px',
-    padding: '0 16px',
-    backgroundColor: isDark ? '#fafafa' : '#18181b',
-    color: isDark ? '#18181b' : '#fafafa',
+  const btnPrimary = {
+    height: '48px',
+    padding: '0 28px',
+    backgroundColor: '#8b5cf6',
+    color: '#fff',
     border: 'none',
-    borderRadius: '6px',
-    fontSize: '14px',
+    borderRadius: '12px',
+    fontSize: '15px',
+    fontWeight: '600',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '8px'
+  };
+
+  const btnOutline = {
+    height: '48px',
+    padding: '0 28px',
+    backgroundColor: 'transparent',
+    color: theme.text,
+    border: '1px solid ' + theme.cardBorder,
+    borderRadius: '12px',
+    fontSize: '15px',
     fontWeight: '500',
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    transition: 'opacity 0.2s'
+    justifyContent: 'center'
   };
 
-  const buttonOutline = {
-    height: '40px',
-    width: '40px',
-    padding: '0',
-    backgroundColor: 'transparent',
-    border: `1px solid ${theme.cardBorder}`,
-    borderRadius: '6px',
-    color: theme.textMuted,
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'background-color 0.2s, border-color 0.2s'
-  };
-
-  // shadcn-style card
-  const cardStyle = {
-    backgroundColor: theme.cardBg,
-    borderRadius: '12px',
-    border: `1px solid ${theme.cardBorder}`,
-    padding: isSmall ? '12px' : '20px',
-    overflow: 'hidden',
-    boxSizing: 'border-box'
-  };
+  const features = [
+    { icon: '🎯', title: 'Lead Tracking', desc: 'Track prospects from LinkedIn, Upwork, OnlineJobsPH and more' },
+    { icon: '👥', title: 'Client Management', desc: 'Manage clients with timezone tracking and billing info' },
+    { icon: '💰', title: 'Income Dashboard', desc: 'Track earnings in USD, convert to PHP automatically' },
+    { icon: '🧾', title: 'Invoicing', desc: 'Create and manage professional invoices' },
+    { icon: '🌍', title: 'ClientClock', desc: 'See client timezones at a glance, find overlap hours' },
+    { icon: '📊', title: 'BIR Tax Helper', desc: 'Calculate quarterly taxes - 8% flat or graduated rates' },
+  ];
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
-      {/* Navigation - Full Width Container */}
-      <div style={{
-        borderBottom: `1px solid ${theme.cardBorder}`,
-        backgroundColor: theme.bg
+      {/* Nav */}
+      <nav style={{
+        padding: isSmall ? '16px' : '16px 32px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderBottom: '1px solid ' + theme.cardBorder
       }}>
-        <nav style={{
-          padding: isSmall ? '12px 16px' : '16px 48px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          width: '100%',
-          boxSizing: 'border-box'
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{
-              width: '32px',
-              height: '32px',
-              borderRadius: '6px',
-              overflow: 'hidden'
-            }}>
-              <img src="https://i.imgur.com/R52jwPv.png" alt="BrewedOps Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            </div>
-            <span style={{ fontSize: '16px', fontWeight: '600', color: theme.text }}>BrewedOps</span>
-          </div>
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <button onClick={() => setIsDark(!isDark)} style={buttonOutline}>
-              {isDark ? <Sun style={{ width: '16px', height: '16px' }} /> : <Moon style={{ width: '16px', height: '16px' }} />}
-            </button>
-            <button onClick={() => onNavigate('login')} style={buttonPrimary}>
-              Login
-            </button>
-          </div>
-        </nav>
-      </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+          <span style={{ fontSize: '18px', fontWeight: '700', color: theme.text }}>BrewedOps</span>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button onClick={() => setIsDark(!isDark)} style={{ width: '40px', height: '40px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
+          </button>
+          {!isSmall && <button onClick={() => onNavigate('login')} style={{ height: '40px', padding: '0 16px', backgroundColor: 'transparent', color: theme.text, border: 'none', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>Login</button>}
+        </div>
+      </nav>
 
-      {/* Hero Section */}
-      <section style={{
-        padding: isSmall ? '48px 16px 64px' : '80px 24px 96px',
-        maxWidth: '800px',
-        margin: '0 auto',
-        textAlign: 'center'
-      }}>
-        <div style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '6px 12px',
-          backgroundColor: isDark ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.08)',
-          border: `1px solid ${isDark ? 'rgba(59, 130, 246, 0.2)' : 'rgba(59, 130, 246, 0.15)'}`,
-          borderRadius: '9999px',
-          marginBottom: '24px'
-        }}>
-          <span style={{ fontSize: '12px', color: '#3b82f6', fontWeight: '500' }}>✨ Smart Expense Tracking</span>
+      {/* Hero */}
+      <section style={{ padding: isSmall ? '48px 20px 56px' : '72px 32px 80px', maxWidth: '720px', margin: '0 auto', textAlign: 'center' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 14px', backgroundColor: isDark ? '#8b5cf620' : '#8b5cf610', borderRadius: '100px', marginBottom: '20px' }}>
+          <span style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: '600' }}>🇵🇭 Built for Filipino VAs</span>
         </div>
         
-        <h1 style={{
-          fontSize: isSmall ? '36px' : isMobile ? '48px' : '60px',
-          fontWeight: '700',
-          color: theme.text,
-          margin: '0 0 16px',
-          lineHeight: '1.1',
-          letterSpacing: '-0.025em'
-        }}>
-          Track Every Peso,<br />
-          <span style={{
-            background: 'linear-gradient(to right, #3b82f6, #8b5cf6)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            backgroundClip: 'text'
-          }}>Master Your Money</span>
+        <h1 style={{ fontSize: isSmall ? '32px' : '48px', fontWeight: '800', color: theme.text, margin: '0 0 16px', lineHeight: '1.15', letterSpacing: '-0.03em' }}>
+          Manage Your VA Business
+          <br />
+          <span style={{ color: '#8b5cf6' }}>All in One Place</span>
         </h1>
         
-        <p style={{
-          fontSize: isSmall ? '16px' : '18px',
-          color: theme.textMuted,
-          maxWidth: '540px',
-          margin: '0 auto 32px',
-          lineHeight: '1.6'
-        }}>
-          Effortlessly manage your bills, receipts, and invoices. Upload documents, 
-          track expenses by category, and gain insights into your spending.
+        <p style={{ fontSize: isSmall ? '16px' : '18px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.6' }}>
+          Track leads, manage clients, send invoices, and calculate your BIR taxes. 
+          Everything a Filipino virtual assistant needs to run their business.
         </p>
         
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button
-            onClick={() => onNavigate('signup')}
-            style={{
-              ...buttonPrimary,
-              height: '44px',
-              padding: '0 24px',
-              fontSize: '15px',
-              borderRadius: '8px'
-            }}
-          >
-            Get Started
-            <span style={{ marginLeft: '4px' }}>→</span>
+          <button onClick={() => onNavigate('signup')} style={btnPrimary}>
+            Start Free
+            <ChevronRight style={{ width: '18px', height: '18px' }} />
           </button>
-          <button
-            onClick={() => onNavigate('login')}
-            style={{
-              ...buttonOutline,
-              width: 'auto',
-              height: '44px',
-              padding: '0 24px',
-              fontSize: '15px',
-              fontWeight: '500',
-              borderRadius: '8px',
-              color: theme.text
-            }}
-          >
+          <button onClick={() => onNavigate('login')} style={btnOutline}>
             Sign In
           </button>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section style={{
-        padding: isSmall ? '48px 16px' : '64px 24px',
-        backgroundColor: isDark ? 'rgba(24, 24, 27, 0.5)' : 'rgba(250, 250, 250, 0.5)',
-        borderTop: `1px solid ${theme.cardBorder}`,
-        borderBottom: `1px solid ${theme.cardBorder}`
-      }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <h2 style={{
-              fontSize: isSmall ? '24px' : '30px',
-              fontWeight: '600',
-              color: theme.text,
-              margin: '0 0 12px',
-              letterSpacing: '-0.025em'
-            }}>
-              Features
-            </h2>
-            <p style={{
-              fontSize: '15px',
-              color: theme.textMuted,
-              maxWidth: '400px',
-              margin: '0 auto'
-            }}>
-              Everything you need to manage your expenses effectively.
-            </p>
-          </div>
+      {/* Features */}
+      <section style={{ padding: isSmall ? '48px 16px' : '64px 32px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', borderTop: '1px solid ' + theme.cardBorder, borderBottom: '1px solid ' + theme.cardBorder }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: isSmall ? '24px' : '32px', fontWeight: '700', color: theme.text, textAlign: 'center', margin: '0 0 12px', letterSpacing: '-0.02em' }}>
+            Everything You Need
+          </h2>
+          <p style={{ fontSize: '15px', color: theme.textMuted, textAlign: 'center', margin: '0 0 40px' }}>
+            Tools designed specifically for virtual assistants
+          </p>
           
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)',
-            gap: '16px'
-          }}>
-            {features.map((feature, i) => (
-              <div key={i} style={{ ...cardStyle, textAlign: 'center' }}>
-                <div style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '8px',
-                  backgroundColor: isDark ? '#27272a' : '#f4f4f5',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: '16px',
-                  marginLeft: 'auto',
-                  marginRight: 'auto'
-                }}>
-                  <feature.Icon style={{ width: '20px', height: '20px', color: isDark ? '#a1a1aa' : '#71717a' }} />
-                </div>
-                <h3 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-                  {feature.title}
-                </h3>
-                <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0, lineHeight: '1.5' }}>
-                  {feature.desc}
-                </p>
+          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '16px' }}>
+            {features.map((f, i) => (
+              <div key={i} style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '20px' }}>
+                <span style={{ fontSize: '28px', display: 'block', marginBottom: '12px' }}>{f.icon}</span>
+                <h3 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: '0 0 6px' }}>{f.title}</h3>
+                <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0, lineHeight: '1.5' }}>{f.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section style={{
-        padding: isSmall ? '48px 16px' : '64px 24px',
-        maxWidth: '900px',
-        margin: '0 auto'
-      }}>
-        <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <h2 style={{
-            fontSize: isSmall ? '24px' : '30px',
-            fontWeight: '600',
-            color: theme.text,
-            margin: '0 0 12px',
-            letterSpacing: '-0.025em'
-          }}>
-            How it works
-          </h2>
-          <p style={{
-            fontSize: '15px',
-            color: theme.textMuted
-          }}>
-            Get started in three simple steps.
-          </p>
-        </div>
+      {/* How it works */}
+      <section style={{ padding: isSmall ? '48px 20px' : '64px 32px', maxWidth: '800px', margin: '0 auto' }}>
+        <h2 style={{ fontSize: isSmall ? '24px' : '32px', fontWeight: '700', color: theme.text, textAlign: 'center', margin: '0 0 40px', letterSpacing: '-0.02em' }}>
+          How It Works
+        </h2>
         
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: isSmall ? '1fr' : 'repeat(3, 1fr)',
-          gap: '24px'
-        }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {[
-            { step: '1', title: 'Create Account', desc: 'Sign up for free with just your email' },
-            { step: '2', title: 'Add Expenses', desc: 'Upload receipts or add entries manually' },
-            { step: '3', title: 'Track & Analyze', desc: 'View insights and spending patterns' },
-          ].map((item, i) => (
-            <div key={i} style={{ ...cardStyle, textAlign: 'center' }}>
-              <div style={{
-                width: '48px',
-                height: '48px',
-                borderRadius: '50%',
-                backgroundColor: isDark ? 'rgba(59, 130, 246, 0.15)' : 'rgba(59, 130, 246, 0.1)',
-                border: '2px solid #3b82f6',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                margin: '0 auto 16px',
-                fontSize: '18px',
-                fontWeight: '600',
-                color: '#3b82f6'
-              }}>
-                {item.step}
+            { num: '1', title: 'Add Your Prospects', desc: 'Import leads from job platforms and track their status' },
+            { num: '2', title: 'Convert to Clients', desc: 'When you win a deal, convert them to a client with one click' },
+            { num: '3', title: 'Track Income & Taxes', desc: 'Record payments and let us calculate your quarterly BIR taxes' },
+          ].map((step, i) => (
+            <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+              <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#8b5cf6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: '700', flexShrink: 0 }}>{step.num}</div>
+              <div>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 4px' }}>{step.title}</h3>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>{step.desc}</p>
               </div>
-              <h3 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-                {item.title}
-              </h3>
-              <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>
-                {item.desc}
-              </p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section style={{
-        padding: isSmall ? '0 16px 48px' : '0 24px 64px',
-        maxWidth: '1600px',
-        margin: '0 auto'
-      }}>
-        <div style={{
-          ...cardStyle,
-          backgroundColor: isDark ? '#18181b' : '#09090b',
-          border: `1px solid ${isDark ? '#27272a' : '#27272a'}`,
-          borderRadius: '12px',
-          padding: isSmall ? '40px 24px' : '56px 40px',
-          textAlign: 'center'
-        }}>
-          <h2 style={{
-            fontSize: isSmall ? '24px' : '28px',
-            fontWeight: '600',
-            color: '#fafafa',
-            margin: '0 0 12px',
-            letterSpacing: '-0.025em'
-          }}>
-            Ready to take control?
+      {/* CTA */}
+      <section style={{ padding: isSmall ? '0 16px 48px' : '0 32px 64px', maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ backgroundColor: isDark ? '#18181b' : '#09090b', borderRadius: '16px', padding: isSmall ? '40px 24px' : '48px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: '#fafafa', margin: '0 0 12px' }}>
+            Ready to Level Up?
           </h2>
-          <p style={{
-            fontSize: '15px',
-            color: '#a1a1aa',
-            margin: '0 0 24px',
-            maxWidth: '400px',
-            marginLeft: 'auto',
-            marginRight: 'auto'
-          }}>
-            Join users who trust BrewedOps for expense management.
+          <p style={{ fontSize: '15px', color: '#a1a1aa', margin: '0 0 24px' }}>
+            Join Filipino VAs who manage their business with BrewedOps
           </p>
-          <button
-            onClick={() => onNavigate('signup')}
-            style={{
-              height: '44px',
-              padding: '0 24px',
-              backgroundColor: '#fafafa',
-              color: '#18181b',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '15px',
-              fontWeight: '500',
-              cursor: 'pointer'
-            }}
-          >
+          <button onClick={() => onNavigate('signup')} style={{ height: '48px', padding: '0 32px', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '600', cursor: 'pointer' }}>
             Get Started — It's Free
           </button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer style={{
-        padding: isSmall ? '20px 16px' : '24px',
-        borderTop: `1px solid ${theme.cardBorder}`,
-        textAlign: 'center'
-      }}>
-        <p style={{ fontSize: '13px', color: theme.textSubtle, margin: 0 }}>
-          © 2025 BrewedOps Tracker by Kenneth V.
-        </p>
+      <footer style={{ padding: '20px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center' }}>
+        <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>© 2025 BrewedOps by Kenneth V.</p>
       </footer>
     </div>
   );
@@ -806,7 +228,6 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 // ============================================
 // LOGIN PAGE
 // ============================================
-
 const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }) => {
   const [isSignup, setIsSignup] = useState(initialMode === 'signup');
   const [email, setEmail] = useState('');
@@ -815,465 +236,215 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   
   const theme = getTheme(isDark);
   const { width } = useWindowSize();
   const isMobile = width < 480;
 
-  // Email validation
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  // Password validation
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePassword = (password) => {
     const issues = [];
-    if (password.length < 8) issues.push('At least 8 characters');
-    if (!/[A-Z]/.test(password)) issues.push('One uppercase letter');
-    if (!/[a-z]/.test(password)) issues.push('One lowercase letter');
-    if (!/[0-9]/.test(password)) issues.push('One number');
+    if (password.length < 8) issues.push('8+ chars');
+    if (!/[A-Z]/.test(password)) issues.push('uppercase');
+    if (!/[a-z]/.test(password)) issues.push('lowercase');
+    if (!/[0-9]/.test(password)) issues.push('number');
     return issues;
+  };
+
+  const handleGoogleSignIn = async () => {
+    setGoogleLoading(true);
+    setErrors({});
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          }
+        }
+      });
+      if (error) throw error;
+    } catch (e) {
+      setErrors({ general: e.message || 'Google sign-in failed' });
+      setGoogleLoading(false);
+    }
   };
 
   const handleSubmit = async () => {
     setLoading(true);
     setErrors({});
     setSuccessMessage('');
-     // Check for admin login FIRST
     
     const newErrors = {};
-
-    // Validate email
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!validateEmail(email)) {
-      newErrors.email = 'Please enter a valid email address';
+    if (!email) newErrors.email = 'Email is required';
+    else if (!validateEmail(email)) newErrors.email = 'Invalid email';
+    if (isSignup && !nickname.trim()) newErrors.nickname = 'Nickname is required';
+    if (!password) newErrors.password = 'Password is required';
+    else if (isSignup) {
+      const issues = validatePassword(password);
+      if (issues.length > 0) newErrors.password = `Need: ${issues.join(', ')}`;
     }
-// Validate nickname for signup
-if (isSignup && !nickname.trim()) {
-  newErrors.nickname = 'Nickname is required';
-}
+    if (isSignup && !confirmPassword) newErrors.confirmPassword = 'Confirm password';
+    else if (isSignup && password !== confirmPassword) newErrors.confirmPassword = 'Passwords don\'t match';
 
-    // Validate password
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (isSignup) {
-      const passwordIssues = validatePassword(password);
-      if (passwordIssues.length > 0) {
-        newErrors.password = `Password needs: ${passwordIssues.join(', ')}`;
-      }
-    }
-
-    // Validate confirm password for signup
-    if (isSignup) {
-      if (!confirmPassword) {
-        newErrors.confirmPassword = 'Please confirm your password';
-      } else if (password !== confirmPassword) {
-        newErrors.confirmPassword = 'Passwords do not match';
-      }
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      setLoading(false);
-      return;
-    }
+    if (Object.keys(newErrors).length > 0) { setErrors(newErrors); setLoading(false); return; }
 
     try {
       if (isSignup) {
-        // Signup with Supabase
-        const { data, error } = await supabase.auth.signUp({
-  email,
-  password,
-  options: {
-    data: {
-      nickname: nickname.trim()
-    }
-  }
-});
-        
+        const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { nickname: nickname.trim() } } });
         if (error) throw error;
-        
-        if (data.user && !data.session) {
-          setSuccessMessage('Please check your email for a confirmation link to complete your registration.');
-          setLoading(false);
-        } else if (data.user) {
-          setSuccessMessage('Account created successfully!');
-          onLogin(data.user);
-        }
+        if (data.user && !data.session) { setSuccessMessage('Check your email to confirm!'); setLoading(false); }
+        else if (data.user) { setSuccessMessage('Account created!'); onLogin(data.user); }
       } else {
-        // Login with Supabase
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        const { data: adminData } = await supabase
-  .from('admins')
-  .select('id')
-  .eq('id', data.user.id)
-  .single();
-
-if (adminData) {
-  onLogin({ ...data.user, isAdmin: true });
-} else {
-  onLogin(data.user);
-}
+        const { data: adminData } = await supabase.from('admins').select('id').eq('id', data.user.id).single();
+        onLogin(adminData ? { ...data.user, isAdmin: true } : data.user);
       }
-    } catch (e) {
-      setErrors({ general: e.message || 'Something went wrong. Please try again.' });
-      setLoading(false);
-    }
+    } catch (e) { setErrors({ general: e.message || 'Something went wrong' }); setLoading(false); }
   };
 
   const handleForgotPassword = async () => {
-    if (!email) {
-      setErrors({ email: 'Please enter your email first' });
-      return;
-    }
-    
+    if (!email) { setErrors({ email: 'Enter email first' }); return; }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
       if (error) throw error;
-      setSuccessMessage('Password reset email sent! Check your inbox.');
-    } catch (error) {
-      setErrors({ general: error.message });
-    } finally {
-      setLoading(false);
-    }
+      setSuccessMessage('Reset link sent!');
+    } catch (e) { setErrors({ general: e.message }); }
+    finally { setLoading(false); }
   };
 
-const switchMode = () => {
-  setIsSignup(!isSignup);
-  setErrors({});
-  setSuccessMessage('');
-  setPassword('');
-  setConfirmPassword('');
-  setNickname('');  // Add this line
-};
+  const switchMode = () => { setIsSignup(!isSignup); setErrors({}); setSuccessMessage(''); setPassword(''); setConfirmPassword(''); setNickname(''); };
+
+  const inputStyle = (hasError) => ({
+    width: '100%',
+    height: '48px',
+    backgroundColor: theme.inputBg,
+    border: `1px solid ${hasError ? '#ef4444' : theme.inputBorder}`,
+    borderRadius: '10px',
+    padding: '0 14px',
+    fontSize: '15px',
+    color: theme.text,
+    outline: 'none',
+    boxSizing: 'border-box'
+  });
+
+  // Google Icon SVG
+  const GoogleIcon = () => (
+    <svg width="18" height="18" viewBox="0 0 24 24">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+    </svg>
+  );
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      backgroundColor: theme.bg,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: isMobile ? '12px' : '16px'
-    }}>
-      {/* Theme toggle in corner */}
-      <div style={{
-        position: 'absolute',
-        top: '12px',
-        right: '12px',
-        display: 'flex',
-        gap: '8px'
-      }}>
-        <button
-          onClick={() => setIsDark(!isDark)}
-          style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: theme.cardBg,
-            border: `1px solid ${theme.cardBorder}`,
-            borderRadius: '8px',
-            color: theme.textMuted,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          {isDark ? <Sun style={{ width: '16px', height: '16px' }} /> : <Moon style={{ width: '16px', height: '16px' }} />}
+    <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', flexDirection: 'column' }}>
+      {/* Header */}
+      <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {onBack ? (
+          <button onClick={onBack} style={{ height: '40px', padding: '0 14px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
+            <ChevronLeft style={{ width: '18px', height: '18px' }} />
+            Back
+          </button>
+        ) : <div />}
+        <button onClick={() => setIsDark(!isDark)} style={{ width: '40px', height: '40px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
         </button>
       </div>
 
-      {/* Back button */}
-      {onBack && (
-        <button
-          onClick={onBack}
-          style={{
-            position: 'absolute',
-            top: '12px',
-            left: '12px',
-            height: '36px',
-            padding: '0 12px',
-            backgroundColor: theme.cardBg,
-            border: `1px solid ${theme.cardBorder}`,
-            borderRadius: '8px',
-            color: theme.textMuted,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '14px'
-          }}
-        >
-          ← Back
-        </button>
-      )}
-
-      <div style={{
-        width: '100%',
-        maxWidth: '380px',
-        backgroundColor: theme.cardBg,
-        borderRadius: '12px',
-        border: `1px solid ${theme.cardBorder}`,
-        padding: isMobile ? '20px' : '32px'
-      }}>
-        {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '32px' }}>
-          <div style={{
-            width: '48px',
-            height: '48px',
-            borderRadius: '50%',
-            overflow: 'hidden',
-            margin: '0 auto 12px'
-          }}>
-            <img src="https://i.imgur.com/R52jwPv.png" alt="BrewedOps Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+      {/* Form Container */}
+      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <div style={{ width: '100%', maxWidth: '360px' }}>
+          {/* Logo & Title */}
+          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '56px', height: '56px', borderRadius: '14px', marginBottom: '16px' }} />
+            <h1 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: '0 0 6px' }}>
+              {isSignup ? 'Create Account' : 'Welcome Back'}
+            </h1>
+            <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
+              {isSignup ? 'Start managing your VA business' : 'Sign in to continue'}
+            </p>
           </div>
-          <h1 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-            BrewedOps Tracker
-          </h1>
-          <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
-            Track your bills, receipts & invoices
-          </p>
-        </div>
 
-        {/* Form */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          {/* General Error */}
+          {/* Messages */}
           {errors.general && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px',
-              backgroundColor: isDark ? '#450a0a' : '#fef2f2',
-              border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`,
-              borderRadius: '8px'
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', border: '1px solid ' + (isDark ? '#7f1d1d' : '#fecaca'), borderRadius: '10px', marginBottom: '16px' }}>
               <AlertCircle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
-              <span style={{ fontSize: '14px', color: isDark ? '#fca5a5' : '#dc2626' }}>{errors.general}</span>
+              <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>{errors.general}</span>
             </div>
           )}
-
-          {/* Success Message */}
           {successMessage && (
-            <div style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px',
-              backgroundColor: isDark ? '#052e16' : '#f0fdf4',
-              border: `1px solid ${isDark ? '#166534' : '#86efac'}`,
-              borderRadius: '8px'
-            }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#052e16' : '#f0fdf4', border: '1px solid ' + (isDark ? '#166534' : '#86efac'), borderRadius: '10px', marginBottom: '16px' }}>
               <Check style={{ width: '16px', height: '16px', color: '#22c55e', flexShrink: 0 }} />
-              <span style={{ fontSize: '14px', color: isDark ? '#86efac' : '#166534' }}>{successMessage}</span>
+              <span style={{ fontSize: '13px', color: isDark ? '#86efac' : '#166534' }}>{successMessage}</span>
             </div>
           )}
 
-<div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
-              Email
-            </label>
-            <input
-              type="email"
-              placeholder=""
-              value={email}
-              onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }); }}
-              onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-              style={{
-                width: '100%',
-                height: '44px',
-                backgroundColor: theme.inputBg,
-                border: `1px solid ${errors.email ? '#ef4444' : theme.inputBorder}`,
-                borderRadius: '8px',
-                padding: '0 12px',
-                fontSize: '16px',
-                color: theme.text,
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-            />
-            {errors.email && (
-              <p style={{ fontSize: '12px', color: '#ef4444', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <AlertCircle style={{ width: '12px', height: '12px' }} />
-                {errors.email}
-              </p>
-            )}
-          </div>
-
-       {/* Nickname - Only for Signup */}
-          {isSignup && (
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
-                Nickname
-              </label>
-              <input
-                type="text"
-                placeholder=""
-                value={nickname}
-                onChange={(e) => { setNickname(e.target.value); setErrors({ ...errors, nickname: '' }); }}
-                style={{
-                  width: '100%',
-                  height: '44px',
-                  backgroundColor: theme.inputBg,
-                  border: `1px solid ${errors.nickname ? '#ef4444' : theme.inputBorder}`,
-                  borderRadius: '8px',
-                  padding: '0 12px',
-                  fontSize: '16px',
-                  color: theme.text,
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-              />
-              {errors.nickname && (
-                <p style={{ fontSize: '12px', color: '#ef4444', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <AlertCircle style={{ width: '12px', height: '12px' }} />
-                  {errors.nickname}
-                </p>
-              )}
-            </div>
-          )}
-          <div>
-            <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
-              Password
-            </label>
-            <input
-              type="password"
-              placeholder={isSignup ? 'ex. Sample12!@' : 'Enter your password'}
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setErrors({ ...errors, password: '' }); }}
-              onKeyDown={(e) => e.key === 'Enter' && !isSignup && handleSubmit()}
-              style={{
-                width: '100%',
-                height: '44px',
-                backgroundColor: theme.inputBg,
-                border: `1px solid ${errors.password ? '#ef4444' : theme.inputBorder}`,
-                borderRadius: '8px',
-                padding: '0 12px',
-                fontSize: '16px',
-                color: theme.text,
-                outline: 'none',
-                boxSizing: 'border-box'
-              }}
-            />
-            {errors.password && (
-              <p style={{ fontSize: '12px', color: '#ef4444', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                <AlertCircle style={{ width: '12px', height: '12px' }} />
-                {errors.password}
-              </p>
-            )}
-          </div>
-
-          {/* Confirm Password - Only for Signup */}
-          {isSignup && (
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', fontWeight: '500', color: theme.text, marginBottom: '6px' }}>
-                Confirm Password
-              </label>
-              <input
-                type="password"
-                placeholder=""
-                value={confirmPassword}
-                onChange={(e) => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }); }}
-                onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
-                style={{
-                  width: '100%',
-                  height: '44px',
-                  backgroundColor: theme.inputBg,
-                  border: `1px solid ${errors.confirmPassword ? '#ef4444' : theme.inputBorder}`,
-                  borderRadius: '8px',
-                  padding: '0 12px',
-                  fontSize: '16px',
-                  color: theme.text,
-                  outline: 'none',
-                  boxSizing: 'border-box'
-                }}
-              />
-              {errors.confirmPassword && (
-                <p style={{ fontSize: '12px', color: '#ef4444', margin: '4px 0 0', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <AlertCircle style={{ width: '12px', height: '12px' }} />
-                  {errors.confirmPassword}
-                </p>
-              )}
-            </div>
-          )}
-
-         <button
-            onClick={handleSubmit}
-            disabled={loading}
-            style={{
-              width: '100%',
-              height: '44px',
-              backgroundColor: isDark ? '#fafafa' : '#18181b',
-              color: isDark ? '#18181b' : '#fafafa',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '15px',
-              fontWeight: '500',
-              cursor: loading ? 'not-allowed' : 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              opacity: loading ? 0.7 : 1,
-              marginTop: '4px'
-            }}
-          >
-            {loading ? (
-              <>
-                <Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} />
-                {isSignup ? 'Creating Account...' : 'Signing In...'}
-              </>
-            ) : (
-              isSignup ? 'Create Account' : 'Sign In'
-            )}
+          {/* Google Sign In Button */}
+          <button onClick={handleGoogleSignIn} disabled={googleLoading || loading} style={{ width: '100%', height: '48px', backgroundColor: theme.cardBg, color: theme.text, border: '1px solid ' + theme.cardBorder, borderRadius: '10px', fontSize: '15px', fontWeight: '500', cursor: (googleLoading || loading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px', opacity: (googleLoading || loading) ? 0.7 : 1 }}>
+            {googleLoading ? <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} /> : <GoogleIcon />}
+            {googleLoading ? 'Connecting...' : (isSignup ? 'Sign up with Google' : 'Continue with Google')}
           </button>
 
-          {!isSignup && (
-            <button
-              onClick={handleForgotPassword}
-              disabled={loading}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: theme.textMuted,
-                fontSize: '13px',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                textDecoration: 'underline',
-                padding: 0,
-                marginTop: '8px',
-                display: 'block',
-                width: '100%',
-                textAlign: 'center'
-              }}
-            >
-              Forgot password?
-            </button>
-          )}
+          {/* Divider */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
+            <div style={{ flex: 1, height: '1px', backgroundColor: theme.cardBorder }} />
+            <span style={{ fontSize: '13px', color: theme.textMuted }}>or</span>
+            <div style={{ flex: 1, height: '1px', backgroundColor: theme.cardBorder }} />
+          </div>
 
-          <p style={{ textAlign: 'center', fontSize: '14px', color: theme.textSubtle }}>
+          {/* Form */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Email</label>
+              <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }); }} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} placeholder="you@example.com" style={inputStyle(errors.email)} />
+              {errors.email && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>{errors.email}</p>}
+            </div>
+
+            {isSignup && (
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Nickname</label>
+                <input type="text" value={nickname} onChange={(e) => { setNickname(e.target.value); setErrors({ ...errors, nickname: '' }); }} placeholder="What should we call you?" style={inputStyle(errors.nickname)} />
+                {errors.nickname && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>{errors.nickname}</p>}
+              </div>
+            )}
+
+            <div>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Password</label>
+              <input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setErrors({ ...errors, password: '' }); }} onKeyDown={(e) => e.key === 'Enter' && !isSignup && handleSubmit()} placeholder={isSignup ? 'Min 8 chars, upper, lower, number' : '••••••••'} style={inputStyle(errors.password)} />
+              {errors.password && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>{errors.password}</p>}
+            </div>
+
+            {isSignup && (
+              <div>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Confirm Password</label>
+                <input type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }); }} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} placeholder="••••••••" style={inputStyle(errors.confirmPassword)} />
+                {errors.confirmPassword && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>{errors.confirmPassword}</p>}
+              </div>
+            )}
+
+            <button onClick={handleSubmit} disabled={loading || googleLoading} style={{ width: '100%', height: '48px', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', cursor: (loading || googleLoading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: (loading || googleLoading) ? 0.7 : 1, marginTop: '6px' }}>
+              {loading ? <><Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />{isSignup ? 'Creating...' : 'Signing in...'}</> : (isSignup ? 'Create Account' : 'Sign In')}
+            </button>
+
+            {!isSignup && (
+              <button onClick={handleForgotPassword} disabled={loading} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '13px', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
+                Forgot password?
+              </button>
+            )}
+          </div>
+
+          {/* Switch Mode */}
+          <p style={{ textAlign: 'center', fontSize: '14px', color: theme.textMuted, marginTop: '24px' }}>
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button
-              onClick={switchMode}
-              style={{
-                background: 'none',
-                border: 'none',
-                color: theme.text,
-                fontWeight: '500',
-                cursor: 'pointer',
-                textDecoration: 'underline'
-              }}
-            >
+            <button onClick={switchMode} style={{ background: 'none', border: 'none', color: '#8b5cf6', fontWeight: '600', cursor: 'pointer' }}>
               {isSignup ? 'Sign in' : 'Sign up'}
             </button>
           </p>
@@ -1286,7 +457,6 @@ const switchMode = () => {
 // ============================================
 // MAIN APP
 // ============================================
-
 const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -1401,6 +571,10 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   
   // Budget streak tracking
   const [budgetStreakMonths, setBudgetStreakMonths] = useState(0);
+  
+  // Sidebar State
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [activeSection, setActiveSection] = useState('tracker'); // 'tracker' or 'vakita'
   
   // Multi-Wallet System
   const [wallets, setWallets] = useState([]);
@@ -3028,9 +2202,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     }
   };
 
-const getInitial = (name) => {
-    return name ? name.charAt(0).toUpperCase() : 'U';
-  };
 const getBudgetStatus = () => {
     if (monthlyBudget <= 0) return null;
     
@@ -3498,36 +2669,60 @@ const getBudgetStatus = () => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
+      {/* Sidebar - Desktop Only */}
+      {!isMobile && (
+        <Sidebar
+          collapsed={sidebarCollapsed}
+          setCollapsed={setSidebarCollapsed}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          isDark={isDark}
+          theme={theme}
+        />
+      )}
+
+      {/* Main Content */}
+      <div style={{ 
+        marginLeft: isMobile ? 0 : (sidebarCollapsed ? '70px' : '260px'),
+        transition: 'margin-left 0.3s ease',
+        minHeight: '100vh',
+      }}>
       {/* Header */}
       <header style={{
         backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
         borderBottom: `1px solid ${theme.cardBorder}`,
-        padding: isSmall ? '10px 8px' : '18px 24px',
+        padding: '0 24px',
         position: 'sticky',
         top: 0,
-        zIndex: 20
+        zIndex: 20,
+        height: '72px',
+        display: 'flex',
+        alignItems: 'center',
       }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0 4px' : '0 16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '6px' : '14px' }}>
-            <img 
-              src="https://i.imgur.com/R52jwPv.png" 
-              alt="BrewedOps Logo" 
-              style={{ 
-                width: isSmall ? '32px' : '44px', 
-                height: isSmall ? '32px' : '44px', 
-                borderRadius: '50%', 
-                objectFit: 'cover',
-                flexShrink: 0 
-              }} 
-            />
-            {!isSmall && (
-              <h1 style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
-            )}
-          </div>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
+          {/* Show logo only on mobile (sidebar hidden) */}
+          {isMobile && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '6px' : '14px' }}>
+              <img 
+                src="https://i.imgur.com/R52jwPv.png" 
+                alt="BrewedOps Logo" 
+                style={{ 
+                  width: isSmall ? '32px' : '44px', 
+                  height: isSmall ? '32px' : '44px', 
+                  borderRadius: '50%', 
+                  objectFit: 'cover',
+                  flexShrink: 0 
+                }} 
+              />
+              {!isSmall && (
+                <h1 style={{ fontSize: isMobile ? '14px' : '18px', fontWeight: '600', color: theme.text, margin: 0 }}>BrewedOps Tracker</h1>
+              )}
+            </div>
+          )}
 
           {/* Desktop Header Actions */}
           {!isMobile ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginLeft: 'auto' }}>
               {/* Level & XP Bar */}
               <div 
                 onClick={() => setShowRewardsModal(true)}
@@ -9230,6 +8425,7 @@ const getBudgetStatus = () => {
           input, select { font-size: 16px !important; }
         }
       `}</style>
+      </div>{/* End Main Content Wrapper */}
     </div>
   );
 };
@@ -9237,7 +8433,6 @@ const getBudgetStatus = () => {
 // ============================================
 // ADMIN DASHBOARD
 // ============================================
-
 const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
   const theme = getTheme(isDark);
   const { width } = useWindowSize();
@@ -9732,10 +8927,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         setFeedbacks(prev => prev.map(f => f.id === feedback.id ? { ...f, read: true } : f));
       });
     }
-  };
-
-  const getInitial = (name) => {
-    return name ? name.charAt(0).toUpperCase() : 'U';
   };
 
   const filteredUsers = users.filter(user => 
@@ -10490,7 +9681,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 // ============================================
 // MAIN EXPORT
 // ============================================
-
 export default function App() {
   const [user, setUser] = useState(null);
   const [isDark, setIsDark] = useState(() => {
