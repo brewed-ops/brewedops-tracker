@@ -23,23 +23,23 @@ const TIMEZONES = [
 ];
 
 const PLATFORMS = [
-  { id: 'wise', name: 'Wise', icon: 'https://cdn.simpleicons.org/wise/9FE870', emoji: '💸' },
-  { id: 'payoneer', name: 'Payoneer', icon: 'https://cdn.simpleicons.org/payoneer/FF4800', emoji: '🔵' },
-  { id: 'paypal', name: 'PayPal', icon: 'https://cdn.simpleicons.org/paypal/00457C', emoji: '🅿️' },
-  { id: 'gcash', name: 'GCash', icon: '📱', emoji: '📱' },  // Replace icon with custom logo URL later
-  { id: 'maya', name: 'Maya', icon: '💜', emoji: '💜' },    // Replace icon with custom logo URL later
+  { id: 'wise', name: 'Wise', icon: '💸', emoji: '💸' },
+  { id: 'payoneer', name: 'Payoneer', icon: '🔵', emoji: '🔵' },
+  { id: 'paypal', name: 'PayPal', icon: '🅿️', emoji: '🅿️' },
+  { id: 'gcash', name: 'GCash', icon: '📱', emoji: '📱' },
+  { id: 'maya', name: 'Maya', icon: '💜', emoji: '💜' },
   { id: 'bank', name: 'Bank', icon: '🏦', emoji: '🏦' },
 ];
 
 const LEAD_SOURCES = [
-  { id: 'linkedin', name: 'LinkedIn', icon: 'https://cdn.simpleicons.org/linkedin/0A66C2', emoji: '💼' },
+  { id: 'linkedin', name: 'LinkedIn', icon: '💼', emoji: '💼' },
   { id: 'onlinejobsph', name: 'OnlineJobsPH', icon: '🇵🇭', emoji: '🇵🇭' },
-  { id: 'upwork', name: 'Upwork', icon: 'https://cdn.simpleicons.org/upwork/14A800', emoji: '🟢' },
-  { id: 'facebook', name: 'Facebook', icon: 'https://cdn.simpleicons.org/facebook/0866FF', emoji: '📘' },
-  { id: 'tiktok', name: 'TikTok', icon: 'https://cdn.simpleicons.org/tiktok/ffffff', emoji: '🎵' },
-  { id: 'instagram', name: 'Instagram', icon: 'https://cdn.simpleicons.org/instagram/E4405F', emoji: '📸' },
-  { id: 'twitter', name: 'Twitter/X', icon: 'https://cdn.simpleicons.org/x/ffffff', emoji: '🐦' },
-  { id: 'fiverr', name: 'Fiverr', icon: 'https://cdn.simpleicons.org/fiverr/1DBF73', emoji: '🟩' },
+  { id: 'upwork', name: 'Upwork', icon: '🟢', emoji: '🟢' },
+  { id: 'facebook', name: 'Facebook', icon: '📘', emoji: '📘' },
+  { id: 'tiktok', name: 'TikTok', icon: '🎵', emoji: '🎵' },
+  { id: 'instagram', name: 'Instagram', icon: '📸', emoji: '📸' },
+  { id: 'twitter', name: 'Twitter/X', icon: '🐦', emoji: '🐦' },
+  { id: 'fiverr', name: 'Fiverr', icon: '🟩', emoji: '🟩' },
   { id: 'referral', name: 'Referral', icon: '🤝', emoji: '🤝' },
   { id: 'coldoutreach', name: 'Cold Outreach', icon: '📧', emoji: '📧' },
   { id: 'other', name: 'Other', icon: '🌐', emoji: '🌐' },
@@ -245,7 +245,36 @@ const VAKita = ({ user, isDark }) => {
   };
   const saveInvoice = () => { const client = clients.find(c => c.id === invoiceForm.clientId); const total = invoiceForm.items.reduce((s, i) => s + ((i.hours||1) * i.rate), 0); const inv = { id: editingInvoice?.id || 'inv_' + Date.now(), ...invoiceForm, clientName: client?.name || 'Unknown', total, phpTotal: toPHP(total, invoiceForm.currency), createdAt: editingInvoice?.createdAt || new Date().toISOString() }; if(editingInvoice) setInvoices(p => p.map(i => i.id === editingInvoice.id ? inv : i)); else setInvoices(p => [inv, ...p]); setShowInvoiceForm(false); setEditingInvoice(null); setInvoiceForm({ clientId: '', invoiceNumber: '', issueDate: new Date().toISOString().split('T')[0], dueDate: '', currency: 'USD', items: [{ description: '', hours: 1, rate: 0 }], status: 'draft' }); };
   const saveProspect = () => { const prospect = { id: editingProspect?.id || 'prospect_' + Date.now(), ...prospectForm, estimatedValue: parseFloat(prospectForm.estimatedValue) || 0, createdAt: editingProspect?.createdAt || new Date().toISOString(), updatedAt: new Date().toISOString() }; if(editingProspect) setProspects(p => p.map(pr => pr.id === editingProspect.id ? prospect : pr)); else setProspects(p => [prospect, ...p]); setShowProspectForm(false); setEditingProspect(null); setProspectForm({ name: '', company: '', email: '', source: 'linkedin', status: 'new', notes: '', estimatedValue: '', currency: 'USD', billingType: 'monthly' }); };
-  const convertToClient = (prospect) => { const newClient = { id: 'client_' + Date.now(), name: prospect.name, company: prospect.company || '', email: prospect.email || '', timezone: 'America/New_York', billingType: 'hourly', rate: 0, currency: prospect.currency || 'USD', paymentPlatform: 'wise', businessHoursStart: 9, businessHoursEnd: 17, status: 'active', color: '#22c55e', createdAt: new Date().toISOString(), fromProspect: prospect.id }; setClients(p => [newClient, ...p]); setProspects(p => p.map(pr => pr.id === prospect.id ? {...pr, status: 'won', updatedAt: new Date().toISOString()} : pr)); setActiveTab('clients'); };
+  const convertToClient = (prospect) => { const newClient = { id: 'client_' + Date.now(), name: prospect.name, company: prospect.company || '', email: prospect.email || '', timezone: 'America/New_York', billingType: prospect.billingType || 'hourly', rate: prospect.estimatedValue || 0, currency: prospect.currency || 'USD', paymentPlatform: 'wise', businessHoursStart: 9, businessHoursEnd: 17, status: 'active', color: '#22c55e', createdAt: new Date().toISOString(), fromProspect: prospect.id }; setClients(p => [newClient, ...p]); setProspects(p => p.map(pr => pr.id === prospect.id ? {...pr, status: 'won', updatedAt: new Date().toISOString()} : pr)); setActiveTab('clients'); };
+  
+  // Handle prospect status change - auto-convert to client when "won"
+  const handleProspectStatusChange = (prospect, newStatus) => {
+    if (newStatus === 'won') {
+      // Auto-convert to client when status changes to won
+      const newClient = { 
+        id: 'client_' + Date.now(), 
+        name: prospect.name, 
+        company: prospect.company || '', 
+        email: prospect.email || '', 
+        timezone: 'America/New_York', 
+        billingType: prospect.billingType || 'hourly', 
+        rate: prospect.estimatedValue || 0, 
+        currency: prospect.currency || 'USD', 
+        paymentPlatform: 'wise', 
+        businessHoursStart: 9, 
+        businessHoursEnd: 17, 
+        status: 'active', 
+        color: '#22c55e', 
+        createdAt: new Date().toISOString(), 
+        fromProspect: prospect.id 
+      };
+      setClients(p => [newClient, ...p]);
+      setProspects(p => p.map(pr => pr.id === prospect.id ? {...pr, status: 'won', updatedAt: new Date().toISOString()} : pr));
+    } else {
+      // Just update the status
+      setProspects(p => p.map(pr => pr.id === prospect.id ? {...pr, status: newStatus, updatedAt: new Date().toISOString()} : pr));
+    }
+  };
 
   const card = { backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: isSmall ? '16px' : '20px' };
   const input = { width: '100%', height: '40px', backgroundColor: theme.inputBg, border: '1px solid ' + theme.inputBorder, borderRadius: '8px', padding: '0 12px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box' };
@@ -387,7 +416,7 @@ const VAKita = ({ user, isDark }) => {
                         </div>
                         <div style={{display:'flex',gap:'8px',alignItems:'center',flexWrap:'wrap'}}>
                           {prospect.estimatedValue > 0 && <span style={{fontSize:'14px',fontWeight:'600',color:'#22c55e',padding:'6px 12px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'8px'}}>{getSymbol(prospect.currency)}{formatAmount(prospect.estimatedValue)}{prospect.billingType === 'hourly' ? '/hr' : '/mo'}</span>}
-                          <select value={prospect.status} onChange={(e) => setProspects(p => p.map(pr => pr.id === prospect.id ? {...pr, status: e.target.value, updatedAt: new Date().toISOString()} : pr))} style={{...select,width:'auto',minWidth:'140px',height:'36px',fontSize:'13px'}}>{PROSPECT_STATUSES.map(s => <option key={s.id} value={s.id}>{s.icon} {s.label}</option>)}</select>
+                          <select value={prospect.status} onChange={(e) => handleProspectStatusChange(prospect, e.target.value)} style={{...select,width:'auto',minWidth:'140px',height:'36px',fontSize:'13px'}}>{PROSPECT_STATUSES.map(s => <option key={s.id} value={s.id}>{s.icon} {s.label}</option>)}</select>
                           {['negotiation', 'proposal', 'meeting'].includes(prospect.status) && <button onClick={() => convertToClient(prospect)} style={{...btnSuccess,height:'36px',padding:'0 12px',fontSize:'13px'}}><CheckCircle style={{width:'14px',height:'14px'}}/>Convert</button>}
                           <button onClick={()=>{setEditingProspect(prospect);setProspectForm({...prospect,estimatedValue:prospect.estimatedValue?.toString()||''});setShowProspectForm(true);}} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><Edit style={{width:'14px',height:'14px'}}/></button>
                           <button onClick={()=>setDeleteModal({show:true,type:'prospect',id:prospect.id,name:prospect.name})} style={{...btnGhost,width:'36px',height:'36px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button>
@@ -398,7 +427,31 @@ const VAKita = ({ user, isDark }) => {
                 })}
                 {prospects.filter(p => ['won', 'lost'].includes(p.status)).length > 0 && (
                   <><h3 style={{fontSize:'14px',fontWeight:'600',color:theme.textMuted,margin:'24px 0 12px',paddingTop:'16px',borderTop:'1px solid ' + theme.cardBorder}}>Closed ({prospects.filter(p => ['won', 'lost'].includes(p.status)).length})</h3>
-                  {prospects.filter(p => ['won', 'lost'].includes(p.status)).map(prospect => { const source = LEAD_SOURCES.find(s => s.id === prospect.source); const status = PROSPECT_STATUSES.find(s => s.id === prospect.status); return (<div key={prospect.id} style={{...card,padding:'14px',opacity:0.7}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><div style={{display:'flex',alignItems:'center',gap:'10px'}}><span style={{display:'flex',alignItems:'center',justifyContent:'center',width:'24px',height:'24px'}}>{renderIcon(source?.icon, 18)}</span><span style={{fontSize:'14px',color:theme.text}}>{prospect.name}</span><span style={{padding:'3px 8px',borderRadius:'10px',fontSize:'11px',fontWeight:'600',...prospectStatusStyle(prospect.status)}}>{status?.label}</span></div><button onClick={()=>setDeleteModal({show:true,type:'prospect',id:prospect.id,name:prospect.name})} style={{...btnGhost,width:'32px',height:'32px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button></div></div>); })}</>
+                  {prospects.filter(p => ['won', 'lost'].includes(p.status)).map(prospect => { 
+                    const source = LEAD_SOURCES.find(s => s.id === prospect.source); 
+                    const status = PROSPECT_STATUSES.find(s => s.id === prospect.status); 
+                    const alreadyClient = clients.some(c => c.fromProspect === prospect.id);
+                    return (
+                      <div key={prospect.id} style={{...card,padding:'14px',opacity:0.7}}>
+                        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+                          <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                            <span style={{display:'flex',alignItems:'center',justifyContent:'center',width:'24px',height:'24px'}}>{renderIcon(source?.icon, 18)}</span>
+                            <span style={{fontSize:'14px',color:theme.text}}>{prospect.name}</span>
+                            <span style={{padding:'3px 8px',borderRadius:'10px',fontSize:'11px',fontWeight:'600',...prospectStatusStyle(prospect.status)}}>{status?.label}</span>
+                            {alreadyClient && <span style={{padding:'3px 8px',borderRadius:'10px',fontSize:'11px',fontWeight:'500',backgroundColor:isDark?'#22c55e20':'#22c55e15',color:'#22c55e'}}>✓ Client</span>}
+                          </div>
+                          <div style={{display:'flex',alignItems:'center',gap:'6px'}}>
+                            {prospect.status === 'won' && !alreadyClient && (
+                              <button onClick={() => convertToClient(prospect)} style={{...btnSuccess,height:'28px',padding:'0 10px',fontSize:'12px'}}>
+                                <UserPlus style={{width:'12px',height:'12px'}}/>Add as Client
+                              </button>
+                            )}
+                            <button onClick={()=>setDeleteModal({show:true,type:'prospect',id:prospect.id,name:prospect.name})} style={{...btnGhost,width:'32px',height:'32px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button>
+                          </div>
+                        </div>
+                      </div>
+                    ); 
+                  })}</>
                 )}
               </div>
             )}
