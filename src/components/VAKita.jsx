@@ -23,22 +23,23 @@ const TIMEZONES = [
 ];
 
 const PLATFORMS = [
-  { id: 'wise', name: 'Wise', icon: '💸' },
-  { id: 'payoneer', name: 'Payoneer', icon: '🔵' },
-  { id: 'paypal', name: 'PayPal', icon: '🅿️' },
-  { id: 'gcash', name: 'GCash', icon: '📱' },
-  { id: 'maya', name: 'Maya', icon: '💜' },
+  { id: 'wise', name: 'Wise', icon: 'https://cdn.simpleicons.org/wise' },
+  { id: 'payoneer', name: 'Payoneer', icon: 'https://cdn.simpleicons.org/payoneer' },
+  { id: 'paypal', name: 'PayPal', icon: 'https://cdn.simpleicons.org/paypal' },
+  { id: 'gcash', name: 'GCash', icon: '📱' },  // Replace with custom logo URL later
+  { id: 'maya', name: 'Maya', icon: '💜' },    // Replace with custom logo URL later
   { id: 'bank', name: 'Bank', icon: '🏦' },
 ];
 
 const LEAD_SOURCES = [
-  { id: 'linkedin', name: 'LinkedIn', icon: '💼' },
+  { id: 'linkedin', name: 'LinkedIn', icon: 'https://cdn.simpleicons.org/linkedin' },
   { id: 'onlinejobsph', name: 'OnlineJobsPH', icon: '🇵🇭' },
-  { id: 'upwork', name: 'Upwork', icon: '🟢' },
-  { id: 'facebook', name: 'Facebook', icon: '📘' },
-  { id: 'tiktok', name: 'TikTok', icon: '🎵' },
-  { id: 'instagram', name: 'Instagram', icon: '📸' },
-  { id: 'twitter', name: 'Twitter/X', icon: '🐦' },
+  { id: 'upwork', name: 'Upwork', icon: 'https://cdn.simpleicons.org/upwork' },
+  { id: 'facebook', name: 'Facebook', icon: 'https://cdn.simpleicons.org/facebook' },
+  { id: 'tiktok', name: 'TikTok', icon: 'https://cdn.simpleicons.org/tiktok' },
+  { id: 'instagram', name: 'Instagram', icon: 'https://cdn.simpleicons.org/instagram' },
+  { id: 'twitter', name: 'Twitter/X', icon: 'https://cdn.simpleicons.org/x' },
+  { id: 'fiverr', name: 'Fiverr', icon: 'https://cdn.simpleicons.org/fiverr' },
   { id: 'referral', name: 'Referral', icon: '🤝' },
   { id: 'coldoutreach', name: 'Cold Outreach', icon: '📧' },
   { id: 'other', name: 'Other', icon: '🌐' },
@@ -78,6 +79,14 @@ const TAX_BRACKETS = [
   { min: 2000001, max: 8000000, rate: 0.30, base: 402500 },
   { min: 8000001, max: Infinity, rate: 0.35, base: 2202500 },
 ];
+
+// Helper to render icon - if it's a URL, render as img; otherwise render as text/emoji
+const renderIcon = (icon, size = 20) => {
+  if (icon && icon.startsWith('http')) {
+    return <img src={icon} alt="" style={{ width: size, height: size, objectFit: 'contain' }} />;
+  }
+  return <span style={{ fontSize: size }}>{icon}</span>;
+};
 
 const VAKita = ({ user, isDark }) => {
   const theme = getTheme(isDark);
@@ -360,7 +369,7 @@ const VAKita = ({ user, isDark }) => {
                       <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'12px',flexWrap:'wrap'}}>
                         <div style={{flex:1,minWidth:'200px'}}>
                           <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}>
-                            <span style={{fontSize:'24px'}}>{source?.icon || '🌐'}</span>
+                            <span style={{display:'flex',alignItems:'center',justifyContent:'center',width:'32px',height:'32px'}}>{renderIcon(source?.icon || '🌐', 24)}</span>
                             <div><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:0}}>{prospect.name}</h3>{prospect.company && <p style={{fontSize:'13px',color:theme.textMuted,margin:'2px 0 0'}}>{prospect.company}</p>}</div>
                           </div>
                           <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginBottom:'8px'}}>
@@ -382,7 +391,7 @@ const VAKita = ({ user, isDark }) => {
                 })}
                 {prospects.filter(p => ['won', 'lost'].includes(p.status)).length > 0 && (
                   <><h3 style={{fontSize:'14px',fontWeight:'600',color:theme.textMuted,margin:'24px 0 12px',paddingTop:'16px',borderTop:'1px solid ' + theme.cardBorder}}>Closed ({prospects.filter(p => ['won', 'lost'].includes(p.status)).length})</h3>
-                  {prospects.filter(p => ['won', 'lost'].includes(p.status)).map(prospect => { const source = LEAD_SOURCES.find(s => s.id === prospect.source); const status = PROSPECT_STATUSES.find(s => s.id === prospect.status); return (<div key={prospect.id} style={{...card,padding:'14px',opacity:0.7}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><div style={{display:'flex',alignItems:'center',gap:'10px'}}><span style={{fontSize:'18px'}}>{source?.icon}</span><span style={{fontSize:'14px',color:theme.text}}>{prospect.name}</span><span style={{padding:'3px 8px',borderRadius:'10px',fontSize:'11px',fontWeight:'600',...prospectStatusStyle(prospect.status)}}>{status?.label}</span></div><button onClick={()=>setDeleteModal({show:true,type:'prospect',id:prospect.id,name:prospect.name})} style={{...btnGhost,width:'32px',height:'32px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button></div></div>); })}</>
+                  {prospects.filter(p => ['won', 'lost'].includes(p.status)).map(prospect => { const source = LEAD_SOURCES.find(s => s.id === prospect.source); const status = PROSPECT_STATUSES.find(s => s.id === prospect.status); return (<div key={prospect.id} style={{...card,padding:'14px',opacity:0.7}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}><div style={{display:'flex',alignItems:'center',gap:'10px'}}><span style={{display:'flex',alignItems:'center',justifyContent:'center',width:'24px',height:'24px'}}>{renderIcon(source?.icon, 18)}</span><span style={{fontSize:'14px',color:theme.text}}>{prospect.name}</span><span style={{padding:'3px 8px',borderRadius:'10px',fontSize:'11px',fontWeight:'600',...prospectStatusStyle(prospect.status)}}>{status?.label}</span></div><button onClick={()=>setDeleteModal({show:true,type:'prospect',id:prospect.id,name:prospect.name})} style={{...btnGhost,width:'32px',height:'32px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button></div></div>); })}</>
                 )}
               </div>
             )}
@@ -402,7 +411,7 @@ const VAKita = ({ user, isDark }) => {
                   return (<div key={c.id} style={{...card,borderLeft:'4px solid ' + c.color,opacity:c.status==='active'?1:0.6}}>
                     <div style={{display:'flex',justifyContent:'space-between',marginBottom:'12px'}}><div><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:0}}>{c.name}</h3>{c.company && <p style={{fontSize:'13px',color:theme.textMuted,margin:'2px 0 0'}}>{c.company}</p>}</div><div style={{display:'flex',gap:'4px'}}><button onClick={()=>{setEditingClient(c);setClientForm({...c,rate:c.rate?.toString()||''});setShowClientForm(true);}} style={{...btnGhost,width:'32px',height:'32px',padding:0}}><Edit style={{width:'14px',height:'14px'}}/></button><button onClick={()=>setDeleteModal({show:true,type:'client',id:c.id,name:c.name})} style={{...btnGhost,width:'32px',height:'32px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button></div></div>
                     <div style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 10px',backgroundColor:theme.statBg,borderRadius:'6px',marginBottom:'12px'}}><span style={{fontSize:'18px',lineHeight:1,width:'24px',textAlign:'center',color:theme.text}}>{tz?.flag||'🌐'}</span><div style={{flex:1}}><p style={{fontSize:'13px',fontWeight:'500',color:theme.text,margin:0}}>{getTime(c.timezone)}</p><p style={{fontSize:'11px',color:theme.textMuted,margin:0}}>{tz?.city || 'Unknown'}</p></div><div style={{display:'flex',alignItems:'center',gap:'4px',padding:'4px 8px',backgroundColor:isDark?ts.color+'20':ts.color+'15',borderRadius:'12px'}}><Icon style={{width:'12px',height:'12px',color:ts.color}}/><span style={{fontSize:'11px',fontWeight:'500',color:ts.color}}>{ts.label}</span></div></div>
-                    <div style={{display:'flex',gap:'8px',marginBottom:'12px',flexWrap:'wrap'}}><span style={{padding:'6px 10px',backgroundColor:theme.statBg,borderRadius:'6px',fontSize:'12px',color:theme.text}}>{getSymbol(c.currency)}{c.rate}{c.billingType==='hourly'?'/hr':'/mo'}</span><span style={{padding:'6px 10px',backgroundColor:theme.statBg,borderRadius:'6px',fontSize:'12px',color:theme.text}}>{pf?.icon} {pf?.name}</span></div>
+                    <div style={{display:'flex',gap:'8px',marginBottom:'12px',flexWrap:'wrap'}}><span style={{padding:'6px 10px',backgroundColor:theme.statBg,borderRadius:'6px',fontSize:'12px',color:theme.text}}>{getSymbol(c.currency)}{c.rate}{c.billingType==='hourly'?'/hr':'/mo'}</span><span style={{padding:'6px 10px',backgroundColor:theme.statBg,borderRadius:'6px',fontSize:'12px',color:theme.text,display:'flex',alignItems:'center',gap:'6px'}}>{renderIcon(pf?.icon, 16)} {pf?.name}</span></div>
                     <div style={{paddingTop:'12px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between'}}><span style={{fontSize:'12px',color:theme.textMuted}}>Lifetime</span><span style={{fontSize:'14px',fontWeight:'600',color:'#22c55e'}}>₱{formatAmount(income)}</span></div>
                   </div>);
                 })}
@@ -420,7 +429,7 @@ const VAKita = ({ user, isDark }) => {
             <div style={{...card, marginBottom: '24px', background: isDark ? 'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(34,197,94,0.1))' : 'linear-gradient(135deg, rgba(139,92,246,0.05), rgba(34,197,94,0.05))'}}>
               <p style={{fontSize:'14px',color:theme.textMuted,margin:'0 0 4px'}}>Monthly Income</p>
               <div style={{display:'flex',alignItems:'baseline',gap:'12px',flexWrap:'wrap'}}><span style={{fontSize:'36px',fontWeight:'700',color:theme.text}}>₱{formatAmount(monthlyStats.total)}</span>{monthlyStats.change !== 0 && <span style={{fontSize:'14px',fontWeight:'600',color:monthlyStats.change>0?'#22c55e':'#ef4444'}}>{monthlyStats.change>0?'↑':'↓'} {Math.abs(monthlyStats.change).toFixed(1)}%</span>}</div>
-              {Object.keys(monthlyStats.byPlatform).length > 0 && (<div style={{display:'flex',gap:'12px',flexWrap:'wrap',marginTop:'16px',paddingTop:'16px',borderTop:'1px solid ' + theme.cardBorder}}>{Object.entries(monthlyStats.byPlatform).map(([p,v]) => { const pf = PLATFORMS.find(x=>x.id===p); return <div key={p} style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 12px',backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',borderRadius:'8px'}}><span style={{fontSize:'18px'}}>{pf?.icon||'💰'}</span><span style={{fontSize:'13px',color:theme.text}}>{pf?.name}: ₱{formatAmount(v)}</span></div>; })}</div>)}
+              {Object.keys(monthlyStats.byPlatform).length > 0 && (<div style={{display:'flex',gap:'12px',flexWrap:'wrap',marginTop:'16px',paddingTop:'16px',borderTop:'1px solid ' + theme.cardBorder}}>{Object.entries(monthlyStats.byPlatform).map(([p,v]) => { const pf = PLATFORMS.find(x=>x.id===p); return <div key={p} style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 12px',backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',borderRadius:'8px'}}><span style={{display:'flex',alignItems:'center',justifyContent:'center',width:'20px',height:'20px'}}>{renderIcon(pf?.icon||'💰', 18)}</span><span style={{fontSize:'13px',color:theme.text}}>{pf?.name}: ₱{formatAmount(v)}</span></div>; })}</div>)}
             </div>
             <div style={{display:'grid',gridTemplateColumns:isSmall?'1fr 1fr':'repeat(4, 1fr)',gap:'12px',marginBottom:'24px'}}>
               <div style={{...card,padding:'16px',borderLeft:'4px solid #8b5cf6'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>6-Month Avg</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(sixMonthAvg)}</p></div>
@@ -430,7 +439,7 @@ const VAKita = ({ user, isDark }) => {
             </div>
             <div style={card}><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 16px'}}>Recent Income</h3>
               {monthlyStats.entries.length === 0 ? (<div style={{textAlign:'center',padding:'40px'}}><Receipt style={{width:'40px',height:'40px',color:theme.textMuted,margin:'0 auto 12px'}}/><p style={{fontSize:'14px',color:theme.textMuted}}>No income this month</p></div>
-              ) : (<div style={{display:'flex',flexDirection:'column',gap:'8px'}}>{monthlyStats.entries.slice(0,10).map(e => { const pf = PLATFORMS.find(p=>p.id===e.platform); return (<div key={e.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px',backgroundColor:theme.statBg,borderRadius:'8px'}}><div style={{display:'flex',alignItems:'center',gap:'12px'}}><span style={{fontSize:'20px'}}>{pf?.icon||'💰'}</span><div><p style={{fontSize:'14px',fontWeight:'500',color:theme.text,margin:0}}>{e.clientName}</p><p style={{fontSize:'12px',color:theme.textMuted,margin:0}}>{e.date}</p></div></div><div style={{display:'flex',alignItems:'center',gap:'12px'}}><div style={{textAlign:'right'}}><p style={{fontSize:'14px',fontWeight:'600',color:theme.text,margin:0}}>{getSymbol(e.currency)}{formatAmount(e.amount)}</p><p style={{fontSize:'12px',color:theme.textMuted,margin:0}}>₱{formatAmount(e.phpAmount)}</p></div><button onClick={()=>setDeleteModal({show:true,type:'income',id:e.id,name:e.clientName+' - '+getSymbol(e.currency)+formatAmount(e.amount)})} style={{...btnGhost,width:'32px',height:'32px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button></div></div>); })}</div>)}
+              ) : (<div style={{display:'flex',flexDirection:'column',gap:'8px'}}>{monthlyStats.entries.slice(0,10).map(e => { const pf = PLATFORMS.find(p=>p.id===e.platform); return (<div key={e.id} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px',backgroundColor:theme.statBg,borderRadius:'8px'}}><div style={{display:'flex',alignItems:'center',gap:'12px'}}><span style={{display:'flex',alignItems:'center',justifyContent:'center',width:'28px',height:'28px'}}>{renderIcon(pf?.icon||'💰', 20)}</span><div><p style={{fontSize:'14px',fontWeight:'500',color:theme.text,margin:0}}>{e.clientName}</p><p style={{fontSize:'12px',color:theme.textMuted,margin:0}}>{e.date}</p></div></div><div style={{display:'flex',alignItems:'center',gap:'12px'}}><div style={{textAlign:'right'}}><p style={{fontSize:'14px',fontWeight:'600',color:theme.text,margin:0}}>{getSymbol(e.currency)}{formatAmount(e.amount)}</p><p style={{fontSize:'12px',color:theme.textMuted,margin:0}}>₱{formatAmount(e.phpAmount)}</p></div><button onClick={()=>setDeleteModal({show:true,type:'income',id:e.id,name:e.clientName+' - '+getSymbol(e.currency)+formatAmount(e.amount)})} style={{...btnGhost,width:'32px',height:'32px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button></div></div>); })}</div>)}
             </div>
           </div>
         )}

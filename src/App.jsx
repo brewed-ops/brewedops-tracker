@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 // Extracted components and utilities
@@ -2726,10 +2726,13 @@ const getBudgetStatus = () => {
                     borderRadius: '6px', 
                     cursor: 'pointer',
                     backgroundColor: activeSection === 'tracker' ? '#22c55e' : 'transparent',
-                    color: activeSection === 'tracker' ? '#fff' : theme.textMuted
+                    color: activeSection === 'tracker' ? '#fff' : theme.textMuted,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}
                 >
-                  💰 Finance
+                  <Wallet style={{ width: '14px', height: '14px' }} /> Finance
                 </button>
                 <button 
                   onClick={() => setActiveSection('vakita')} 
@@ -2741,10 +2744,13 @@ const getBudgetStatus = () => {
                     borderRadius: '6px', 
                     cursor: 'pointer',
                     backgroundColor: activeSection === 'vakita' ? '#8b5cf6' : 'transparent',
-                    color: activeSection === 'vakita' ? '#fff' : theme.textMuted
+                    color: activeSection === 'vakita' ? '#fff' : theme.textMuted,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
                   }}
                 >
-                  📊 VAKita
+                  <Headset style={{ width: '14px', height: '14px' }} /> VAKita
                 </button>
               </div>
             </div>
