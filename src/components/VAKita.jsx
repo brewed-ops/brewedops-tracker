@@ -293,21 +293,25 @@ const VAKita = ({ user, isDark }) => {
 
   return (
     <>
-      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 4px' : '0 24px' }}>
+      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 12px' : '0 24px' }}>
         <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0' : '0 16px' }}>
-          {/* Main category tabs */}
+          {/* Main category tabs - matching Finance Tracker style */}
           <div style={{ display: 'flex', gap: '0', alignItems: 'center' }}>
             <button 
               onClick={() => { if (!['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab)) setActiveTab('prospecting'); }}
               style={{
-                padding: isSmall ? '14px 10px' : '16px 20px',
+                padding: isSmall ? '12px 14px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
-                borderBottom: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? '2px solid #8b5cf6' : '2px solid transparent',
-                fontSize: isSmall ? '12px' : '15px',
-                fontWeight: '600',
-                color: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? (isDark ? '#fff' : '#18181b') : theme.textMuted,
+                borderBottom: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
+                fontSize: isSmall ? '13px' : '15px',
+                fontWeight: '500',
+                color: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? theme.text : theme.textMuted,
                 cursor: 'pointer',
+                transition: 'color 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
                 whiteSpace: 'nowrap'
               }}
             >
@@ -316,34 +320,40 @@ const VAKita = ({ user, isDark }) => {
             <button 
               onClick={() => setActiveTab('timezone')} 
               style={{
-                padding: isSmall ? '14px 10px' : '16px 20px',
+                padding: isSmall ? '12px 14px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
-                borderBottom: activeTab === 'timezone' ? '2px solid #8b5cf6' : '2px solid transparent',
-                fontSize: isSmall ? '12px' : '15px',
-                fontWeight: '600',
-                color: activeTab === 'timezone' ? (isDark ? '#fff' : '#18181b') : theme.textMuted,
+                borderBottom: activeTab === 'timezone' ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
+                fontSize: isSmall ? '13px' : '15px',
+                fontWeight: '500',
+                color: activeTab === 'timezone' ? theme.text : theme.textMuted,
                 cursor: 'pointer',
+                transition: 'color 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
+                gap: '8px',
                 whiteSpace: 'nowrap'
               }}
             >
               <Clock style={{ width: '16px', height: '16px' }} />
               {!isSmall && 'Timezone Manager'}
+              {isSmall && 'Clock'}
             </button>
             <button 
               onClick={() => setActiveTab('tax')} 
               style={{
-                padding: isSmall ? '14px 10px' : '16px 20px',
+                padding: isSmall ? '12px 14px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
-                borderBottom: activeTab === 'tax' ? '2px solid #8b5cf6' : '2px solid transparent',
-                fontSize: isSmall ? '12px' : '15px',
-                fontWeight: '600',
-                color: activeTab === 'tax' ? (isDark ? '#fff' : '#18181b') : theme.textMuted,
+                borderBottom: activeTab === 'tax' ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
+                fontSize: isSmall ? '13px' : '15px',
+                fontWeight: '500',
+                color: activeTab === 'tax' ? theme.text : theme.textMuted,
                 cursor: 'pointer',
+                transition: 'color 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
                 whiteSpace: 'nowrap'
               }}
             >
@@ -426,96 +436,101 @@ const VAKita = ({ user, isDark }) => {
             {saving && <span style={{ fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />{isSmall ? '' : 'Saving...'}</span>}
           </div>
         </div>
-        
-        {/* Sub-tabs for Client Management */}
-        {['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) && (
-          <div style={{ 
-            maxWidth: '1600px', 
-            margin: '0 auto', 
-            padding: isSmall ? '8px 4px' : '8px 32px',
-            display: 'flex',
-            gap: '8px',
-            flexWrap: 'wrap'
-          }}>
-            <button 
-              onClick={() => setActiveTab('prospecting')} 
-              style={{
-                padding: '8px 16px',
-                backgroundColor: activeTab === 'prospecting' ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: activeTab === 'prospecting' ? theme.text : theme.textMuted,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <Target style={{ width: '14px', height: '14px' }} />
-              Leads
-            </button>
-            <button 
-              onClick={() => setActiveTab('clients')} 
-              style={{
-                padding: '8px 16px',
-                backgroundColor: activeTab === 'clients' ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: activeTab === 'clients' ? theme.text : theme.textMuted,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <Users style={{ width: '14px', height: '14px' }} />
-              Clients
-            </button>
-            <button 
-              onClick={() => setActiveTab('invoices')} 
-              style={{
-                padding: '8px 16px',
-                backgroundColor: activeTab === 'invoices' ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: activeTab === 'invoices' ? theme.text : theme.textMuted,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <FileText style={{ width: '14px', height: '14px' }} />
-              Invoices
-            </button>
-            <button 
-              onClick={() => setActiveTab('dashboard')} 
-              style={{
-                padding: '8px 16px',
-                backgroundColor: activeTab === 'dashboard' ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
-                border: 'none',
-                borderRadius: '6px',
-                fontSize: '14px',
-                fontWeight: '500',
-                color: activeTab === 'dashboard' ? theme.text : theme.textMuted,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}
-            >
-              <BarChart3 style={{ width: '14px', height: '14px' }} />
-              Income
-            </button>
-          </div>
-        )}
       </div>
+      
+      {/* Sub-tabs for Client Management - matching Finance Tracker sub-tab style */}
+      {['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) && (
+        <div style={{ 
+          backgroundColor: isDark ? '#0a0a0b' : '#ffffff', 
+          borderBottom: '1px solid ' + theme.cardBorder, 
+          padding: isSmall ? '0 12px' : '0 24px' 
+        }}>
+          <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '12px 16px' }}>
+            <div style={{ display: 'flex', gap: '6px', backgroundColor: theme.toggleBg || (isDark ? '#18181b' : '#f4f4f5'), borderRadius: '8px', padding: '4px', width: 'fit-content' }}>
+              <button 
+                onClick={() => setActiveTab('prospecting')} 
+                style={{
+                  padding: '8px 14px',
+                  backgroundColor: activeTab === 'prospecting' ? (isDark ? '#27272a' : '#ffffff') : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  color: activeTab === 'prospecting' ? theme.text : theme.textMuted,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: activeTab === 'prospecting' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none'
+                }}
+              >
+                <Target style={{ width: '14px', height: '14px' }} />
+                Leads
+              </button>
+              <button 
+                onClick={() => setActiveTab('clients')} 
+                style={{
+                  padding: '8px 14px',
+                  backgroundColor: activeTab === 'clients' ? (isDark ? '#27272a' : '#ffffff') : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  color: activeTab === 'clients' ? theme.text : theme.textMuted,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: activeTab === 'clients' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none'
+                }}
+              >
+                <Users style={{ width: '14px', height: '14px' }} />
+                Clients
+              </button>
+              <button 
+                onClick={() => setActiveTab('invoices')} 
+                style={{
+                  padding: '8px 14px',
+                  backgroundColor: activeTab === 'invoices' ? (isDark ? '#27272a' : '#ffffff') : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  color: activeTab === 'invoices' ? theme.text : theme.textMuted,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: activeTab === 'invoices' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none'
+                }}
+              >
+                <FileText style={{ width: '14px', height: '14px' }} />
+                Invoices
+              </button>
+              <button 
+                onClick={() => setActiveTab('dashboard')} 
+                style={{
+                  padding: '8px 14px',
+                  backgroundColor: activeTab === 'dashboard' ? (isDark ? '#27272a' : '#ffffff') : 'transparent',
+                  border: 'none',
+                  borderRadius: '6px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  color: activeTab === 'dashboard' ? theme.text : theme.textMuted,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  boxShadow: activeTab === 'dashboard' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none'
+                }}
+              >
+                <BarChart3 style={{ width: '14px', height: '14px' }} />
+                Income
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ padding: isSmall ? '16px' : '24px', maxWidth: '1600px', margin: '0 auto' }}>
         {activeTab === 'prospecting' && (
@@ -687,7 +702,7 @@ const VAKita = ({ user, isDark }) => {
               </h3>
               <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
                 <a 
-                  href="https://www.bir.gov.ph/index.php/tax-information/income-tax.html" 
+                  href="https://www.bir.gov.ph/income-tax" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   style={{
@@ -706,60 +721,12 @@ const VAKita = ({ user, isDark }) => {
                   <span style={{fontSize:'20px'}}>🏛️</span>
                   <div style={{flex:1}}>
                     <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>BIR Income Tax Information</p>
-                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Official BIR page on income tax rates and brackets</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Official BIR page on income tax forms and requirements</p>
                   </div>
                   <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
                 </a>
                 <a 
-                  href="https://www.bir.gov.ph/index.php/tax-information/withholding-tax.html" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{
-                    display:'flex',
-                    alignItems:'center',
-                    gap:'10px',
-                    padding:'12px 16px',
-                    backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',
-                    borderRadius:'8px',
-                    textDecoration:'none',
-                    color:theme.text,
-                    border:'1px solid ' + theme.cardBorder,
-                    transition:'all 0.2s'
-                  }}
-                >
-                  <span style={{fontSize:'20px'}}>📋</span>
-                  <div style={{flex:1}}>
-                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>Withholding Tax Guidelines</p>
-                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Information on withholding tax for freelancers</p>
-                  </div>
-                  <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
-                </a>
-                <a 
-                  href="https://www.bir.gov.ph/index.php/train-law.html" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  style={{
-                    display:'flex',
-                    alignItems:'center',
-                    gap:'10px',
-                    padding:'12px 16px',
-                    backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',
-                    borderRadius:'8px',
-                    textDecoration:'none',
-                    color:theme.text,
-                    border:'1px solid ' + theme.cardBorder,
-                    transition:'all 0.2s'
-                  }}
-                >
-                  <span style={{fontSize:'20px'}}>⚖️</span>
-                  <div style={{flex:1}}>
-                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>TRAIN Law (RA 10963)</p>
-                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Tax Reform for Acceleration and Inclusion - 8% option details</p>
-                  </div>
-                  <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
-                </a>
-                <a 
-                  href="https://www.bir.gov.ph/index.php/bir-forms.html" 
+                  href="https://www.bir.gov.ph/bir-forms?tab=Income+Tax+Return" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   style={{
@@ -777,8 +744,56 @@ const VAKita = ({ user, isDark }) => {
                 >
                   <span style={{fontSize:'20px'}}>📝</span>
                   <div style={{flex:1}}>
-                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>BIR Forms Download</p>
-                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Download Form 1701Q (Quarterly) and other tax forms</p>
+                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>BIR Forms - Income Tax Returns</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Download Form 1701Q, 1701A, and other tax forms</p>
+                  </div>
+                  <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
+                </a>
+                <a 
+                  href="https://www.bir.gov.ph/index.php/tax-information" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{
+                    display:'flex',
+                    alignItems:'center',
+                    gap:'10px',
+                    padding:'12px 16px',
+                    backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',
+                    borderRadius:'8px',
+                    textDecoration:'none',
+                    color:theme.text,
+                    border:'1px solid ' + theme.cardBorder,
+                    transition:'all 0.2s'
+                  }}
+                >
+                  <span style={{fontSize:'20px'}}>📋</span>
+                  <div style={{flex:1}}>
+                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>BIR Tax Information</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Complete tax information and regulations</p>
+                  </div>
+                  <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
+                </a>
+                <a 
+                  href="https://efps.bir.gov.ph" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{
+                    display:'flex',
+                    alignItems:'center',
+                    gap:'10px',
+                    padding:'12px 16px',
+                    backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',
+                    borderRadius:'8px',
+                    textDecoration:'none',
+                    color:theme.text,
+                    border:'1px solid ' + theme.cardBorder,
+                    transition:'all 0.2s'
+                  }}
+                >
+                  <span style={{fontSize:'20px'}}>💻</span>
+                  <div style={{flex:1}}>
+                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>eFPS - Electronic Filing & Payment</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>File and pay taxes online through BIR's eFPS</p>
                   </div>
                   <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
                 </a>
