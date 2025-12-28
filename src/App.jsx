@@ -2966,6 +2966,8 @@ const getBudgetStatus = () => {
                     
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#27272a' : '#f4f4f5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       style={{
                         width: '100%',
                         padding: '12px 16px',
@@ -2977,7 +2979,8 @@ const getBudgetStatus = () => {
                         cursor: 'pointer',
                         fontSize: '14px',
                         color: theme.text,
-                        textAlign: 'left'
+                        textAlign: 'left',
+                        transition: 'background-color 0.15s'
                       }}
                     >
                       <Edit style={{ width: '18px', height: '18px', color: theme.textMuted }} />
@@ -2985,6 +2988,8 @@ const getBudgetStatus = () => {
                     </button>
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowFeedback(true); }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#27272a' : '#f4f4f5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       style={{
                         width: '100%',
                         padding: '12px 16px',
@@ -2996,7 +3001,8 @@ const getBudgetStatus = () => {
                         cursor: 'pointer',
                         fontSize: '14px',
                         color: theme.text,
-                        textAlign: 'left'
+                        textAlign: 'left',
+                        transition: 'background-color 0.15s'
                       }}
                     >
                       <MessageSquare style={{ width: '18px', height: '18px', color: theme.textMuted }} />
@@ -3208,6 +3214,8 @@ const getBudgetStatus = () => {
                     
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#27272a' : '#f4f4f5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       style={{
                         width: '100%',
                         padding: '12px 16px',
@@ -3219,7 +3227,8 @@ const getBudgetStatus = () => {
                         cursor: 'pointer',
                         fontSize: '15px',
                         color: theme.text,
-                        textAlign: 'left'
+                        textAlign: 'left',
+                        transition: 'background-color 0.15s'
                       }}
                     >
                       <Edit style={{ width: '18px', height: '18px', color: theme.textMuted }} />
@@ -3227,6 +3236,8 @@ const getBudgetStatus = () => {
                     </button>
                     <button
                       onClick={() => { setShowProfileMenu(false); setShowFeedback(true); }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#27272a' : '#f4f4f5'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       style={{
                         width: '100%',
                         padding: '12px 16px',
@@ -3238,7 +3249,8 @@ const getBudgetStatus = () => {
                         cursor: 'pointer',
                         fontSize: '15px',
                         color: theme.text,
-                        textAlign: 'left'
+                        textAlign: 'left',
+                        transition: 'background-color 0.15s'
                       }}
                     >
                       <MessageSquare style={{ width: '18px', height: '18px', color: theme.textMuted }} />
