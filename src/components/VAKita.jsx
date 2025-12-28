@@ -2,7 +2,7 @@
 // Renders INSIDE App.jsx main content area - App.jsx handles header with level/XP/achievements
 // Data stored in Supabase for persistence
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { FileText, Clock, Plus, Trash2, Edit, Eye, X, Sun, Moon as MoonIcon, Coffee, Zap, Users, Bell, PiggyBank, Calculator, Receipt, BarChart3, Loader2, Target, UserPlus, CheckCircle, Info, Mail, Copy } from 'lucide-react';
+import { FileText, Clock, Plus, Trash2, Edit, Eye, X, Sun, Moon as MoonIcon, Coffee, Zap, Users, Bell, PiggyBank, Calculator, Receipt, BarChart3, Loader2, Target, UserPlus, CheckCircle, Info, Mail, Copy, Send, Settings } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { getTheme } from '../lib/theme';
 import { useWindowSize } from '../lib/hooks';
@@ -129,7 +129,13 @@ const VAKita = ({ user, isDark }) => {
   const [showOverlapTooltip, setShowOverlapTooltip] = useState(false);
   const [emailModal, setEmailModal] = useState({ show: false, invoice: null });
   const [emailCopied, setEmailCopied] = useState(false);
+  const [sendEmailModal, setSendEmailModal] = useState({ show: false, invoice: null, recipientEmail: '' });
   const [paidConfirmModal, setPaidConfirmModal] = useState({ show: false, invoice: null });
+  const [showProfileModal, setShowProfileModal] = useState(false);
+  const [vakitaProfile, setVakitaProfile] = useState({ name: '', email: '', businessName: '', googleConnected: false });
+  const [activities, setActivities] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [deleteModal, setDeleteModal] = useState({ show: false, type: '', id: null, name: '' });
 
   const [incomeForm, setIncomeForm] = useState({ clientId: '', amount: '', currency: 'USD', platform: 'wise', date: new Date().toISOString().split('T')[0], description: '' });
@@ -163,7 +169,7 @@ const VAKita = ({ user, isDark }) => {
     const loadData = async () => {
       setLoading(true);
       try {
-        const { data, error } = await supabase.from('user_profiles').select('vakita_clients, vakita_income, vakita_invoices, vakita_tax_settings, vakita_prospects').eq('user_id', user.id).single();
+        const { data, error } = await supabase.from('user_profiles').select('vakita_clients, vakita_income, vakita_invoices, vakita_tax_settings, vakita_prospects, vakita_profile, vakita_activities').eq('user_id', user.id).single();
         if (error && error.code !== 'PGRST116') console.error('Error loading VAKita data:', error);
         if (data) {
           setClients(data.vakita_clients || []);
@@ -171,6 +177,8 @@ const VAKita = ({ user, isDark }) => {
           setInvoices(data.vakita_invoices || []);
           setProspects(data.vakita_prospects || []);
           setTaxSettings(data.vakita_tax_settings || { taxOption: '8percent', tinNumber: '' });
+          setVakitaProfile(data.vakita_profile || { name: '', email: '', businessName: '' });
+          setActivities(data.vakita_activities || []);
         }
       } catch (err) { console.error('Error loading VAKita data:', err); }
       finally { setLoading(false); }
@@ -191,6 +199,8 @@ const VAKita = ({ user, isDark }) => {
   useEffect(() => { if (loading || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_invoices', invoices), 500); return () => clearTimeout(t); }, [invoices, loading, user?.id, saveToSupabase]);
   useEffect(() => { if (loading || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_prospects', prospects), 500); return () => clearTimeout(t); }, [prospects, loading, user?.id, saveToSupabase]);
   useEffect(() => { if (loading || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_tax_settings', taxSettings), 500); return () => clearTimeout(t); }, [taxSettings, loading, user?.id, saveToSupabase]);
+  useEffect(() => { if (loading || !user?.id || !vakitaProfile.name) return; const t = setTimeout(() => saveToSupabase('vakita_profile', vakitaProfile), 500); return () => clearTimeout(t); }, [vakitaProfile, loading, user?.id, saveToSupabase]);
+  useEffect(() => { if (loading || !user?.id || activities.length === 0) return; const t = setTimeout(() => saveToSupabase('vakita_activities', activities), 500); return () => clearTimeout(t); }, [activities, loading, user?.id, saveToSupabase]);
   useEffect(() => { if(showInvoiceForm && !editingInvoice) setInvoiceForm(p => ({...p, invoiceNumber: 'INV-' + new Date().getFullYear() + '-' + String(invoices.length+1).padStart(4,'0')})); }, [showInvoiceForm, editingInvoice, invoices.length]);
 
   const getRate = (c) => CURRENCIES.find(x => x.code === c)?.rate || 1;
@@ -295,6 +305,91 @@ Warm regards,
     });
   };
   
+  // Show toast notification
+  const showToast = (message, type = 'success') => {
+    setToast({ show: true, message, type });
+    setTimeout(() => setToast({ show: false, message: '', type: 'success' }), 3000);
+  };
+  
+  // Add activity to log
+  const addActivity = (title, description, type = 'info') => {
+    const newActivity = {
+      id: 'act_' + Date.now(),
+      title,
+      description,
+      type,
+      read: false,
+      createdAt: new Date().toISOString()
+    };
+    setActivities(prev => [newActivity, ...prev].slice(0, 50)); // Keep last 50 activities
+  };
+  
+  // Mark activities as read
+  const markActivitiesAsRead = () => {
+    setActivities(prev => prev.map(a => ({ ...a, read: true })));
+  };
+  
+  // Get unread activity count
+  const unreadCount = activities.filter(a => !a.read).length;
+  
+  // Open send email modal
+  const openSendEmailModal = (inv) => {
+    const client = clients.find(c => c.id === inv.clientId);
+    setSendEmailModal({ 
+      show: true, 
+      invoice: inv, 
+      recipientEmail: client?.email || '' 
+    });
+  };
+  
+  // Send email via mailto (opens default email client)
+  const sendInvoiceEmail = () => {
+    const inv = sendEmailModal.invoice;
+    const recipientEmail = sendEmailModal.recipientEmail;
+    
+    if (!recipientEmail) {
+      showToast('Please enter a recipient email', 'error');
+      return;
+    }
+    
+    const senderName = vakitaProfile.name || '[Your Name]';
+    const emailContent = generateInvoiceEmail(inv).replace('[Your Name]', senderName);
+    
+    // Extract subject from email content
+    const subjectMatch = emailContent.match(/Subject: (.+)\n/);
+    const subject = subjectMatch ? subjectMatch[1] : `Invoice ${inv.invoiceNumber}`;
+    
+    // Get body (everything after Subject line)
+    const body = emailContent.replace(/Subject: .+\n\n/, '');
+    
+    // Create mailto link
+    const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    
+    // Open email client
+    window.open(mailtoLink, '_blank');
+    
+    // Log activity
+    addActivity(
+      'Invoice Email Sent',
+      `Sent ${inv.invoiceNumber} to ${recipientEmail}`,
+      'email'
+    );
+    
+    // Show toast
+    showToast(`Email client opened for ${inv.invoiceNumber}`);
+    
+    // Close modal
+    setSendEmailModal({ show: false, invoice: null, recipientEmail: '' });
+    setEmailModal({ show: false, invoice: null });
+  };
+  
+  // Save VAKita profile
+  const saveVakitaProfile = () => {
+    addActivity('Profile Updated', 'VAKita profile settings saved', 'settings');
+    showToast('Profile saved successfully!');
+    setShowProfileModal(false);
+  };
+  
   // Handle invoice status change - show confirmation for "paid" status
   const handleInvoiceStatusChange = (inv, newStatus) => {
     if (newStatus === 'paid' && inv.status !== 'paid') {
@@ -338,6 +433,11 @@ Warm regards,
     };
     
     setIncomeEntries(p => [newIncome, ...p]);
+    
+    // Log activity and show toast
+    addActivity('Invoice Paid', `${inv.invoiceNumber} marked as paid - ${getSymbol(inv.currency)}${formatAmount(inv.total)}`, 'payment');
+    showToast(`${inv.invoiceNumber} marked as paid!`);
+    
     setPaidConfirmModal({ show: false, invoice: null });
   };
   
@@ -458,8 +558,98 @@ Warm regards,
             </button>
           </div>
           
-          {/* Exchange rate + saving indicator */}
+          {/* Notification Bell, Exchange rate + saving indicator */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {/* Notification Bell */}
+            <div style={{ position: 'relative' }}>
+              <button 
+                onClick={() => { setShowNotifications(!showNotifications); if (!showNotifications) markActivitiesAsRead(); }}
+                style={{
+                  ...btnGhost,
+                  width: '36px',
+                  height: '36px',
+                  padding: 0,
+                  position: 'relative'
+                }}
+                title="Notifications"
+              >
+                <Bell style={{ width: '18px', height: '18px' }} />
+                {unreadCount > 0 && (
+                  <span style={{
+                    position: 'absolute',
+                    top: '4px',
+                    right: '4px',
+                    width: '16px',
+                    height: '16px',
+                    backgroundColor: '#ef4444',
+                    borderRadius: '50%',
+                    fontSize: '10px',
+                    fontWeight: '700',
+                    color: '#fff',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              {showNotifications && (
+                <div style={{
+                  position: 'absolute',
+                  top: 'calc(100% + 8px)',
+                  right: 0,
+                  width: '320px',
+                  maxHeight: '400px',
+                  overflow: 'auto',
+                  backgroundColor: theme.cardBg,
+                  border: '1px solid ' + theme.cardBorder,
+                  borderRadius: '12px',
+                  boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.15)',
+                  zIndex: 100
+                }}>
+                  <div style={{ padding: '14px 16px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Recent Activity</span>
+                    <button onClick={() => setShowProfileModal(true)} style={{ ...btnGhost, padding: '6px 10px', fontSize: '12px', gap: '4px' }}>
+                      <Settings style={{ width: '14px', height: '14px' }} />
+                      Profile
+                    </button>
+                  </div>
+                  {activities.length === 0 ? (
+                    <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+                      <Bell style={{ width: '32px', height: '32px', color: theme.textMuted, marginBottom: '8px', opacity: 0.5 }} />
+                      <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>No recent activity</p>
+                    </div>
+                  ) : (
+                    <div style={{ padding: '8px' }}>
+                      {activities.slice(0, 10).map(act => (
+                        <div key={act.id} style={{
+                          padding: '10px 12px',
+                          borderRadius: '8px',
+                          backgroundColor: act.read ? 'transparent' : (isDark ? '#3b82f610' : '#3b82f608'),
+                          marginBottom: '4px'
+                        }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                            <span style={{ 
+                              fontSize: '12px', 
+                              color: act.type === 'payment' ? '#22c55e' : act.type === 'email' ? '#3b82f6' : '#8b5cf6'
+                            }}>
+                              {act.type === 'payment' ? '💰' : act.type === 'email' ? '✉️' : '📋'}
+                            </span>
+                            <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text }}>{act.title}</span>
+                          </div>
+                          <p style={{ fontSize: '12px', color: theme.textMuted, margin: '0 0 0 22px' }}>{act.description}</p>
+                          <p style={{ fontSize: '11px', color: theme.textMuted, margin: '4px 0 0 22px', opacity: 0.7 }}>
+                            {new Date(act.createdAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            
             {liveRate && !isSmall && (
               <div 
                 style={{ position: 'relative', flexShrink: 0 }}
@@ -1018,25 +1208,212 @@ Warm regards,
                 </div>
               </div>
             </div>
-            <div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end'}}>
+            <div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end',flexWrap:'wrap'}}>
               <button onClick={()=>{setEmailModal({show:false,invoice:null});setEmailCopied(false);}} style={btnOutline}>Close</button>
               <button 
-                onClick={()=>copyEmailToClipboard(generateInvoiceEmail(emailModal.invoice))} 
+                onClick={()=>copyEmailToClipboard(generateInvoiceEmail(emailModal.invoice).replace('[Your Name]', vakitaProfile.name || '[Your Name]'))} 
                 style={{
                   ...btnPrimary,
-                  backgroundColor: emailCopied ? '#22c55e' : '#8b5cf6',
+                  backgroundColor: emailCopied ? '#22c55e' : '#6b7280',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}
               >
                 {emailCopied ? <CheckCircle style={{width:'16px',height:'16px'}}/> : <Copy style={{width:'16px',height:'16px'}}/>}
-                {emailCopied ? 'Copied!' : 'Copy to Clipboard'}
+                {emailCopied ? 'Copied!' : 'Copy'}
+              </button>
+              <button 
+                onClick={()=>openSendEmailModal(emailModal.invoice)} 
+                style={{
+                  ...btnPrimary,
+                  backgroundColor: '#3b82f6',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Send style={{width:'16px',height:'16px'}}/>
+                Send Email
               </button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Send Email Modal */}
+      {sendEmailModal.show && sendEmailModal.invoice && (
+        <div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.7)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:70}} onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:''})}>
+          <div style={{width:'100%',maxWidth:'450px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder}} onClick={e=>e.stopPropagation()}>
+            <div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                <div style={{width:'40px',height:'40px',backgroundColor:isDark?'#3b82f620':'#3b82f610',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  <Send style={{width:'20px',height:'20px',color:'#3b82f6'}}/>
+                </div>
+                <div>
+                  <h3 style={{fontSize:'18px',fontWeight:'600',color:theme.text,margin:0}}>Send Invoice Email</h3>
+                  <p style={{fontSize:'13px',color:theme.textMuted,margin:'2px 0 0'}}>{sendEmailModal.invoice.invoiceNumber}</p>
+                </div>
+              </div>
+              <button onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:''})} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button>
+            </div>
+            <div style={{padding:'20px'}}>
+              <div style={{marginBottom:'16px'}}>
+                <label style={label}>Recipient Email *</label>
+                <input 
+                  type="email" 
+                  placeholder="client@example.com"
+                  value={sendEmailModal.recipientEmail}
+                  onChange={e => setSendEmailModal(p => ({...p, recipientEmail: e.target.value}))}
+                  style={input}
+                />
+                {clients.find(c => c.id === sendEmailModal.invoice.clientId)?.email && (
+                  <p style={{fontSize:'12px',color:theme.textMuted,margin:'6px 0 0'}}>
+                    Client email: <button 
+                      onClick={() => setSendEmailModal(p => ({...p, recipientEmail: clients.find(c => c.id === p.invoice.clientId)?.email}))}
+                      style={{background:'none',border:'none',color:'#3b82f6',cursor:'pointer',padding:0,fontSize:'12px',textDecoration:'underline'}}
+                    >
+                      {clients.find(c => c.id === sendEmailModal.invoice.clientId)?.email}
+                    </button>
+                  </p>
+                )}
+              </div>
+              {!vakitaProfile.name && (
+                <div style={{padding:'12px',backgroundColor:isDark?'#f59e0b15':'#f59e0b10',borderRadius:'8px',border:'1px solid #f59e0b40',marginBottom:'16px'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
+                    <span style={{fontSize:'14px'}}>⚠️</span>
+                    <p style={{fontSize:'13px',color:theme.textMuted,margin:0}}>
+                      Set up your <button onClick={() => {setSendEmailModal({show:false,invoice:null,recipientEmail:''});setShowProfileModal(true);}} style={{background:'none',border:'none',color:'#3b82f6',cursor:'pointer',padding:0,fontSize:'13px',textDecoration:'underline'}}>VAKita profile</button> to auto-fill your name in emails.
+                    </p>
+                  </div>
+                </div>
+              )}
+              <div style={{padding:'12px',backgroundColor:isDark?'#3b82f615':'#3b82f610',borderRadius:'8px'}}>
+                <p style={{fontSize:'12px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
+                  <strong style={{color:theme.text}}>Note:</strong> This will open your default email app with the invoice email pre-filled. You can review and edit before sending.
+                </p>
+              </div>
+            </div>
+            <div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end'}}>
+              <button onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:''})} style={btnOutline}>Cancel</button>
+              <button 
+                onClick={sendInvoiceEmail}
+                disabled={!sendEmailModal.recipientEmail}
+                style={{
+                  ...btnPrimary,
+                  backgroundColor: '#3b82f6',
+                  opacity: sendEmailModal.recipientEmail ? 1 : 0.5,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}
+              >
+                <Send style={{width:'16px',height:'16px'}}/>
+                Open Email Client
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* VAKita Profile Modal */}
+      {showProfileModal && (
+        <div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.7)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:70}} onClick={()=>setShowProfileModal(false)}>
+          <div style={{width:'100%',maxWidth:'450px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder}} onClick={e=>e.stopPropagation()}>
+            <div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+              <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
+                <div style={{width:'40px',height:'40px',backgroundColor:isDark?'#8b5cf620':'#8b5cf610',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  <Settings style={{width:'20px',height:'20px',color:'#8b5cf6'}}/>
+                </div>
+                <div>
+                  <h3 style={{fontSize:'18px',fontWeight:'600',color:theme.text,margin:0}}>VAKita Profile</h3>
+                  <p style={{fontSize:'13px',color:theme.textMuted,margin:'2px 0 0'}}>Your business information</p>
+                </div>
+              </div>
+              <button onClick={()=>setShowProfileModal(false)} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button>
+            </div>
+            <div style={{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}}>
+              <div>
+                <label style={label}>Your Name *</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. Juan dela Cruz"
+                  value={vakitaProfile.name}
+                  onChange={e => setVakitaProfile(p => ({...p, name: e.target.value}))}
+                  style={input}
+                />
+                <p style={{fontSize:'11px',color:theme.textMuted,margin:'4px 0 0'}}>Used in email signatures</p>
+              </div>
+              <div>
+                <label style={label}>Business Name (Optional)</label>
+                <input 
+                  type="text" 
+                  placeholder="e.g. JD Virtual Services"
+                  value={vakitaProfile.businessName || ''}
+                  onChange={e => setVakitaProfile(p => ({...p, businessName: e.target.value}))}
+                  style={input}
+                />
+              </div>
+              <div>
+                <label style={label}>Your Email</label>
+                <input 
+                  type="email" 
+                  placeholder="your@email.com"
+                  value={vakitaProfile.email || ''}
+                  onChange={e => setVakitaProfile(p => ({...p, email: e.target.value}))}
+                  style={input}
+                />
+              </div>
+              <div style={{padding:'14px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'8px',border:'1px solid #22c55e40'}}>
+                <p style={{fontSize:'13px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
+                  💡 <strong style={{color:theme.text}}>Tip:</strong> Your name will automatically replace "[Your Name]" in invoice email templates.
+                </p>
+              </div>
+            </div>
+            <div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end'}}>
+              <button onClick={()=>setShowProfileModal(false)} style={btnOutline}>Cancel</button>
+              <button 
+                onClick={saveVakitaProfile}
+                disabled={!vakitaProfile.name}
+                style={{
+                  ...btnPrimary,
+                  opacity: vakitaProfile.name ? 1 : 0.5
+                }}
+              >
+                Save Profile
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {toast.show && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          padding: '14px 20px',
+          backgroundColor: toast.type === 'error' ? '#ef4444' : '#22c55e',
+          color: '#fff',
+          borderRadius: '10px',
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          animation: 'slideIn 0.3s ease'
+        }}>
+          {toast.type === 'error' ? '❌' : '✓'}
+          <span style={{ fontSize: '14px', fontWeight: '500' }}>{toast.message}</span>
+        </div>
+      )}
+      <style>{`
+        @keyframes slideIn {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+      `}</style>
 
       {deleteModal.show && (<div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.7)',display:'flex',alignItems:isSmall?'flex-end':'center',justifyContent:'center',padding:isSmall?0:'16px',zIndex:60}} onClick={()=>setDeleteModal({show:false,type:'',id:null,name:''})}><div style={{width:'100%',maxWidth:isSmall?'100%':'360px',backgroundColor:theme.cardBg,borderRadius:isSmall?'16px 16px 0 0':'12px',border:'1px solid ' + theme.cardBorder,borderBottom:isSmall?'none':('1px solid ' + theme.cardBorder),overflow:'hidden'}} onClick={e=>e.stopPropagation()}><div style={{padding:isSmall?'20px 20px 16px':'20px',textAlign:'center'}}><div style={{width:'48px',height:'48px',backgroundColor:isDark?'#ef444420':'#ef444410',borderRadius:'50%',display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 12px'}}><Trash2 style={{width:'24px',height:'24px',color:'#ef4444'}}/></div><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 6px'}}>Delete {deleteModal.type === 'prospect' ? 'Prospect' : deleteModal.type === 'client' ? 'Client' : deleteModal.type === 'invoice' ? 'Invoice' : 'Income'}?</h3><p style={{fontSize:'13px',color:theme.textMuted,margin:0,lineHeight:'1.4'}}><strong style={{color:theme.text}}>{deleteModal.name}</strong></p>{deleteModal.type === 'client' && <p style={{fontSize:'12px',color:'#f59e0b',margin:'8px 0 0'}}>⚠️ Income entries will also be removed</p>}</div><div style={{padding:isSmall?'12px 16px 24px':'12px 20px 16px',display:'flex',gap:'10px'}}><button onClick={()=>setDeleteModal({show:false,type:'',id:null,name:''})} style={{flex:1,height:'44px',backgroundColor:'transparent',color:theme.text,border:'1px solid ' + theme.cardBorder,borderRadius:'10px',fontSize:'14px',fontWeight:'500',cursor:'pointer'}}>Cancel</button><button onClick={confirmDelete} style={{flex:1,height:'44px',backgroundColor:'#ef4444',color:'#fff',border:'none',borderRadius:'10px',fontSize:'14px',fontWeight:'500',cursor:'pointer'}}>Delete</button></div></div></div>)}
     </>
