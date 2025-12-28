@@ -23,23 +23,23 @@ const TIMEZONES = [
 ];
 
 const PLATFORMS = [
-  { id: 'wise', name: 'Wise', icon: '💸', emoji: '💸' },
-  { id: 'payoneer', name: 'Payoneer', icon: '🔵', emoji: '🔵' },
-  { id: 'paypal', name: 'PayPal', icon: '🅿️', emoji: '🅿️' },
+  { id: 'wise', name: 'Wise', icon: 'https://cdn.simpleicons.org/wise/9FE870', emoji: '💸' },
+  { id: 'payoneer', name: 'Payoneer', icon: 'https://cdn.simpleicons.org/payoneer/FF4800', emoji: '🔵' },
+  { id: 'paypal', name: 'PayPal', icon: 'https://cdn.simpleicons.org/paypal/00457C', emoji: '🅿️' },
   { id: 'gcash', name: 'GCash', icon: '📱', emoji: '📱' },
   { id: 'maya', name: 'Maya', icon: '💜', emoji: '💜' },
   { id: 'bank', name: 'Bank', icon: '🏦', emoji: '🏦' },
 ];
 
 const LEAD_SOURCES = [
-  { id: 'linkedin', name: 'LinkedIn', icon: '💼', emoji: '💼' },
+  { id: 'linkedin', name: 'LinkedIn', icon: 'https://cdn.simpleicons.org/linkedin/0A66C2', emoji: '💼' },
   { id: 'onlinejobsph', name: 'OnlineJobsPH', icon: '🇵🇭', emoji: '🇵🇭' },
-  { id: 'upwork', name: 'Upwork', icon: '🟢', emoji: '🟢' },
-  { id: 'facebook', name: 'Facebook', icon: '📘', emoji: '📘' },
-  { id: 'tiktok', name: 'TikTok', icon: '🎵', emoji: '🎵' },
-  { id: 'instagram', name: 'Instagram', icon: '📸', emoji: '📸' },
-  { id: 'twitter', name: 'Twitter/X', icon: '🐦', emoji: '🐦' },
-  { id: 'fiverr', name: 'Fiverr', icon: '🟩', emoji: '🟩' },
+  { id: 'upwork', name: 'Upwork', icon: 'https://cdn.simpleicons.org/upwork/14A800', emoji: '🟢' },
+  { id: 'facebook', name: 'Facebook', icon: 'https://cdn.simpleicons.org/facebook/0866FF', emoji: '📘' },
+  { id: 'tiktok', name: 'TikTok', icon: 'https://cdn.simpleicons.org/tiktok/ffffff', emoji: '🎵' },
+  { id: 'instagram', name: 'Instagram', icon: 'https://cdn.simpleicons.org/instagram/E4405F', emoji: '📸' },
+  { id: 'twitter', name: 'Twitter/X', icon: 'https://cdn.simpleicons.org/x/ffffff', emoji: '🐦' },
+  { id: 'fiverr', name: 'Fiverr', icon: 'https://cdn.simpleicons.org/fiverr/1DBF73', emoji: '🟩' },
   { id: 'referral', name: 'Referral', icon: '🤝', emoji: '🤝' },
   { id: 'coldoutreach', name: 'Cold Outreach', icon: '📧', emoji: '📧' },
   { id: 'other', name: 'Other', icon: '🌐', emoji: '🌐' },
