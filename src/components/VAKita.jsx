@@ -294,90 +294,227 @@ const VAKita = ({ user, isDark }) => {
   return (
     <>
       <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 4px' : '0 24px' }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', gap: '0', padding: isSmall ? '0' : '0 16px' }}>
-          {/* Scrollable tabs */}
-          <div style={{ display: 'flex', gap: '0', overflowX: 'auto', alignItems: 'center', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none', flex: 1 }}>
-            <button onClick={() => setActiveTab('prospecting')} style={tab(activeTab === 'prospecting')}><Target style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Leads'}</button>
-            <button onClick={() => setActiveTab('clients')} style={tab(activeTab === 'clients')}><Users style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clients'}</button>
-            <button onClick={() => setActiveTab('dashboard')} style={tab(activeTab === 'dashboard')}><BarChart3 style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Income'}</button>
-            <button onClick={() => setActiveTab('invoices')} style={tab(activeTab === 'invoices')}><FileText style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Invoices'}</button>
-            <button onClick={() => setActiveTab('timezone')} style={tab(activeTab === 'timezone')}><Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Clock'}</button>
-            <button onClick={() => setActiveTab('tax')} style={tab(activeTab === 'tax')}><Calculator style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />{isSmall ? '' : 'Tax'}</button>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0' : '0 16px' }}>
+          {/* Main category tabs */}
+          <div style={{ display: 'flex', gap: '0', alignItems: 'center' }}>
+            <button 
+              onClick={() => { if (!['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab)) setActiveTab('prospecting'); }}
+              style={{
+                padding: isSmall ? '14px 10px' : '16px 20px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                borderBottom: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? '2px solid #8b5cf6' : '2px solid transparent',
+                fontSize: isSmall ? '12px' : '15px',
+                fontWeight: '600',
+                color: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? (isDark ? '#fff' : '#18181b') : theme.textMuted,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              Client Management
+            </button>
+            <button 
+              onClick={() => setActiveTab('timezone')} 
+              style={{
+                padding: isSmall ? '14px 10px' : '16px 20px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                borderBottom: activeTab === 'timezone' ? '2px solid #8b5cf6' : '2px solid transparent',
+                fontSize: isSmall ? '12px' : '15px',
+                fontWeight: '600',
+                color: activeTab === 'timezone' ? (isDark ? '#fff' : '#18181b') : theme.textMuted,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <Clock style={{ width: '16px', height: '16px' }} />
+              {!isSmall && 'Timezone Manager'}
+            </button>
+            <button 
+              onClick={() => setActiveTab('tax')} 
+              style={{
+                padding: isSmall ? '14px 10px' : '16px 20px',
+                backgroundColor: 'transparent',
+                border: 'none',
+                borderBottom: activeTab === 'tax' ? '2px solid #8b5cf6' : '2px solid transparent',
+                fontSize: isSmall ? '12px' : '15px',
+                fontWeight: '600',
+                color: activeTab === 'tax' ? (isDark ? '#fff' : '#18181b') : theme.textMuted,
+                cursor: 'pointer',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              Tax
+            </button>
           </div>
           
-          {/* Exchange rate - outside scrollable area */}
-          {liveRate && !isSmall && (
-            <div 
-              style={{ marginLeft: 'auto', position: 'relative', flexShrink: 0, paddingLeft: '12px' }}
-              onMouseEnter={() => setShowRateTooltip(true)}
-              onMouseLeave={() => setShowRateTooltip(false)}
-            >
-              <span style={{ 
-                fontSize: '12px', 
-                color: '#22c55e', 
-                display: 'flex', 
-                alignItems: 'center', 
-                gap: '6px', 
-                padding: '6px 12px', 
-                backgroundColor: isDark ? '#22c55e15' : '#22c55e10', 
-                borderRadius: '8px', 
-                fontWeight: '600',
-                cursor: 'pointer',
-                border: '1px solid ' + (isDark ? '#22c55e30' : '#22c55e25')
-              }}>
-                <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
-                $1 = ₱{liveRate.toFixed(2)}
-              </span>
-              {showRateTooltip && (
-                <div style={{
-                  position: 'absolute',
-                  top: 'calc(100% + 8px)',
-                  right: 0,
-                  padding: '12px 14px',
-                  backgroundColor: theme.cardBg,
-                  border: '1px solid ' + theme.cardBorder,
-                  borderRadius: '10px',
-                  boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.15)',
-                  zIndex: 100,
-                  minWidth: '220px',
-                  whiteSpace: 'nowrap'
+          {/* Exchange rate + saving indicator */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            {liveRate && !isSmall && (
+              <div 
+                style={{ position: 'relative', flexShrink: 0 }}
+                onMouseEnter={() => setShowRateTooltip(true)}
+                onMouseLeave={() => setShowRateTooltip(false)}
+              >
+                <span style={{ 
+                  fontSize: '12px', 
+                  color: '#22c55e', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '6px', 
+                  padding: '6px 12px', 
+                  backgroundColor: isDark ? '#22c55e15' : '#22c55e10', 
+                  borderRadius: '8px', 
+                  fontWeight: '600',
+                  cursor: 'pointer',
+                  border: '1px solid ' + (isDark ? '#22c55e30' : '#22c55e25')
                 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
-                    <span style={{ width: '8px', height: '8px', backgroundColor: '#22c55e', borderRadius: '50%' }} />
-                    <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Live Exchange Rate</span>
-                  </div>
-                  <div style={{ fontSize: '13px', color: theme.text, marginBottom: '6px' }}>
-                    <span style={{ color: theme.textMuted }}>Rate:</span> $1 USD = ₱{liveRate.toFixed(4)} PHP
-                  </div>
-                  {lastRateUpdate && (
-                    <div style={{ fontSize: '12px', color: theme.textMuted, marginBottom: '10px' }}>
-                      <span style={{ fontWeight: '500' }}>Updated:</span> {lastRateUpdate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
-                    </div>
-                  )}
-                  <div style={{ 
-                    fontSize: '11px', 
-                    color: theme.textMuted, 
-                    paddingTop: '10px', 
-                    borderTop: '1px solid ' + theme.cardBorder,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
+                  <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
+                  $1 = ₱{liveRate.toFixed(2)}
+                </span>
+                {showRateTooltip && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    padding: '12px 14px',
+                    backgroundColor: theme.cardBg,
+                    border: '1px solid ' + theme.cardBorder,
+                    borderRadius: '10px',
+                    boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.15)',
+                    zIndex: 100,
+                    minWidth: '220px',
+                    whiteSpace: 'nowrap'
                   }}>
-                    <Info style={{ width: '12px', height: '12px' }} />
-                    Source: ExchangeRate-API.com
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '10px' }}>
+                      <span style={{ width: '8px', height: '8px', backgroundColor: '#22c55e', borderRadius: '50%' }} />
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Live Exchange Rate</span>
+                    </div>
+                    <div style={{ fontSize: '13px', color: theme.text, marginBottom: '6px' }}>
+                      <span style={{ color: theme.textMuted }}>Rate:</span> $1 USD = ₱{liveRate.toFixed(4)} PHP
+                    </div>
+                    {lastRateUpdate && (
+                      <div style={{ fontSize: '12px', color: theme.textMuted, marginBottom: '10px' }}>
+                        <span style={{ fontWeight: '500' }}>Updated:</span> {lastRateUpdate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    )}
+                    <div style={{ 
+                      fontSize: '11px', 
+                      color: theme.textMuted, 
+                      paddingTop: '10px', 
+                      borderTop: '1px solid ' + theme.cardBorder,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}>
+                      <Info style={{ width: '12px', height: '12px' }} />
+                      Source: ExchangeRate-API.com
+                    </div>
                   </div>
-                </div>
-              )}
-              <style>{`
-                @keyframes pulse {
-                  0%, 100% { opacity: 1; }
-                  50% { opacity: 0.5; }
-                }
-              `}</style>
-            </div>
-          )}
-          {saving && <span style={{ marginLeft: '8px', fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />{isSmall ? '' : 'Saving...'}</span>}
+                )}
+                <style>{`
+                  @keyframes pulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                  }
+                `}</style>
+              </div>
+            )}
+            {saving && <span style={{ fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />{isSmall ? '' : 'Saving...'}</span>}
+          </div>
         </div>
+        
+        {/* Sub-tabs for Client Management */}
+        {['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) && (
+          <div style={{ 
+            maxWidth: '1600px', 
+            margin: '0 auto', 
+            padding: isSmall ? '8px 4px' : '8px 32px',
+            display: 'flex',
+            gap: '8px',
+            flexWrap: 'wrap'
+          }}>
+            <button 
+              onClick={() => setActiveTab('prospecting')} 
+              style={{
+                padding: '8px 16px',
+                backgroundColor: activeTab === 'prospecting' ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: activeTab === 'prospecting' ? theme.text : theme.textMuted,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <Target style={{ width: '14px', height: '14px' }} />
+              Leads
+            </button>
+            <button 
+              onClick={() => setActiveTab('clients')} 
+              style={{
+                padding: '8px 16px',
+                backgroundColor: activeTab === 'clients' ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: activeTab === 'clients' ? theme.text : theme.textMuted,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <Users style={{ width: '14px', height: '14px' }} />
+              Clients
+            </button>
+            <button 
+              onClick={() => setActiveTab('invoices')} 
+              style={{
+                padding: '8px 16px',
+                backgroundColor: activeTab === 'invoices' ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: activeTab === 'invoices' ? theme.text : theme.textMuted,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <FileText style={{ width: '14px', height: '14px' }} />
+              Invoices
+            </button>
+            <button 
+              onClick={() => setActiveTab('dashboard')} 
+              style={{
+                padding: '8px 16px',
+                backgroundColor: activeTab === 'dashboard' ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
+                border: 'none',
+                borderRadius: '6px',
+                fontSize: '14px',
+                fontWeight: '500',
+                color: activeTab === 'dashboard' ? theme.text : theme.textMuted,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              <BarChart3 style={{ width: '14px', height: '14px' }} />
+              Income
+            </button>
+          </div>
+        )}
       </div>
 
       <div style={{ padding: isSmall ? '16px' : '24px', maxWidth: '1600px', margin: '0 auto' }}>
@@ -540,7 +677,116 @@ const VAKita = ({ user, isDark }) => {
               <div style={{...card,background:isDark?'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05))':'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(139,92,246,0.02))'}}><p style={{fontSize:'14px',color:theme.textMuted,margin:'0 0 8px'}}>Q{quarterlyTax.quarter} {quarterlyTax.year} Gross</p><p style={{fontSize:'32px',fontWeight:'700',color:theme.text,margin:'0 0 8px'}}>₱{formatAmount(quarterlyTax.qGross)}</p><p style={{fontSize:'13px',color:theme.textMuted}}>YTD: ₱{formatAmount(quarterlyTax.yearGross)}</p></div>
               <div style={{...card,background:isDark?'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.05))':'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'}}><p style={{fontSize:'14px',color:theme.textMuted,margin:'0 0 8px'}}>Est. Tax Due ({taxSettings.taxOption === '8percent' ? '8%' : 'Grad'})</p><p style={{fontSize:'32px',fontWeight:'700',color:'#ef4444',margin:'0 0 8px'}}>₱{formatAmount(quarterlyTax.tax)}</p><p style={{fontSize:'13px',color:theme.textMuted}}>Due: {quarterlyTax.due}</p></div>
             </div>
-            <div style={card}><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 16px'}}>Tax Comparison</h3><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}}><div style={{padding:'16px',backgroundColor:taxSettings.taxOption==='8percent'?(isDark?'#8b5cf615':'#8b5cf610'):theme.statBg,borderRadius:'8px',border:taxSettings.taxOption==='8percent'?'2px solid #8b5cf6':'1px solid ' + theme.cardBorder}}><p style={{fontSize:'13px',fontWeight:'600',color:taxSettings.taxOption==='8percent'?'#8b5cf6':theme.textMuted,margin:'0 0 8px'}}>8% Flat Rate {taxSettings.taxOption==='8percent'&&'✓'}</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.tax8)}</p></div><div style={{padding:'16px',backgroundColor:taxSettings.taxOption==='graduated'?(isDark?'#8b5cf615':'#8b5cf610'):theme.statBg,borderRadius:'8px',border:taxSettings.taxOption==='graduated'?'2px solid #8b5cf6':'1px solid ' + theme.cardBorder}}><p style={{fontSize:'13px',fontWeight:'600',color:taxSettings.taxOption==='graduated'?'#8b5cf6':theme.textMuted,margin:'0 0 8px'}}>Graduated {taxSettings.taxOption==='graduated'&&'✓'}</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.taxGrad)}</p></div></div></div>
+            <div style={{...card,marginBottom:'24px'}}><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 16px'}}>Tax Comparison</h3><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}}><div style={{padding:'16px',backgroundColor:taxSettings.taxOption==='8percent'?(isDark?'#8b5cf615':'#8b5cf610'):theme.statBg,borderRadius:'8px',border:taxSettings.taxOption==='8percent'?'2px solid #8b5cf6':'1px solid ' + theme.cardBorder}}><p style={{fontSize:'13px',fontWeight:'600',color:taxSettings.taxOption==='8percent'?'#8b5cf6':theme.textMuted,margin:'0 0 8px'}}>8% Flat Rate {taxSettings.taxOption==='8percent'&&'✓'}</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.tax8)}</p></div><div style={{padding:'16px',backgroundColor:taxSettings.taxOption==='graduated'?(isDark?'#8b5cf615':'#8b5cf610'):theme.statBg,borderRadius:'8px',border:taxSettings.taxOption==='graduated'?'2px solid #8b5cf6':'1px solid ' + theme.cardBorder}}><p style={{fontSize:'13px',fontWeight:'600',color:taxSettings.taxOption==='graduated'?'#8b5cf6':theme.textMuted,margin:'0 0 8px'}}>Graduated {taxSettings.taxOption==='graduated'&&'✓'}</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.taxGrad)}</p></div></div></div>
+            
+            {/* BIR Policy Source Links */}
+            <div style={{...card,background:isDark?'linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.05))':'linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02))',border:'1px solid #22c55e40'}}>
+              <h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 16px',display:'flex',alignItems:'center',gap:'8px'}}>
+                <FileText style={{width:'18px',height:'18px',color:'#22c55e'}}/>
+                BIR Policy References
+              </h3>
+              <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+                <a 
+                  href="https://www.bir.gov.ph/index.php/tax-information/income-tax.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{
+                    display:'flex',
+                    alignItems:'center',
+                    gap:'10px',
+                    padding:'12px 16px',
+                    backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',
+                    borderRadius:'8px',
+                    textDecoration:'none',
+                    color:theme.text,
+                    border:'1px solid ' + theme.cardBorder,
+                    transition:'all 0.2s'
+                  }}
+                >
+                  <span style={{fontSize:'20px'}}>🏛️</span>
+                  <div style={{flex:1}}>
+                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>BIR Income Tax Information</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Official BIR page on income tax rates and brackets</p>
+                  </div>
+                  <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
+                </a>
+                <a 
+                  href="https://www.bir.gov.ph/index.php/tax-information/withholding-tax.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{
+                    display:'flex',
+                    alignItems:'center',
+                    gap:'10px',
+                    padding:'12px 16px',
+                    backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',
+                    borderRadius:'8px',
+                    textDecoration:'none',
+                    color:theme.text,
+                    border:'1px solid ' + theme.cardBorder,
+                    transition:'all 0.2s'
+                  }}
+                >
+                  <span style={{fontSize:'20px'}}>📋</span>
+                  <div style={{flex:1}}>
+                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>Withholding Tax Guidelines</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Information on withholding tax for freelancers</p>
+                  </div>
+                  <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
+                </a>
+                <a 
+                  href="https://www.bir.gov.ph/index.php/train-law.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{
+                    display:'flex',
+                    alignItems:'center',
+                    gap:'10px',
+                    padding:'12px 16px',
+                    backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',
+                    borderRadius:'8px',
+                    textDecoration:'none',
+                    color:theme.text,
+                    border:'1px solid ' + theme.cardBorder,
+                    transition:'all 0.2s'
+                  }}
+                >
+                  <span style={{fontSize:'20px'}}>⚖️</span>
+                  <div style={{flex:1}}>
+                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>TRAIN Law (RA 10963)</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Tax Reform for Acceleration and Inclusion - 8% option details</p>
+                  </div>
+                  <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
+                </a>
+                <a 
+                  href="https://www.bir.gov.ph/index.php/bir-forms.html" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  style={{
+                    display:'flex',
+                    alignItems:'center',
+                    gap:'10px',
+                    padding:'12px 16px',
+                    backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',
+                    borderRadius:'8px',
+                    textDecoration:'none',
+                    color:theme.text,
+                    border:'1px solid ' + theme.cardBorder,
+                    transition:'all 0.2s'
+                  }}
+                >
+                  <span style={{fontSize:'20px'}}>📝</span>
+                  <div style={{flex:1}}>
+                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>BIR Forms Download</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Download Form 1701Q (Quarterly) and other tax forms</p>
+                  </div>
+                  <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
+                </a>
+              </div>
+              <p style={{fontSize:'11px',color:theme.textMuted,margin:'16px 0 0',fontStyle:'italic'}}>
+                💡 Tip: Always consult with a registered tax professional for personalized advice. These calculations are estimates only.
+              </p>
+            </div>
           </div>
         )}
       </div>
