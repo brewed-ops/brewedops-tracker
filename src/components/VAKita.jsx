@@ -562,7 +562,7 @@ Warm regards,
             </button>
           </div>
           
-          {/* Notification Bell, Exchange rate + saving indicator */}
+          {/* Notification Bell, Profile Settings, Exchange rate + saving indicator */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Notification Bell */}
             <div style={{ position: 'relative' }}>
@@ -612,12 +612,8 @@ Warm regards,
                   boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.15)',
                   zIndex: 100
                 }}>
-                  <div style={{ padding: '14px 16px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ padding: '14px 16px', borderBottom: '1px solid ' + theme.cardBorder }}>
                     <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Recent Activity</span>
-                    <button onClick={() => setShowProfileModal(true)} style={{ ...btnGhost, padding: '6px 10px', fontSize: '12px', gap: '4px' }}>
-                      <Settings style={{ width: '14px', height: '14px' }} />
-                      Profile
-                    </button>
                   </div>
                   {activities.length === 0 ? (
                     <div style={{ padding: '32px 16px', textAlign: 'center' }}>
@@ -653,6 +649,20 @@ Warm regards,
                 </div>
               )}
             </div>
+            
+            {/* VAKita Profile Settings Button */}
+            <button 
+              onClick={() => setShowProfileModal(true)}
+              style={{
+                ...btnGhost,
+                width: '36px',
+                height: '36px',
+                padding: 0
+              }}
+              title="VAKita Settings"
+            >
+              <Settings style={{ width: '18px', height: '18px' }} />
+            </button>
             
             {liveRate && !isSmall && (
               <div 
