@@ -126,6 +126,7 @@ const VAKita = ({ user, isDark }) => {
   const [editingProspect, setEditingProspect] = useState(null);
   const [viewingInvoice, setViewingInvoice] = useState(null);
   const [showOverlap, setShowOverlap] = useState(false);
+  const [showOverlapTooltip, setShowOverlapTooltip] = useState(false);
   const [deleteModal, setDeleteModal] = useState({ show: false, type: '', id: null, name: '' });
 
   const [incomeForm, setIncomeForm] = useState({ clientId: '', amount: '', currency: 'USD', platform: 'wise', date: new Date().toISOString().split('T')[0], description: '' });
@@ -675,7 +676,37 @@ const VAKita = ({ user, isDark }) => {
           <div>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'24px',flexWrap:'wrap',gap:'12px'}}>
               <div><h2 style={{fontSize:'20px',fontWeight:'600',color:theme.text,margin:0}}>ClientClock</h2><p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0'}}>Client timezones at a glance</p></div>
-              <button onClick={()=>setShowOverlap(!showOverlap)} style={{...btnOutline,backgroundColor:showOverlap?(isDark?'#22c55e20':'#22c55e15'):'transparent',borderColor:showOverlap?'#22c55e':theme.cardBorder,color:showOverlap?'#22c55e':theme.text}}><Zap style={{width:'16px',height:'16px'}}/>Find Overlap</button>
+              <div style={{ position: 'relative' }}
+                onMouseEnter={() => setShowOverlapTooltip(true)}
+                onMouseLeave={() => setShowOverlapTooltip(false)}
+              >
+                <button onClick={()=>setShowOverlap(!showOverlap)} style={{...btnOutline,backgroundColor:showOverlap?(isDark?'#22c55e20':'#22c55e15'):'transparent',borderColor:showOverlap?'#22c55e':theme.cardBorder,color:showOverlap?'#22c55e':theme.text}}><Zap style={{width:'16px',height:'16px'}}/>Find Overlap</button>
+                {showOverlapTooltip && !showOverlap && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    right: 0,
+                    padding: '12px 14px',
+                    backgroundColor: theme.cardBg,
+                    border: '1px solid ' + theme.cardBorder,
+                    borderRadius: '10px',
+                    boxShadow: isDark ? '0 4px 16px rgba(0,0,0,0.5)' : '0 4px 16px rgba(0,0,0,0.15)',
+                    zIndex: 100,
+                    width: '280px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                      <Zap style={{ width: '16px', height: '16px', color: '#22c55e' }} />
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Find Overlap</span>
+                    </div>
+                    <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0, lineHeight: '1.5' }}>
+                      Calculates the best meeting times when all your active clients are within their business hours. Shows overlapping hours in your local timezone (Philippines).
+                    </p>
+                    <p style={{ fontSize: '12px', color: theme.textMuted, margin: '8px 0 0', fontStyle: 'italic' }}>
+                      💡 Requires at least 2 active clients to work.
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
             {showOverlap && clients.filter(c=>c.status==='active').length >= 2 && (<div style={{...card,marginBottom:'24px',background:isDark?'linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.05))':'linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02))',border:'1px solid #22c55e40'}}><div style={{display:'flex',alignItems:'center',gap:'12px'}}><div style={{width:'40px',height:'40px',backgroundColor:'#22c55e20',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}><Zap style={{width:'20px',height:'20px',color:'#22c55e'}}/></div><div><p style={{fontSize:'14px',fontWeight:'600',color:theme.text,margin:0}}>Best Meeting Times (Your Time)</p><p style={{fontSize:'16px',fontWeight:'700',color:'#22c55e',margin:'4px 0 0'}}>{formatOverlap(findOverlap())}</p></div></div></div>)}
             {clients.length === 0 ? (<div style={{...card,textAlign:'center',padding:'60px'}}><Clock style={{width:'48px',height:'48px',color:theme.textMuted,margin:'0 auto 16px'}}/><p style={{fontSize:'16px',color:theme.text}}>No clients yet</p></div>
@@ -750,7 +781,7 @@ const VAKita = ({ user, isDark }) => {
                   <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
                 </a>
                 <a 
-                  href="https://www.bir.gov.ph/index.php/tax-information" 
+                  href="https://www.bir.gov.ph" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   style={{
@@ -766,10 +797,10 @@ const VAKita = ({ user, isDark }) => {
                     transition:'all 0.2s'
                   }}
                 >
-                  <span style={{fontSize:'20px'}}>📋</span>
+                  <span style={{fontSize:'20px'}}>🌐</span>
                   <div style={{flex:1}}>
-                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>BIR Tax Information</p>
-                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Complete tax information and regulations</p>
+                    <p style={{fontSize:'14px',fontWeight:'500',margin:0,color:theme.text}}>BIR Official Website</p>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>Bureau of Internal Revenue main portal</p>
                   </div>
                   <span style={{fontSize:'14px',color:'#22c55e'}}>↗</span>
                 </a>
