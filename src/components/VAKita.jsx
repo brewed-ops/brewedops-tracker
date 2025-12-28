@@ -137,6 +137,24 @@ const VAKita = ({ user, isDark }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
   const [deleteModal, setDeleteModal] = useState({ show: false, type: '', id: null, name: '' });
+  const notificationRef = useRef(null);
+
+  // Close notifications dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    
+    if (showNotifications) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showNotifications]);
 
   const [incomeForm, setIncomeForm] = useState({ clientId: '', amount: '', currency: 'USD', platform: 'wise', date: new Date().toISOString().split('T')[0], description: '' });
   const [clientForm, setClientForm] = useState({ name: '', company: '', email: '', timezone: 'America/New_York', billingType: 'hourly', rate: '', currency: 'USD', paymentPlatform: 'wise', businessHoursStart: 9, businessHoursEnd: 17, status: 'active', color: '#3b82f6' });
@@ -601,7 +619,7 @@ Warm regards,
           {/* Notification Bell, Profile Settings, Exchange rate + saving indicator */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {/* Notification Bell */}
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative' }} ref={notificationRef}>
               <button 
                 onClick={() => { setShowNotifications(!showNotifications); if (!showNotifications) markActivitiesAsRead(); }}
                 style={{

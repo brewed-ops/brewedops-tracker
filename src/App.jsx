@@ -2965,7 +2965,7 @@ const getBudgetStatus = () => {
                     </div>
                     
                     <button
-                      onClick={() => { setShowProfileMenu(false); setShowEditProfile(true); }}
+                      onClick={() => { console.log('[App] Edit Profile clicked'); setShowProfileMenu(false); setShowEditProfile(true); }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#27272a' : '#f4f4f5'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       style={{
@@ -2987,7 +2987,7 @@ const getBudgetStatus = () => {
                       Edit Profile
                     </button>
                     <button
-                      onClick={() => { setShowProfileMenu(false); setShowFeedback(true); }}
+                      onClick={() => { console.log('[App] Send Feedback clicked'); setShowProfileMenu(false); setShowFeedback(true); }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#27272a' : '#f4f4f5'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       style={{
@@ -6850,6 +6850,7 @@ const getBudgetStatus = () => {
       )}
 
         {/* Edit Profile Modal */}
+      {showEditProfile && console.log('[App] Rendering Edit Profile Modal')}
       {showEditProfile && (
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 200 }} onClick={() => setShowEditProfile(false)}>
           <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px' }} onClick={(e) => e.stopPropagation()}>
