@@ -164,6 +164,8 @@ const VAKita = ({ user, isDark }) => {
     return () => clearInterval(interval);
   }, []);
 
+  const [dataLoaded, setDataLoaded] = useState(false);
+
   useEffect(() => {
     if (!user?.id) return;
     const loadData = async () => {
@@ -180,6 +182,7 @@ const VAKita = ({ user, isDark }) => {
           setVakitaProfile(data.vakita_profile || { name: '', email: '', businessName: '' });
           setActivities(data.vakita_activities || []);
         }
+        setDataLoaded(true);
       } catch (err) { console.error('Error loading VAKita data:', err); }
       finally { setLoading(false); }
     };
@@ -194,13 +197,14 @@ const VAKita = ({ user, isDark }) => {
     finally { setSaving(false); }
   }, [user?.id]);
 
-  useEffect(() => { if (loading || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_clients', clients), 500); return () => clearTimeout(t); }, [clients, loading, user?.id, saveToSupabase]);
-  useEffect(() => { if (loading || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_income', incomeEntries), 500); return () => clearTimeout(t); }, [incomeEntries, loading, user?.id, saveToSupabase]);
-  useEffect(() => { if (loading || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_invoices', invoices), 500); return () => clearTimeout(t); }, [invoices, loading, user?.id, saveToSupabase]);
-  useEffect(() => { if (loading || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_prospects', prospects), 500); return () => clearTimeout(t); }, [prospects, loading, user?.id, saveToSupabase]);
-  useEffect(() => { if (loading || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_tax_settings', taxSettings), 500); return () => clearTimeout(t); }, [taxSettings, loading, user?.id, saveToSupabase]);
-  useEffect(() => { if (loading || !user?.id || !vakitaProfile.name) return; const t = setTimeout(() => saveToSupabase('vakita_profile', vakitaProfile), 500); return () => clearTimeout(t); }, [vakitaProfile, loading, user?.id, saveToSupabase]);
-  useEffect(() => { if (loading || !user?.id || activities.length === 0) return; const t = setTimeout(() => saveToSupabase('vakita_activities', activities), 500); return () => clearTimeout(t); }, [activities, loading, user?.id, saveToSupabase]);
+  // Only save AFTER initial data has been loaded (dataLoaded = true)
+  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_clients', clients), 500); return () => clearTimeout(t); }, [clients, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_income', incomeEntries), 500); return () => clearTimeout(t); }, [incomeEntries, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_invoices', invoices), 500); return () => clearTimeout(t); }, [invoices, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_prospects', prospects), 500); return () => clearTimeout(t); }, [prospects, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id) return; const t = setTimeout(() => saveToSupabase('vakita_tax_settings', taxSettings), 500); return () => clearTimeout(t); }, [taxSettings, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id || !vakitaProfile.name) return; const t = setTimeout(() => saveToSupabase('vakita_profile', vakitaProfile), 500); return () => clearTimeout(t); }, [vakitaProfile, dataLoaded, user?.id, saveToSupabase]);
+  useEffect(() => { if (!dataLoaded || !user?.id || activities.length === 0) return; const t = setTimeout(() => saveToSupabase('vakita_activities', activities), 500); return () => clearTimeout(t); }, [activities, dataLoaded, user?.id, saveToSupabase]);
   useEffect(() => { if(showInvoiceForm && !editingInvoice) setInvoiceForm(p => ({...p, invoiceNumber: 'INV-' + new Date().getFullYear() + '-' + String(invoices.length+1).padStart(4,'0')})); }, [showInvoiceForm, editingInvoice, invoices.length]);
 
   const getRate = (c) => CURRENCIES.find(x => x.code === c)?.rate || 1;
