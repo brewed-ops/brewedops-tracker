@@ -1,6 +1,6 @@
 // TermsOfService.jsx - Terms of Service page for BrewedOps
 import React from 'react';
-import { ArrowLeft, FileText, CheckCircle, AlertTriangle, Scale, Ban, RefreshCw, Mail, Shield, Zap, Globe, Lock, Coffee } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle, AlertTriangle, Scale, Ban, RefreshCw, Mail, Shield, Zap, Globe, Lock } from 'lucide-react';
 
 const TermsOfService = ({ onBack, onNavigate, isDark }) => {
   const theme = {
@@ -72,17 +72,15 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             padding: '8px 0'
           }}
         >
-          <div style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: '#8b5cf6',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Coffee style={{ width: '20px', height: '20px', color: '#fff' }} />
-          </div>
+          <img 
+            src="https://i.imgur.com/R52jwPv.png" 
+            alt="BrewedOps Logo" 
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px'
+            }}
+          />
           <span style={{ 
             fontSize: '20px', 
             fontWeight: '700', 

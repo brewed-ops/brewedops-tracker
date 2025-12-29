@@ -1,6 +1,6 @@
 // AboutUs.jsx - About Us page for BrewedOps
 import React from 'react';
-import { ArrowLeft, Coffee, Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target } from 'lucide-react';
+import { ArrowLeft, Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target } from 'lucide-react';
 
 const AboutUs = ({ onBack, onNavigate, isDark }) => {
   const theme = {
@@ -42,17 +42,15 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
             padding: '8px 0'
           }}
         >
-          <div style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: '#8b5cf6',
-            borderRadius: '10px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}>
-            <Coffee style={{ width: '20px', height: '20px', color: '#fff' }} />
-          </div>
+          <img 
+            src="https://i.imgur.com/R52jwPv.png" 
+            alt="BrewedOps Logo" 
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px'
+            }}
+          />
           <span style={{ 
             fontSize: '20px', 
             fontWeight: '700', 
