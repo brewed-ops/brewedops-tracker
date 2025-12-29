@@ -132,7 +132,15 @@ const VAKita = ({ user, isDark }) => {
   const [sendEmailModal, setSendEmailModal] = useState({ show: false, invoice: null, recipientEmail: '' });
   const [paidConfirmModal, setPaidConfirmModal] = useState({ show: false, invoice: null });
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [vakitaProfile, setVakitaProfile] = useState({ name: '', email: '', businessName: '', googleConnected: false });
+  const [vakitaProfile, setVakitaProfile] = useState({ 
+    name: '', 
+    email: '', 
+    businessName: '', 
+    gmailConnected: false,
+    gmailEmail: null,
+    useGmail: false 
+  });
+  const [gmailConnecting, setGmailConnecting] = useState(false);
   const [activities, setActivities] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [toast, setToast] = useState({ show: false, message: '', type: 'success' });
@@ -191,7 +199,7 @@ const VAKita = ({ user, isDark }) => {
       setLoading(true);
       console.log('[VAKita] Loading data for user:', user.id);
       try {
-        const { data, error } = await supabase.from('user_profiles').select('vakita_clients, vakita_income, vakita_invoices, vakita_tax_settings, vakita_prospects, vakita_profile, vakita_activities').eq('user_id', user.id).single();
+        const { data, error } = await supabase.from('user_profiles').select('vakita_clients, vakita_income, vakita_invoices, vakita_tax_settings, vakita_prospects, vakita_profile, vakita_activities, gmail_email, gmail_connected_at').eq('user_id', user.id).single();
         console.log('[VAKita] Loaded data:', data);
         console.log('[VAKita] Load error:', error);
         if (error && error.code !== 'PGRST116') console.error('Error loading VAKita data:', error);
@@ -202,7 +210,16 @@ const VAKita = ({ user, isDark }) => {
           setInvoices(data.vakita_invoices || []);
           setProspects(data.vakita_prospects || []);
           setTaxSettings(data.vakita_tax_settings || { taxOption: '8percent', tinNumber: '' });
-          setVakitaProfile(data.vakita_profile || { name: '', email: '', businessName: '' });
+          
+          // Load profile with Gmail status from database
+          const savedProfile = data.vakita_profile || { name: '', email: '', businessName: '' };
+          setVakitaProfile({
+            ...savedProfile,
+            gmailConnected: !!data.gmail_connected_at,
+            gmailEmail: data.gmail_email || null,
+            useGmail: savedProfile.useGmail || false
+          });
+          
           setActivities(data.vakita_activities || []);
         }
       } catch (err) { console.error('Error loading VAKita data:', err); }
@@ -401,8 +418,8 @@ ${senderName}`;
     });
   };
   
-  // Send email via mailto (opens default email client)
-  const sendInvoiceEmail = () => {
+  // Send email via Gmail API or mailto fallback
+  const sendInvoiceEmail = async () => {
     const inv = sendEmailModal.invoice;
     const recipientEmail = sendEmailModal.recipientEmail;
     
@@ -411,8 +428,7 @@ ${senderName}`;
       return;
     }
     
-    const senderName = vakitaProfile.name || '[Your Name]';
-    const emailContent = generateInvoiceEmail(inv).replace('[Your Name]', senderName);
+    const emailContent = generateInvoiceEmail(inv);
     
     // Extract subject from email content
     const subjectMatch = emailContent.match(/Subject: (.+)\n/);
@@ -421,26 +437,147 @@ ${senderName}`;
     // Get body (everything after Subject line)
     const body = emailContent.replace(/Subject: .+\n\n/, '');
     
-    // Create mailto link
-    const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    
-    // Open email client
-    window.open(mailtoLink, '_blank');
-    
-    // Log activity
-    addActivity(
-      'Invoice Email Sent',
-      `Sent ${inv.invoiceNumber} to ${recipientEmail}`,
-      'email'
-    );
-    
-    // Show toast
-    showToast(`Email client opened for ${inv.invoiceNumber}`);
-    
-    // Close modal
-    setSendEmailModal({ show: false, invoice: null, recipientEmail: '' });
-    setEmailModal({ show: false, invoice: null });
+    // Check if Gmail is connected and user wants to use it
+    if (vakitaProfile.gmailConnected && vakitaProfile.useGmail) {
+      setSendEmailModal(prev => ({ ...prev, sending: true }));
+      try {
+        const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-send`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+          },
+          body: JSON.stringify({
+            userId: user.id,
+            to: recipientEmail,
+            subject: subject,
+            body: body
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (!response.ok || data.error) {
+          throw new Error(data.error || 'Failed to send email');
+        }
+        
+        // Log activity
+        addActivity(
+          'Invoice Email Sent',
+          `Sent ${inv.invoiceNumber} to ${recipientEmail} via Gmail`,
+          'email'
+        );
+        
+        showToast(`Email sent successfully to ${recipientEmail}!`, 'success');
+        setSendEmailModal({ show: false, invoice: null, recipientEmail: '', sending: false });
+        setEmailModal({ show: false, invoice: null });
+      } catch (error) {
+        console.error('Gmail send error:', error);
+        showToast('Failed to send via Gmail. Try again or use email client.', 'error');
+        setSendEmailModal(prev => ({ ...prev, sending: false }));
+      }
+    } else {
+      // Fallback to mailto
+      const mailtoLink = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(mailtoLink, '_blank');
+      
+      // Log activity
+      addActivity(
+        'Invoice Email Drafted',
+        `Opened email client for ${inv.invoiceNumber} to ${recipientEmail}`,
+        'email'
+      );
+      
+      showToast(`Email client opened for ${inv.invoiceNumber}`);
+      setSendEmailModal({ show: false, invoice: null, recipientEmail: '', sending: false });
+      setEmailModal({ show: false, invoice: null });
+    }
   };
+  
+  // Connect Gmail account via Supabase Edge Function
+  const connectGmail = async () => {
+    setGmailConnecting(true);
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-auth`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          returnUrl: window.location.origin + '/?section=vakita'
+        })
+      });
+      
+      const data = await response.json();
+      
+      if (data.authUrl) {
+        // Redirect to Google OAuth
+        window.location.href = data.authUrl;
+      } else {
+        throw new Error(data.error || 'Failed to get auth URL');
+      }
+    } catch (error) {
+      console.error('Gmail connect error:', error);
+      showToast('Failed to connect Gmail. Please try again.', 'error');
+      setGmailConnecting(false);
+    }
+  };
+  
+  // Disconnect Gmail account
+  const disconnectGmail = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gmail-disconnect`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
+        },
+        body: JSON.stringify({ userId: user.id })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setVakitaProfile(prev => ({
+          ...prev,
+          gmailConnected: false,
+          gmailEmail: null,
+          useGmail: false
+        }));
+        showToast('Gmail disconnected successfully');
+      } else {
+        throw new Error(data.error || 'Failed to disconnect');
+      }
+    } catch (error) {
+      console.error('Gmail disconnect error:', error);
+      showToast('Failed to disconnect Gmail', 'error');
+    }
+  };
+  
+  // Check for Gmail callback params on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const gmailConnected = params.get('gmail_connected');
+    const gmailEmail = params.get('gmail_email');
+    const gmailError = params.get('gmail_error');
+    
+    if (gmailConnected === 'true' && gmailEmail) {
+      setVakitaProfile(prev => ({
+        ...prev,
+        gmailConnected: true,
+        gmailEmail: gmailEmail,
+        useGmail: true
+      }));
+      showToast(`Gmail connected: ${gmailEmail}`, 'success');
+      // Clean URL
+      window.history.replaceState({}, '', window.location.pathname);
+    } else if (gmailError) {
+      showToast(`Gmail connection failed: ${gmailError}`, 'error');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
   
   // Save VAKita profile
   const saveVakitaProfile = () => {
@@ -1323,7 +1460,7 @@ ${senderName}`;
 
       {/* Send Email Modal */}
       {sendEmailModal.show && sendEmailModal.invoice && (
-        <div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.7)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:70}} onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:''})}>
+        <div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.7)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:70}} onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:'',sending:false})}>
           <div style={{width:'100%',maxWidth:'450px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder}} onClick={e=>e.stopPropagation()}>
             <div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
@@ -1335,7 +1472,7 @@ ${senderName}`;
                   <p style={{fontSize:'13px',color:theme.textMuted,margin:'2px 0 0'}}>{sendEmailModal.invoice.invoiceNumber}</p>
                 </div>
               </div>
-              <button onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:''})} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button>
+              <button onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:'',sending:false})} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button>
             </div>
             <div style={{padding:'20px'}}>
               <div style={{marginBottom:'16px'}}>
@@ -1346,12 +1483,14 @@ ${senderName}`;
                   value={sendEmailModal.recipientEmail}
                   onChange={e => setSendEmailModal(p => ({...p, recipientEmail: e.target.value}))}
                   style={input}
+                  disabled={sendEmailModal.sending}
                 />
                 {clients.find(c => c.id === sendEmailModal.invoice.clientId)?.email && (
                   <p style={{fontSize:'12px',color:theme.textMuted,margin:'6px 0 0'}}>
                     Client email: <button 
                       onClick={() => setSendEmailModal(p => ({...p, recipientEmail: clients.find(c => c.id === p.invoice.clientId)?.email}))}
                       style={{background:'none',border:'none',color:'#3b82f6',cursor:'pointer',padding:0,fontSize:'12px',textDecoration:'underline'}}
+                      disabled={sendEmailModal.sending}
                     >
                       {clients.find(c => c.id === sendEmailModal.invoice.clientId)?.email}
                     </button>
@@ -1363,33 +1502,63 @@ ${senderName}`;
                   <div style={{display:'flex',alignItems:'center',gap:'8px'}}>
                     <span style={{fontSize:'14px'}}>⚠️</span>
                     <p style={{fontSize:'13px',color:theme.textMuted,margin:0}}>
-                      Set up your <button onClick={() => {setSendEmailModal({show:false,invoice:null,recipientEmail:''});setShowProfileModal(true);}} style={{background:'none',border:'none',color:'#3b82f6',cursor:'pointer',padding:0,fontSize:'13px',textDecoration:'underline'}}>VAKita profile</button> to auto-fill your name in emails.
+                      Set up your <button onClick={() => {setSendEmailModal({show:false,invoice:null,recipientEmail:'',sending:false});setShowProfileModal(true);}} style={{background:'none',border:'none',color:'#3b82f6',cursor:'pointer',padding:0,fontSize:'13px',textDecoration:'underline'}}>VAKita profile</button> to auto-fill your name in emails.
                     </p>
                   </div>
                 </div>
               )}
-              <div style={{padding:'12px',backgroundColor:isDark?'#3b82f615':'#3b82f610',borderRadius:'8px'}}>
-                <p style={{fontSize:'12px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
-                  <strong style={{color:theme.text}}>Note:</strong> This will open your default email app with the invoice email pre-filled. You can review and edit before sending.
-                </p>
-              </div>
+              
+              {/* Gmail Status Info */}
+              {vakitaProfile.gmailConnected && vakitaProfile.useGmail ? (
+                <div style={{padding:'12px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'8px',border:'1px solid #22c55e40'}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                    <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    <p style={{fontSize:'12px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
+                      <strong style={{color:'#22c55e'}}>Gmail connected</strong> — Email will be sent directly from {vakitaProfile.gmailEmail || 'your Gmail'}.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div style={{padding:'12px',backgroundColor:isDark?'#3b82f615':'#3b82f610',borderRadius:'8px'}}>
+                  <p style={{fontSize:'12px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
+                    <strong style={{color:theme.text}}>Note:</strong> This will open your default email app with the invoice email pre-filled.
+                    {!vakitaProfile.gmailConnected && (
+                      <span> <button onClick={() => {setSendEmailModal({show:false,invoice:null,recipientEmail:'',sending:false});setShowProfileModal(true);}} style={{background:'none',border:'none',color:'#3b82f6',cursor:'pointer',padding:0,fontSize:'12px',textDecoration:'underline'}}>Connect Gmail</button> to send directly.</span>
+                    )}
+                  </p>
+                </div>
+              )}
             </div>
             <div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end'}}>
-              <button onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:''})} style={btnOutline}>Cancel</button>
+              <button onClick={()=>setSendEmailModal({show:false,invoice:null,recipientEmail:'',sending:false})} style={btnOutline} disabled={sendEmailModal.sending}>Cancel</button>
               <button 
                 onClick={sendInvoiceEmail}
-                disabled={!sendEmailModal.recipientEmail}
+                disabled={!sendEmailModal.recipientEmail || sendEmailModal.sending}
                 style={{
                   ...btnPrimary,
-                  backgroundColor: '#3b82f6',
-                  opacity: sendEmailModal.recipientEmail ? 1 : 0.5,
+                  backgroundColor: vakitaProfile.gmailConnected && vakitaProfile.useGmail ? '#22c55e' : '#3b82f6',
+                  opacity: sendEmailModal.recipientEmail && !sendEmailModal.sending ? 1 : 0.5,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '8px'
                 }}
               >
-                <Send style={{width:'16px',height:'16px'}}/>
-                Open Email Client
+                {sendEmailModal.sending ? (
+                  <>
+                    <Loader2 style={{width:'16px',height:'16px',animation:'spin 1s linear infinite'}}/>
+                    Sending...
+                  </>
+                ) : vakitaProfile.gmailConnected && vakitaProfile.useGmail ? (
+                  <>
+                    <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                    Send via Gmail
+                  </>
+                ) : (
+                  <>
+                    <Send style={{width:'16px',height:'16px'}}/>
+                    Open Email Client
+                  </>
+                )}
               </button>
             </div>
           </div>
@@ -1399,8 +1568,8 @@ ${senderName}`;
       {/* VAKita Profile Modal */}
       {showProfileModal && (
         <div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.7)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:70}} onClick={()=>setShowProfileModal(false)}>
-          <div style={{width:'100%',maxWidth:'450px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder}} onClick={e=>e.stopPropagation()}>
-            <div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <div style={{width:'100%',maxWidth:'480px',maxHeight:'90vh',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder,overflow:'hidden',display:'flex',flexDirection:'column'}} onClick={e=>e.stopPropagation()}>
+            <div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
               <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
                 <div style={{width:'40px',height:'40px',backgroundColor:isDark?'#8b5cf620':'#8b5cf610',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
                   <Settings style={{width:'20px',height:'20px',color:'#8b5cf6'}}/>
@@ -1412,7 +1581,7 @@ ${senderName}`;
               </div>
               <button onClick={()=>setShowProfileModal(false)} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button>
             </div>
-            <div style={{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}}>
+            <div style={{padding:'20px',display:'flex',flexDirection:'column',gap:'16px',overflow:'auto',flex:1}}>
               <div>
                 <label style={label}>Your Name *</label>
                 <input 
@@ -1434,23 +1603,113 @@ ${senderName}`;
                   style={input}
                 />
               </div>
-              <div>
-                <label style={label}>Your Email</label>
-                <input 
-                  type="email" 
-                  placeholder="your@email.com"
-                  value={vakitaProfile.email || ''}
-                  onChange={e => setVakitaProfile(p => ({...p, email: e.target.value}))}
-                  style={input}
-                />
+              
+              {/* Gmail Integration Section */}
+              <div style={{borderTop:'1px solid ' + theme.cardBorder,paddingTop:'16px',marginTop:'4px'}}>
+                <label style={{...label,display:'flex',alignItems:'center',gap:'8px',marginBottom:'12px'}}>
+                  <Mail style={{width:'16px',height:'16px',color:'#ea4335'}}/>
+                  Gmail Integration
+                </label>
+                
+                {vakitaProfile.gmailConnected ? (
+                  <div style={{padding:'14px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'10px',border:'1px solid #22c55e40'}}>
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'12px'}}>
+                      <div style={{display:'flex',alignItems:'center',gap:'10px'}}>
+                        <div style={{width:'32px',height:'32px',backgroundColor:'#fff',borderRadius:'8px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                        </div>
+                        <div>
+                          <p style={{fontSize:'14px',fontWeight:'500',color:theme.text,margin:0}}>Connected</p>
+                          <p style={{fontSize:'12px',color:theme.textMuted,margin:'2px 0 0'}}>{vakitaProfile.gmailEmail || 'Gmail account'}</p>
+                        </div>
+                      </div>
+                      <button 
+                        onClick={disconnectGmail}
+                        style={{...btnGhost,fontSize:'12px',color:'#ef4444',padding:'6px 10px'}}
+                      >
+                        Disconnect
+                      </button>
+                    </div>
+                    
+                    {/* Use Gmail toggle */}
+                    <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',paddingTop:'12px',borderTop:'1px solid #22c55e30'}}>
+                      <div>
+                        <p style={{fontSize:'13px',fontWeight:'500',color:theme.text,margin:0}}>Send emails via Gmail</p>
+                        <p style={{fontSize:'11px',color:theme.textMuted,margin:'2px 0 0'}}>Directly send without opening email client</p>
+                      </div>
+                      <button 
+                        onClick={() => setVakitaProfile(p => ({...p, useGmail: !p.useGmail}))}
+                        style={{
+                          width:'44px',
+                          height:'24px',
+                          borderRadius:'12px',
+                          border:'none',
+                          backgroundColor: vakitaProfile.useGmail ? '#22c55e' : (isDark ? '#3f3f46' : '#d4d4d8'),
+                          cursor:'pointer',
+                          position:'relative',
+                          transition:'background-color 0.2s'
+                        }}
+                      >
+                        <div style={{
+                          width:'20px',
+                          height:'20px',
+                          borderRadius:'50%',
+                          backgroundColor:'#fff',
+                          position:'absolute',
+                          top:'2px',
+                          left: vakitaProfile.useGmail ? '22px' : '2px',
+                          transition:'left 0.2s',
+                          boxShadow:'0 1px 3px rgba(0,0,0,0.2)'
+                        }}/>
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div style={{padding:'14px',backgroundColor:isDark?'#27272a':'#f4f4f5',borderRadius:'10px',border:'1px solid ' + theme.cardBorder}}>
+                    <p style={{fontSize:'13px',color:theme.textMuted,margin:'0 0 12px',lineHeight:'1.5'}}>
+                      Connect your Gmail to send invoice emails directly without opening your email client.
+                    </p>
+                    <button 
+                      onClick={connectGmail}
+                      disabled={gmailConnecting}
+                      style={{
+                        display:'flex',
+                        alignItems:'center',
+                        justifyContent:'center',
+                        gap:'10px',
+                        width:'100%',
+                        height:'44px',
+                        backgroundColor:'#fff',
+                        border:'1px solid #dadce0',
+                        borderRadius:'8px',
+                        fontSize:'14px',
+                        fontWeight:'500',
+                        color:'#3c4043',
+                        cursor: gmailConnecting ? 'not-allowed' : 'pointer',
+                        opacity: gmailConnecting ? 0.7 : 1
+                      }}
+                    >
+                      {gmailConnecting ? (
+                        <Loader2 style={{width:'18px',height:'18px',animation:'spin 1s linear infinite'}}/>
+                      ) : (
+                        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+                      )}
+                      {gmailConnecting ? 'Connecting...' : 'Connect Gmail Account'}
+                    </button>
+                    <p style={{fontSize:'11px',color:theme.textMuted,margin:'10px 0 0',textAlign:'center'}}>
+                      We only request permission to send emails on your behalf.
+                    </p>
+                  </div>
+                )}
               </div>
-              <div style={{padding:'14px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'8px',border:'1px solid #22c55e40'}}>
+              
+              <div style={{padding:'14px',backgroundColor:isDark?'#3b82f615':'#3b82f610',borderRadius:'8px',border:'1px solid #3b82f640'}}>
                 <p style={{fontSize:'13px',color:theme.textMuted,margin:0,lineHeight:'1.5'}}>
-                  💡 <strong style={{color:theme.text}}>Tip:</strong> Your name will automatically replace "[Your Name]" in invoice email templates.
+                  💡 <strong style={{color:theme.text}}>Tip:</strong> Your name will automatically appear in invoice email signatures.
                 </p>
               </div>
             </div>
-            <div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end'}}>
+            <div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end',flexShrink:0}}>
               <button onClick={()=>setShowProfileModal(false)} style={btnOutline}>Cancel</button>
               <button 
                 onClick={saveVakitaProfile}
