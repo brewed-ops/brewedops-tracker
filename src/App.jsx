@@ -8661,10 +8661,10 @@ function AppContent() {
         navigate('/signup');
         break;
       case 'privacy':
-        navigate('/privacypolicy');
+        navigate('/privacy');
         break;
       case 'terms':
-        navigate('/tos');
+        navigate('/terms');
         break;
       case 'about':
         navigate('/about');
@@ -8711,8 +8711,8 @@ function AppContent() {
       <Route path="/" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
       <Route path="/login" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
       <Route path="/signup" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="signup" />} />
-      <Route path="/privacypolicy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
-      <Route path="/tos" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+      <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+      <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
       <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
