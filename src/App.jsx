@@ -8695,6 +8695,15 @@ function AppContent() {
       </div>
     );
   }
+
+  // Check if we're on the reset-password page - show it regardless of auth state
+  // This is needed because Supabase creates a session from the recovery token
+  const isResetPasswordPage = location.pathname === '/reset-password' || 
+    (location.hash && location.hash.includes('type=recovery'));
+  
+  if (isResetPasswordPage) {
+    return <ResetPassword isDark={isDark} setIsDark={setIsDark} />;
+  }
   
   // Admin Dashboard
   if (user?.isAdmin) {
