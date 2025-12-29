@@ -131,6 +131,25 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           <span style={{ fontSize: '18px', fontWeight: '700', color: theme.text }}>BrewedOps</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '4px' : '8px' }}>
+          {/* Privacy - for Google OAuth compliance */}
+          <a 
+            href="/privacy" 
+            style={{ 
+              height: '40px', 
+              padding: isSmall ? '0 8px' : '0 14px', 
+              backgroundColor: 'transparent', 
+              color: theme.textMuted, 
+              border: 'none', 
+              fontSize: '14px', 
+              fontWeight: '500', 
+              cursor: 'pointer',
+              display: isSmall ? 'none' : 'flex',
+              alignItems: 'center',
+              textDecoration: 'none'
+            }}
+          >
+            Privacy
+          </a>
           {/* About */}
           <button 
             onClick={() => onNavigate('about')} 
@@ -216,6 +235,14 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             Sign In
           </button>
         </div>
+        
+        {/* Privacy Policy link for Google OAuth compliance - must be easily visible */}
+        <p style={{ fontSize: '13px', color: theme.textMuted, marginTop: '20px' }}>
+          By signing up, you agree to our{' '}
+          <a href="/terms" style={{ color: '#8b5cf6', textDecoration: 'none' }}>Terms of Service</a>
+          {' '}and{' '}
+          <a href="/privacy" style={{ color: '#8b5cf6', textDecoration: 'none' }}>Privacy Policy</a>
+        </p>
       </section>
 
       {/* What is BrewedOps */}
