@@ -6,6 +6,8 @@ import { supabase } from './lib/supabase';
 // Extracted components and utilities
 import Sidebar from './components/layout/Sidebar';
 import VAKita from './components/VAKita';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsOfService from './components/TermsOfService';
 import {
   CATEGORIES,
   CURRENCIES,
@@ -219,7 +221,54 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       </section>
 
       {/* Footer */}
-      <footer style={{ padding: '20px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center' }}>
+      <footer style={{ padding: '24px 20px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '12px', flexWrap: 'wrap' }}>
+          <button 
+            onClick={() => onNavigate('privacy')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: theme.textMuted, 
+              fontSize: '13px', 
+              cursor: 'pointer',
+              textDecoration: 'none',
+              padding: '4px 0'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
+          >
+            Privacy Policy
+          </button>
+          <button 
+            onClick={() => onNavigate('terms')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: theme.textMuted, 
+              fontSize: '13px', 
+              cursor: 'pointer',
+              textDecoration: 'none',
+              padding: '4px 0'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
+          >
+            Terms of Service
+          </button>
+          <a 
+            href="mailto:support@brewedops.com"
+            style={{ 
+              color: theme.textMuted, 
+              fontSize: '13px', 
+              textDecoration: 'none',
+              padding: '4px 0'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
+          >
+            Contact
+          </a>
+        </div>
         <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>© 2025 BrewedOps by Kenneth V.</p>
       </footer>
     </div>
@@ -9766,6 +9815,14 @@ if (user) {
       setIsDark={setIsDark}
       initialMode={currentPage}
     />;
+  }
+  
+  if (currentPage === 'privacy') {
+    return <PrivacyPolicy onBack={() => setCurrentPage('home')} isDark={isDark} />;
+  }
+  
+  if (currentPage === 'terms') {
+    return <TermsOfService onBack={() => setCurrentPage('home')} isDark={isDark} />;
   }
   
   return <HomePage onNavigate={setCurrentPage} isDark={isDark} setIsDark={setIsDark} />;
