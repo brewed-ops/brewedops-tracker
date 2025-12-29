@@ -1486,19 +1486,37 @@ ${senderName}`;
                 {emailCopied ? <CheckCircle style={{width:'16px',height:'16px'}}/> : <Copy style={{width:'16px',height:'16px'}}/>}
                 {emailCopied ? 'Copied!' : 'Copy'}
               </button>
-              <button 
-                onClick={()=>openSendEmailModal(emailModal.invoice)} 
-                style={{
-                  ...btnPrimary,
-                  backgroundColor: '#3b82f6',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}
-              >
-                <Send style={{width:'16px',height:'16px'}}/>
-                Send Email
-              </button>
+              {vakitaProfile.gmailConnected ? (
+                <button 
+                  onClick={()=>openSendEmailModal(emailModal.invoice)} 
+                  style={{
+                    ...btnPrimary,
+                    backgroundColor: '#22c55e',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px'
+                  }}
+                >
+                  <Send style={{width:'16px',height:'16px'}}/>
+                  Send Email
+                </button>
+              ) : (
+                <button 
+                  onClick={()=>setShowProfileModal(true)} 
+                  style={{
+                    ...btnOutline,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    color: theme.textMuted,
+                    fontSize: '13px'
+                  }}
+                  title="Connect Gmail in Profile Settings to send emails directly"
+                >
+                  <Mail style={{width:'16px',height:'16px'}}/>
+                  Connect Gmail to Send
+                </button>
+              )}
             </div>
           </div>
         </div>
