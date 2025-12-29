@@ -687,17 +687,17 @@ ${senderName}`;
   return (
     <>
       <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 8px' : '0 24px' }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0' : '0 16px', gap: isSmall ? '4px' : '0' }}>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0' : '0 16px', gap: isSmall ? '8px' : '0' }}>
           {/* Main category tabs - matching Finance Tracker style */}
-          <div style={{ display: 'flex', gap: '0', alignItems: 'center', flex: 1, overflow: 'auto', minWidth: 0 }}>
+          <div style={{ display: 'flex', gap: '0', alignItems: 'center', flex: 1, overflow: 'auto', minWidth: 0, WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <button 
               onClick={() => { if (!['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab)) setActiveTab('prospecting'); }}
               style={{
-                padding: isSmall ? '12px 8px' : '14px 18px',
+                padding: isSmall ? '12px 10px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
-                fontSize: isSmall ? '12px' : '15px',
+                fontSize: isSmall ? '13px' : '15px',
                 fontWeight: '500',
                 color: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? theme.text : theme.textMuted,
                 cursor: 'pointer',
@@ -714,11 +714,11 @@ ${senderName}`;
             <button 
               onClick={() => setActiveTab('timezone')} 
               style={{
-                padding: isSmall ? '12px 8px' : '14px 18px',
+                padding: isSmall ? '12px 10px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: activeTab === 'timezone' ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
-                fontSize: isSmall ? '12px' : '15px',
+                fontSize: isSmall ? '13px' : '15px',
                 fontWeight: '500',
                 color: activeTab === 'timezone' ? theme.text : theme.textMuted,
                 cursor: 'pointer',
@@ -731,16 +731,16 @@ ${senderName}`;
               }}
             >
               <Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />
-              {isSmall ? 'Time' : 'Timezone Manager'}
+              {isSmall ? 'Timezone' : 'Timezone Manager'}
             </button>
             <button 
               onClick={() => setActiveTab('tax')} 
               style={{
-                padding: isSmall ? '12px 8px' : '14px 18px',
+                padding: isSmall ? '12px 10px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: activeTab === 'tax' ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
-                fontSize: isSmall ? '12px' : '15px',
+                fontSize: isSmall ? '13px' : '15px',
                 fontWeight: '500',
                 color: activeTab === 'tax' ? theme.text : theme.textMuted,
                 cursor: 'pointer',
@@ -757,7 +757,7 @@ ${senderName}`;
           </div>
           
           {/* Notification Bell, Profile Settings, Exchange rate + saving indicator */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '4px' : '8px', flexShrink: 0 }}>
             {/* Notification Bell */}
             <div style={{ position: 'relative' }} ref={notificationRef}>
               <button 
