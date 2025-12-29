@@ -104,12 +104,14 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   };
 
   const features = [
-    { icon: '🎯', title: 'Lead Tracking', desc: 'Track prospects from LinkedIn, Upwork, OnlineJobsPH and more' },
-    { icon: '👥', title: 'Client Management', desc: 'Manage clients with timezone tracking and billing info' },
-    { icon: '💰', title: 'Income Dashboard', desc: 'Track earnings in USD, convert to PHP automatically' },
-    { icon: '🧾', title: 'Invoicing', desc: 'Create and manage professional invoices' },
-    { icon: '🌍', title: 'ClientClock', desc: 'See client timezones at a glance, find overlap hours' },
-    { icon: '📊', title: 'BIR Tax Helper', desc: 'Calculate quarterly taxes - 8% flat or graduated rates' },
+    { icon: '💰', title: 'Income Tracking', desc: 'Track all your earnings in multiple currencies with automatic PHP conversion using live exchange rates' },
+    { icon: '📊', title: 'Expense Management', desc: 'Categorize and monitor your expenses, set budgets, and see where your money goes' },
+    { icon: '🎯', title: 'Lead Tracking', desc: 'Track prospects from LinkedIn, Upwork, OnlineJobsPH, and other platforms through your sales pipeline' },
+    { icon: '👥', title: 'Client Management', desc: 'Manage clients with timezone tracking, billing rates, and payment platform preferences' },
+    { icon: '🧾', title: 'Invoice Generation', desc: 'Create professional invoices and send them directly via Gmail integration' },
+    { icon: '🌍', title: 'ClientClock', desc: 'See all client timezones at a glance and find the best meeting overlap hours' },
+    { icon: '📈', title: 'BIR Tax Calculator', desc: 'Calculate quarterly taxes automatically - choose between 8% flat rate or graduated rates' },
+    { icon: '🏆', title: 'Gamification', desc: 'Earn XP, level up, unlock achievements and stay motivated to reach your financial goals' },
   ];
 
   return (
@@ -126,29 +128,81 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
           <span style={{ fontSize: '18px', fontWeight: '700', color: theme.text }}>BrewedOps</span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '4px' : '8px' }}>
+          {/* About */}
+          <button 
+            onClick={() => onNavigate('about')} 
+            style={{ 
+              height: '40px', 
+              padding: isSmall ? '0 10px' : '0 14px', 
+              backgroundColor: 'transparent', 
+              color: theme.textMuted, 
+              border: 'none', 
+              fontSize: '14px', 
+              fontWeight: '500', 
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            About
+          </button>
+          {/* Dark/Light Mode */}
           <button onClick={() => setIsDark(!isDark)} style={{ width: '40px', height: '40px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
           </button>
-          {!isSmall && <button onClick={() => onNavigate('login')} style={{ height: '40px', padding: '0 16px', backgroundColor: 'transparent', color: theme.text, border: 'none', fontSize: '14px', fontWeight: '500', cursor: 'pointer' }}>Login</button>}
+          {/* Sign Up */}
+          <button 
+            onClick={() => onNavigate('signup')} 
+            style={{ 
+              height: '40px', 
+              padding: isSmall ? '0 12px' : '0 16px', 
+              backgroundColor: '#8b5cf6', 
+              color: '#fff', 
+              border: 'none', 
+              borderRadius: '10px',
+              fontSize: '14px', 
+              fontWeight: '500', 
+              cursor: 'pointer' 
+            }}
+          >
+            {isSmall ? 'Sign Up' : 'Sign Up'}
+          </button>
+          {/* Login */}
+          <button 
+            onClick={() => onNavigate('login')} 
+            style={{ 
+              height: '40px', 
+              padding: isSmall ? '0 12px' : '0 16px', 
+              backgroundColor: 'transparent', 
+              color: theme.text, 
+              border: '1px solid ' + theme.cardBorder, 
+              borderRadius: '10px',
+              fontSize: '14px', 
+              fontWeight: '500', 
+              cursor: 'pointer' 
+            }}
+          >
+            Login
+          </button>
         </div>
       </nav>
 
       {/* Hero */}
-      <section style={{ padding: isSmall ? '48px 20px 56px' : '72px 32px 80px', maxWidth: '720px', margin: '0 auto', textAlign: 'center' }}>
+      <section style={{ padding: isSmall ? '48px 20px 56px' : '72px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 14px', backgroundColor: isDark ? '#8b5cf620' : '#8b5cf610', borderRadius: '100px', marginBottom: '20px' }}>
-          <span style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: '600' }}>🇵🇭 Built for Filipino VAs</span>
+          <span style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: '600' }}>🇵🇭 Built for Filipino VAs & Freelancers</span>
         </div>
         
         <h1 style={{ fontSize: isSmall ? '32px' : '48px', fontWeight: '800', color: theme.text, margin: '0 0 16px', lineHeight: '1.15', letterSpacing: '-0.03em' }}>
-          Manage Your VA Business
+          Your Complete Financial
           <br />
-          <span style={{ color: '#8b5cf6' }}>All in One Place</span>
+          <span style={{ color: '#8b5cf6' }}>& Client Management Hub</span>
         </h1>
         
-        <p style={{ fontSize: isSmall ? '16px' : '18px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.6' }}>
-          Track leads, manage clients, send invoices, and calculate your BIR taxes. 
-          Everything a Filipino virtual assistant needs to run their business.
+        <p style={{ fontSize: isSmall ? '16px' : '18px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.7', maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto' }}>
+          Track your income & expenses, manage clients across timezones, send professional invoices, 
+          and calculate your BIR taxes — all in one powerful platform designed specifically for Filipino virtual assistants and freelancers.
         </p>
         
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -162,17 +216,62 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         </div>
       </section>
 
-      {/* Features */}
-      <section style={{ padding: isSmall ? '48px 16px' : '64px 32px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', borderTop: '1px solid ' + theme.cardBorder, borderBottom: '1px solid ' + theme.cardBorder }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: isSmall ? '24px' : '32px', fontWeight: '700', color: theme.text, textAlign: 'center', margin: '0 0 12px', letterSpacing: '-0.02em' }}>
-            Everything You Need
+      {/* What is BrewedOps */}
+      <section style={{ padding: isSmall ? '48px 20px' : '64px 32px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', borderTop: '1px solid ' + theme.cardBorder }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+          <h2 style={{ fontSize: isSmall ? '24px' : '32px', fontWeight: '700', color: theme.text, margin: '0 0 16px', letterSpacing: '-0.02em' }}>
+            What is BrewedOps?
           </h2>
-          <p style={{ fontSize: '15px', color: theme.textMuted, textAlign: 'center', margin: '0 0 40px' }}>
-            Tools designed specifically for virtual assistants
+          <p style={{ fontSize: '16px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.8', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}>
+            BrewedOps is an all-in-one financial tracking and client management system built specifically for 
+            Filipino Virtual Assistants and Freelancers. Whether you're managing multiple international clients, 
+            tracking income in different currencies, or preparing for your quarterly BIR tax filing — BrewedOps 
+            has everything you need to run your freelance business professionally.
           </p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : 'repeat(2, 1fr)', gap: '20px', textAlign: 'left' }}>
+            <div style={{ padding: '24px', backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? '#22c55e20' : '#22c55e15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '22px' }}>💵</span>
+                </div>
+                <h3 style={{ fontSize: '17px', fontWeight: '600', color: theme.text, margin: 0 }}>Financial Tracking</h3>
+              </div>
+              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6' }}>
+                Monitor all your income streams and expenses. Support for multiple currencies (USD, EUR, GBP, AUD) 
+                with automatic PHP conversion using live exchange rates. Categorize transactions, set budgets, 
+                and get insights into your financial health.
+              </p>
+            </div>
+            
+            <div style={{ padding: '24px', backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
+                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? '#3b82f620' : '#3b82f615', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '22px' }}>👥</span>
+                </div>
+                <h3 style={{ fontSize: '17px', fontWeight: '600', color: theme.text, margin: 0 }}>VA Client Management</h3>
+              </div>
+              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6' }}>
+                Manage your entire client pipeline from lead to paying customer. Track prospects from job platforms, 
+                store client details with timezone info, manage billing rates, and never miss a follow-up with 
+                our prospecting pipeline.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section style={{ padding: isSmall ? '48px 16px' : '64px 32px', borderBottom: '1px solid ' + theme.cardBorder }}>
+        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+          <h2 style={{ fontSize: isSmall ? '24px' : '32px', fontWeight: '700', color: theme.text, textAlign: 'center', margin: '0 0 12px', letterSpacing: '-0.02em' }}>
+            Everything You Need to Succeed
+          </h2>
+          <p style={{ fontSize: '15px', color: theme.textMuted, textAlign: 'center', margin: '0 0 40px' }}>
+            Powerful tools designed specifically for Filipino VAs and freelancers
+          </p>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px' }}>
             {features.map((f, i) => (
               <div key={i} style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '20px' }}>
                 <span style={{ fontSize: '28px', display: 'block', marginBottom: '12px' }}>{f.icon}</span>
@@ -192,9 +291,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {[
-            { num: '1', title: 'Add Your Prospects', desc: 'Import leads from job platforms and track their status' },
-            { num: '2', title: 'Convert to Clients', desc: 'When you win a deal, convert them to a client with one click' },
-            { num: '3', title: 'Track Income & Taxes', desc: 'Record payments and let us calculate your quarterly BIR taxes' },
+            { num: '1', title: 'Sign Up for Free', desc: 'Create your account in seconds and start exploring all features immediately' },
+            { num: '2', title: 'Add Your Clients & Income', desc: 'Import your existing clients, track prospects, and record your income from various platforms' },
+            { num: '3', title: 'Send Invoices & Track Taxes', desc: 'Generate professional invoices, send via Gmail, and let BrewedOps calculate your quarterly BIR taxes' },
+            { num: '4', title: 'Level Up & Grow', desc: 'Earn XP for your activities, unlock achievements, and watch your freelance business thrive' },
           ].map((step, i) => (
             <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
               <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#8b5cf6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: '700', flexShrink: 0 }}>{step.num}</div>
@@ -211,10 +311,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       <section style={{ padding: isSmall ? '0 16px 48px' : '0 32px 64px', maxWidth: '800px', margin: '0 auto' }}>
         <div style={{ backgroundColor: isDark ? '#18181b' : '#09090b', borderRadius: '16px', padding: isSmall ? '40px 24px' : '48px', textAlign: 'center' }}>
           <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: '#fafafa', margin: '0 0 12px' }}>
-            Ready to Level Up?
+            Ready to Take Control of Your Finances?
           </h2>
           <p style={{ fontSize: '15px', color: '#a1a1aa', margin: '0 0 24px' }}>
-            Join Filipino VAs who manage their business with BrewedOps
+            Join Filipino VAs and freelancers who are managing their business smarter with BrewedOps
           </p>
           <button onClick={() => onNavigate('signup')} style={{ height: '48px', padding: '0 32px', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '600', cursor: 'pointer' }}>
             Get Started — It's Free
