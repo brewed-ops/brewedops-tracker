@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Loader2, Sun, Moon, ArrowLeft } from 'lucide-react';
-import { supabase } from './supabaseClient';
+import { supabase } from './lib/supabase';
 
-const ResetPassword = ({ isDark, setIsDark }) => {
+const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -25,11 +25,14 @@ const ResetPassword = ({ isDark, setIsDark }) => {
     inputBg: isDark ? '#1a1a1a' : '#f8fafc',
   };
 
-  // Check if user came from a valid reset link
+  // Check if user has a valid session for password reset
   useEffect(() => {
     const checkSession = async () => {
       try {
-        // Check URL hash for recovery token (Supabase sends it as hash fragment)
+        // Check if we're in recovery mode (set by App.jsx)
+        const isRecoveryMode = sessionStorage.getItem('passwordRecovery') === 'true';
+        
+        // Check URL hash for recovery token
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         const accessToken = hashParams.get('access_token');
         const type = hashParams.get('type');
@@ -50,8 +53,17 @@ const ResetPassword = ({ isDark, setIsDark }) => {
             // Clear the hash from URL for cleaner look
             window.history.replaceState(null, '', window.location.pathname);
           }
+        } else if (isRecoveryMode) {
+          // We're in recovery mode, check for existing session
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            setIsValidSession(true);
+          } else {
+            setError('Session expired. Please request a new password reset link.');
+            setIsValidSession(false);
+          }
         } else {
-          // Check if there's an existing session from the recovery flow
+          // Check if there's an existing session
           const { data: { session } } = await supabase.auth.getSession();
           if (session) {
             setIsValidSession(true);
@@ -118,11 +130,17 @@ const ResetPassword = ({ isDark, setIsDark }) => {
 
       setSuccess(true);
       
+      // Clear recovery mode and sign out
+      sessionStorage.removeItem('passwordRecovery');
+      
       // Sign out after password change so user can log in with new password
       setTimeout(async () => {
         await supabase.auth.signOut();
+        if (onComplete) {
+          onComplete();
+        }
         navigate('/login');
-      }, 3000);
+      }, 2500);
 
     } catch (err) {
       console.error('Reset password error:', err);

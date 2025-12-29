@@ -8593,23 +8593,32 @@ function AppContent() {
     return saved ? saved === 'dark' : true;
   });
   const [loading, setLoading] = useState(true);
+  const [isPasswordRecovery, setIsPasswordRecovery] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   // Check for existing session on load
   useEffect(() => {
-    // Check if this is a password recovery flow
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const isRecovery = hashParams.get('type') === 'recovery' || 
-                       window.location.pathname === '/reset-password';
+    // Check URL hash for recovery token BEFORE Supabase processes it
+    const hash = window.location.hash;
+    if (hash && hash.includes('type=recovery')) {
+      console.log('Recovery mode detected in URL');
+      setIsPasswordRecovery(true);
+      sessionStorage.setItem('passwordRecovery', 'true');
+    }
     
-    if (isRecovery) {
-      // Don't auto-login, just stop loading and let ResetPassword handle it
-      setLoading(false);
-      return;
+    // Also check if we already set recovery mode
+    if (sessionStorage.getItem('passwordRecovery') === 'true') {
+      setIsPasswordRecovery(true);
     }
     
     supabase.auth.getSession().then(({ data: { session } }) => {
+      // If in recovery mode, don't set user as logged in for main app
+      if (sessionStorage.getItem('passwordRecovery') === 'true') {
+        setLoading(false);
+        return;
+      }
+      
       if (session?.user) {
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
         setUser(isAdmin ? { ...session.user, isAdmin: true } : session.user);
@@ -8622,23 +8631,22 @@ function AppContent() {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth event:', event); // Debug log
+      console.log('Auth event:', event);
       
-      // Handle password recovery - redirect to reset page
+      // Handle password recovery event
       if (event === 'PASSWORD_RECOVERY') {
-        // Don't set user, navigate to reset password page
-        navigate('/reset-password');
+        console.log('PASSWORD_RECOVERY event fired');
+        setIsPasswordRecovery(true);
+        sessionStorage.setItem('passwordRecovery', 'true');
+        return;
+      }
+      
+      // If in recovery mode, don't update user state
+      if (sessionStorage.getItem('passwordRecovery') === 'true') {
         return;
       }
       
       if (session?.user) {
-        // Check if this is a recovery session - don't auto-login
-        if (window.location.pathname === '/reset-password' || 
-            window.location.hash.includes('type=recovery')) {
-          // Don't set user yet, let them reset password first
-          return;
-        }
-        
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
         setUser(isAdmin ? { ...session.user, isAdmin: true } : session.user);
       } else {
@@ -8723,13 +8731,18 @@ function AppContent() {
     );
   }
 
-  // Check if we're on the reset-password page - show it regardless of auth state
-  // This is needed because Supabase creates a session from the recovery token
-  const isResetPasswordPage = location.pathname === '/reset-password' || 
-    (location.hash && location.hash.includes('type=recovery'));
-  
-  if (isResetPasswordPage) {
-    return <ResetPassword isDark={isDark} setIsDark={setIsDark} />;
+  // Password Recovery Mode - show reset page regardless of auth state
+  if (isPasswordRecovery) {
+    return <ResetPassword 
+      isDark={isDark} 
+      setIsDark={setIsDark} 
+      onComplete={() => {
+        // Clear recovery mode when password is reset
+        sessionStorage.removeItem('passwordRecovery');
+        setIsPasswordRecovery(false);
+        setUser(null);
+      }}
+    />;
   }
   
   // Admin Dashboard
