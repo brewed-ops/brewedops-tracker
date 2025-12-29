@@ -74,20 +74,19 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
   const fetchUsers = async () => {
     try {
-      // Get all profiles
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (profilesError) console.error('Profiles error:', profilesError);
-
-      // Get user_profiles for additional data
+      // Get user_profiles (main source - contains user data and VAKita data)
       const { data: userProfiles, error: upError } = await supabase
         .from('user_profiles')
         .select('*');
 
       if (upError) console.error('User profiles error:', upError);
+
+      // Try to get profiles table (may or may not exist depending on setup)
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('*');
+
+      if (profilesError) console.error('Profiles error (may be expected):', profilesError);
 
       // Get all expenses
       const { data: expenses, error: expError } = await supabase
@@ -97,77 +96,131 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
       if (expError) console.error('Expenses error:', expError);
 
-      // Build user map
+      // Build user map - start with user_profiles as primary source
       const userMap = {};
       let totalClients = 0;
       let totalInvoices = 0;
       let totalIncome = 0;
       let totalExpenseAmount = 0;
 
-      // Add users from profiles
-      if (profiles) {
-        profiles.forEach(profile => {
-          userMap[profile.id] = {
-            id: profile.id,
-            email: profile.email || profile.id,
-            nickname: profile.nickname || profile.full_name || profile.username || 'User',
-            avatar_url: profile.avatar_url,
-            created_at: profile.created_at,
+      // First, add users from user_profiles (this is the main data source)
+      if (userProfiles && userProfiles.length > 0) {
+        userProfiles.forEach(up => {
+          const odl = {
+            id: up.user_id,
+            email: up.email || up.user_id,
+            nickname: up.nickname || up.full_name || 'User',
+            avatar_url: up.avatar_url || up.profile_picture,
+            created_at: up.created_at,
             expenses: [],
             totalSpent: 0,
-            level: 1,
-            xp: 0,
+            level: calculateLevelFromXP(up.xp || 0),
+            xp: up.xp || 0,
+            streak: up.streak || 0,
             clientCount: 0,
             invoiceCount: 0,
             incomeTotal: 0
           };
+
+          // Parse VAKita data
+          try {
+            const clients = up.vakita_clients ? (typeof up.vakita_clients === 'string' ? JSON.parse(up.vakita_clients) : up.vakita_clients) : [];
+            const invoices = up.vakita_invoices ? (typeof up.vakita_invoices === 'string' ? JSON.parse(up.vakita_invoices) : up.vakita_invoices) : [];
+            const income = up.vakita_income ? (typeof up.vakita_income === 'string' ? JSON.parse(up.vakita_income) : up.vakita_income) : [];
+
+            odl.clientCount = Array.isArray(clients) ? clients.length : 0;
+            odl.invoiceCount = Array.isArray(invoices) ? invoices.length : 0;
+            odl.incomeTotal = Array.isArray(income) ? income.reduce((sum, i) => sum + (parseFloat(i.amountPHP) || 0), 0) : 0;
+
+            totalClients += odl.clientCount;
+            totalInvoices += odl.invoiceCount;
+            totalIncome += odl.incomeTotal;
+          } catch (e) {
+            console.error('Error parsing VAKita data:', e);
+          }
+
+          userMap[up.user_id] = odl;
         });
       }
 
-      // Add user_profiles data (VAKita, level, etc.)
-      if (userProfiles) {
-        userProfiles.forEach(up => {
-          if (userMap[up.user_id]) {
-            userMap[up.user_id].xp = up.xp || 0;
-            userMap[up.user_id].level = calculateLevelFromXP(up.xp || 0);
-            userMap[up.user_id].streak = up.streak || 0;
-            
-            // Count VAKita data
-            const clients = up.vakita_clients ? JSON.parse(up.vakita_clients) : [];
-            const invoices = up.vakita_invoices ? JSON.parse(up.vakita_invoices) : [];
-            const income = up.vakita_income ? JSON.parse(up.vakita_income) : [];
-            
-            userMap[up.user_id].clientCount = clients.length;
-            userMap[up.user_id].invoiceCount = invoices.length;
-            userMap[up.user_id].incomeTotal = income.reduce((sum, i) => sum + (parseFloat(i.amountPHP) || 0), 0);
-            
-            totalClients += clients.length;
-            totalInvoices += invoices.length;
-            totalIncome += userMap[up.user_id].incomeTotal;
+      // Add/update from profiles table if available
+      if (profiles && profiles.length > 0) {
+        profiles.forEach(profile => {
+          if (userMap[profile.id]) {
+            // Update existing user with profile data
+            if (profile.email) userMap[profile.id].email = profile.email;
+            if (profile.nickname || profile.full_name || profile.username) {
+              userMap[profile.id].nickname = profile.nickname || profile.full_name || profile.username;
+            }
+            if (profile.avatar_url) userMap[profile.id].avatar_url = profile.avatar_url;
+          } else {
+            // Add new user from profiles
+            userMap[profile.id] = {
+              id: profile.id,
+              email: profile.email || profile.id,
+              nickname: profile.nickname || profile.full_name || profile.username || 'User',
+              avatar_url: profile.avatar_url,
+              created_at: profile.created_at,
+              expenses: [],
+              totalSpent: 0,
+              level: 1,
+              xp: 0,
+              clientCount: 0,
+              invoiceCount: 0,
+              incomeTotal: 0
+            };
           }
         });
       }
 
-      // Add expenses data
-      if (expenses) {
+      // Also check expenses for users not in profiles/user_profiles
+      if (expenses && expenses.length > 0) {
         expenses.forEach(expense => {
           const userId = expense.user_id;
-          if (userMap[userId]) {
-            userMap[userId].expenses.push(expense);
-            userMap[userId].totalSpent += parseFloat(expense.amount) || 0;
+          if (userId) {
+            if (userMap[userId]) {
+              userMap[userId].expenses.push(expense);
+              userMap[userId].totalSpent += parseFloat(expense.amount) || 0;
+              // Update email/nickname from expense if missing
+              if (expense.user_email && userMap[userId].email === userId) {
+                userMap[userId].email = expense.user_email;
+              }
+              if (expense.user_nickname && userMap[userId].nickname === 'User') {
+                userMap[userId].nickname = expense.user_nickname;
+              }
+            } else {
+              // Create user from expense data
+              userMap[userId] = {
+                id: userId,
+                email: expense.user_email || userId,
+                nickname: expense.user_nickname || 'User',
+                avatar_url: null,
+                created_at: expense.created_at,
+                expenses: [expense],
+                totalSpent: parseFloat(expense.amount) || 0,
+                level: 1,
+                xp: 0,
+                clientCount: 0,
+                invoiceCount: 0,
+                incomeTotal: 0
+              };
+            }
             totalExpenseAmount += parseFloat(expense.amount) || 0;
           }
         });
       }
 
-      const userList = Object.values(userMap);
-      setUsers(userList);
+      const userList = Object.values(userMap).sort((a, b) => 
+        new Date(b.created_at || 0) - new Date(a.created_at || 0)
+      );
       
+      setUsers(userList);
+
       // Calculate active users (users who logged in last 30 days or have recent activity)
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      const activeUsers = userList.filter(u => 
-        new Date(u.created_at) > thirtyDaysAgo || u.expenses.length > 0
+      const activeUsers = userList.filter(u =>
+        new Date(u.created_at) > thirtyDaysAgo || u.expenses.length > 0 || u.xp > 0
       ).length;
 
       setStats({
@@ -178,6 +231,8 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         totalIncome,
         activeUsers
       });
+
+      console.log('Fetched users:', userList.length, userList);
 
     } catch (error) {
       console.error('Error fetching users:', error);
