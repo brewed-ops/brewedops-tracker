@@ -686,18 +686,18 @@ ${senderName}`;
 
   return (
     <>
-      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 12px' : '0 24px' }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0' : '0 16px' }}>
+      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 8px' : '0 24px' }}>
+        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0' : '0 16px', gap: isSmall ? '4px' : '0' }}>
           {/* Main category tabs - matching Finance Tracker style */}
-          <div style={{ display: 'flex', gap: '0', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0', alignItems: 'center', flex: 1, overflow: 'auto', minWidth: 0 }}>
             <button 
               onClick={() => { if (!['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab)) setActiveTab('prospecting'); }}
               style={{
-                padding: isSmall ? '12px 14px' : '14px 18px',
+                padding: isSmall ? '12px 8px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
-                fontSize: isSmall ? '13px' : '15px',
+                fontSize: isSmall ? '12px' : '15px',
                 fontWeight: '500',
                 color: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? theme.text : theme.textMuted,
                 cursor: 'pointer',
@@ -705,41 +705,42 @@ ${senderName}`;
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
-              Client Management
+              {isSmall ? 'Clients' : 'Client Management'}
             </button>
             <button 
               onClick={() => setActiveTab('timezone')} 
               style={{
-                padding: isSmall ? '12px 14px' : '14px 18px',
+                padding: isSmall ? '12px 8px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: activeTab === 'timezone' ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
-                fontSize: isSmall ? '13px' : '15px',
+                fontSize: isSmall ? '12px' : '15px',
                 fontWeight: '500',
                 color: activeTab === 'timezone' ? theme.text : theme.textMuted,
                 cursor: 'pointer',
                 transition: 'color 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
-                whiteSpace: 'nowrap'
+                gap: isSmall ? '4px' : '8px',
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
-              <Clock style={{ width: '16px', height: '16px' }} />
-              {!isSmall && 'Timezone Manager'}
-              {isSmall && 'Clock'}
+              <Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />
+              {isSmall ? 'Time' : 'Timezone Manager'}
             </button>
             <button 
               onClick={() => setActiveTab('tax')} 
               style={{
-                padding: isSmall ? '12px 14px' : '14px 18px',
+                padding: isSmall ? '12px 8px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: activeTab === 'tax' ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
-                fontSize: isSmall ? '13px' : '15px',
+                fontSize: isSmall ? '12px' : '15px',
                 fontWeight: '500',
                 color: activeTab === 'tax' ? theme.text : theme.textMuted,
                 cursor: 'pointer',
@@ -747,7 +748,8 @@ ${senderName}`;
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                whiteSpace: 'nowrap'
+                whiteSpace: 'nowrap',
+                flexShrink: 0
               }}
             >
               Tax
@@ -794,8 +796,9 @@ ${senderName}`;
                 <div style={{
                   position: 'absolute',
                   top: 'calc(100% + 8px)',
-                  right: 0,
-                  width: '320px',
+                  right: isSmall ? '-60px' : 0,
+                  width: isSmall ? 'calc(100vw - 32px)' : '320px',
+                  maxWidth: '320px',
                   maxHeight: '400px',
                   overflow: 'auto',
                   backgroundColor: theme.cardBg,
@@ -936,88 +939,100 @@ ${senderName}`;
         <div style={{ 
           backgroundColor: isDark ? '#0a0a0b' : '#ffffff', 
           borderBottom: '1px solid ' + theme.cardBorder, 
-          padding: isSmall ? '0 12px' : '0 24px' 
+          padding: isSmall ? '0 8px' : '0 24px' 
         }}>
-          <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '12px 16px' }}>
-            <div style={{ display: 'flex', gap: '6px', backgroundColor: theme.toggleBg || (isDark ? '#18181b' : '#f4f4f5'), borderRadius: '8px', padding: '4px', width: 'fit-content' }}>
+          <div style={{ maxWidth: '1600px', margin: '0 auto', padding: isSmall ? '10px 8px' : '12px 16px' }}>
+            <div style={{ display: 'flex', gap: isSmall ? '4px' : '6px', backgroundColor: theme.toggleBg || (isDark ? '#18181b' : '#f4f4f5'), borderRadius: '8px', padding: '4px', width: isSmall ? '100%' : 'fit-content', overflow: 'auto' }}>
               <button 
                 onClick={() => setActiveTab('prospecting')} 
                 style={{
-                  padding: '8px 14px',
+                  padding: isSmall ? '8px 10px' : '8px 14px',
                   backgroundColor: activeTab === 'prospecting' ? (isDark ? '#27272a' : '#ffffff') : 'transparent',
                   border: 'none',
                   borderRadius: '6px',
-                  fontSize: '13px',
+                  fontSize: isSmall ? '12px' : '13px',
                   fontWeight: '500',
                   color: activeTab === 'prospecting' ? theme.text : theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: activeTab === 'prospecting' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none'
+                  gap: isSmall ? '4px' : '6px',
+                  boxShadow: activeTab === 'prospecting' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none',
+                  flex: isSmall ? 1 : 'none',
+                  justifyContent: 'center',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <Target style={{ width: '14px', height: '14px' }} />
+                <Target style={{ width: isSmall ? '12px' : '14px', height: isSmall ? '12px' : '14px' }} />
                 Leads
               </button>
               <button 
                 onClick={() => setActiveTab('clients')} 
                 style={{
-                  padding: '8px 14px',
+                  padding: isSmall ? '8px 10px' : '8px 14px',
                   backgroundColor: activeTab === 'clients' ? (isDark ? '#27272a' : '#ffffff') : 'transparent',
                   border: 'none',
                   borderRadius: '6px',
-                  fontSize: '13px',
+                  fontSize: isSmall ? '12px' : '13px',
                   fontWeight: '500',
                   color: activeTab === 'clients' ? theme.text : theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: activeTab === 'clients' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none'
+                  gap: isSmall ? '4px' : '6px',
+                  boxShadow: activeTab === 'clients' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none',
+                  flex: isSmall ? 1 : 'none',
+                  justifyContent: 'center',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <Users style={{ width: '14px', height: '14px' }} />
+                <Users style={{ width: isSmall ? '12px' : '14px', height: isSmall ? '12px' : '14px' }} />
                 Clients
               </button>
               <button 
                 onClick={() => setActiveTab('invoices')} 
                 style={{
-                  padding: '8px 14px',
+                  padding: isSmall ? '8px 10px' : '8px 14px',
                   backgroundColor: activeTab === 'invoices' ? (isDark ? '#27272a' : '#ffffff') : 'transparent',
                   border: 'none',
                   borderRadius: '6px',
-                  fontSize: '13px',
+                  fontSize: isSmall ? '12px' : '13px',
                   fontWeight: '500',
                   color: activeTab === 'invoices' ? theme.text : theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: activeTab === 'invoices' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none'
+                  gap: isSmall ? '4px' : '6px',
+                  boxShadow: activeTab === 'invoices' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none',
+                  flex: isSmall ? 1 : 'none',
+                  justifyContent: 'center',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <FileText style={{ width: '14px', height: '14px' }} />
-                Invoices
+                <FileText style={{ width: isSmall ? '12px' : '14px', height: isSmall ? '12px' : '14px' }} />
+                {isSmall ? 'Inv.' : 'Invoices'}
               </button>
               <button 
                 onClick={() => setActiveTab('dashboard')} 
                 style={{
-                  padding: '8px 14px',
+                  padding: isSmall ? '8px 10px' : '8px 14px',
                   backgroundColor: activeTab === 'dashboard' ? (isDark ? '#27272a' : '#ffffff') : 'transparent',
                   border: 'none',
                   borderRadius: '6px',
-                  fontSize: '13px',
+                  fontSize: isSmall ? '12px' : '13px',
                   fontWeight: '500',
                   color: activeTab === 'dashboard' ? theme.text : theme.textMuted,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '6px',
-                  boxShadow: activeTab === 'dashboard' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none'
+                  gap: isSmall ? '4px' : '6px',
+                  boxShadow: activeTab === 'dashboard' ? (isDark ? 'none' : '0 1px 2px rgba(0,0,0,0.05)') : 'none',
+                  flex: isSmall ? 1 : 'none',
+                  justifyContent: 'center',
+                  whiteSpace: 'nowrap'
                 }}
               >
-                <BarChart3 style={{ width: '14px', height: '14px' }} />
+                <BarChart3 style={{ width: isSmall ? '12px' : '14px', height: isSmall ? '12px' : '14px' }} />
                 Income
               </button>
             </div>
@@ -1025,46 +1040,48 @@ ${senderName}`;
         </div>
       )}
 
-      <div style={{ padding: isSmall ? '16px' : '24px', maxWidth: '1600px', margin: '0 auto' }}>
+      <div style={{ padding: isSmall ? '12px 8px' : '24px', maxWidth: '1600px', margin: '0 auto' }}>
         {activeTab === 'prospecting' && (
           <div>
-            <div style={{display:'grid',gridTemplateColumns:isSmall?'repeat(2,1fr)':'repeat(4,1fr)',gap:'12px',marginBottom:'24px'}}>
-              <div style={{...card,padding:'16px',borderLeft:'4px solid #8b5cf6'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Active Leads</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>{prospectStats.active}</p></div>
-              <div style={{...card,padding:'16px',borderLeft:'4px solid #22c55e'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Won</p><p style={{fontSize:'24px',fontWeight:'700',color:'#22c55e',margin:0}}>{prospectStats.won}</p></div>
-              <div style={{...card,padding:'16px',borderLeft:'4px solid #ef4444'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Lost</p><p style={{fontSize:'24px',fontWeight:'700',color:'#ef4444',margin:0}}>{prospectStats.lost}</p></div>
-              <div style={{...card,padding:'16px',borderLeft:'4px solid #f59e0b'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Win Rate</p><p style={{fontSize:'24px',fontWeight:'700',color:'#f59e0b',margin:0}}>{prospectStats.winRate}%</p></div>
+            <div style={{display:'grid',gridTemplateColumns:isSmall?'repeat(2,1fr)':'repeat(4,1fr)',gap:isSmall?'8px':'12px',marginBottom:isSmall?'16px':'24px'}}>
+              <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #8b5cf6'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Active Leads</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:theme.text,margin:0}}>{prospectStats.active}</p></div>
+              <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #22c55e'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Won</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:'#22c55e',margin:0}}>{prospectStats.won}</p></div>
+              <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #ef4444'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Lost</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:'#ef4444',margin:0}}>{prospectStats.lost}</p></div>
+              <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #f59e0b'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Win Rate</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:'#f59e0b',margin:0}}>{prospectStats.winRate}%</p></div>
             </div>
-            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'24px',flexWrap:'wrap',gap:'12px'}}>
-              <div><h2 style={{fontSize:'20px',fontWeight:'600',color:theme.text,margin:0}}>Prospecting Pipeline</h2><p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0'}}>Track potential clients from lead to close</p></div>
-              <button onClick={() => setShowProspectForm(true)} style={btnPrimary}><UserPlus style={{width:'18px',height:'18px'}}/>Add Lead</button>
+            <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:isSmall?'16px':'24px',flexWrap:'wrap',gap:'12px'}}>
+              <div><h2 style={{fontSize:isSmall?'16px':'20px',fontWeight:'600',color:theme.text,margin:0}}>Prospecting Pipeline</h2>{!isSmall && <p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0'}}>Track potential clients from lead to close</p>}</div>
+              <button onClick={() => setShowProspectForm(true)} style={{...btnPrimary,height:isSmall?'36px':'40px',padding:isSmall?'0 12px':'0 16px',fontSize:isSmall?'13px':'14px'}}><UserPlus style={{width:isSmall?'16px':'18px',height:isSmall?'16px':'18px'}}/>{isSmall?'Add':'Add Lead'}</button>
             </div>
             {prospects.length === 0 ? (
-              <div style={{...card,textAlign:'center',padding:'60px'}}><Target style={{width:'48px',height:'48px',color:theme.textMuted,margin:'0 auto 16px'}}/><p style={{fontSize:'16px',color:theme.text,margin:'0 0 8px'}}>No prospects yet</p><p style={{fontSize:'14px',color:theme.textMuted,margin:'0 0 20px'}}>Start tracking potential clients</p><button onClick={() => setShowProspectForm(true)} style={btnPrimary}><UserPlus style={{width:'16px',height:'16px'}}/>Add First Lead</button></div>
+              <div style={{...card,textAlign:'center',padding:isSmall?'40px 20px':'60px'}}><Target style={{width:isSmall?'36px':'48px',height:isSmall?'36px':'48px',color:theme.textMuted,margin:'0 auto 16px'}}/><p style={{fontSize:isSmall?'14px':'16px',color:theme.text,margin:'0 0 8px'}}>No prospects yet</p><p style={{fontSize:isSmall?'12px':'14px',color:theme.textMuted,margin:'0 0 20px'}}>Start tracking potential clients</p><button onClick={() => setShowProspectForm(true)} style={{...btnPrimary,height:isSmall?'36px':'40px'}}><UserPlus style={{width:'16px',height:'16px'}}/>Add First Lead</button></div>
             ) : (
-              <div style={{display:'flex',flexDirection:'column',gap:'12px'}}>
+              <div style={{display:'flex',flexDirection:'column',gap:isSmall?'8px':'12px'}}>
                 {prospects.filter(p => !['won', 'lost'].includes(p.status)).map(prospect => {
                   const source = LEAD_SOURCES.find(s => s.id === prospect.source);
                   const status = PROSPECT_STATUSES.find(s => s.id === prospect.status);
                   return (
-                    <div key={prospect.id} style={{...card,padding:'16px'}}>
-                      <div style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start',gap:'12px',flexWrap:'wrap'}}>
-                        <div style={{flex:1,minWidth:'200px'}}>
+                    <div key={prospect.id} style={{...card,padding:isSmall?'12px':'16px'}}>
+                      <div style={{display:'flex',flexDirection:isSmall?'column':'row',justifyContent:'space-between',alignItems:isSmall?'stretch':'flex-start',gap:'12px'}}>
+                        <div style={{flex:1,minWidth:0}}>
                           <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'8px'}}>
-                            <span style={{display:'flex',alignItems:'center',justifyContent:'center',width:'32px',height:'32px'}}>{renderIcon(source?.icon || '🌐', 24)}</span>
-                            <div><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:0}}>{prospect.name}</h3>{prospect.company && <p style={{fontSize:'13px',color:theme.textMuted,margin:'2px 0 0'}}>{prospect.company}</p>}</div>
+                            <span style={{display:'flex',alignItems:'center',justifyContent:'center',width:isSmall?'28px':'32px',height:isSmall?'28px':'32px',flexShrink:0}}>{renderIcon(source?.icon || '🌐', isSmall?20:24)}</span>
+                            <div style={{minWidth:0}}><h3 style={{fontSize:isSmall?'14px':'16px',fontWeight:'600',color:theme.text,margin:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{prospect.name}</h3>{prospect.company && <p style={{fontSize:isSmall?'12px':'13px',color:theme.textMuted,margin:'2px 0 0',overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{prospect.company}</p>}</div>
                           </div>
-                          <div style={{display:'flex',gap:'8px',flexWrap:'wrap',marginBottom:'8px'}}>
-                            <span style={{padding:'4px 10px',borderRadius:'12px',fontSize:'12px',fontWeight:'600',...prospectStatusStyle(prospect.status)}}>{status?.icon} {status?.label}</span>
-                            <span style={{padding:'4px 10px',borderRadius:'12px',fontSize:'12px',backgroundColor:theme.statBg,color:theme.textMuted}}>{source?.name}</span>
+                          <div style={{display:'flex',gap:'6px',flexWrap:'wrap',marginBottom:'8px'}}>
+                            <span style={{padding:isSmall?'3px 8px':'4px 10px',borderRadius:'12px',fontSize:isSmall?'11px':'12px',fontWeight:'600',...prospectStatusStyle(prospect.status)}}>{status?.icon} {status?.label}</span>
+                            <span style={{padding:isSmall?'3px 8px':'4px 10px',borderRadius:'12px',fontSize:isSmall?'11px':'12px',backgroundColor:theme.statBg,color:theme.textMuted}}>{source?.name}</span>
                           </div>
-                          {prospect.notes && <p style={{fontSize:'13px',color:theme.textMuted,margin:'8px 0 0',lineHeight:'1.4'}}>{prospect.notes}</p>}
+                          {prospect.notes && !isSmall && <p style={{fontSize:'13px',color:theme.textMuted,margin:'8px 0 0',lineHeight:'1.4'}}>{prospect.notes}</p>}
                         </div>
-                        <div style={{display:'flex',gap:'8px',alignItems:'center',flexWrap:'wrap'}}>
-                          {prospect.estimatedValue > 0 && <span style={{fontSize:'14px',fontWeight:'600',color:'#22c55e',padding:'6px 12px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'8px'}}>{getSymbol(prospect.currency)}{formatAmount(prospect.estimatedValue)}{prospect.billingType === 'hourly' ? '/hr' : '/mo'}</span>}
-                          <select value={prospect.status} onChange={(e) => handleProspectStatusChange(prospect, e.target.value)} style={{...select,width:'auto',minWidth:'140px',height:'36px',fontSize:'13px'}}>{PROSPECT_STATUSES.map(s => <option key={s.id} value={s.id}>{s.icon} {s.label}</option>)}</select>
-                          {['negotiation', 'proposal', 'meeting'].includes(prospect.status) && <button onClick={() => convertToClient(prospect)} style={{...btnSuccess,height:'36px',padding:'0 12px',fontSize:'13px'}}><CheckCircle style={{width:'14px',height:'14px'}}/>Convert</button>}
-                          <button onClick={()=>{setEditingProspect(prospect);setProspectForm({...prospect,estimatedValue:prospect.estimatedValue?.toString()||''});setShowProspectForm(true);}} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><Edit style={{width:'14px',height:'14px'}}/></button>
-                          <button onClick={()=>setDeleteModal({show:true,type:'prospect',id:prospect.id,name:prospect.name})} style={{...btnGhost,width:'36px',height:'36px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button>
+                        <div style={{display:'flex',gap:'8px',alignItems:'center',flexWrap:'wrap',justifyContent:isSmall?'space-between':'flex-end'}}>
+                          {prospect.estimatedValue > 0 && <span style={{fontSize:isSmall?'13px':'14px',fontWeight:'600',color:'#22c55e',padding:isSmall?'4px 10px':'6px 12px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'8px'}}>{getSymbol(prospect.currency)}{formatAmount(prospect.estimatedValue)}{prospect.billingType === 'hourly' ? '/hr' : '/mo'}</span>}
+                          <div style={{display:'flex',gap:'6px',alignItems:'center'}}>
+                            <select value={prospect.status} onChange={(e) => handleProspectStatusChange(prospect, e.target.value)} style={{...select,width:'auto',minWidth:isSmall?'110px':'140px',height:isSmall?'32px':'36px',fontSize:isSmall?'12px':'13px',padding:'0 8px'}}>{PROSPECT_STATUSES.map(s => <option key={s.id} value={s.id}>{s.icon} {s.label}</option>)}</select>
+                            {['negotiation', 'proposal', 'meeting'].includes(prospect.status) && !isSmall && <button onClick={() => convertToClient(prospect)} style={{...btnSuccess,height:'36px',padding:'0 12px',fontSize:'13px'}}><CheckCircle style={{width:'14px',height:'14px'}}/>Convert</button>}
+                            <button onClick={()=>{setEditingProspect(prospect);setProspectForm({...prospect,estimatedValue:prospect.estimatedValue?.toString()||''});setShowProspectForm(true);}} style={{...btnGhost,width:isSmall?'32px':'36px',height:isSmall?'32px':'36px',padding:0}}><Edit style={{width:'14px',height:'14px'}}/></button>
+                            <button onClick={()=>setDeleteModal({show:true,type:'prospect',id:prospect.id,name:prospect.name})} style={{...btnGhost,width:isSmall?'32px':'36px',height:isSmall?'32px':'36px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1151,16 +1168,45 @@ ${senderName}`;
 
         {activeTab === 'invoices' && (
           <div>
-            <div style={{display:'grid',gridTemplateColumns:isSmall?'repeat(2,1fr)':'repeat(5,1fr)',gap:'12px',marginBottom:'24px'}}>
-              <div style={{...card,padding:'14px',textAlign:'center'}}><p style={{fontSize:'11px',color:theme.textMuted,margin:'0 0 4px'}}>Total</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>{invoiceStats.total}</p></div>
-              <div style={{...card,padding:'14px',textAlign:'center'}}><p style={{fontSize:'11px',color:theme.textMuted,margin:'0 0 4px'}}>Paid</p><p style={{fontSize:'20px',fontWeight:'700',color:'#22c55e',margin:0}}>{invoiceStats.paid}</p></div>
-              <div style={{...card,padding:'14px',textAlign:'center'}}><p style={{fontSize:'11px',color:theme.textMuted,margin:'0 0 4px'}}>Pending</p><p style={{fontSize:'20px',fontWeight:'700',color:'#3b82f6',margin:0}}>{invoiceStats.pending}</p></div>
-              <div style={{...card,padding:'14px',textAlign:'center'}}><p style={{fontSize:'11px',color:theme.textMuted,margin:'0 0 4px'}}>Overdue</p><p style={{fontSize:'20px',fontWeight:'700',color:'#ef4444',margin:0}}>{invoiceStats.overdue}</p></div>
-              <div style={{...card,padding:'14px',textAlign:'center',gridColumn:isSmall?'span 2':'auto'}}><p style={{fontSize:'11px',color:theme.textMuted,margin:'0 0 4px'}}>Revenue</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(invoiceStats.revenue)}</p></div>
+            <div style={{display:'grid',gridTemplateColumns:isSmall?'repeat(2,1fr)':'repeat(5,1fr)',gap:isSmall?'8px':'12px',marginBottom:isSmall?'16px':'24px'}}>
+              <div style={{...card,padding:isSmall?'10px':'14px',textAlign:'center'}}><p style={{fontSize:isSmall?'10px':'11px',color:theme.textMuted,margin:'0 0 4px'}}>Total</p><p style={{fontSize:isSmall?'18px':'20px',fontWeight:'700',color:theme.text,margin:0}}>{invoiceStats.total}</p></div>
+              <div style={{...card,padding:isSmall?'10px':'14px',textAlign:'center'}}><p style={{fontSize:isSmall?'10px':'11px',color:theme.textMuted,margin:'0 0 4px'}}>Paid</p><p style={{fontSize:isSmall?'18px':'20px',fontWeight:'700',color:'#22c55e',margin:0}}>{invoiceStats.paid}</p></div>
+              <div style={{...card,padding:isSmall?'10px':'14px',textAlign:'center'}}><p style={{fontSize:isSmall?'10px':'11px',color:theme.textMuted,margin:'0 0 4px'}}>Pending</p><p style={{fontSize:isSmall?'18px':'20px',fontWeight:'700',color:'#3b82f6',margin:0}}>{invoiceStats.pending}</p></div>
+              <div style={{...card,padding:isSmall?'10px':'14px',textAlign:'center'}}><p style={{fontSize:isSmall?'10px':'11px',color:theme.textMuted,margin:'0 0 4px'}}>Overdue</p><p style={{fontSize:isSmall?'18px':'20px',fontWeight:'700',color:'#ef4444',margin:0}}>{invoiceStats.overdue}</p></div>
+              <div style={{...card,padding:isSmall?'10px':'14px',textAlign:'center',gridColumn:isSmall?'span 2':'auto'}}><p style={{fontSize:isSmall?'10px':'11px',color:theme.textMuted,margin:'0 0 4px'}}>Revenue</p><p style={{fontSize:isSmall?'18px':'20px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(invoiceStats.revenue)}</p></div>
             </div>
-            <div style={{display:'flex',justifyContent:'flex-end',marginBottom:'20px'}}><button onClick={() => setShowInvoiceForm(true)} style={btnPrimary}><Plus style={{width:'18px',height:'18px'}}/>New Invoice</button></div>
-            {invoices.length === 0 ? (<div style={{...card,textAlign:'center',padding:'60px'}}><FileText style={{width:'48px',height:'48px',color:theme.textMuted,margin:'0 auto 16px'}}/><p style={{fontSize:'16px',color:theme.text}}>No invoices yet</p></div>
-            ) : (<div style={{display:'flex',flexDirection:'column',gap:'12px'}}>{invoices.map(inv => { const isPaid = inv.status === 'paid'; return (<div key={inv.id} style={{...card,padding:'16px',opacity:isPaid?0.85:1}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'center',flexWrap:'wrap',gap:'12px'}}><div style={{flex:1,minWidth:'200px'}}><div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'4px',flexWrap:'wrap'}}><span style={{fontSize:'15px',fontWeight:'600',color:theme.text}}>{inv.invoiceNumber}</span>{isPaid ? (<div style={{display:'flex',alignItems:'center',gap:'6px'}}><span style={{padding:'4px 10px',borderRadius:'8px',fontSize:'12px',fontWeight:'600',backgroundColor:'#22c55e20',color:'#22c55e'}}>✓ Paid</span>{inv.paidAt && <span style={{fontSize:'11px',color:theme.textMuted}}>{new Date(inv.paidAt).toLocaleDateString('en-US', {month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'})}</span>}</div>) : (<select value={inv.status} onChange={(e)=>handleInvoiceStatusChange(inv, e.target.value)} style={{padding:'4px 8px',borderRadius:'8px',fontSize:'12px',fontWeight:'600',border:'none',cursor:'pointer',backgroundColor:STATUSES.find(s=>s.id===inv.status)?.color+'20',color:STATUSES.find(s=>s.id===inv.status)?.color}}>{STATUSES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}</select>)}</div><p style={{fontSize:'14px',color:theme.textMuted,margin:0}}>{inv.clientName} • Due: {inv.dueDate||'Not set'}</p></div><div style={{display:'flex',alignItems:'center',gap:'8px'}}><div style={{textAlign:'right',marginRight:'8px'}}><p style={{fontSize:'18px',fontWeight:'700',color:isPaid?'#22c55e':theme.text,margin:0}}>{getSymbol(inv.currency)}{formatAmount(inv.total)}</p><p style={{fontSize:'12px',color:theme.textMuted,margin:0}}>₱{formatAmount(inv.phpTotal)}</p></div><div style={{display:'flex',gap:'4px'}}><button onClick={()=>setViewingInvoice(inv)} style={{...btnGhost,width:'32px',height:'32px',padding:0}} title="View"><Eye style={{width:'15px',height:'15px'}}/></button><button onClick={()=>setEmailModal({show:true,invoice:inv})} style={{...btnGhost,width:'32px',height:'32px',padding:0}} title="Generate Email"><Mail style={{width:'15px',height:'15px'}}/></button><button onClick={()=>{if(!isPaid){setEditingInvoice(inv);setInvoiceForm({...inv});setShowInvoiceForm(true);}}} style={{...btnGhost,width:'32px',height:'32px',padding:0,opacity:isPaid?0.4:1,cursor:isPaid?'not-allowed':'pointer'}} title={isPaid?'Cannot edit paid invoice':'Edit'} disabled={isPaid}><Edit style={{width:'15px',height:'15px'}}/></button><button onClick={()=>{if(!isPaid)setDeleteModal({show:true,type:'invoice',id:inv.id,name:inv.invoiceNumber});}} style={{...btnGhost,width:'32px',height:'32px',padding:0,color:'#ef4444',opacity:isPaid?0.4:1,cursor:isPaid?'not-allowed':'pointer'}} title={isPaid?'Cannot delete paid invoice':'Delete'} disabled={isPaid}><Trash2 style={{width:'15px',height:'15px'}}/></button></div></div></div></div>); })}</div>)}
+            <div style={{display:'flex',justifyContent:'flex-end',marginBottom:isSmall?'12px':'20px'}}><button onClick={() => setShowInvoiceForm(true)} style={{...btnPrimary,height:isSmall?'36px':'40px',padding:isSmall?'0 12px':'0 16px',fontSize:isSmall?'13px':'14px'}}><Plus style={{width:isSmall?'16px':'18px',height:isSmall?'16px':'18px'}}/>{isSmall?'New':'New Invoice'}</button></div>
+            {invoices.length === 0 ? (<div style={{...card,textAlign:'center',padding:isSmall?'40px 20px':'60px'}}><FileText style={{width:isSmall?'36px':'48px',height:isSmall?'36px':'48px',color:theme.textMuted,margin:'0 auto 16px'}}/><p style={{fontSize:isSmall?'14px':'16px',color:theme.text}}>No invoices yet</p></div>
+            ) : (<div style={{display:'flex',flexDirection:'column',gap:isSmall?'8px':'12px'}}>{invoices.map(inv => { const isPaid = inv.status === 'paid'; return (<div key={inv.id} style={{...card,padding:isSmall?'12px':'16px',opacity:isPaid?0.85:1}}>
+              <div style={{display:'flex',flexDirection:isSmall?'column':'row',justifyContent:'space-between',alignItems:isSmall?'stretch':'center',gap:isSmall?'10px':'12px'}}>
+                <div style={{flex:1,minWidth:0}}>
+                  <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'4px',flexWrap:'wrap'}}>
+                    <span style={{fontSize:isSmall?'13px':'15px',fontWeight:'600',color:theme.text}}>{inv.invoiceNumber}</span>
+                    {isPaid ? (
+                      <div style={{display:'flex',alignItems:'center',gap:'6px',flexWrap:'wrap'}}>
+                        <span style={{padding:isSmall?'3px 8px':'4px 10px',borderRadius:'8px',fontSize:isSmall?'11px':'12px',fontWeight:'600',backgroundColor:'#22c55e20',color:'#22c55e'}}>✓ Paid</span>
+                        {inv.paidAt && !isSmall && <span style={{fontSize:'11px',color:theme.textMuted}}>{new Date(inv.paidAt).toLocaleDateString('en-US', {month:'short',day:'numeric'})}</span>}
+                      </div>
+                    ) : (
+                      <select value={inv.status} onChange={(e)=>handleInvoiceStatusChange(inv, e.target.value)} style={{padding:isSmall?'3px 6px':'4px 8px',borderRadius:'8px',fontSize:isSmall?'11px':'12px',fontWeight:'600',border:'none',cursor:'pointer',backgroundColor:STATUSES.find(s=>s.id===inv.status)?.color+'20',color:STATUSES.find(s=>s.id===inv.status)?.color}}>{STATUSES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}</select>
+                    )}
+                  </div>
+                  <p style={{fontSize:isSmall?'12px':'14px',color:theme.textMuted,margin:0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{inv.clientName} • Due: {inv.dueDate||'Not set'}</p>
+                </div>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',justifyContent:isSmall?'space-between':'flex-end'}}>
+                  <div style={{textAlign:isSmall?'left':'right'}}>
+                    <p style={{fontSize:isSmall?'16px':'18px',fontWeight:'700',color:isPaid?'#22c55e':theme.text,margin:0}}>{getSymbol(inv.currency)}{formatAmount(inv.total)}</p>
+                    <p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:0}}>₱{formatAmount(inv.phpTotal)}</p>
+                  </div>
+                  <div style={{display:'flex',gap:'4px'}}>
+                    <button onClick={()=>setViewingInvoice(inv)} style={{...btnGhost,width:isSmall?'28px':'32px',height:isSmall?'28px':'32px',padding:0}} title="View"><Eye style={{width:isSmall?'14px':'15px',height:isSmall?'14px':'15px'}}/></button>
+                    <button onClick={()=>setEmailModal({show:true,invoice:inv})} style={{...btnGhost,width:isSmall?'28px':'32px',height:isSmall?'28px':'32px',padding:0}} title="Email"><Mail style={{width:isSmall?'14px':'15px',height:isSmall?'14px':'15px'}}/></button>
+                    <button onClick={()=>{if(!isPaid){setEditingInvoice(inv);setInvoiceForm({...inv});setShowInvoiceForm(true);}}} style={{...btnGhost,width:isSmall?'28px':'32px',height:isSmall?'28px':'32px',padding:0,opacity:isPaid?0.4:1,cursor:isPaid?'not-allowed':'pointer'}} disabled={isPaid}><Edit style={{width:isSmall?'14px':'15px',height:isSmall?'14px':'15px'}}/></button>
+                    <button onClick={()=>{if(!isPaid)setDeleteModal({show:true,type:'invoice',id:inv.id,name:inv.invoiceNumber});}} style={{...btnGhost,width:isSmall?'28px':'32px',height:isSmall?'28px':'32px',padding:0,color:'#ef4444',opacity:isPaid?0.4:1,cursor:isPaid?'not-allowed':'pointer'}} disabled={isPaid}><Trash2 style={{width:isSmall?'14px':'15px',height:isSmall?'14px':'15px'}}/></button>
+                  </div>
+                </div>
+              </div>
+            </div>); })}</div>)}
           </div>
         )}
 
@@ -1333,9 +1379,9 @@ ${senderName}`;
 
       {showIncomeForm && (<div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.6)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:50}} onClick={()=>setShowIncomeForm(false)}><div style={{width:'100%',maxWidth:'450px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder,maxHeight:'90vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}><div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}><h3 style={{fontSize:'18px',fontWeight:'600',color:theme.text,margin:0}}>Record Income</h3><button onClick={()=>setShowIncomeForm(false)} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button></div><div style={{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}}><div><label style={label}>Client</label><select value={incomeForm.clientId} onChange={e=>setIncomeForm(p=>({...p,clientId:e.target.value}))} style={select}><option value="">Select client</option>{clients.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div><div style={{display:'grid',gridTemplateColumns:'2fr 1fr',gap:'12px'}}><div><label style={label}>Amount</label><input type="number" placeholder="0" value={incomeForm.amount} onChange={e=>setIncomeForm(p=>({...p,amount:e.target.value}))} style={input}/></div><div><label style={label}>Currency</label><select value={incomeForm.currency} onChange={e=>setIncomeForm(p=>({...p,currency:e.target.value}))} style={select}>{CURRENCIES.map(c=><option key={c.code} value={c.code}>{c.code}</option>)}</select></div></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}><div><label style={label}>Platform</label><select value={incomeForm.platform} onChange={e=>setIncomeForm(p=>({...p,platform:e.target.value}))} style={select}>{PLATFORMS.map(p=><option key={p.id} value={p.id}>{p.emoji} {p.name}</option>)}</select></div><div><label style={label}>Date</label><input type="date" value={incomeForm.date} onChange={e=>setIncomeForm(p=>({...p,date:e.target.value}))} style={input}/></div></div>{incomeForm.amount && <div style={{padding:'12px',backgroundColor:theme.statBg,borderRadius:'8px',textAlign:'center'}}><p style={{fontSize:'13px',color:theme.textMuted,margin:'0 0 4px'}}>PHP Equivalent</p><p style={{fontSize:'20px',fontWeight:'700',color:'#22c55e',margin:0}}>₱{formatAmount(toPHP(parseFloat(incomeForm.amount)||0,incomeForm.currency))}</p></div>}</div><div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end'}}><button onClick={()=>setShowIncomeForm(false)} style={btnOutline}>Cancel</button><button onClick={saveIncome} disabled={!incomeForm.clientId||!incomeForm.amount} style={{...btnPrimary,opacity:(incomeForm.clientId&&incomeForm.amount)?1:0.5}}>Save Income</button></div></div></div>)}
 
-      {showClientForm && (<div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.6)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:50}} onClick={()=>{setShowClientForm(false);setEditingClient(null);}}><div style={{width:'100%',maxWidth:'500px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder,maxHeight:'90vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}><div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}><h3 style={{fontSize:'18px',fontWeight:'600',color:theme.text,margin:0}}>{editingClient?'Edit':'Add'} Client</h3><button onClick={()=>{setShowClientForm(false);setEditingClient(null);}} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button></div><div style={{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}}><div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:'12px'}}><div><label style={label}>Name *</label><input type="text" placeholder="Client name" value={clientForm.name} onChange={e=>setClientForm(p=>({...p,name:e.target.value}))} style={input}/></div><div><label style={label}>Color</label><input type="color" value={clientForm.color} onChange={e=>setClientForm(p=>({...p,color:e.target.value}))} style={{...input,width:'50px',padding:'4px',cursor:'pointer'}}/></div></div><div><label style={label}>Company</label><input type="text" placeholder="Company name" value={clientForm.company} onChange={e=>setClientForm(p=>({...p,company:e.target.value}))} style={input}/></div><div><label style={label}>Email</label><input type="email" placeholder="client@company.com" value={clientForm.email} onChange={e=>setClientForm(p=>({...p,email:e.target.value}))} style={input}/></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}><div><label style={label}>Timezone</label><select value={clientForm.timezone} onChange={e=>setClientForm(p=>({...p,timezone:e.target.value}))} style={select}>{TIMEZONES.map(t=><option key={t.id} value={t.id}>{t.flag} {t.city}</option>)}</select></div><div><label style={label}>Status</label><select value={clientForm.status} onChange={e=>setClientForm(p=>({...p,status:e.target.value}))} style={select}><option value="active">Active</option><option value="inactive">Inactive</option></select></div></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px'}}><div><label style={label}>Rate</label><input type="number" placeholder="0" value={clientForm.rate} onChange={e=>setClientForm(p=>({...p,rate:e.target.value}))} style={input}/></div><div><label style={label}>Type</label><select value={clientForm.billingType} onChange={e=>setClientForm(p=>({...p,billingType:e.target.value}))} style={select}><option value="hourly">Hourly</option><option value="monthly">Monthly</option></select></div><div><label style={label}>Currency</label><select value={clientForm.currency} onChange={e=>setClientForm(p=>({...p,currency:e.target.value}))} style={select}>{CURRENCIES.map(c=><option key={c.code} value={c.code}>{c.code}</option>)}</select></div></div><div><label style={label}>Payment Platform</label><select value={clientForm.paymentPlatform} onChange={e=>setClientForm(p=>({...p,paymentPlatform:e.target.value}))} style={select}>{PLATFORMS.map(p=><option key={p.id} value={p.id}>{p.emoji} {p.name}</option>)}</select></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}><div><label style={label}>Business Hours Start</label><select value={clientForm.businessHoursStart} onChange={e=>setClientForm(p=>({...p,businessHoursStart:parseInt(e.target.value)}))} style={select}>{Array.from({length:24},(_,i)=><option key={i} value={i}>{i}:00</option>)}</select></div><div><label style={label}>Business Hours End</label><select value={clientForm.businessHoursEnd} onChange={e=>setClientForm(p=>({...p,businessHoursEnd:parseInt(e.target.value)}))} style={select}>{Array.from({length:24},(_,i)=><option key={i} value={i}>{i}:00</option>)}</select></div></div></div><div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end'}}><button onClick={()=>{setShowClientForm(false);setEditingClient(null);}} style={btnOutline}>Cancel</button><button onClick={saveClient} disabled={!clientForm.name} style={{...btnPrimary,opacity:clientForm.name?1:0.5}}>{editingClient?'Update':'Add'} Client</button></div></div></div>)}
+      {showClientForm && (<div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.6)',display:'flex',alignItems:isSmall?'flex-end':'center',justifyContent:'center',padding:isSmall?'0':'16px',zIndex:50}} onClick={()=>{setShowClientForm(false);setEditingClient(null);}}><div style={{width:'100%',maxWidth:'500px',backgroundColor:theme.cardBg,borderRadius:isSmall?'16px 16px 0 0':'12px',border:'1px solid ' + theme.cardBorder,maxHeight:isSmall?'85vh':'90vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}><div style={{padding:isSmall?'16px':'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,backgroundColor:theme.cardBg,zIndex:1}}><h3 style={{fontSize:isSmall?'16px':'18px',fontWeight:'600',color:theme.text,margin:0}}>{editingClient?'Edit':'Add'} Client</h3><button onClick={()=>{setShowClientForm(false);setEditingClient(null);}} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button></div><div style={{padding:isSmall?'16px':'20px',display:'flex',flexDirection:'column',gap:isSmall?'12px':'16px'}}><div style={{display:'grid',gridTemplateColumns:'1fr auto',gap:'12px'}}><div><label style={label}>Name *</label><input type="text" placeholder="Client name" value={clientForm.name} onChange={e=>setClientForm(p=>({...p,name:e.target.value}))} style={input}/></div><div><label style={label}>Color</label><input type="color" value={clientForm.color} onChange={e=>setClientForm(p=>({...p,color:e.target.value}))} style={{...input,width:'50px',padding:'4px',cursor:'pointer'}}/></div></div><div><label style={label}>Company</label><input type="text" placeholder="Company name" value={clientForm.company} onChange={e=>setClientForm(p=>({...p,company:e.target.value}))} style={input}/></div><div><label style={label}>Email</label><input type="email" placeholder="client@company.com" value={clientForm.email} onChange={e=>setClientForm(p=>({...p,email:e.target.value}))} style={input}/></div><div style={{display:'grid',gridTemplateColumns:isSmall?'1fr':'1fr 1fr',gap:'12px'}}><div><label style={label}>Timezone</label><select value={clientForm.timezone} onChange={e=>setClientForm(p=>({...p,timezone:e.target.value}))} style={select}>{TIMEZONES.map(t=><option key={t.id} value={t.id}>{t.flag} {t.city}</option>)}</select></div><div><label style={label}>Status</label><select value={clientForm.status} onChange={e=>setClientForm(p=>({...p,status:e.target.value}))} style={select}><option value="active">Active</option><option value="inactive">Inactive</option></select></div></div><div style={{display:'grid',gridTemplateColumns:isSmall?'1fr 1fr':'1fr 1fr 1fr',gap:'12px'}}><div><label style={label}>Rate</label><input type="number" placeholder="0" value={clientForm.rate} onChange={e=>setClientForm(p=>({...p,rate:e.target.value}))} style={input}/></div><div><label style={label}>Type</label><select value={clientForm.billingType} onChange={e=>setClientForm(p=>({...p,billingType:e.target.value}))} style={select}><option value="hourly">Hourly</option><option value="monthly">Monthly</option></select></div><div style={{gridColumn:isSmall?'span 2':'auto'}}><label style={label}>Currency</label><select value={clientForm.currency} onChange={e=>setClientForm(p=>({...p,currency:e.target.value}))} style={select}>{CURRENCIES.map(c=><option key={c.code} value={c.code}>{c.code}</option>)}</select></div></div><div><label style={label}>Payment Platform</label><select value={clientForm.paymentPlatform} onChange={e=>setClientForm(p=>({...p,paymentPlatform:e.target.value}))} style={select}>{PLATFORMS.map(p=><option key={p.id} value={p.id}>{p.emoji} {p.name}</option>)}</select></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}><div><label style={label}>Hours Start</label><select value={clientForm.businessHoursStart} onChange={e=>setClientForm(p=>({...p,businessHoursStart:parseInt(e.target.value)}))} style={select}>{Array.from({length:24},(_,i)=><option key={i} value={i}>{i}:00</option>)}</select></div><div><label style={label}>Hours End</label><select value={clientForm.businessHoursEnd} onChange={e=>setClientForm(p=>({...p,businessHoursEnd:parseInt(e.target.value)}))} style={select}>{Array.from({length:24},(_,i)=><option key={i} value={i}>{i}:00</option>)}</select></div></div></div><div style={{padding:isSmall?'16px':'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end',position:'sticky',bottom:0,backgroundColor:theme.cardBg}}><button onClick={()=>{setShowClientForm(false);setEditingClient(null);}} style={btnOutline}>Cancel</button><button onClick={saveClient} disabled={!clientForm.name} style={{...btnPrimary,opacity:clientForm.name?1:0.5}}>{editingClient?'Update':'Add'} Client</button></div></div></div>)}
 
-      {showInvoiceForm && (<div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.6)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:50}} onClick={()=>{setShowInvoiceForm(false);setEditingInvoice(null);}}><div style={{width:'100%',maxWidth:'600px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder,maxHeight:'90vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}><div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}><h3 style={{fontSize:'18px',fontWeight:'600',color:theme.text,margin:0}}>{editingInvoice?'Edit':'New'} Invoice</h3><button onClick={()=>{setShowInvoiceForm(false);setEditingInvoice(null);}} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button></div><div style={{padding:'20px',display:'flex',flexDirection:'column',gap:'16px'}}><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}><div><label style={label}>Client</label><select value={invoiceForm.clientId} onChange={e=>setInvoiceForm(p=>({...p,clientId:e.target.value}))} style={select}><option value="">Select client</option>{clients.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div><div><label style={label}>Invoice #</label><input type="text" value={invoiceForm.invoiceNumber} onChange={e=>setInvoiceForm(p=>({...p,invoiceNumber:e.target.value}))} style={input}/></div></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr 1fr',gap:'12px'}}><div><label style={label}>Issue Date</label><input type="date" value={invoiceForm.issueDate} onChange={e=>setInvoiceForm(p=>({...p,issueDate:e.target.value}))} style={input}/></div><div><label style={label}>Due Date</label><input type="date" value={invoiceForm.dueDate} onChange={e=>setInvoiceForm(p=>({...p,dueDate:e.target.value}))} style={input}/></div><div><label style={label}>Currency</label><select value={invoiceForm.currency} onChange={e=>setInvoiceForm(p=>({...p,currency:e.target.value}))} style={select}>{CURRENCIES.map(c=><option key={c.code} value={c.code}>{c.code}</option>)}</select></div></div><div><label style={label}>Line Items</label><div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr auto',gap:'8px',marginBottom:'8px'}}><span style={{fontSize:'11px',color:theme.textMuted,fontWeight:'500'}}>Description</span><span style={{fontSize:'11px',color:theme.textMuted,fontWeight:'500'}}>Hours</span><span style={{fontSize:'11px',color:theme.textMuted,fontWeight:'500'}}>Rate</span><span style={{width:'40px'}}></span></div>{invoiceForm.items.map((item,idx)=>(<div key={idx} style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr auto',gap:'8px',marginBottom:'8px'}}><input type="text" placeholder="e.g. Web Development" value={item.description} onChange={e=>{const items=[...invoiceForm.items];items[idx].description=e.target.value;setInvoiceForm(p=>({...p,items}));}} style={input}/><input type="number" placeholder="0" value={item.hours} onChange={e=>{const items=[...invoiceForm.items];items[idx].hours=parseFloat(e.target.value)||0;setInvoiceForm(p=>({...p,items}));}} style={input}/><input type="number" placeholder="0" value={item.rate} onChange={e=>{const items=[...invoiceForm.items];items[idx].rate=parseFloat(e.target.value)||0;setInvoiceForm(p=>({...p,items}));}} style={input}/>{invoiceForm.items.length>1&&<button onClick={()=>setInvoiceForm(p=>({...p,items:p.items.filter((_,i)=>i!==idx)}))} style={{...btnGhost,width:'40px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button>}{invoiceForm.items.length===1&&<span style={{width:'40px'}}></span>}</div>))}<button onClick={()=>setInvoiceForm(p=>({...p,items:[...p.items,{description:'',hours:1,rate:0}]}))} style={{...btnGhost,justifyContent:'flex-start'}}><Plus style={{width:'14px',height:'14px'}}/>Add Line</button></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}><div><label style={label}>Status</label><select value={invoiceForm.status} onChange={e=>setInvoiceForm(p=>({...p,status:e.target.value}))} style={select}>{STATUSES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}</select></div><div style={{padding:'12px',backgroundColor:theme.statBg,borderRadius:'8px',textAlign:'center'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Total</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>{getSymbol(invoiceForm.currency)}{formatAmount(invoiceForm.items.reduce((s,i)=>s+((i.hours||1)*i.rate),0))}</p></div></div></div><div style={{padding:'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end'}}><button onClick={()=>{setShowInvoiceForm(false);setEditingInvoice(null);}} style={btnOutline}>Cancel</button><button onClick={saveInvoice} disabled={!invoiceForm.clientId} style={{...btnPrimary,opacity:invoiceForm.clientId?1:0.5}}>{editingInvoice?'Update':'Create'} Invoice</button></div></div></div>)}
+      {showInvoiceForm && (<div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.6)',display:'flex',alignItems:isSmall?'flex-end':'center',justifyContent:'center',padding:isSmall?'0':'16px',zIndex:50}} onClick={()=>{setShowInvoiceForm(false);setEditingInvoice(null);}}><div style={{width:'100%',maxWidth:'600px',backgroundColor:theme.cardBg,borderRadius:isSmall?'16px 16px 0 0':'12px',border:'1px solid ' + theme.cardBorder,maxHeight:isSmall?'90vh':'90vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}><div style={{padding:isSmall?'16px':'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center',position:'sticky',top:0,backgroundColor:theme.cardBg,zIndex:1}}><h3 style={{fontSize:isSmall?'16px':'18px',fontWeight:'600',color:theme.text,margin:0}}>{editingInvoice?'Edit':'New'} Invoice</h3><button onClick={()=>{setShowInvoiceForm(false);setEditingInvoice(null);}} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button></div><div style={{padding:isSmall?'16px':'20px',display:'flex',flexDirection:'column',gap:isSmall?'12px':'16px'}}><div style={{display:'grid',gridTemplateColumns:isSmall?'1fr':'1fr 1fr',gap:'12px'}}><div><label style={label}>Client</label><select value={invoiceForm.clientId} onChange={e=>setInvoiceForm(p=>({...p,clientId:e.target.value}))} style={select}><option value="">Select client</option>{clients.map(c=><option key={c.id} value={c.id}>{c.name}</option>)}</select></div><div><label style={label}>Invoice #</label><input type="text" value={invoiceForm.invoiceNumber} onChange={e=>setInvoiceForm(p=>({...p,invoiceNumber:e.target.value}))} style={input}/></div></div><div style={{display:'grid',gridTemplateColumns:isSmall?'1fr 1fr':'1fr 1fr 1fr',gap:'12px'}}><div><label style={label}>Issue Date</label><input type="date" value={invoiceForm.issueDate} onChange={e=>setInvoiceForm(p=>({...p,issueDate:e.target.value}))} style={input}/></div><div><label style={label}>Due Date</label><input type="date" value={invoiceForm.dueDate} onChange={e=>setInvoiceForm(p=>({...p,dueDate:e.target.value}))} style={input}/></div><div style={{gridColumn:isSmall?'span 2':'auto'}}><label style={label}>Currency</label><select value={invoiceForm.currency} onChange={e=>setInvoiceForm(p=>({...p,currency:e.target.value}))} style={select}>{CURRENCIES.map(c=><option key={c.code} value={c.code}>{c.code}</option>)}</select></div></div><div><label style={label}>Line Items</label>{!isSmall && <div style={{display:'grid',gridTemplateColumns:'2fr 1fr 1fr auto',gap:'8px',marginBottom:'8px'}}><span style={{fontSize:'11px',color:theme.textMuted,fontWeight:'500'}}>Description</span><span style={{fontSize:'11px',color:theme.textMuted,fontWeight:'500'}}>Hours</span><span style={{fontSize:'11px',color:theme.textMuted,fontWeight:'500'}}>Rate</span><span style={{width:'40px'}}></span></div>}{invoiceForm.items.map((item,idx)=>(<div key={idx} style={{display:'grid',gridTemplateColumns:isSmall?'1fr':'2fr 1fr 1fr auto',gap:'8px',marginBottom:'8px',padding:isSmall?'12px':'0',backgroundColor:isSmall?theme.statBg:'transparent',borderRadius:isSmall?'8px':'0'}}>{isSmall && <div style={{gridColumn:'span 2',display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'4px'}}><span style={{fontSize:'12px',color:theme.textMuted}}>Item {idx+1}</span>{invoiceForm.items.length>1&&<button onClick={()=>setInvoiceForm(p=>({...p,items:p.items.filter((_,i)=>i!==idx)}))} style={{...btnGhost,width:'28px',height:'28px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button>}</div>}<input type="text" placeholder={isSmall?'Description':'e.g. Web Development'} value={item.description} onChange={e=>{const items=[...invoiceForm.items];items[idx].description=e.target.value;setInvoiceForm(p=>({...p,items}));}} style={{...input,gridColumn:isSmall?'span 2':'auto'}}/><input type="number" placeholder={isSmall?'Hours':'0'} value={item.hours} onChange={e=>{const items=[...invoiceForm.items];items[idx].hours=parseFloat(e.target.value)||0;setInvoiceForm(p=>({...p,items}));}} style={input}/><input type="number" placeholder={isSmall?'Rate':'0'} value={item.rate} onChange={e=>{const items=[...invoiceForm.items];items[idx].rate=parseFloat(e.target.value)||0;setInvoiceForm(p=>({...p,items}));}} style={input}/>{!isSmall && invoiceForm.items.length>1&&<button onClick={()=>setInvoiceForm(p=>({...p,items:p.items.filter((_,i)=>i!==idx)}))} style={{...btnGhost,width:'40px',padding:0,color:'#ef4444'}}><Trash2 style={{width:'14px',height:'14px'}}/></button>}{!isSmall && invoiceForm.items.length===1&&<span style={{width:'40px'}}></span>}</div>))}<button onClick={()=>setInvoiceForm(p=>({...p,items:[...p.items,{description:'',hours:1,rate:0}]}))} style={{...btnGhost,justifyContent:'flex-start'}}><Plus style={{width:'14px',height:'14px'}}/>Add Line</button></div><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}><div><label style={label}>Status</label><select value={invoiceForm.status} onChange={e=>setInvoiceForm(p=>({...p,status:e.target.value}))} style={select}>{STATUSES.map(s=><option key={s.id} value={s.id}>{s.label}</option>)}</select></div><div style={{padding:'12px',backgroundColor:theme.statBg,borderRadius:'8px',textAlign:'center'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Total</p><p style={{fontSize:isSmall?'18px':'20px',fontWeight:'700',color:theme.text,margin:0}}>{getSymbol(invoiceForm.currency)}{formatAmount(invoiceForm.items.reduce((s,i)=>s+((i.hours||1)*i.rate),0))}</p></div></div></div><div style={{padding:isSmall?'16px':'20px',borderTop:'1px solid ' + theme.cardBorder,display:'flex',gap:'12px',justifyContent:'flex-end',position:'sticky',bottom:0,backgroundColor:theme.cardBg}}><button onClick={()=>{setShowInvoiceForm(false);setEditingInvoice(null);}} style={btnOutline}>Cancel</button><button onClick={saveInvoice} disabled={!invoiceForm.clientId} style={{...btnPrimary,opacity:invoiceForm.clientId?1:0.5}}>{editingInvoice?'Update':'Create'}</button></div></div></div>)}
 
       {viewingInvoice && (<div style={{position:'fixed',inset:0,backgroundColor:'rgba(0,0,0,0.6)',display:'flex',alignItems:'center',justifyContent:'center',padding:'16px',zIndex:50}} onClick={()=>setViewingInvoice(null)}><div style={{width:'100%',maxWidth:'500px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder,maxHeight:'90vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}><div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}><div><h3 style={{fontSize:'18px',fontWeight:'600',color:theme.text,margin:0}}>{viewingInvoice.invoiceNumber}</h3><p style={{fontSize:'13px',color:theme.textMuted,margin:'4px 0 0'}}>{viewingInvoice.clientName}</p></div><button onClick={()=>setViewingInvoice(null)} style={{...btnGhost,width:'36px',height:'36px',padding:0}}><X style={{width:'18px',height:'18px'}}/></button></div><div style={{padding:'20px'}}><div style={{display:'flex',justifyContent:'space-between',marginBottom:'20px'}}><div><p style={{fontSize:'13px',color:theme.textMuted,margin:0}}>Issue Date</p><p style={{fontSize:'14px',color:theme.text,margin:'4px 0 0'}}>{viewingInvoice.issueDate}</p></div><div style={{textAlign:'right'}}><p style={{fontSize:'13px',color:theme.textMuted,margin:0}}>Due Date</p><p style={{fontSize:'14px',color:theme.text,margin:'4px 0 0'}}>{viewingInvoice.dueDate||'Not set'}</p></div></div><div style={{marginBottom:'20px'}}><p style={{fontSize:'13px',fontWeight:'600',color:theme.textMuted,margin:'0 0 12px'}}>Line Items</p>{viewingInvoice.items?.map((item,idx)=>(<div key={idx} style={{display:'flex',justifyContent:'space-between',padding:'12px',backgroundColor:theme.statBg,borderRadius:'8px',marginBottom:'8px'}}><div><p style={{fontSize:'14px',color:theme.text,margin:0}}>{item.description||'Service'}</p><p style={{fontSize:'12px',color:theme.textMuted,margin:'4px 0 0'}}>{item.hours} hrs × {getSymbol(viewingInvoice.currency)}{item.rate}</p></div><p style={{fontSize:'14px',fontWeight:'600',color:theme.text,margin:0}}>{getSymbol(viewingInvoice.currency)}{formatAmount((item.hours||1)*item.rate)}</p></div>))}</div><div style={{padding:'16px',backgroundColor:isDark?'#22c55e15':'#22c55e10',borderRadius:'8px',display:'flex',justifyContent:'space-between',alignItems:'center'}}><span style={{fontSize:'16px',fontWeight:'600',color:theme.text}}>Total</span><div style={{textAlign:'right'}}><p style={{fontSize:'24px',fontWeight:'700',color:'#22c55e',margin:0}}>{getSymbol(viewingInvoice.currency)}{formatAmount(viewingInvoice.total)}</p><p style={{fontSize:'13px',color:theme.textMuted,margin:'4px 0 0'}}>₱{formatAmount(viewingInvoice.phpTotal)}</p></div></div></div></div></div>)}
 
