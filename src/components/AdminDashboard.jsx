@@ -11,7 +11,8 @@ import { supabase } from '../lib/supabase';
 import { getTheme } from '../lib/theme';
 import { useWindowSize } from '../lib/hooks';
 import { formatAmount, getInitial } from '../lib/utils';
-import { ACHIEVEMENTS } from '../lib/constants';
+import { ACHIEVEMENTS, LEVEL_THRESHOLDS } from '../lib/constants';
+import { calculateLevel, getXPForNextLevel, getLevelProgress } from '../lib/gamification';
 
 const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
   const theme = getTheme(isDark);
@@ -74,21 +75,21 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
   const fetchUsers = async () => {
     try {
-      // Get user_profiles (main source - contains user data and VAKita data)
+      // Get user_profiles (contains VAKita data, XP, etc.)
       const { data: userProfiles, error: upError } = await supabase
         .from('user_profiles')
         .select('*');
 
       if (upError) console.error('User profiles error:', upError);
 
-      // Try to get profiles table (may or may not exist depending on setup)
+      // Try to get profiles table (may contain nickname, avatar)
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
 
       if (profilesError) console.error('Profiles error (may be expected):', profilesError);
 
-      // Get all expenses
+      // Get all expenses (contains user_email and user_nickname)
       const { data: expenses, error: expError } = await supabase
         .from('expenses')
         .select('*')
@@ -96,50 +97,109 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
       if (expError) console.error('Expenses error:', expError);
 
-      // Build user map - start with user_profiles as primary source
+      // Try to get auth users via edge function (has actual emails)
+      let authUsers = [];
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const response = await fetch(
+            `${supabase.supabaseUrl}/functions/v1/admin-list-users`,
+            {
+              method: 'GET',
+              headers: {
+                'Authorization': `Bearer ${session.access_token}`,
+              }
+            }
+          );
+          if (response.ok) {
+            const result = await response.json();
+            authUsers = result.users || [];
+          }
+        }
+      } catch (e) {
+        console.log('Could not fetch auth users (edge function may not exist):', e);
+      }
+
+      // Build user map
       const userMap = {};
       let totalClients = 0;
       let totalInvoices = 0;
       let totalIncome = 0;
       let totalExpenseAmount = 0;
 
-      // First, add users from user_profiles (this is the main data source)
-      if (userProfiles && userProfiles.length > 0) {
-        userProfiles.forEach(up => {
-          const odl = {
-            id: up.user_id,
-            email: up.email || up.user_id,
-            nickname: up.nickname || up.full_name || 'User',
-            avatar_url: up.avatar_url || up.profile_picture,
-            created_at: up.created_at,
+      // First, add auth users (most reliable source for email)
+      if (authUsers.length > 0) {
+        authUsers.forEach(authUser => {
+          userMap[authUser.id] = {
+            id: authUser.id,
+            email: authUser.email || authUser.id,
+            nickname: authUser.user_metadata?.nickname || authUser.user_metadata?.full_name || authUser.email?.split('@')[0] || 'User',
+            avatar_url: authUser.user_metadata?.avatar_url || authUser.user_metadata?.profile_picture,
+            created_at: authUser.created_at,
             expenses: [],
             totalSpent: 0,
-            level: calculateLevelFromXP(up.xp || 0),
-            xp: up.xp || 0,
-            streak: up.streak || 0,
+            level: 1,
+            xp: 0,
+            streak: 0,
             clientCount: 0,
             invoiceCount: 0,
             incomeTotal: 0
           };
+        });
+      }
 
+      // Add/update from user_profiles (has XP, VAKita data)
+      if (userProfiles && userProfiles.length > 0) {
+        userProfiles.forEach(up => {
+          const existingUser = userMap[up.user_id];
+          
           // Parse VAKita data
+          let clientCount = 0, invoiceCount = 0, incomeTotal = 0;
           try {
             const clients = up.vakita_clients ? (typeof up.vakita_clients === 'string' ? JSON.parse(up.vakita_clients) : up.vakita_clients) : [];
             const invoices = up.vakita_invoices ? (typeof up.vakita_invoices === 'string' ? JSON.parse(up.vakita_invoices) : up.vakita_invoices) : [];
             const income = up.vakita_income ? (typeof up.vakita_income === 'string' ? JSON.parse(up.vakita_income) : up.vakita_income) : [];
 
-            odl.clientCount = Array.isArray(clients) ? clients.length : 0;
-            odl.invoiceCount = Array.isArray(invoices) ? invoices.length : 0;
-            odl.incomeTotal = Array.isArray(income) ? income.reduce((sum, i) => sum + (parseFloat(i.amountPHP) || 0), 0) : 0;
+            clientCount = Array.isArray(clients) ? clients.length : 0;
+            invoiceCount = Array.isArray(invoices) ? invoices.length : 0;
+            incomeTotal = Array.isArray(income) ? income.reduce((sum, i) => sum + (parseFloat(i.amountPHP) || 0), 0) : 0;
 
-            totalClients += odl.clientCount;
-            totalInvoices += odl.invoiceCount;
-            totalIncome += odl.incomeTotal;
+            totalClients += clientCount;
+            totalInvoices += invoiceCount;
+            totalIncome += incomeTotal;
           } catch (e) {
             console.error('Error parsing VAKita data:', e);
           }
 
-          userMap[up.user_id] = odl;
+          if (existingUser) {
+            // Update existing user with user_profiles data
+            existingUser.xp = up.xp || 0;
+            existingUser.level = calculateLevel(up.xp || 0);
+            existingUser.streak = up.streak || 0;
+            existingUser.clientCount = clientCount;
+            existingUser.invoiceCount = invoiceCount;
+            existingUser.incomeTotal = incomeTotal;
+            if (up.avatar_url || up.profile_picture) {
+              existingUser.avatar_url = up.avatar_url || up.profile_picture;
+            }
+          } else {
+            // Create new user from user_profiles
+            userMap[up.user_id] = {
+              id: up.user_id,
+              email: up.email || up.user_id,
+              nickname: up.nickname || up.full_name || 'User',
+              avatar_url: up.avatar_url || up.profile_picture,
+              created_at: up.created_at,
+              expenses: [],
+              totalSpent: 0,
+              level: calculateLevel(up.xp || 0),
+              xp: up.xp || 0,
+              streak: up.streak || 0,
+              clientCount,
+              invoiceCount,
+              incomeTotal
+            };
+          }
         });
       }
 
@@ -148,8 +208,10 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         profiles.forEach(profile => {
           if (userMap[profile.id]) {
             // Update existing user with profile data
-            if (profile.email) userMap[profile.id].email = profile.email;
-            if (profile.nickname || profile.full_name || profile.username) {
+            if (profile.email && userMap[profile.id].email === profile.id) {
+              userMap[profile.id].email = profile.email;
+            }
+            if ((profile.nickname || profile.full_name || profile.username) && userMap[profile.id].nickname === 'User') {
               userMap[profile.id].nickname = profile.nickname || profile.full_name || profile.username;
             }
             if (profile.avatar_url) userMap[profile.id].avatar_url = profile.avatar_url;
@@ -173,7 +235,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         });
       }
 
-      // Also check expenses for users not in profiles/user_profiles
+      // Also check expenses for user info and add expense data
       if (expenses && expenses.length > 0) {
         expenses.forEach(expense => {
           const userId = expense.user_id;
@@ -181,8 +243,8 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             if (userMap[userId]) {
               userMap[userId].expenses.push(expense);
               userMap[userId].totalSpent += parseFloat(expense.amount) || 0;
-              // Update email/nickname from expense if missing
-              if (expense.user_email && userMap[userId].email === userId) {
+              // Update email/nickname from expense if still showing UUID
+              if (expense.user_email && (userMap[userId].email === userId || !userMap[userId].email.includes('@'))) {
                 userMap[userId].email = expense.user_email;
               }
               if (expense.user_nickname && userMap[userId].nickname === 'User') {
@@ -315,18 +377,9 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
     }
   };
 
-  // Helper functions
-  const calculateLevelFromXP = (xp) => {
-    const thresholds = [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5500, 7500, 10000, 13000, 17000, 22000, 28000, 35000, 45000, 60000];
-    for (let i = thresholds.length - 1; i >= 0; i--) {
-      if (xp >= thresholds[i]) return i + 1;
-    }
-    return 1;
-  };
-
+  // Helper function for getting XP needed for a specific level
   const getXPForLevel = (level) => {
-    const thresholds = [0, 100, 250, 500, 800, 1200, 1700, 2300, 3000, 4000, 5500, 7500, 10000, 13000, 17000, 22000, 28000, 35000, 45000, 60000];
-    return level <= thresholds.length ? thresholds[level - 1] : thresholds[thresholds.length - 1];
+    return level <= LEVEL_THRESHOLDS.length ? LEVEL_THRESHOLDS[level - 1] : LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
   };
 
   // Edit user
@@ -586,7 +639,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
     if (!selectedUser || !userProfileData) return;
 
     const currentXP = userProfileData.xp || 0;
-    const currentLevel = calculateLevelFromXP(currentXP);
+    const currentLevel = calculateLevel(currentXP);
     const newLevel = Math.max(1, currentLevel + adjustment);
     const newXP = getXPForLevel(newLevel);
 
@@ -922,7 +975,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                             <p style={{ fontSize: '13px', color: theme.textMuted, margin: '2px 0' }}>{selectedUser.email}</p>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '4px' }}>
                               <span style={{ fontSize: '12px', padding: '2px 8px', borderRadius: '4px', backgroundColor: '#8b5cf620', color: '#8b5cf6', fontWeight: '500' }}>
-                                Level {calculateLevelFromXP(userProfileData?.xp || 0)}
+                                Level {calculateLevel(userProfileData?.xp || 0)}
                               </span>
                               <span style={{ fontSize: '12px', color: theme.textMuted }}>
                                 {userProfileData?.xp || 0} XP
@@ -1003,7 +1056,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
                             <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Level / XP</p>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <p style={{ fontSize: '20px', fontWeight: '700', color: '#8b5cf6', margin: 0 }}>Lv.{calculateLevelFromXP(userProfileData?.xp || 0)}</p>
+                              <p style={{ fontSize: '20px', fontWeight: '700', color: '#8b5cf6', margin: 0 }}>Lv.{calculateLevel(userProfileData?.xp || 0)}</p>
                               <div style={{ display: 'flex', gap: '4px' }}>
                                 <button onClick={() => handleAdjustLevel(-1)} style={{ width: '24px', height: '24px', borderRadius: '4px', border: 'none', backgroundColor: '#ef4444', color: '#fff', cursor: 'pointer', fontSize: '14px' }}>-</button>
                                 <button onClick={() => handleAdjustLevel(1)} style={{ width: '24px', height: '24px', borderRadius: '4px', border: 'none', backgroundColor: '#22c55e', color: '#fff', cursor: 'pointer', fontSize: '14px' }}>+</button>
