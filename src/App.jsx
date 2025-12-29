@@ -327,14 +327,11 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       {/* Footer */}
       <footer style={{ padding: '24px 20px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '12px', flexWrap: 'wrap' }}>
-          <button 
-            onClick={() => onNavigate('privacy')}
+          <a 
+            href="/privacy"
             style={{ 
-              background: 'none', 
-              border: 'none', 
               color: theme.textMuted, 
               fontSize: '13px', 
-              cursor: 'pointer',
               textDecoration: 'none',
               padding: '4px 0'
             }}
@@ -342,15 +339,12 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             onMouseLeave={(e) => e.target.style.color = theme.textMuted}
           >
             Privacy Policy
-          </button>
-          <button 
-            onClick={() => onNavigate('terms')}
+          </a>
+          <a 
+            href="/terms"
             style={{ 
-              background: 'none', 
-              border: 'none', 
               color: theme.textMuted, 
               fontSize: '13px', 
-              cursor: 'pointer',
               textDecoration: 'none',
               padding: '4px 0'
             }}
@@ -358,15 +352,12 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             onMouseLeave={(e) => e.target.style.color = theme.textMuted}
           >
             Terms of Service
-          </button>
-          <button 
-            onClick={() => onNavigate('about')}
+          </a>
+          <a 
+            href="/about"
             style={{ 
-              background: 'none', 
-              border: 'none', 
               color: theme.textMuted, 
               fontSize: '13px', 
-              cursor: 'pointer',
               textDecoration: 'none',
               padding: '4px 0'
             }}
@@ -374,7 +365,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             onMouseLeave={(e) => e.target.style.color = theme.textMuted}
           >
             About Us
-          </button>
+          </a>
           <a 
             href="mailto:brewedops@gmail.com"
             style={{ 
