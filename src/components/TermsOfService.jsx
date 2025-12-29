@@ -1,8 +1,8 @@
 // TermsOfService.jsx - Terms of Service page for BrewedOps
 import React from 'react';
-import { ArrowLeft, FileText, CheckCircle, AlertTriangle, Scale, Ban, RefreshCw, Mail, Shield, Zap, Globe, Lock } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle, AlertTriangle, Scale, Ban, RefreshCw, Mail, Shield, Zap, Globe, Lock, Coffee } from 'lucide-react';
 
-const TermsOfService = ({ onBack, isDark }) => {
+const TermsOfService = ({ onBack, onNavigate, isDark }) => {
   const theme = {
     bg: isDark ? '#09090b' : '#ffffff',
     text: isDark ? '#fafafa' : '#18181b',
@@ -11,7 +11,7 @@ const TermsOfService = ({ onBack, isDark }) => {
     cardBorder: isDark ? '#27272a' : '#e4e4e7',
   };
 
-  const lastUpdated = 'December 29, 2024';
+  const lastUpdated = 'December 29, 2025';
 
   const Section = ({ icon: Icon, title, children, color = '#8b5cf6' }) => (
     <div style={{ marginBottom: '32px' }}>
@@ -35,66 +35,100 @@ const TermsOfService = ({ onBack, isDark }) => {
     </div>
   );
 
+  const handleNavigate = (page) => {
+    if (onNavigate) {
+      onNavigate(page);
+    }
+  };
+
   return (
     <div style={{ 
       minHeight: '100vh', 
       backgroundColor: theme.bg,
-      padding: '24px'
+      display: 'flex',
+      flexDirection: 'column'
     }}>
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-        {/* Header */}
-        <div style={{ marginBottom: '40px' }}>
-          {onBack && (
-            <button 
-              onClick={onBack}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                backgroundColor: 'transparent',
-                border: 'none',
-                color: theme.textMuted,
-                fontSize: '14px',
-                cursor: 'pointer',
-                padding: '8px 0',
-                marginBottom: '24px'
-              }}
-            >
-              <ArrowLeft style={{ width: '18px', height: '18px' }} />
-              Back to BrewedOps
-            </button>
-          )}
-          
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-            <div style={{ 
-              width: '56px', 
-              height: '56px', 
-              backgroundColor: isDark ? '#8b5cf620' : '#8b5cf615', 
-              borderRadius: '14px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center' 
-            }}>
-              <Scale style={{ width: '28px', height: '28px', color: '#8b5cf6' }} />
-            </div>
-            <div>
-              <h1 style={{ fontSize: '32px', fontWeight: '700', color: theme.text, margin: 0 }}>Terms of Service</h1>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>Last updated: {lastUpdated}</p>
-            </div>
-          </div>
-          
-          <div style={{ 
-            padding: '16px 20px', 
-            backgroundColor: isDark ? '#3b82f615' : '#3b82f610', 
-            borderRadius: '12px',
-            border: '1px solid #3b82f640'
+      {/* Header */}
+      <header style={{
+        padding: '16px 24px',
+        borderBottom: '1px solid ' + theme.cardBorder,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: theme.bg,
+        position: 'sticky',
+        top: 0,
+        zIndex: 10
+      }}>
+        <button 
+          onClick={() => handleNavigate('home')}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            backgroundColor: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '8px 0'
+          }}
+        >
+          <div style={{
+            width: '36px',
+            height: '36px',
+            backgroundColor: '#8b5cf6',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
-            <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.6' }}>
-              Welcome to <strong>BrewedOps</strong>! These Terms of Service ("Terms") govern your use of our 
-              financial tracking application. By using BrewedOps, you agree to these Terms.
-            </p>
+            <Coffee style={{ width: '20px', height: '20px', color: '#fff' }} />
           </div>
-        </div>
+          <span style={{ 
+            fontSize: '20px', 
+            fontWeight: '700', 
+            color: theme.text,
+            letterSpacing: '-0.5px'
+          }}>
+            BrewedOps
+          </span>
+        </button>
+      </header>
+
+      {/* Main Content */}
+      <main style={{ flex: 1, padding: '24px' }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          {/* Page Header */}
+          <div style={{ marginBottom: '40px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
+              <div style={{ 
+                width: '56px', 
+                height: '56px', 
+                backgroundColor: isDark ? '#8b5cf620' : '#8b5cf615', 
+                borderRadius: '14px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center' 
+              }}>
+                <Scale style={{ width: '28px', height: '28px', color: '#8b5cf6' }} />
+              </div>
+              <div>
+                <h1 style={{ fontSize: '32px', fontWeight: '700', color: theme.text, margin: 0 }}>Terms of Service</h1>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>Last updated: {lastUpdated}</p>
+              </div>
+            </div>
+            
+            <div style={{ 
+              padding: '16px 20px', 
+              backgroundColor: isDark ? '#3b82f615' : '#3b82f610', 
+              borderRadius: '12px',
+              border: '1px solid #3b82f640'
+            }}>
+              <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.6' }}>
+                Welcome to <strong>BrewedOps</strong>! These Terms of Service ("Terms") govern your use of our 
+                financial tracking application. By using BrewedOps, you agree to these Terms.
+              </p>
+            </div>
+          </div>
 
         {/* Content */}
         <Section icon={CheckCircle} title="Acceptance of Terms" color="#22c55e">
@@ -328,7 +362,7 @@ const TermsOfService = ({ onBack, isDark }) => {
             If you have questions about these Terms of Service, please contact us at:
           </p>
           <p style={{ fontSize: '15px', color: '#8b5cf6', margin: '12px 0 0', fontWeight: '500' }}>
-            support@brewedops.com
+            brewedops@gmail.com
           </p>
         </div>
 
@@ -346,19 +380,67 @@ const TermsOfService = ({ onBack, isDark }) => {
             By using BrewedOps, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
           </p>
         </div>
-
-        {/* Footer */}
-        <div style={{ 
-          marginTop: '40px', 
-          paddingTop: '24px', 
-          borderTop: '1px solid ' + theme.cardBorder,
-          textAlign: 'center'
-        }}>
-          <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>
-            © {new Date().getFullYear()} BrewedOps. All rights reserved.
-          </p>
         </div>
-      </div>
+      </main>
+
+      {/* Footer */}
+      <footer style={{ 
+        padding: '24px', 
+        borderTop: '1px solid ' + theme.cardBorder,
+        textAlign: 'center'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          gap: '24px', 
+          marginBottom: '12px',
+          flexWrap: 'wrap'
+        }}>
+          <button 
+            onClick={() => handleNavigate('privacy')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: theme.textMuted, 
+              fontSize: '13px', 
+              cursor: 'pointer',
+              padding: '4px 0'
+            }}
+          >
+            Privacy Policy
+          </button>
+          <button 
+            onClick={() => handleNavigate('terms')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: '#8b5cf6', 
+              fontSize: '13px', 
+              cursor: 'pointer',
+              padding: '4px 0',
+              fontWeight: '500'
+            }}
+          >
+            Terms of Service
+          </button>
+          <button 
+            onClick={() => handleNavigate('about')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: theme.textMuted, 
+              fontSize: '13px', 
+              cursor: 'pointer',
+              padding: '4px 0'
+            }}
+          >
+            About Us
+          </button>
+        </div>
+        <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>
+          © {new Date().getFullYear()} BrewedOps. All rights reserved.
+        </p>
+      </footer>
     </div>
   );
 };

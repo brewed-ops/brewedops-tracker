@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
 import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset } from 'lucide-react';
 import { supabase } from './lib/supabase';
@@ -8,6 +9,7 @@ import Sidebar from './components/layout/Sidebar';
 import VAKita from './components/VAKita';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
+import AboutUs from './components/AboutUs';
 import {
   CATEGORIES,
   CURRENCIES,
@@ -255,8 +257,24 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           >
             Terms of Service
           </button>
+          <button 
+            onClick={() => onNavigate('about')}
+            style={{ 
+              background: 'none', 
+              border: 'none', 
+              color: theme.textMuted, 
+              fontSize: '13px', 
+              cursor: 'pointer',
+              textDecoration: 'none',
+              padding: '4px 0'
+            }}
+            onMouseEnter={(e) => e.target.style.color = '#8b5cf6'}
+            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
+          >
+            About Us
+          </button>
           <a 
-            href="mailto:support@brewedops.com"
+            href="mailto:brewedops@gmail.com"
             style={{ 
               color: theme.textMuted, 
               fontSize: '13px', 
@@ -9712,16 +9730,17 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
 
 // ============================================
-// MAIN EXPORT
+// MAIN APP CONTENT (with routing logic)
 // ============================================
-export default function App() {
+function AppContent() {
   const [user, setUser] = useState(null);
   const [isDark, setIsDark] = useState(() => {
-  const saved = localStorage.getItem('theme');
-  return saved ? saved === 'dark' : true;
-});
-  const [currentPage, setCurrentPage] = useState('home');
+    const saved = localStorage.getItem('theme');
+    return saved ? saved === 'dark' : true;
+  });
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Check for existing session on load
   useEffect(() => {
@@ -9762,18 +9781,44 @@ export default function App() {
       localStorage.removeItem('isAdmin');
     }
     setUser(userData);
+    navigate('/');
   };
 
- const handleLogout = async () => {
+  const handleLogout = async () => {
     localStorage.removeItem('isAdmin');
     if (user?.isAdmin) {
       setUser(null);
-      setCurrentPage('home');
+      navigate('/');
       return;
     }
     await supabase.auth.signOut();
     setUser(null);
-    setCurrentPage('home');
+    navigate('/');
+  };
+
+  const handleNavigate = (page) => {
+    switch(page) {
+      case 'home':
+        navigate('/');
+        break;
+      case 'login':
+        navigate('/login');
+        break;
+      case 'signup':
+        navigate('/signup');
+        break;
+      case 'privacy':
+        navigate('/privacypolicy');
+        break;
+      case 'terms':
+        navigate('/tos');
+        break;
+      case 'about':
+        navigate('/about');
+        break;
+      default:
+        navigate('/');
+    }
   };
 
   // Show loading screen
@@ -9798,32 +9843,36 @@ export default function App() {
   }
   
   // Admin Dashboard
-if (user?.isAdmin) {
-  return <AdminDashboard onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
+  if (user?.isAdmin) {
+    return <AdminDashboard onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
+  }
+
+  // User Dashboard  
+  if (user) {
+    return <ExpenseTrackerApp user={user} onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
+  }
+
+  // Public routes
+  return (
+    <Routes>
+      <Route path="/" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
+      <Route path="/login" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
+      <Route path="/signup" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="signup" />} />
+      <Route path="/privacypolicy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+      <Route path="/tos" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+      <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+      <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
+    </Routes>
+  );
 }
 
-// User Dashboard  
-if (user) {
-  return <ExpenseTrackerApp user={user} onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
-}
-  
-  if (currentPage === 'login' || currentPage === 'signup') {
-    return <LoginPage 
-      onLogin={handleLogin} 
-      onBack={() => setCurrentPage('home')} 
-      isDark={isDark} 
-      setIsDark={setIsDark}
-      initialMode={currentPage}
-    />;
-  }
-  
-  if (currentPage === 'privacy') {
-    return <PrivacyPolicy onBack={() => setCurrentPage('home')} isDark={isDark} />;
-  }
-  
-  if (currentPage === 'terms') {
-    return <TermsOfService onBack={() => setCurrentPage('home')} isDark={isDark} />;
-  }
-  
-  return <HomePage onNavigate={setCurrentPage} isDark={isDark} setIsDark={setIsDark} />;
+// ============================================
+// MAIN EXPORT WITH BROWSER ROUTER
+// ============================================
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
+    </BrowserRouter>
+  );
 }
