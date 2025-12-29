@@ -578,6 +578,21 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
     }
   };
 
+  const handleDeleteWallet = async (walletId) => {
+    if (!window.confirm('Delete this wallet? This will also delete all transactions for this wallet.')) return;
+    try {
+      // First delete wallet transactions
+      await supabase.from('wallet_transactions').delete().eq('wallet_id', walletId);
+      // Then delete the wallet
+      await supabase.from('wallets').delete().eq('id', walletId);
+      setUserWallets(prev => prev.filter(w => w.id !== walletId));
+      alert('Wallet deleted');
+    } catch (error) {
+      console.error('Error deleting wallet:', error);
+      alert('Failed to delete wallet: ' + error.message);
+    }
+  };
+
   const handleDeleteClient = async (clientId) => {
     if (!window.confirm('Delete this client?')) return;
     try {
@@ -1007,6 +1022,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                       {[
                         { id: 'overview', label: 'Overview' },
                         { id: 'expenses', label: `Expenses (${userExpenses.length})` },
+                        { id: 'wallets', label: `Wallets (${userWallets.length})` },
                         { id: 'clients', label: `Clients (${userVAKitaData?.clients?.length || 0})` },
                         { id: 'invoices', label: `Invoices (${userVAKitaData?.invoices?.length || 0})` },
                         { id: 'income', label: `Income (${userVAKitaData?.income?.length || 0})` },
@@ -1036,36 +1052,58 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                     {/* Tab Content */}
                     <div style={{ padding: '16px 20px', maxHeight: '400px', overflowY: 'auto' }}>
                       {userDetailTab === 'overview' && (
-                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '12px' }}>
-                          <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
-                            <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Total Expenses</p>
-                            <p style={{ fontSize: '20px', fontWeight: '700', color: theme.text, margin: 0 }}>₱{formatAmount(selectedUser.totalSpent)}</p>
-                          </div>
-                          <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
-                            <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Total Income</p>
-                            <p style={{ fontSize: '20px', fontWeight: '700', color: '#22c55e', margin: 0 }}>₱{formatAmount(userVAKitaData?.income?.reduce((sum, i) => sum + (parseFloat(i.amountPHP) || 0), 0) || 0)}</p>
-                          </div>
-                          <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
-                            <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Clients</p>
-                            <p style={{ fontSize: '20px', fontWeight: '700', color: theme.text, margin: 0 }}>{userVAKitaData?.clients?.length || 0}</p>
-                          </div>
-                          <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
-                            <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Invoices</p>
-                            <p style={{ fontSize: '20px', fontWeight: '700', color: theme.text, margin: 0 }}>{userVAKitaData?.invoices?.length || 0}</p>
-                          </div>
-                          <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
-                            <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Level / XP</p>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <p style={{ fontSize: '20px', fontWeight: '700', color: '#8b5cf6', margin: 0 }}>Lv.{calculateLevel(userProfileData?.xp || 0)}</p>
-                              <div style={{ display: 'flex', gap: '4px' }}>
-                                <button onClick={() => handleAdjustLevel(-1)} style={{ width: '24px', height: '24px', borderRadius: '4px', border: 'none', backgroundColor: '#ef4444', color: '#fff', cursor: 'pointer', fontSize: '14px' }}>-</button>
-                                <button onClick={() => handleAdjustLevel(1)} style={{ width: '24px', height: '24px', borderRadius: '4px', border: 'none', backgroundColor: '#22c55e', color: '#fff', cursor: 'pointer', fontSize: '14px' }}>+</button>
-                              </div>
+                        <div>
+                          {/* Finance Tracker Section */}
+                          <p style={{ fontSize: '12px', fontWeight: '600', color: theme.textMuted, margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>💰 Finance Tracker</p>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' }}>
+                            <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Total Expenses</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#ef4444', margin: 0 }}>₱{formatAmount(selectedUser.totalSpent)}</p>
+                            </div>
+                            <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Wallets Balance</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#22c55e', margin: 0 }}>₱{formatAmount(userWallets.reduce((sum, w) => sum + (parseFloat(w.balance) || 0), 0))}</p>
                             </div>
                           </div>
-                          <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
-                            <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Achievements</p>
-                            <p style={{ fontSize: '20px', fontWeight: '700', color: '#f59e0b', margin: 0 }}>{userAchievements.length}</p>
+
+                          {/* VAKita Section */}
+                          <p style={{ fontSize: '12px', fontWeight: '600', color: theme.textMuted, margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>📊 VAKita</p>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' }}>
+                            <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Total Income</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#22c55e', margin: 0 }}>₱{formatAmount(userVAKitaData?.income?.reduce((sum, i) => sum + (parseFloat(i.amountPHP) || 0), 0) || 0)}</p>
+                            </div>
+                            <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Clients</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0 }}>{userVAKitaData?.clients?.length || 0}</p>
+                            </div>
+                            <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Invoices</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0 }}>{userVAKitaData?.invoices?.length || 0}</p>
+                            </div>
+                            <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Prospects</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0 }}>{userVAKitaData?.prospects?.length || 0}</p>
+                            </div>
+                          </div>
+
+                          {/* Gamification Section */}
+                          <p style={{ fontSize: '12px', fontWeight: '600', color: theme.textMuted, margin: '0 0 10px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>🎮 Gamification</p>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px' }}>
+                            <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Level / XP</p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <p style={{ fontSize: '18px', fontWeight: '700', color: '#8b5cf6', margin: 0 }}>Lv.{calculateLevel(userProfileData?.xp || 0)}</p>
+                                <div style={{ display: 'flex', gap: '4px' }}>
+                                  <button onClick={() => handleAdjustLevel(-1)} style={{ width: '22px', height: '22px', borderRadius: '4px', border: 'none', backgroundColor: '#ef4444', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>-</button>
+                                  <button onClick={() => handleAdjustLevel(1)} style={{ width: '22px', height: '22px', borderRadius: '4px', border: 'none', backgroundColor: '#22c55e', color: '#fff', cursor: 'pointer', fontSize: '12px' }}>+</button>
+                                </div>
+                              </div>
+                            </div>
+                            <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
+                              <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Achievements</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#f59e0b', margin: 0 }}>{userAchievements.length} / {ACHIEVEMENTS.length}</p>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -1077,7 +1115,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           ) : (
                             userExpenses.slice(0, 50).map(expense => (
                               <div key={expense.id} style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                <div>
+                                <div style={{ flex: 1 }}>
                                   <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0 }}>{expense.name}</p>
                                   <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>{expense.category} • {new Date(expense.date).toLocaleDateString()}</p>
                                 </div>
@@ -1089,6 +1127,46 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                 </div>
                               </div>
                             ))
+                          )}
+                          {userExpenses.length > 0 && (
+                            <div style={{ marginTop: '12px', padding: '12px', backgroundColor: isDark ? '#1e3a5f20' : '#dbeafe20', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '13px', color: theme.textMuted }}>Total: {userExpenses.length} expenses</span>
+                              <span style={{ fontSize: '15px', fontWeight: '600', color: theme.text }}>₱{formatAmount(userExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0))}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      {userDetailTab === 'wallets' && (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                          {userWallets.length === 0 ? (
+                            <p style={{ textAlign: 'center', color: theme.textMuted, padding: '20px' }}>No wallets</p>
+                          ) : (
+                            userWallets.map(wallet => (
+                              <div key={wallet.id} style={{ padding: '12px', backgroundColor: theme.statBg, borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                  <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: wallet.color || '#8b5cf6', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '14px' }}>
+                                    {wallet.icon || '💳'}
+                                  </div>
+                                  <div>
+                                    <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0 }}>{wallet.name}</p>
+                                    <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>{wallet.type || 'Wallet'}</p>
+                                  </div>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                  <span style={{ fontSize: '14px', fontWeight: '600', color: (wallet.balance || 0) >= 0 ? '#22c55e' : '#ef4444' }}>₱{formatAmount(wallet.balance || 0)}</span>
+                                  <button onClick={() => handleDeleteWallet(wallet.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    <Trash2 style={{ width: '12px', height: '12px' }} />
+                                  </button>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                          {userWallets.length > 0 && (
+                            <div style={{ marginTop: '12px', padding: '12px', backgroundColor: isDark ? '#1e3a5f20' : '#dbeafe20', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontSize: '13px', color: theme.textMuted }}>Total Balance ({userWallets.length} wallets)</span>
+                              <span style={{ fontSize: '15px', fontWeight: '600', color: '#22c55e' }}>₱{formatAmount(userWallets.reduce((sum, w) => sum + (parseFloat(w.balance) || 0), 0))}</span>
+                            </div>
                           )}
                         </div>
                       )}
