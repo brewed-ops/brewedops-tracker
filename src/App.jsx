@@ -8598,6 +8598,17 @@ function AppContent() {
 
   // Check for existing session on load
   useEffect(() => {
+    // Check if this is a password recovery flow
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const isRecovery = hashParams.get('type') === 'recovery' || 
+                       window.location.pathname === '/reset-password';
+    
+    if (isRecovery) {
+      // Don't auto-login, just stop loading and let ResetPassword handle it
+      setLoading(false);
+      return;
+    }
+    
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session?.user) {
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
@@ -8610,8 +8621,24 @@ function AppContent() {
     });
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth event:', event); // Debug log
+      
+      // Handle password recovery - redirect to reset page
+      if (event === 'PASSWORD_RECOVERY') {
+        // Don't set user, navigate to reset password page
+        navigate('/reset-password');
+        return;
+      }
+      
       if (session?.user) {
+        // Check if this is a recovery session - don't auto-login
+        if (window.location.pathname === '/reset-password' || 
+            window.location.hash.includes('type=recovery')) {
+          // Don't set user yet, let them reset password first
+          return;
+        }
+        
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
         setUser(isAdmin ? { ...session.user, isAdmin: true } : session.user);
       } else {
