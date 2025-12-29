@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Loader2, Sun, Moon, ArrowLeft } from 'lucide-react';
-import { supabase } from './lib/supabase';
+import { supabase } from '../lib/supabase';
 
 const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
   const navigate = useNavigate();
