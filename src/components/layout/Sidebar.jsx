@@ -1,151 +1,195 @@
+// Sidebar.jsx - BrewedOps Sidebar Navigation
 import React from 'react';
-import { Receipt, Calculator, PanelLeftClose, PanelLeft } from 'lucide-react';
+import { LayoutDashboard, Headphones, Menu, ChevronLeft } from 'lucide-react';
+
+// ============================================
+// BREWEDOPS BRAND CONFIGURATION
+// ============================================
+const BRAND = {
+  brown: '#3F200C',
+  blue: '#004AAC',
+  green: '#51AF43',
+  cream: '#FFF0D4',
+};
+
+const FONTS = {
+  heading: "'Montserrat', sans-serif",
+  body: "'Poppins', sans-serif",
+};
 
 const Sidebar = ({ 
   collapsed, 
   setCollapsed, 
   activeSection, 
   setActiveSection, 
-  isDark, 
-  theme 
+  isDark 
 }) => {
-  const sidebarWidth = collapsed ? 70 : 260;
-  
+  const theme = {
+    bg: isDark ? '#0a0a0a' : '#ffffff',
+    cardBg: isDark ? '#141414' : '#ffffff',
+    cardBorder: isDark ? '#262626' : '#e4e4e7',
+    text: isDark ? '#fafafa' : BRAND.brown,
+    textMuted: isDark ? '#a1a1aa' : '#71717a',
+  };
+
+  const menuItems = [
+    { id: 'dashboard', icon: LayoutDashboard, label: 'Finance Tracker' },
+    { id: 'vakita', icon: Headphones, label: 'VAKita' },
+  ];
+
   return (
-    <div style={{
-      position: 'fixed',
-      left: 0,
-      top: 0,
-      bottom: 0,
-      width: `${sidebarWidth}px`,
-      backgroundColor: isDark ? '#09090b' : '#ffffff',
-      borderRight: `1px solid ${theme.cardBorder}`,
-      display: 'flex',
-      flexDirection: 'column',
-      transition: 'width 0.3s ease',
-      zIndex: 40,
-    }}>
-      {/* Header with Logo */}
-      <div style={{
-        height: '72px',
-        padding: collapsed ? '0 12px' : '0 16px',
+    <div
+      style={{
+        width: collapsed ? '70px' : '260px',
+        height: '100vh',
+        backgroundColor: isDark ? '#0a0a0a' : '#ffffff',
+        borderRight: `1px solid ${theme.cardBorder}`,
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: collapsed ? 'center' : 'flex-start',
-        borderBottom: `1px solid ${theme.cardBorder}`,
-        flexShrink: 0,
-        gap: '12px',
-      }}>
-        <img 
-          src="https://i.imgur.com/R52jwPv.png" 
-          alt="Logo" 
-          style={{ 
-            width: '40px', 
-            height: '40px', 
-            borderRadius: '50%', 
-            flexShrink: 0 
-          }} 
-        />
+        flexDirection: 'column',
+        transition: 'width 0.2s ease',
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        zIndex: 40,
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          padding: collapsed ? '16px 12px' : '16px 20px',
+          borderBottom: `1px solid ${theme.cardBorder}`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: collapsed ? 'center' : 'space-between',
+          minHeight: '64px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <img
+            src="https://i.imgur.com/R52jwPv.png"
+            alt="BrewedOps Logo"
+            style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '10px',
+              flexShrink: 0,
+            }}
+          />
+          {!collapsed && (
+            <span
+              style={{
+                fontSize: '18px',
+                fontWeight: '700',
+                fontFamily: FONTS.heading,
+                letterSpacing: '-0.02em',
+              }}
+            >
+              <span style={{ color: isDark ? '#ffffff' : BRAND.brown }}>Brewed</span>
+              <span style={{ color: BRAND.blue }}>Ops</span>
+            </span>
+          )}
+        </div>
         {!collapsed && (
-          <span style={{ 
-            fontSize: '17px', 
-            fontWeight: '700', 
-            color: theme.text, 
-            whiteSpace: 'nowrap',
-          }}>
-            BrewedOps
-          </span>
+          <button
+            onClick={() => setCollapsed(true)}
+            style={{
+              width: '32px',
+              height: '32px',
+              backgroundColor: 'transparent',
+              border: `1px solid ${theme.cardBorder}`,
+              borderRadius: '8px',
+              color: theme.textMuted,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <ChevronLeft style={{ width: '16px', height: '16px' }} />
+          </button>
         )}
       </div>
 
-      {/* Navigation */}
-      <div style={{ 
-        flex: 1, 
-        overflowY: 'auto', 
-        padding: collapsed ? '16px 8px' : '16px 12px',
-      }}>
-        {/* Finance Tracker */}
+      {/* Collapsed expand button */}
+      {collapsed && (
         <button
-          onClick={() => setActiveSection('tracker')}
+          onClick={() => setCollapsed(false)}
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: collapsed ? '12px' : '12px 14px',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            backgroundColor: activeSection === 'tracker' ? '#22c55e' : 'transparent',
-            color: activeSection === 'tracker' ? '#fff' : theme.textMuted,
-            border: 'none',
-            borderRadius: '10px',
-            cursor: 'pointer',
             width: '100%',
-            fontSize: '14px',
-            fontWeight: '600',
-            marginBottom: '8px',
-            transition: 'all 0.15s ease',
-          }}
-          title={collapsed ? 'Finance Tracker' : undefined}
-        >
-          <Receipt style={{ width: '20px', height: '20px', flexShrink: 0 }} />
-          {!collapsed && <span>Finance Tracker</span>}
-        </button>
-
-        {/* VAKita */}
-        <button
-          onClick={() => setActiveSection('vakita')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: collapsed ? '12px' : '12px 14px',
-            justifyContent: collapsed ? 'center' : 'flex-start',
-            backgroundColor: activeSection === 'vakita' ? '#8b5cf6' : 'transparent',
-            color: activeSection === 'vakita' ? '#fff' : theme.textMuted,
-            border: 'none',
-            borderRadius: '10px',
-            cursor: 'pointer',
-            width: '100%',
-            fontSize: '14px',
-            fontWeight: '600',
-            transition: 'all 0.15s ease',
-          }}
-          title={collapsed ? 'VAKita' : undefined}
-        >
-          <Calculator style={{ width: '20px', height: '20px', flexShrink: 0 }} />
-          {!collapsed && <span>VAKita</span>}
-        </button>
-      </div>
-
-      {/* Toggle Button - Always at bottom */}
-      <div style={{
-        padding: collapsed ? '12px 8px' : '12px 16px',
-        borderTop: `1px solid ${theme.cardBorder}`,
-        flexShrink: 0,
-      }}>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          style={{
-            width: collapsed ? '100%' : '40px',
-            height: '40px',
-            borderRadius: '8px',
-            backgroundColor: isDark ? '#27272a' : '#f4f4f5',
+            padding: '12px',
+            backgroundColor: 'transparent',
             border: 'none',
             color: theme.textMuted,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transition: 'background-color 0.15s ease',
           }}
-          title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {collapsed ? (
-            <PanelLeft style={{ width: '20px', height: '20px' }} />
-          ) : (
-            <PanelLeftClose style={{ width: '20px', height: '20px' }} />
-          )}
+          <Menu style={{ width: '20px', height: '20px' }} />
         </button>
-      </div>
+      )}
+
+      {/* Navigation */}
+      <nav style={{ flex: 1, padding: '12px 8px' }}>
+        {menuItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeSection === item.id;
+          
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveSection(item.id)}
+              style={{
+                width: '100%',
+                padding: collapsed ? '12px' : '12px 16px',
+                backgroundColor: isActive ? BRAND.blue : 'transparent',
+                border: 'none',
+                borderRadius: '10px',
+                color: isActive ? '#ffffff' : theme.textMuted,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: collapsed ? 'center' : 'flex-start',
+                gap: '12px',
+                marginBottom: '4px',
+                transition: 'all 0.15s ease',
+                fontFamily: FONTS.body,
+                fontSize: '14px',
+                fontWeight: isActive ? '600' : '500',
+              }}
+              onMouseEnter={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.backgroundColor = isDark ? '#1a1a1a' : '#f4f4f5';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!isActive) {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                }
+              }}
+            >
+              <Icon style={{ width: '20px', height: '20px', flexShrink: 0 }} />
+              {!collapsed && <span>{item.label}</span>}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* Footer */}
+      {!collapsed && (
+        <div
+          style={{
+            padding: '16px 20px',
+            borderTop: `1px solid ${theme.cardBorder}`,
+            fontSize: '11px',
+            color: theme.textMuted,
+            fontFamily: FONTS.body,
+          }}
+        >
+          © 2025 BrewedOps
+        </div>
+      )}
     </div>
   );
 };

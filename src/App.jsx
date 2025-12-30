@@ -4,6 +4,59 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveCo
 import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
+// ============================================
+// BREWEDOPS BRAND CONFIGURATION
+// ============================================
+const BRAND = {
+  brown: '#3F200C',      // Coffee Brown - Primary text
+  blue: '#004AAC',       // Brand Blue - Buttons, accents
+  green: '#51AF43',      // Success Green
+  cream: '#FFF0D4',      // Light backgrounds
+  black: '#000000',
+};
+
+const FONTS = {
+  heading: "'Montserrat', sans-serif",
+  body: "'Poppins', sans-serif",
+};
+
+// Inject Google Fonts and Global Styles
+if (typeof document !== 'undefined' && !document.getElementById('brewedops-fonts')) {
+  const link = document.createElement('link');
+  link.id = 'brewedops-fonts';
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600&display=swap';
+  document.head.appendChild(link);
+  
+  // Add comprehensive base font styles
+  const style = document.createElement('style');
+  style.id = 'brewedops-global-styles';
+  style.textContent = `
+    * { 
+      font-family: 'Poppins', sans-serif; 
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    h1, h2, h3, h4, h5, h6 { 
+      font-family: 'Montserrat', sans-serif; 
+    }
+    button, input, select, textarea {
+      font-family: 'Poppins', sans-serif;
+    }
+    @keyframes spin { 
+      from { transform: rotate(0deg); } 
+      to { transform: rotate(360deg); } 
+    }
+    /* Brand text helper classes */
+    .brand-heading { font-family: 'Montserrat', sans-serif; }
+    .brand-body { font-family: 'Poppins', sans-serif; }
+    .brand-text-brown { color: #3F200C; }
+    .brand-text-blue { color: #004AAC; }
+    .brand-text-green { color: #51AF43; }
+  `;
+  document.head.appendChild(style);
+}
+
 // Extracted components and utilities
 import Sidebar from './components/layout/Sidebar';
 import VAKita from './components/VAKita';
@@ -44,7 +97,7 @@ import { formatAmount, getInitial } from './lib/utils';
 const getBadgeStyle = (type, isDark) => {
   const darkStyles = {
     utilities: { bg: '#1e3a5f', color: '#60a5fa', border: '#2563eb' },
-    subscription: { bg: '#3b1f5e', color: '#a78bfa', border: '#7c3aed' },
+    subscription: { bg: '#001a40', color: '#3373c4', border: '#003d8f' },
     food: { bg: '#4a2c17', color: '#fb923c', border: '#ea580c' },
     shopping: { bg: '#4a1d3d', color: '#f472b6', border: '#db2777' },
     healthcare: { bg: '#134e3a', color: '#34d399', border: '#059669' },
@@ -53,7 +106,7 @@ const getBadgeStyle = (type, isDark) => {
   };
   const lightStyles = {
     utilities: { bg: '#dbeafe', color: '#1d4ed8', border: '#93c5fd' },
-    subscription: { bg: '#ede9fe', color: '#6d28d9', border: '#c4b5fd' },
+    subscription: { bg: '#ede9fe', color: '#003380', border: '#c4b5fd' },
     food: { bg: '#ffedd5', color: '#c2410c', border: '#fdba74' },
     shopping: { bg: '#fce7f3', color: '#be185d', border: '#f9a8d4' },
     healthcare: { bg: '#d1fae5', color: '#047857', border: '#6ee7b7' },
@@ -65,7 +118,7 @@ const getBadgeStyle = (type, isDark) => {
 };
 
 // ============================================
-// HOME PAGE (Landing) - shadcn inspired
+// HOME PAGE (Landing) - BrewedOps Brand Design
 // ============================================
 
 const HomePage = ({ onNavigate, isDark, setIsDark }) => {
@@ -77,17 +130,19 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   const btnPrimary = {
     height: '48px',
     padding: '0 28px',
-    backgroundColor: '#8b5cf6',
+    backgroundColor: BRAND.blue,
     color: '#fff',
     border: 'none',
-    borderRadius: '12px',
+    borderRadius: '10px',
     fontSize: '15px',
     fontWeight: '600',
+    fontFamily: FONTS.body,
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px'
+    gap: '8px',
+    transition: 'all 0.2s ease',
   };
 
   const btnOutline = {
@@ -96,13 +151,15 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
     backgroundColor: 'transparent',
     color: theme.text,
     border: '1px solid ' + theme.cardBorder,
-    borderRadius: '12px',
+    borderRadius: '10px',
     fontSize: '15px',
     fontWeight: '500',
+    fontFamily: FONTS.body,
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    transition: 'all 0.2s ease',
   };
 
   const features = [
@@ -117,50 +174,60 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   ];
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
+    <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#ffffff' }}>
       {/* Nav */}
       <nav style={{
-        padding: isSmall ? '16px' : '16px 32px',
+        padding: isSmall ? '12px 16px' : '16px 32px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottom: '1px solid ' + theme.cardBorder
+        borderBottom: '1px solid ' + theme.cardBorder,
+        backgroundColor: isDark ? theme.bg : '#ffffff',
+        gap: '12px'
       }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
-          <span style={{ fontSize: '18px', fontWeight: '700', color: theme.text }}>BrewedOps</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
+          <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: isSmall ? '32px' : '36px', height: isSmall ? '32px' : '36px', borderRadius: '8px' }} />
+          <span style={{ fontSize: isSmall ? '18px' : '20px', fontWeight: '700', fontFamily: FONTS.heading }}>
+            <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
+            <span style={{ color: BRAND.blue }}>Ops</span>
+          </span>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '4px' : '8px' }}>
-          {/* Privacy - for Google OAuth compliance */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '6px' : '8px' }}>
+          {/* Privacy - hide on mobile */}
+          {!isMobile && (
           <a 
             href="/privacy" 
             style={{ 
               height: '40px', 
-              padding: isSmall ? '0 8px' : '0 14px', 
+              padding: '0 14px', 
               backgroundColor: 'transparent', 
               color: theme.textMuted, 
               border: 'none', 
               fontSize: '14px', 
               fontWeight: '500', 
+              fontFamily: FONTS.body,
               cursor: 'pointer',
-              display: isSmall ? 'none' : 'flex',
+              display: 'flex',
               alignItems: 'center',
               textDecoration: 'none'
             }}
           >
             Privacy
           </a>
-          {/* About */}
+          )}
+          {/* About - hide on mobile */}
+          {!isMobile && (
           <button 
             onClick={() => onNavigate('about')} 
             style={{ 
               height: '40px', 
-              padding: isSmall ? '0 10px' : '0 14px', 
+              padding: '0 14px', 
               backgroundColor: 'transparent', 
               color: theme.textMuted, 
               border: 'none', 
               fontSize: '14px', 
               fontWeight: '500', 
+              fontFamily: FONTS.body,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center'
@@ -168,40 +235,45 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           >
             About
           </button>
+          )}
           {/* Dark/Light Mode */}
-          <button onClick={() => setIsDark(!isDark)} style={{ width: '40px', height: '40px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <button onClick={() => setIsDark(!isDark)} style={{ width: isSmall ? '36px' : '40px', height: isSmall ? '36px' : '40px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
             {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
           </button>
-          {/* Sign Up */}
+          {/* Sign Up - always show */}
           <button 
             onClick={() => onNavigate('signup')} 
             style={{ 
-              height: '40px', 
+              height: isSmall ? '36px' : '40px', 
               padding: isSmall ? '0 12px' : '0 16px', 
-              backgroundColor: '#8b5cf6', 
+              backgroundColor: BRAND.blue, 
               color: '#fff', 
               border: 'none', 
               borderRadius: '10px',
               fontSize: '14px', 
-              fontWeight: '500', 
-              cursor: 'pointer' 
+              fontWeight: '600',
+              fontFamily: FONTS.body,
+              cursor: 'pointer',
+              flexShrink: 0
             }}
           >
-            {isSmall ? 'Sign Up' : 'Sign Up'}
+            Sign Up
           </button>
-          {/* Login */}
+          {/* Login - always show */}
           <button 
             onClick={() => onNavigate('login')} 
             style={{ 
-              height: '40px', 
+              height: isSmall ? '36px' : '40px', 
               padding: isSmall ? '0 12px' : '0 16px', 
               backgroundColor: 'transparent', 
               color: theme.text, 
               border: '1px solid ' + theme.cardBorder, 
               borderRadius: '10px',
               fontSize: '14px', 
-              fontWeight: '500', 
-              cursor: 'pointer' 
+              fontWeight: '500',
+              fontFamily: FONTS.body,
+              cursor: 'pointer',
+              flexShrink: 0
             }}
           >
             Login
@@ -211,17 +283,17 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 
       {/* Hero */}
       <section style={{ padding: isSmall ? '48px 20px 56px' : '72px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 14px', backgroundColor: isDark ? '#8b5cf620' : '#8b5cf610', borderRadius: '100px', marginBottom: '20px' }}>
-          <span style={{ fontSize: '13px', color: '#8b5cf6', fontWeight: '600' }}>🇵🇭 Built for Filipino VAs & Freelancers</span>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.cream, borderRadius: '100px', marginBottom: '24px', border: isDark ? 'none' : '1px solid ' + BRAND.blue + '20' }}>
+          <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>🇵🇭 Built for Filipino VAs & Freelancers</span>
         </div>
         
-        <h1 style={{ fontSize: isSmall ? '32px' : '48px', fontWeight: '800', color: theme.text, margin: '0 0 16px', lineHeight: '1.15', letterSpacing: '-0.03em' }}>
+        <h1 style={{ fontSize: isSmall ? '32px' : '52px', fontWeight: '800', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 16px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
           Your Complete Financial
           <br />
-          <span style={{ color: '#8b5cf6' }}>& Client Management Hub</span>
+          <span style={{ color: BRAND.blue }}>& Client Management Hub</span>
         </h1>
         
-        <p style={{ fontSize: isSmall ? '16px' : '18px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.7', maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto' }}>
+        <p style={{ fontSize: isSmall ? '16px' : '18px', color: theme.textMuted, margin: '0 0 36px', lineHeight: '1.7', maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
           Track your income & expenses, manage clients across timezones, send professional invoices, 
           and calculate your BIR taxes — all in one powerful platform designed specifically for Filipino virtual assistants and freelancers.
         </p>
@@ -237,21 +309,21 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         </div>
         
         {/* Privacy Policy link for Google OAuth compliance - must be easily visible */}
-        <p style={{ fontSize: '13px', color: theme.textMuted, marginTop: '20px' }}>
+        <p style={{ fontSize: '13px', color: theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
           By signing up, you agree to our{' '}
-          <a href="/terms" style={{ color: '#8b5cf6', textDecoration: 'none' }}>Terms of Service</a>
+          <a href="/terms" style={{ color: BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Terms of Service</a>
           {' '}and{' '}
-          <a href="/privacy" style={{ color: '#8b5cf6', textDecoration: 'none' }}>Privacy Policy</a>
+          <a href="/privacy" style={{ color: BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Privacy Policy</a>
         </p>
       </section>
 
       {/* What is BrewedOps */}
-      <section style={{ padding: isSmall ? '48px 20px' : '64px 32px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', borderTop: '1px solid ' + theme.cardBorder }}>
+      <section style={{ padding: isSmall ? '48px 20px' : '64px 32px', backgroundColor: isDark ? '#0a0a0b' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: isSmall ? '24px' : '32px', fontWeight: '700', color: theme.text, margin: '0 0 16px', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: isSmall ? '24px' : '36px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 16px', letterSpacing: '-0.02em', fontFamily: FONTS.heading }}>
             What is BrewedOps?
           </h2>
-          <p style={{ fontSize: '16px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.8', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto' }}>
+          <p style={{ fontSize: '16px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.8', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
             BrewedOps is an all-in-one financial tracking and client management system built specifically for 
             Filipino Virtual Assistants and Freelancers. Whether you're managing multiple international clients, 
             tracking income in different currencies, or preparing for your quarterly BIR tax filing — BrewedOps 
@@ -259,28 +331,28 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           </p>
           
           <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : 'repeat(2, 1fr)', gap: '20px', textAlign: 'left' }}>
-            <div style={{ padding: '24px', backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
+            <div style={{ padding: '24px', backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? '#22c55e20' : '#22c55e15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? BRAND.green + '20' : BRAND.green + '15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <span style={{ fontSize: '22px' }}>💵</span>
                 </div>
-                <h3 style={{ fontSize: '17px', fontWeight: '600', color: theme.text, margin: 0 }}>Financial Tracking</h3>
+                <h3 style={{ fontSize: '17px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>Financial Tracking</h3>
               </div>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6' }}>
+              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6', fontFamily: FONTS.body }}>
                 Monitor all your income streams and expenses. Support for multiple currencies (USD, EUR, GBP, AUD) 
                 with automatic PHP conversion using live exchange rates. Categorize transactions, set budgets, 
                 and get insights into your financial health.
               </p>
             </div>
             
-            <div style={{ padding: '24px', backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
+            <div style={{ padding: '24px', backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? '#3b82f620' : '#3b82f615', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.blue + '15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <span style={{ fontSize: '22px' }}>👥</span>
                 </div>
-                <h3 style={{ fontSize: '17px', fontWeight: '600', color: theme.text, margin: 0 }}>VA Client Management</h3>
+                <h3 style={{ fontSize: '17px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>VA Client Management</h3>
               </div>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6' }}>
+              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6', fontFamily: FONTS.body }}>
                 Manage your entire client pipeline from lead to paying customer. Track prospects from job platforms, 
                 store client details with timezone info, manage billing rates, and never miss a follow-up with 
                 our prospecting pipeline.
@@ -291,21 +363,21 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       </section>
 
       {/* Features */}
-      <section style={{ padding: isSmall ? '48px 16px' : '64px 32px', borderBottom: '1px solid ' + theme.cardBorder }}>
+      <section style={{ padding: isSmall ? '48px 16px' : '64px 32px', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#fff' }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: isSmall ? '24px' : '32px', fontWeight: '700', color: theme.text, textAlign: 'center', margin: '0 0 12px', letterSpacing: '-0.02em' }}>
+          <h2 style={{ fontSize: isSmall ? '24px' : '36px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, textAlign: 'center', margin: '0 0 12px', letterSpacing: '-0.02em', fontFamily: FONTS.heading }}>
             Everything You Need to Succeed
           </h2>
-          <p style={{ fontSize: '15px', color: theme.textMuted, textAlign: 'center', margin: '0 0 40px' }}>
+          <p style={{ fontSize: '15px', color: theme.textMuted, textAlign: 'center', margin: '0 0 40px', fontFamily: FONTS.body }}>
             Powerful tools designed specifically for Filipino VAs and freelancers
           </p>
           
           <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px' }}>
             {features.map((f, i) => (
-              <div key={i} style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '20px' }}>
+              <div key={i} style={{ backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '20px', transition: 'all 0.2s ease' }}>
                 <span style={{ fontSize: '28px', display: 'block', marginBottom: '12px' }}>{f.icon}</span>
-                <h3 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: '0 0 6px' }}>{f.title}</h3>
-                <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0, lineHeight: '1.5' }}>{f.desc}</p>
+                <h3 style={{ fontSize: '15px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 6px', fontFamily: FONTS.heading }}>{f.title}</h3>
+                <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0, lineHeight: '1.5', fontFamily: FONTS.body }}>{f.desc}</p>
               </div>
             ))}
           </div>
@@ -314,7 +386,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 
       {/* How it works */}
       <section style={{ padding: isSmall ? '48px 20px' : '64px 32px', maxWidth: '800px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: isSmall ? '24px' : '32px', fontWeight: '700', color: theme.text, textAlign: 'center', margin: '0 0 40px', letterSpacing: '-0.02em' }}>
+        <h2 style={{ fontSize: isSmall ? '24px' : '36px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, textAlign: 'center', margin: '0 0 40px', letterSpacing: '-0.02em', fontFamily: FONTS.heading }}>
           How It Works
         </h2>
         
@@ -326,10 +398,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             { num: '4', title: 'Level Up & Grow', desc: 'Earn XP for your activities, unlock achievements, and watch your freelance business thrive' },
           ].map((step, i) => (
             <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-              <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#8b5cf6', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: '700', flexShrink: 0 }}>{step.num}</div>
+              <div style={{ width: '44px', height: '44px', borderRadius: '10px', backgroundColor: BRAND.blue, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: '700', flexShrink: 0, fontFamily: FONTS.heading }}>{step.num}</div>
               <div>
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 4px' }}>{step.title}</h3>
-                <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>{step.desc}</p>
+                <h3 style={{ fontSize: '16px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 4px', fontFamily: FONTS.heading }}>{step.title}</h3>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>{step.desc}</p>
               </div>
             </div>
           ))}
@@ -338,21 +410,21 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 
       {/* CTA */}
       <section style={{ padding: isSmall ? '0 16px 48px' : '0 32px 64px', maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ backgroundColor: isDark ? '#18181b' : '#09090b', borderRadius: '16px', padding: isSmall ? '40px 24px' : '48px', textAlign: 'center' }}>
-          <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: '#fafafa', margin: '0 0 12px' }}>
+        <div style={{ backgroundColor: BRAND.brown, borderRadius: '16px', padding: isSmall ? '40px 24px' : '48px', textAlign: 'center' }}>
+          <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: '#fafafa', margin: '0 0 12px', fontFamily: FONTS.heading }}>
             Ready to Take Control of Your Finances?
           </h2>
-          <p style={{ fontSize: '15px', color: '#a1a1aa', margin: '0 0 24px' }}>
+          <p style={{ fontSize: '15px', color: '#d4d4d8', margin: '0 0 24px', fontFamily: FONTS.body }}>
             Join Filipino VAs and freelancers who are managing their business smarter with BrewedOps
           </p>
-          <button onClick={() => onNavigate('signup')} style={{ height: '48px', padding: '0 32px', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '12px', fontSize: '15px', fontWeight: '600', cursor: 'pointer' }}>
+          <button onClick={() => onNavigate('signup')} style={{ height: '48px', padding: '0 32px', backgroundColor: BRAND.green, color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', cursor: 'pointer', fontFamily: FONTS.body, transition: 'all 0.2s ease' }}>
             Get Started — It's Free
           </button>
         </div>
       </section>
 
       {/* Footer */}
-      <footer style={{ padding: '24px 20px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center' }}>
+      <footer style={{ padding: '24px 20px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center', backgroundColor: isDark ? theme.bg : '#fff' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '12px', flexWrap: 'wrap' }}>
           <a 
             href="/privacy"
@@ -360,9 +432,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               textDecoration: 'none',
-              padding: '4px 0'
+              padding: '4px 0',
+              fontFamily: FONTS.body,
             }}
-            onMouseEnter={(e) => e.target.style.color = '#8b5cf6'}
+            onMouseEnter={(e) => e.target.style.color = BRAND.blue}
             onMouseLeave={(e) => e.target.style.color = theme.textMuted}
           >
             Privacy Policy
@@ -373,9 +446,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               textDecoration: 'none',
-              padding: '4px 0'
+              padding: '4px 0',
+              fontFamily: FONTS.body,
             }}
-            onMouseEnter={(e) => e.target.style.color = '#8b5cf6'}
+            onMouseEnter={(e) => e.target.style.color = '#004AAC'}
             onMouseLeave={(e) => e.target.style.color = theme.textMuted}
           >
             Terms of Service
@@ -388,7 +462,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               textDecoration: 'none',
               padding: '4px 0'
             }}
-            onMouseEnter={(e) => e.target.style.color = '#8b5cf6'}
+            onMouseEnter={(e) => e.target.style.color = '#004AAC'}
             onMouseLeave={(e) => e.target.style.color = theme.textMuted}
           >
             About Us
@@ -401,7 +475,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               textDecoration: 'none',
               padding: '4px 0'
             }}
-            onMouseEnter={(e) => e.target.style.color = '#8b5cf6'}
+            onMouseEnter={(e) => e.target.style.color = '#004AAC'}
             onMouseLeave={(e) => e.target.style.color = theme.textMuted}
           >
             Contact
@@ -517,9 +591,11 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     borderRadius: '10px',
     padding: '0 14px',
     fontSize: '15px',
+    fontFamily: FONTS.body,
     color: theme.text,
     outline: 'none',
-    boxSizing: 'border-box'
+    boxSizing: 'border-box',
+    transition: 'border-color 0.2s ease',
   });
 
   // Google Icon SVG
@@ -533,11 +609,11 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
   );
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#ffffff', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {onBack ? (
-          <button onClick={onBack} style={{ height: '40px', padding: '0 14px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
+          <button onClick={onBack} style={{ height: '40px', padding: '0 14px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', fontFamily: FONTS.body }}>
             <ChevronLeft style={{ width: '18px', height: '18px' }} />
             Back
           </button>
@@ -549,14 +625,14 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
 
       {/* Form Container */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{ width: '100%', maxWidth: '360px' }}>
+        <div style={{ width: '100%', maxWidth: '380px' }}>
           {/* Logo & Title */}
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '56px', height: '56px', borderRadius: '14px', marginBottom: '16px' }} />
-            <h1 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: '0 0 6px' }}>
+            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '64px', height: '64px', borderRadius: '14px', marginBottom: '16px' }} />
+            <h1 style={{ fontSize: '26px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 6px', fontFamily: FONTS.heading }}>
               {isSignup ? 'Create Account' : 'Welcome Back'}
             </h1>
-            <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
+            <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>
               {isSignup ? 'Start managing your VA business' : 'Sign in to continue'}
             </p>
           </div>
@@ -565,18 +641,18 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
           {errors.general && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', border: '1px solid ' + (isDark ? '#7f1d1d' : '#fecaca'), borderRadius: '10px', marginBottom: '16px' }}>
               <AlertCircle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
-              <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>{errors.general}</span>
+              <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626', fontFamily: FONTS.body }}>{errors.general}</span>
             </div>
           )}
           {successMessage && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#052e16' : '#f0fdf4', border: '1px solid ' + (isDark ? '#166534' : '#86efac'), borderRadius: '10px', marginBottom: '16px' }}>
-              <Check style={{ width: '16px', height: '16px', color: '#22c55e', flexShrink: 0 }} />
-              <span style={{ fontSize: '13px', color: isDark ? '#86efac' : '#166534' }}>{successMessage}</span>
+              <Check style={{ width: '16px', height: '16px', color: BRAND.green, flexShrink: 0 }} />
+              <span style={{ fontSize: '13px', color: isDark ? '#86efac' : '#166534', fontFamily: FONTS.body }}>{successMessage}</span>
             </div>
           )}
 
           {/* Google Sign In Button */}
-          <button onClick={handleGoogleSignIn} disabled={googleLoading || loading} style={{ width: '100%', height: '48px', backgroundColor: theme.cardBg, color: theme.text, border: '1px solid ' + theme.cardBorder, borderRadius: '10px', fontSize: '15px', fontWeight: '500', cursor: (googleLoading || loading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px', opacity: (googleLoading || loading) ? 0.7 : 1 }}>
+          <button onClick={handleGoogleSignIn} disabled={googleLoading || loading} style={{ width: '100%', height: '48px', backgroundColor: isDark ? theme.cardBg : '#fff', color: theme.text, border: '1px solid ' + theme.cardBorder, borderRadius: '10px', fontSize: '15px', fontWeight: '500', fontFamily: FONTS.body, cursor: (googleLoading || loading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px', opacity: (googleLoading || loading) ? 0.7 : 1, transition: 'all 0.2s ease' }}>
             {googleLoading ? <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} /> : <GoogleIcon />}
             {googleLoading ? 'Connecting...' : (isSignup ? 'Sign up with Google' : 'Continue with Google')}
           </button>
@@ -584,55 +660,55 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
           {/* Divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
             <div style={{ flex: 1, height: '1px', backgroundColor: theme.cardBorder }} />
-            <span style={{ fontSize: '13px', color: theme.textMuted }}>or</span>
+            <span style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body }}>or</span>
             <div style={{ flex: 1, height: '1px', backgroundColor: theme.cardBorder }} />
           </div>
 
           {/* Form */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Email</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px', fontFamily: FONTS.body }}>Email</label>
               <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }); }} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} placeholder="you@example.com" style={inputStyle(errors.email)} />
-              {errors.email && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>{errors.email}</p>}
+              {errors.email && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0', fontFamily: FONTS.body }}>{errors.email}</p>}
             </div>
 
             {isSignup && (
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Nickname</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px', fontFamily: FONTS.body }}>Nickname</label>
                 <input type="text" value={nickname} onChange={(e) => { setNickname(e.target.value); setErrors({ ...errors, nickname: '' }); }} placeholder="What should we call you?" style={inputStyle(errors.nickname)} />
-                {errors.nickname && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>{errors.nickname}</p>}
+                {errors.nickname && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0', fontFamily: FONTS.body }}>{errors.nickname}</p>}
               </div>
             )}
 
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Password</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px', fontFamily: FONTS.body }}>Password</label>
               <input type="password" value={password} onChange={(e) => { setPassword(e.target.value); setErrors({ ...errors, password: '' }); }} onKeyDown={(e) => e.key === 'Enter' && !isSignup && handleSubmit()} placeholder={isSignup ? 'Min 8 chars, upper, lower, number' : '••••••••'} style={inputStyle(errors.password)} />
-              {errors.password && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>{errors.password}</p>}
+              {errors.password && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0', fontFamily: FONTS.body }}>{errors.password}</p>}
             </div>
 
             {isSignup && (
               <div>
-                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' }}>Confirm Password</label>
+                <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px', fontFamily: FONTS.body }}>Confirm Password</label>
                 <input type="password" value={confirmPassword} onChange={(e) => { setConfirmPassword(e.target.value); setErrors({ ...errors, confirmPassword: '' }); }} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} placeholder="••••••••" style={inputStyle(errors.confirmPassword)} />
-                {errors.confirmPassword && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0' }}>{errors.confirmPassword}</p>}
+                {errors.confirmPassword && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0', fontFamily: FONTS.body }}>{errors.confirmPassword}</p>}
               </div>
             )}
 
-            <button onClick={handleSubmit} disabled={loading || googleLoading} style={{ width: '100%', height: '48px', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', cursor: (loading || googleLoading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: (loading || googleLoading) ? 0.7 : 1, marginTop: '6px' }}>
+            <button onClick={handleSubmit} disabled={loading || googleLoading} style={{ width: '100%', height: '48px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', fontFamily: FONTS.body, cursor: (loading || googleLoading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: (loading || googleLoading) ? 0.7 : 1, marginTop: '6px', transition: 'all 0.2s ease' }}>
               {loading ? <><Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />{isSignup ? 'Creating...' : 'Signing in...'}</> : (isSignup ? 'Create Account' : 'Sign In')}
             </button>
 
             {!isSignup && (
-              <button onClick={handleForgotPassword} disabled={loading} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '13px', cursor: 'pointer', padding: 0, textAlign: 'center' }}>
+              <button onClick={handleForgotPassword} disabled={loading} style={{ background: 'none', border: 'none', color: theme.textMuted, fontSize: '13px', fontFamily: FONTS.body, cursor: 'pointer', padding: 0, textAlign: 'center' }}>
                 Forgot password?
               </button>
             )}
           </div>
 
           {/* Switch Mode */}
-          <p style={{ textAlign: 'center', fontSize: '14px', color: theme.textMuted, marginTop: '24px' }}>
+          <p style={{ textAlign: 'center', fontSize: '14px', color: theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
-            <button onClick={switchMode} style={{ background: 'none', border: 'none', color: '#8b5cf6', fontWeight: '600', cursor: 'pointer' }}>
+            <button onClick={switchMode} style={{ background: 'none', border: 'none', color: BRAND.blue, fontWeight: '600', cursor: 'pointer', fontFamily: FONTS.body }}>
               {isSignup ? 'Sign in' : 'Sign up'}
             </button>
           </p>
@@ -2930,7 +3006,7 @@ const getBudgetStatus = () => {
                     border: 'none', 
                     borderRadius: '6px', 
                     cursor: 'pointer',
-                    backgroundColor: activeSection === 'vakita' ? '#8b5cf6' : 'transparent',
+                    backgroundColor: activeSection === 'vakita' ? '#004AAC' : 'transparent',
                     color: activeSection === 'vakita' ? '#fff' : theme.textMuted,
                     display: 'flex',
                     alignItems: 'center',
@@ -3626,7 +3702,7 @@ const getBudgetStatus = () => {
                 Bills
                 {entries.filter(e => e.recurring).length > 0 && (
                   <span style={{
-                    backgroundColor: dashboardSubTab === 'bills' ? (isDark ? '#8b5cf6' : '#7c3aed') : (isDark ? '#52525b' : '#d4d4d8'),
+                    backgroundColor: dashboardSubTab === 'bills' ? (isDark ? '#004AAC' : '#003d8f') : (isDark ? '#52525b' : '#d4d4d8'),
                     color: dashboardSubTab === 'bills' ? '#fff' : theme.textMuted,
                     fontSize: '10px',
                     fontWeight: '600',
@@ -4913,8 +4989,8 @@ const getBudgetStatus = () => {
               <div style={{
                 ...cardStyle,
                 background: isDark 
-                  ? 'linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)' 
-                  : 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+                  ? 'linear-gradient(135deg, #003d8f 0%, #003380 100%)' 
+                  : 'linear-gradient(135deg, #004AAC 0%, #003d8f 100%)',
                 border: 'none'
               }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -5058,7 +5134,7 @@ const getBudgetStatus = () => {
                     <XAxis type="number" tick={{ fontSize: 11, fill: theme.textSubtle }} axisLine={false} tickLine={false} tickFormatter={(v) => `${currency}${v >= 1000 ? (v/1000).toFixed(0) + 'k' : v}`} />
                     <YAxis type="category" dataKey="name" tick={{ fontSize: 11, fill: theme.textSubtle }} axisLine={false} tickLine={false} width={35} />
                     <Tooltip formatter={(v) => `${currency}${formatAmount(v)}`} contentStyle={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.inputBorder}`, borderRadius: '8px', color: theme.text }} itemStyle={{ color: theme.text }} labelStyle={{ color: theme.text }} />
-                    <Bar dataKey="amount" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="amount" fill="#004AAC" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -5136,7 +5212,7 @@ const getBudgetStatus = () => {
                 const typeColors = {
                   cash: '#22c55e',
                   ewallet: '#3b82f6',
-                  bank: '#8b5cf6',
+                  bank: '#004AAC',
                   credit: '#ef4444'
                 };
                 const cardColor = typeColors[walletType.type];

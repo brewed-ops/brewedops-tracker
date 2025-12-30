@@ -152,21 +152,55 @@ export const LEVEL_THRESHOLDS = [
   200000, // Level 25
 ];
 
-// Profile frame rewards - unlocked at specific levels (Gen Z/Gen Alpha aesthetic)
+// Profile frame rewards - unlocked at specific levels
+// Supports both CSS-based frames and image-based frames
+// For image frames: use transparent PNG that overlays the avatar
+// Recommended image size: 200x200px or 300x300px with transparent center
 export const PROFILE_FRAMES = [
-  { level: 1, id: 'none', name: 'No Frame', border: 'none', glow: 'none', animation: null, gradient: null },
-  { level: 2, id: 'bronze', name: 'Bronze Pulse', border: '3px solid #cd7f32', glow: '0 0 10px #cd7f32', animation: 'pulse-bronze', gradient: null },
-  { level: 3, id: 'silver', name: 'Silver Wave', border: '3px solid #c0c0c0', glow: '0 0 12px #c0c0c0, 0 0 20px #e8e8e8', animation: 'shimmer-silver', gradient: null },
-  { level: 5, id: 'gold', name: 'Golden Drip', border: '3px solid transparent', glow: '0 0 15px #ffd700, 0 0 25px #ffaa00', animation: 'drip-gold', gradient: 'linear-gradient(135deg, #ffd700, #ffaa00, #ffd700)' },
-  { level: 7, id: 'emerald', name: 'Matrix Code', border: '3px solid #00ff41', glow: '0 0 15px #00ff41, 0 0 30px #003d00', animation: 'matrix-glow', gradient: null },
-  { level: 10, id: 'ice', name: 'Frozen Aura', border: '3px solid #00f7ff', glow: '0 0 20px #00f7ff, 0 0 40px #0080ff, 0 0 60px #00f7ff33', animation: 'ice-pulse', gradient: null },
-  { level: 12, id: 'fire', name: '🔥 Flame Ring', border: '4px solid transparent', glow: '0 0 20px #ff4500, 0 0 40px #ff6600, 0 0 60px #ff000066', animation: 'fire-border', gradient: 'linear-gradient(45deg, #ff0000, #ff4500, #ff6600, #ff4500, #ff0000)' },
-  { level: 15, id: 'neon', name: 'Cyberpunk Neon', border: '3px solid transparent', glow: '0 0 10px #ff00ff, 0 0 20px #00ffff, 0 0 30px #ff00ff', animation: 'neon-flicker', gradient: 'linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff)' },
-  { level: 18, id: 'galaxy', name: '🌌 Galaxy Swirl', border: '4px solid transparent', glow: '0 0 25px #9d4edd, 0 0 50px #4361ee, 0 0 75px #7209b7', animation: 'galaxy-rotate', gradient: 'conic-gradient(from 0deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4361ee, #3a0ca3, #7209b7)' },
-  { level: 20, id: 'rainbow', name: '🌈 RGB Gamer', border: '4px solid transparent', glow: '0 0 20px #ff0000, 0 0 40px #00ff00, 0 0 60px #0000ff', animation: 'rgb-rotate', gradient: 'conic-gradient(from 0deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0080ff, #8000ff, #ff0080, #ff0000)' },
-  // VAKita Special Frames (NEW)
-  { level: 8, id: 'va_star', name: '⭐ VA Star', border: '3px solid #8b5cf6', glow: '0 0 15px #8b5cf6, 0 0 30px #6d28d9', animation: 'pulse-purple', gradient: null },
-  { level: 16, id: 'money_maker', name: '💰 Money Maker', border: '4px solid transparent', glow: '0 0 20px #22c55e, 0 0 40px #16a34a', animation: 'money-glow', gradient: 'linear-gradient(135deg, #22c55e, #16a34a, #15803d)' },
+  // CSS-based frames (original)
+  { level: 1, id: 'none', name: 'No Frame', type: 'css', border: 'none', glow: 'none', animation: null, gradient: null, image: null },
+  { level: 2, id: 'bronze', name: 'Bronze Pulse', type: 'css', border: '3px solid #cd7f32', glow: '0 0 10px #cd7f32', animation: 'pulse-bronze', gradient: null, image: null },
+  { level: 3, id: 'silver', name: 'Silver Wave', type: 'css', border: '3px solid #c0c0c0', glow: '0 0 12px #c0c0c0, 0 0 20px #e8e8e8', animation: 'shimmer-silver', gradient: null, image: null },
+  { level: 5, id: 'gold', name: 'Golden Drip', type: 'css', border: '3px solid transparent', glow: '0 0 15px #ffd700, 0 0 25px #ffaa00', animation: 'drip-gold', gradient: 'linear-gradient(135deg, #ffd700, #ffaa00, #ffd700)', image: null },
+  { level: 7, id: 'emerald', name: 'Matrix Code', type: 'css', border: '3px solid #00ff41', glow: '0 0 15px #00ff41, 0 0 30px #003d00', animation: 'matrix-glow', gradient: null, image: null },
+  { level: 10, id: 'ice', name: 'Frozen Aura', type: 'css', border: '3px solid #00f7ff', glow: '0 0 20px #00f7ff, 0 0 40px #0080ff, 0 0 60px #00f7ff33', animation: 'ice-pulse', gradient: null, image: null },
+  { level: 12, id: 'fire', name: '🔥 Flame Ring', type: 'css', border: '4px solid transparent', glow: '0 0 20px #ff4500, 0 0 40px #ff6600, 0 0 60px #ff000066', animation: 'fire-border', gradient: 'linear-gradient(45deg, #ff0000, #ff4500, #ff6600, #ff4500, #ff0000)', image: null },
+  { level: 15, id: 'neon', name: 'Cyberpunk Neon', type: 'css', border: '3px solid transparent', glow: '0 0 10px #ff00ff, 0 0 20px #00ffff, 0 0 30px #ff00ff', animation: 'neon-flicker', gradient: 'linear-gradient(90deg, #ff00ff, #00ffff, #ff00ff)', image: null },
+  { level: 18, id: 'galaxy', name: '🌌 Galaxy Swirl', type: 'css', border: '4px solid transparent', glow: '0 0 25px #9d4edd, 0 0 50px #4361ee, 0 0 75px #7209b7', animation: 'galaxy-rotate', gradient: 'conic-gradient(from 0deg, #7209b7, #3a0ca3, #4361ee, #4cc9f0, #4361ee, #3a0ca3, #7209b7)', image: null },
+  { level: 20, id: 'rainbow', name: '🌈 RGB Gamer', type: 'css', border: '4px solid transparent', glow: '0 0 20px #ff0000, 0 0 40px #00ff00, 0 0 60px #0000ff', animation: 'rgb-rotate', gradient: 'conic-gradient(from 0deg, #ff0000, #ff8000, #ffff00, #00ff00, #00ffff, #0080ff, #8000ff, #ff0080, #ff0000)', image: null },
+  
+  // VAKita Special Frames (CSS)
+  { level: 8, id: 'va_star', name: '⭐ VA Star', type: 'css', border: '3px solid #8b5cf6', glow: '0 0 15px #8b5cf6, 0 0 30px #6d28d9', animation: 'pulse-purple', gradient: null, image: null },
+  { level: 16, id: 'money_maker', name: '💰 Money Maker', type: 'css', border: '4px solid transparent', glow: '0 0 20px #22c55e, 0 0 40px #16a34a', animation: 'money-glow', gradient: 'linear-gradient(135deg, #22c55e, #16a34a, #15803d)', image: null },
+  
+  // ============================================
+  // IMAGE-BASED FRAMES (PNG overlays)
+  // Upload your frames to Imgur, Cloudinary, or your own CDN
+  // Replace the placeholder URLs with your actual frame images
+  // ============================================
+  
+  // Gaming/Esports Style Frames
+  { level: 4, id: 'gaming_basic', name: '🎮 Gamer I', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER1.png', glow: '0 0 10px #6366f1', animation: null },
+  { level: 9, id: 'gaming_pro', name: '🎮 Gamer Pro', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER2.png', glow: '0 0 15px #8b5cf6', animation: 'pulse' },
+  { level: 14, id: 'gaming_elite', name: '🎮 Gamer Elite', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER3.png', glow: '0 0 20px #a855f7, 0 0 40px #7c3aed', animation: 'pulse' },
+  
+  // Cute/Kawaii Style Frames
+  { level: 6, id: 'kawaii_hearts', name: '💕 Heart Frame', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER4.png', glow: '0 0 12px #ec4899', animation: null },
+  { level: 11, id: 'kawaii_stars', name: '✨ Starry Frame', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER5.png', glow: '0 0 15px #fbbf24', animation: 'twinkle' },
+  
+  // Nature/Element Frames
+  { level: 13, id: 'cherry_blossom', name: '🌸 Sakura', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER6.png', glow: '0 0 15px #f472b6', animation: 'float' },
+  { level: 17, id: 'lightning', name: '⚡ Thunder', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER7.png', glow: '0 0 20px #facc15, 0 0 40px #eab308', animation: 'flash' },
+  
+  // Premium/Legendary Frames
+  { level: 19, id: 'dragon', name: '🐉 Dragon Lord', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER8.png', glow: '0 0 25px #ef4444, 0 0 50px #dc2626', animation: 'breathe' },
+  { level: 22, id: 'cosmic', name: '🌌 Cosmic', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER9.png', glow: '0 0 30px #8b5cf6, 0 0 60px #6366f1', animation: 'cosmic-pulse' },
+  { level: 25, id: 'legendary_crown', name: '👑 Legendary', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER10.png', glow: '0 0 30px #ffd700, 0 0 60px #f59e0b, 0 0 90px #fbbf2450', animation: 'legendary-glow' },
+  
+  // Filipino/VA Themed Frames
+  { level: 21, id: 'ph_pride', name: '🇵🇭 Pinoy Pride', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER11.png', glow: '0 0 15px #0038a8, 0 0 30px #ce1126', animation: null },
+  { level: 23, id: 'va_champion', name: '🏆 VA Champion', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER12.png', glow: '0 0 20px #8b5cf6, 0 0 40px #6d28d9', animation: 'champion-pulse' },
+  { level: 24, id: 'boss_mode', name: '👔 Boss Mode', type: 'image', image: 'https://i.imgur.com/PLACEHOLDER13.png', glow: '0 0 25px #1e293b, 0 0 50px #334155', animation: null },
 ];
 
 // Badge tier styling

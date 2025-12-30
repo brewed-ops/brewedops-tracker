@@ -2,6 +2,10 @@
 import React from 'react';
 import { ArrowLeft, FileText, CheckCircle, AlertTriangle, Scale, Ban, RefreshCw, Mail, Shield, Zap, Globe, Lock } from 'lucide-react';
 
+// BREWEDOPS BRAND
+const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
+const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
+
 const TermsOfService = ({ onBack, onNavigate, isDark }) => {
   const theme = {
     bg: isDark ? '#09090b' : '#ffffff',
@@ -13,7 +17,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
 
   const lastUpdated = 'December 29, 2025';
 
-  const Section = ({ icon: Icon, title, children, color = '#8b5cf6' }) => (
+  const Section = ({ icon: Icon, title, children, color = '#004AAC' }) => (
     <div style={{ marginBottom: '32px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
         <div style={{ 
@@ -101,13 +105,13 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
               <div style={{ 
                 width: '56px', 
                 height: '56px', 
-                backgroundColor: isDark ? '#8b5cf620' : '#8b5cf615', 
+                backgroundColor: isDark ? '#004AAC20' : '#004AAC15', 
                 borderRadius: '14px', 
                 display: 'flex', 
                 alignItems: 'center', 
                 justifyContent: 'center' 
               }}>
-                <Scale style={{ width: '28px', height: '28px', color: '#8b5cf6' }} />
+                <Scale style={{ width: '28px', height: '28px', color: '#004AAC' }} />
               </div>
               <div>
                 <h1 style={{ fontSize: '32px', fontWeight: '700', color: theme.text, margin: 0 }}>Terms of Service</h1>
@@ -359,7 +363,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
           <p style={{ fontSize: '15px', color: theme.textMuted, margin: 0, lineHeight: '1.7' }}>
             If you have questions about these Terms of Service, please contact us at:
           </p>
-          <p style={{ fontSize: '15px', color: '#8b5cf6', margin: '12px 0 0', fontWeight: '500' }}>
+          <p style={{ fontSize: '15px', color: '#004AAC', margin: '12px 0 0', fontWeight: '500' }}>
             brewedops@gmail.com
           </p>
         </div>
@@ -412,7 +416,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             style={{ 
               background: 'none', 
               border: 'none', 
-              color: '#8b5cf6', 
+              color: '#004AAC', 
               fontSize: '13px', 
               cursor: 'pointer',
               padding: '4px 0',

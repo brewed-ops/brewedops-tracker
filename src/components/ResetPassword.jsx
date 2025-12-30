@@ -4,6 +4,30 @@ import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Loader2, Sun, Moon, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+// ============================================
+// BREWEDOPS BRAND CONFIGURATION
+// ============================================
+const BRAND = {
+  brown: '#3F200C',
+  blue: '#004AAC',
+  green: '#51AF43',
+  cream: '#FFF0D4',
+};
+
+const FONTS = {
+  heading: "'Montserrat', sans-serif",
+  body: "'Poppins', sans-serif",
+};
+
+// Inject Google Fonts if not already loaded
+if (typeof document !== 'undefined' && !document.getElementById('brewedops-fonts')) {
+  const link = document.createElement('link');
+  link.id = 'brewedops-fonts';
+  link.rel = 'stylesheet';
+  link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600&display=swap';
+  document.head.appendChild(link);
+}
+
 const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
@@ -17,10 +41,10 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
   const [checkingSession, setCheckingSession] = useState(true);
 
   const theme = {
-    bg: isDark ? '#0a0a0a' : '#f8fafc',
+    bg: isDark ? '#0a0a0a' : '#ffffff',
     cardBg: isDark ? '#141414' : '#ffffff',
     cardBorder: isDark ? '#262626' : '#e2e8f0',
-    text: isDark ? '#fafafa' : '#0f172a',
+    text: isDark ? '#fafafa' : BRAND.brown,
     textMuted: isDark ? '#a1a1aa' : '#64748b',
     inputBg: isDark ? '#1a1a1a' : '#f8fafc',
   };
@@ -168,7 +192,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
   const btnPrimary = {
     width: '100%',
     height: '48px',
-    backgroundColor: '#8b5cf6',
+    backgroundColor: '#004AAC',
     color: '#fff',
     border: 'none',
     borderRadius: '10px',
@@ -193,7 +217,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
         justifyContent: 'center',
       }}>
         <div style={{ textAlign: 'center' }}>
-          <Loader2 style={{ width: '40px', height: '40px', color: '#8b5cf6', animation: 'spin 1s linear infinite' }} />
+          <Loader2 style={{ width: '40px', height: '40px', color: '#004AAC', animation: 'spin 1s linear infinite' }} />
           <p style={{ marginTop: '16px', color: theme.textMuted }}>Verifying reset link...</p>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>

@@ -2,6 +2,10 @@
 import React from 'react';
 import { ArrowLeft, Shield, Mail, Database, Lock, Eye, Trash2, Globe, Users, Zap, Bell, MapPin, RefreshCw } from 'lucide-react';
 
+// BREWEDOPS BRAND
+const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
+const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
+
 const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
   const theme = {
     bg: isDark ? '#09090b' : '#ffffff',
@@ -19,13 +23,13 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
         <div style={{ 
           width: '40px', 
           height: '40px', 
-          backgroundColor: isDark ? '#8b5cf620' : '#8b5cf610', 
+          backgroundColor: isDark ? '#004AAC20' : '#004AAC10', 
           borderRadius: '10px', 
           display: 'flex', 
           alignItems: 'center', 
           justifyContent: 'center' 
         }}>
-          <Icon style={{ width: '20px', height: '20px', color: '#8b5cf6' }} />
+          <Icon style={{ width: '20px', height: '20px', color: '#004AAC' }} />
         </div>
         <h2 style={{ fontSize: '20px', fontWeight: '600', color: theme.text, margin: 0 }}>{title}</h2>
       </div>
@@ -261,10 +265,10 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
         <Section icon={Globe} title="Third-Party Services">
           <p>BrewedOps integrates with the following third-party services:</p>
           <ul style={{ margin: '12px 0', paddingLeft: '20px' }}>
-            <li><strong style={{ color: theme.text }}>Supabase:</strong> Database and authentication (<a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8b5cf6' }}>Privacy Policy</a>)</li>
-            <li><strong style={{ color: theme.text }}>Google Gmail API:</strong> Email sending (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#8b5cf6' }}>Privacy Policy</a>)</li>
-            <li><strong style={{ color: theme.text }}>GoHighLevel (GHL):</strong> CRM and automation integration (<a href="https://www.gohighlevel.com/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: '#8b5cf6' }}>Privacy Policy</a>)</li>
-            <li><strong style={{ color: theme.text }}>ExchangeRate-API:</strong> Currency conversion rates (<a href="https://www.exchangerate-api.com/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#8b5cf6' }}>Terms</a>)</li>
+            <li><strong style={{ color: theme.text }}>Supabase:</strong> Database and authentication (<a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#004AAC' }}>Privacy Policy</a>)</li>
+            <li><strong style={{ color: theme.text }}>Google Gmail API:</strong> Email sending (<a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#004AAC' }}>Privacy Policy</a>)</li>
+            <li><strong style={{ color: theme.text }}>GoHighLevel (GHL):</strong> CRM and automation integration (<a href="https://www.gohighlevel.com/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: '#004AAC' }}>Privacy Policy</a>)</li>
+            <li><strong style={{ color: theme.text }}>ExchangeRate-API:</strong> Currency conversion rates (<a href="https://www.exchangerate-api.com/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#004AAC' }}>Terms</a>)</li>
           </ul>
           <p style={{ marginTop: '12px' }}>
             Each integration requires your explicit authorization. You can review and revoke access to any connected service through your account settings at any time.
@@ -362,7 +366,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
           <p style={{ fontSize: '15px', color: theme.textMuted, margin: 0, lineHeight: '1.7' }}>
             If you have questions about this Privacy Policy or your data, please contact us at:
           </p>
-          <p style={{ fontSize: '15px', color: '#8b5cf6', margin: '12px 0 0', fontWeight: '500' }}>
+          <p style={{ fontSize: '15px', color: '#004AAC', margin: '12px 0 0', fontWeight: '500' }}>
             brewedops@gmail.com
           </p>
         </div>
@@ -387,7 +391,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
             style={{ 
               background: 'none', 
               border: 'none', 
-              color: '#8b5cf6', 
+              color: '#004AAC', 
               fontSize: '13px', 
               cursor: 'pointer',
               padding: '4px 0',

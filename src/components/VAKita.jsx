@@ -3,6 +3,10 @@
 // Data stored in Supabase for persistence
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { FileText, Clock, Plus, Trash2, Edit, Eye, X, Sun, Moon as MoonIcon, Coffee, Zap, Users, Bell, PiggyBank, Calculator, Receipt, BarChart3, Loader2, Target, UserPlus, CheckCircle, Info, Mail, Copy, Send, Settings } from 'lucide-react';
+
+// BREWEDOPS BRAND
+const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
+const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
 import { supabase } from '../lib/supabase';
 import { getTheme } from '../lib/theme';
 import { useWindowSize } from '../lib/hooks';
@@ -48,7 +52,7 @@ const LEAD_SOURCES = [
 const PROSPECT_STATUSES = [
   { id: 'new', label: 'New Lead', color: '#6b7280', icon: '🆕' },
   { id: 'contacted', label: 'Contacted', color: '#3b82f6', icon: '📨' },
-  { id: 'responded', label: 'Responded', color: '#8b5cf6', icon: '💬' },
+  { id: 'responded', label: 'Responded', color: '#004AAC', icon: '💬' },
   { id: 'meeting', label: 'Meeting Set', color: '#f59e0b', icon: '📅' },
   { id: 'proposal', label: 'Proposal Sent', color: '#ec4899', icon: '📄' },
   { id: 'negotiation', label: 'Negotiation', color: '#14b8a6', icon: '🤝' },
@@ -673,27 +677,44 @@ ${senderName}`;
   const input = { width: '100%', height: '40px', backgroundColor: theme.inputBg, border: '1px solid ' + theme.inputBorder, borderRadius: '8px', padding: '0 12px', fontSize: '14px', color: theme.text, outline: 'none', boxSizing: 'border-box' };
   const select = { ...input, cursor: 'pointer' };
   const textarea = { ...input, height: '80px', padding: '12px', resize: 'vertical' };
-  const btnPrimary = { height: '40px', padding: '0 16px', backgroundColor: '#8b5cf6', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };
+  const btnPrimary = { height: '40px', padding: '0 16px', backgroundColor: '#004AAC', color: '#fff', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '8px' };
   const btnOutline = { ...btnPrimary, backgroundColor: 'transparent', color: theme.text, border: '1px solid ' + theme.cardBorder };
   const btnGhost = { height: '36px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', borderRadius: '6px', fontSize: '13px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' };
   const btnSuccess = { ...btnPrimary, backgroundColor: '#22c55e' };
-  const tab = (a) => ({ padding: isSmall ? '12px 10px' : '14px 18px', backgroundColor: 'transparent', border: 'none', borderBottom: a ? '2px solid #8b5cf6' : '2px solid transparent', fontSize: isSmall ? '11px' : '15px', fontWeight: '500', color: a ? (isDark ? '#fff' : '#18181b') : theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isSmall ? '0' : '8px', whiteSpace: 'nowrap', flexShrink: 0, minWidth: isSmall ? '44px' : 'auto' });
+  const tab = (a) => ({ padding: isSmall ? '12px 10px' : '14px 18px', backgroundColor: 'transparent', border: 'none', borderBottom: a ? '2px solid #004AAC' : '2px solid transparent', fontSize: isSmall ? '11px' : '15px', fontWeight: '500', color: a ? (isDark ? '#fff' : '#18181b') : theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isSmall ? '0' : '8px', whiteSpace: 'nowrap', flexShrink: 0, minWidth: isSmall ? '44px' : 'auto' });
   const label = { display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px' };
   const statusStyle = (s) => { const st = STATUSES.find(x => x.id === s) || STATUSES[0]; return { backgroundColor: isDark ? st.color + '20' : st.color + '15', color: st.color }; };
   const prospectStatusStyle = (s) => { const st = PROSPECT_STATUSES.find(x => x.id === s) || PROSPECT_STATUSES[0]; return { backgroundColor: isDark ? st.color + '20' : st.color + '15', color: st.color }; };
 
-  if (loading) return (<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px', flexDirection: 'column', gap: '16px' }}><Loader2 style={{ width: '32px', height: '32px', color: '#8b5cf6', animation: 'spin 1s linear infinite' }} /><p style={{ fontSize: '14px', color: theme.textMuted }}>Loading VAKita...</p><style>{'@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }'}</style></div>);
+  if (loading) return (<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '400px', flexDirection: 'column', gap: '16px' }}><Loader2 style={{ width: '32px', height: '32px', color: '#004AAC', animation: 'spin 1s linear infinite' }} /><p style={{ fontSize: '14px', color: theme.textMuted }}>Loading VAKita...</p><style>{'@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }'}</style></div>);
 
   return (
     <>
-      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder, padding: isSmall ? '0 8px' : '0 24px' }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: isSmall ? '0' : '0 16px', gap: isSmall ? '8px' : '0' }}>
-          {/* Main category tabs - matching Finance Tracker style */}
-          <div style={{ display: 'flex', gap: '0', alignItems: 'center', flex: 1, overflow: 'auto', minWidth: 0, WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      {/* Main Navigation Header */}
+      <div style={{ backgroundColor: isDark ? '#0a0a0b' : '#ffffff', borderBottom: '1px solid ' + theme.cardBorder }}>
+        {/* ROW 1: Main Tabs - always full width, scrollable */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: isMobile ? '0 12px' : '0 24px',
+          borderBottom: isMobile ? '1px solid ' + theme.cardBorder : 'none'
+        }}>
+          {/* Main category tabs */}
+          <div style={{ 
+            display: 'flex', 
+            gap: '0', 
+            alignItems: 'center', 
+            flex: 1,
+            overflow: 'auto', 
+            WebkitOverflowScrolling: 'touch', 
+            scrollbarWidth: 'none', 
+            msOverflowStyle: 'none'
+          }}>
             <button 
               onClick={() => { if (!['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab)) setActiveTab('prospecting'); }}
               style={{
-                padding: isSmall ? '12px 10px' : '14px 18px',
+                padding: isSmall ? '14px 12px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: ['prospecting', 'clients', 'invoices', 'dashboard'].includes(activeTab) ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
@@ -704,17 +725,18 @@ ${senderName}`;
                 transition: 'color 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '6px',
                 whiteSpace: 'nowrap',
-                flexShrink: 0
+                flexShrink: 0,
+                fontFamily: FONTS.body
               }}
             >
-              {isSmall ? 'Clients' : 'Client Management'}
+              {isMobile ? 'Clients' : 'Client Management'}
             </button>
             <button 
               onClick={() => setActiveTab('timezone')} 
               style={{
-                padding: isSmall ? '12px 10px' : '14px 18px',
+                padding: isSmall ? '14px 12px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: activeTab === 'timezone' ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
@@ -725,18 +747,19 @@ ${senderName}`;
                 transition: 'color 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: isSmall ? '4px' : '8px',
+                gap: '6px',
                 whiteSpace: 'nowrap',
-                flexShrink: 0
+                flexShrink: 0,
+                fontFamily: FONTS.body
               }}
             >
-              <Clock style={{ width: isSmall ? '14px' : '16px', height: isSmall ? '14px' : '16px' }} />
-              {isSmall ? 'Timezone' : 'Timezone Manager'}
+              <Clock style={{ width: '14px', height: '14px' }} />
+              {isMobile ? 'Timezone' : 'Timezone Manager'}
             </button>
             <button 
               onClick={() => setActiveTab('tax')} 
               style={{
-                padding: isSmall ? '12px 10px' : '14px 18px',
+                padding: isSmall ? '14px 12px' : '14px 18px',
                 backgroundColor: 'transparent',
                 border: 'none',
                 borderBottom: activeTab === 'tax' ? '2px solid ' + (isDark ? '#fafafa' : '#18181b') : '2px solid transparent',
@@ -747,17 +770,19 @@ ${senderName}`;
                 transition: 'color 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '6px',
                 whiteSpace: 'nowrap',
-                flexShrink: 0
+                flexShrink: 0,
+                fontFamily: FONTS.body
               }}
             >
               Tax
             </button>
           </div>
           
-          {/* Notification Bell, Profile Settings, Exchange rate + saving indicator */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '4px' : '8px', flexShrink: 0 }}>
+          {/* Desktop only: Icons inline with tabs */}
+          {!isMobile && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
             {/* Notification Bell */}
             <div style={{ position: 'relative' }} ref={notificationRef}>
               <button 
@@ -796,8 +821,8 @@ ${senderName}`;
                 <div style={{
                   position: 'absolute',
                   top: 'calc(100% + 8px)',
-                  right: isSmall ? '-60px' : 0,
-                  width: isSmall ? 'calc(100vw - 32px)' : '320px',
+                  right: 0,
+                  width: '320px',
                   maxWidth: '320px',
                   maxHeight: '400px',
                   overflow: 'auto',
@@ -827,7 +852,7 @@ ${senderName}`;
                           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
                             <span style={{ 
                               fontSize: '12px', 
-                              color: act.type === 'payment' ? '#22c55e' : act.type === 'email' ? '#3b82f6' : '#8b5cf6'
+                              color: act.type === 'payment' ? '#22c55e' : act.type === 'email' ? '#3b82f6' : '#004AAC'
                             }}>
                               {act.type === 'payment' ? '💰' : act.type === 'email' ? '✉️' : '📋'}
                             </span>
@@ -859,7 +884,8 @@ ${senderName}`;
               <Settings style={{ width: '18px', height: '18px' }} />
             </button>
             
-            {liveRate && !isSmall && (
+            {/* Exchange Rate */}
+            {liveRate && (
               <div 
                 style={{ position: 'relative', flexShrink: 0 }}
                 onMouseEnter={() => setShowRateTooltip(true)}
@@ -873,10 +899,11 @@ ${senderName}`;
                   gap: '6px', 
                   padding: '6px 12px', 
                   backgroundColor: isDark ? '#22c55e15' : '#22c55e10', 
-                  borderRadius: '8px', 
+                  borderRadius: '6px', 
                   fontWeight: '600',
                   cursor: 'pointer',
-                  border: '1px solid ' + (isDark ? '#22c55e30' : '#22c55e25')
+                  border: '1px solid ' + (isDark ? '#22c55e30' : '#22c55e25'),
+                  whiteSpace: 'nowrap'
                 }}>
                   <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
                   $1 = ₱{liveRate.toFixed(2)}
@@ -929,9 +956,140 @@ ${senderName}`;
                 `}</style>
               </div>
             )}
-            {saving && <span style={{ fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />{isSmall ? '' : 'Saving...'}</span>}
+            {saving && <span style={{ fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} />Saving...</span>}
           </div>
+          )}
         </div>
+        
+        {/* ROW 2: Mobile only - Icons row */}
+        {isMobile && (
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '8px 12px',
+            gap: '8px'
+          }}>
+            {/* Left: Notification Bell & Settings */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {/* Notification Bell */}
+              <div style={{ position: 'relative' }} ref={notificationRef}>
+                <button 
+                  onClick={() => { setShowNotifications(!showNotifications); if (!showNotifications) markActivitiesAsRead(); }}
+                  style={{
+                    ...btnGhost,
+                    width: '36px',
+                    height: '36px',
+                    padding: 0,
+                    position: 'relative'
+                  }}
+                  title="Notifications"
+                >
+                  <Bell style={{ width: '18px', height: '18px' }} />
+                  {unreadCount > 0 && (
+                    <span style={{
+                      position: 'absolute',
+                      top: '4px',
+                      right: '4px',
+                      width: '16px',
+                      height: '16px',
+                      backgroundColor: '#ef4444',
+                      borderRadius: '50%',
+                      fontSize: '10px',
+                      fontWeight: '700',
+                      color: '#fff',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                      {unreadCount > 9 ? '9+' : unreadCount}
+                    </span>
+                  )}
+                </button>
+                {showNotifications && (
+                  <div style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 8px)',
+                    left: 0,
+                    width: 'calc(100vw - 24px)',
+                    maxWidth: '320px',
+                    maxHeight: '400px',
+                    overflow: 'auto',
+                    backgroundColor: theme.cardBg,
+                    border: '1px solid ' + theme.cardBorder,
+                    borderRadius: '12px',
+                    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.15)',
+                    zIndex: 100
+                  }}>
+                    <div style={{ padding: '14px 16px', borderBottom: '1px solid ' + theme.cardBorder }}>
+                      <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Recent Activity</span>
+                    </div>
+                    {activities.length === 0 ? (
+                      <div style={{ padding: '32px 16px', textAlign: 'center' }}>
+                        <Bell style={{ width: '32px', height: '32px', color: theme.textMuted, marginBottom: '8px', opacity: 0.5 }} />
+                        <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>No recent activity</p>
+                      </div>
+                    ) : (
+                      <div style={{ padding: '8px' }}>
+                        {activities.slice(0, 10).map(act => (
+                          <div key={act.id} style={{
+                            padding: '10px 12px',
+                            borderRadius: '8px',
+                            backgroundColor: act.read ? 'transparent' : (isDark ? '#3b82f610' : '#3b82f608'),
+                            marginBottom: '4px'
+                          }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
+                              <span style={{ fontSize: '12px', color: act.type === 'payment' ? '#22c55e' : act.type === 'email' ? '#3b82f6' : '#004AAC' }}>
+                                {act.type === 'payment' ? '💰' : act.type === 'email' ? '✉️' : '📋'}
+                              </span>
+                              <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text }}>{act.title}</span>
+                            </div>
+                            <p style={{ fontSize: '12px', color: theme.textMuted, margin: '0 0 0 22px' }}>{act.description}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+              
+              {/* Settings */}
+              <button 
+                onClick={() => setShowProfileModal(true)}
+                style={{
+                  ...btnGhost,
+                  width: '36px',
+                  height: '36px',
+                  padding: 0
+                }}
+                title="VAKita Settings"
+              >
+                <Settings style={{ width: '18px', height: '18px' }} />
+              </button>
+            </div>
+            
+            {/* Right: Exchange Rate */}
+            {liveRate && (
+              <span style={{ 
+                fontSize: '12px', 
+                color: '#22c55e', 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '6px', 
+                padding: '6px 12px', 
+                backgroundColor: isDark ? '#22c55e15' : '#22c55e10', 
+                borderRadius: '6px', 
+                fontWeight: '600',
+                border: '1px solid ' + (isDark ? '#22c55e30' : '#22c55e25')
+              }}>
+                <span style={{ width: '6px', height: '6px', backgroundColor: '#22c55e', borderRadius: '50%', animation: 'pulse 2s infinite' }} />
+                $1 = ₱{liveRate.toFixed(2)}
+              </span>
+            )}
+            
+            {saving && <span style={{ fontSize: '12px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><Loader2 style={{ width: '12px', height: '12px', animation: 'spin 1s linear infinite' }} /></span>}
+          </div>
+        )}
       </div>
       
       {/* Sub-tabs for Client Management - matching Finance Tracker sub-tab style */}
@@ -1044,13 +1202,13 @@ ${senderName}`;
         {activeTab === 'prospecting' && (
           <div>
             <div style={{display:'grid',gridTemplateColumns:isSmall?'repeat(2,1fr)':'repeat(4,1fr)',gap:isSmall?'8px':'12px',marginBottom:isSmall?'16px':'24px'}}>
-              <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #8b5cf6'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Active Leads</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:theme.text,margin:0}}>{prospectStats.active}</p></div>
+              <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #004AAC'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Active Leads</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:theme.text,margin:0}}>{prospectStats.active}</p></div>
               <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #22c55e'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Won</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:'#22c55e',margin:0}}>{prospectStats.won}</p></div>
               <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #ef4444'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Lost</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:'#ef4444',margin:0}}>{prospectStats.lost}</p></div>
               <div style={{...card,padding:isSmall?'12px':'16px',borderLeft:'4px solid #f59e0b'}}><p style={{fontSize:isSmall?'11px':'12px',color:theme.textMuted,margin:'0 0 4px'}}>Win Rate</p><p style={{fontSize:isSmall?'20px':'24px',fontWeight:'700',color:'#f59e0b',margin:0}}>{prospectStats.winRate}%</p></div>
             </div>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:isSmall?'16px':'24px',flexWrap:'wrap',gap:'12px'}}>
-              <div><h2 style={{fontSize:isSmall?'16px':'20px',fontWeight:'600',color:theme.text,margin:0}}>Prospecting Pipeline</h2>{!isSmall && <p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0'}}>Track potential clients from lead to close</p>}</div>
+              <div><h2 style={{fontSize:isSmall?'16px':'20px',fontWeight:'600',color:theme.text,margin:0,fontFamily:FONTS.heading}}>Prospecting Pipeline</h2>{!isSmall && <p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0',fontFamily:FONTS.body}}>Track potential clients from lead to close</p>}</div>
               <button onClick={() => setShowProspectForm(true)} style={{...btnPrimary,height:isSmall?'36px':'40px',padding:isSmall?'0 12px':'0 16px',fontSize:isSmall?'13px':'14px'}}><UserPlus style={{width:isSmall?'16px':'18px',height:isSmall?'16px':'18px'}}/>{isSmall?'Add':'Add Lead'}</button>
             </div>
             {prospects.length === 0 ? (
@@ -1123,7 +1281,7 @@ ${senderName}`;
         {activeTab === 'clients' && (
           <div>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'24px',flexWrap:'wrap',gap:'12px'}}>
-              <div><h2 style={{fontSize:'20px',fontWeight:'600',color:theme.text,margin:0}}>Clients</h2><p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0'}}>{clients.filter(c=>c.status==='active').length} active</p></div>
+              <div><h2 style={{fontSize:'20px',fontWeight:'600',color:theme.text,margin:0,fontFamily:FONTS.heading}}>Clients</h2><p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0',fontFamily:FONTS.body}}>{clients.filter(c=>c.status==='active').length} active</p></div>
               <button onClick={() => setShowClientForm(true)} style={btnPrimary}><Plus style={{width:'18px',height:'18px'}}/>Add Client</button>
             </div>
             {clients.length === 0 ? (<div style={{...card,textAlign:'center',padding:'60px'}}><Users style={{width:'48px',height:'48px',color:theme.textMuted,margin:'0 auto 16px'}}/><p style={{fontSize:'16px',color:theme.text}}>No clients yet</p><button onClick={() => setShowClientForm(true)} style={{...btnPrimary,marginTop:'16px'}}><Plus style={{width:'16px',height:'16px'}}/>Add Client</button></div>
@@ -1154,7 +1312,7 @@ ${senderName}`;
               {Object.keys(monthlyStats.byPlatform).length > 0 && (<div style={{display:'flex',gap:'12px',flexWrap:'wrap',marginTop:'16px',paddingTop:'16px',borderTop:'1px solid ' + theme.cardBorder}}>{Object.entries(monthlyStats.byPlatform).map(([p,v]) => { const pf = PLATFORMS.find(x=>x.id===p); return <div key={p} style={{display:'flex',alignItems:'center',gap:'8px',padding:'8px 12px',backgroundColor:isDark?'rgba(255,255,255,0.05)':'rgba(0,0,0,0.03)',borderRadius:'8px'}}><span style={{display:'flex',alignItems:'center',justifyContent:'center',width:'20px',height:'20px'}}>{renderIcon(pf?.icon||'💰', 18)}</span><span style={{fontSize:'13px',color:theme.text}}>{pf?.name}: ₱{formatAmount(v)}</span></div>; })}</div>)}
             </div>
             <div style={{display:'grid',gridTemplateColumns:isSmall?'1fr 1fr':'repeat(4, 1fr)',gap:'12px',marginBottom:'24px'}}>
-              <div style={{...card,padding:'16px',borderLeft:'4px solid #8b5cf6'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>6-Month Avg</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(sixMonthAvg)}</p></div>
+              <div style={{...card,padding:'16px',borderLeft:'4px solid #004AAC'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>6-Month Avg</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(sixMonthAvg)}</p></div>
               <div style={{...card,padding:'16px',borderLeft:'4px solid #f59e0b'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Pending</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(invoiceStats.pendingAmt)}</p></div>
               <div style={{...card,padding:'16px',borderLeft:'4px solid #22c55e'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Revenue</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(invoiceStats.revenue)}</p></div>
               <div style={{...card,padding:'16px',borderLeft:'4px solid #ef4444'}}><p style={{fontSize:'12px',color:theme.textMuted,margin:'0 0 4px'}}>Q{quarterlyTax.quarter} Tax</p><p style={{fontSize:'20px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.tax)}</p></div>
@@ -1213,7 +1371,7 @@ ${senderName}`;
         {activeTab === 'timezone' && (
           <div>
             <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:'24px',flexWrap:'wrap',gap:'12px'}}>
-              <div><h2 style={{fontSize:'20px',fontWeight:'600',color:theme.text,margin:0}}>ClientClock</h2><p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0'}}>Client timezones at a glance</p></div>
+              <div><h2 style={{fontSize:'20px',fontWeight:'600',color:theme.text,margin:0,fontFamily:FONTS.heading}}>ClientClock</h2><p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0',fontFamily:FONTS.body}}>Client timezones at a glance</p></div>
               <div style={{ position: 'relative' }}
                 onMouseEnter={() => setShowOverlapTooltip(true)}
                 onMouseLeave={() => setShowOverlapTooltip(false)}
@@ -1254,14 +1412,14 @@ ${senderName}`;
 
         {activeTab === 'tax' && (
           <div>
-            <div style={{marginBottom:'24px'}}><h2 style={{fontSize:'20px',fontWeight:'600',color:theme.text,margin:0}}>BIR Tax Helper</h2><p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0'}}>Quarterly tax calculator for Filipino freelancers</p></div>
+            <div style={{marginBottom:'24px'}}><h2 style={{fontSize:'20px',fontWeight:'600',color:theme.text,margin:0,fontFamily:FONTS.heading}}>BIR Tax Helper</h2><p style={{fontSize:'14px',color:theme.textMuted,margin:'4px 0 0',fontFamily:FONTS.body}}>Quarterly tax calculator for Filipino freelancers</p></div>
             <div style={{...card,marginBottom:'24px',background:isDark?'linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05))':'linear-gradient(135deg, rgba(59,130,246,0.08), rgba(59,130,246,0.02))',border:'1px solid #3b82f640'}}><div style={{display:'flex',gap:'12px'}}><Info style={{width:'20px',height:'20px',color:'#3b82f6',flexShrink:0,marginTop:'2px'}}/><div><p style={{fontSize:'14px',fontWeight:'600',color:theme.text,margin:'0 0 8px'}}>How this works</p><ul style={{fontSize:'13px',color:theme.textMuted,margin:0,paddingLeft:'16px',lineHeight:'1.6'}}><li><strong>TIN Number:</strong> Store your Tax ID for easy reference when filing</li><li><strong>8% Flat Rate:</strong> Pay 8% on gross income above ₱250K/year. Best if you have few expenses</li><li><strong>Graduated Rates:</strong> Tax brackets from 0-35%. Better if you have deductible expenses</li><li>Select the option you registered with BIR</li></ul></div></div></div>
-            <div style={{...card,marginBottom:'24px'}}><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 16px'}}>Tax Settings</h3><div style={{display:'grid',gridTemplateColumns:isSmall?'1fr':'1fr 1fr',gap:'16px'}}><div><label style={label}>TIN Number</label><input type="text" placeholder="XXX-XXX-XXX-XXX" value={taxSettings.tinNumber} onChange={(e) => setTaxSettings(p => ({...p, tinNumber: e.target.value}))} style={input}/></div><div><label style={label}>Tax Option</label><div style={{display:'flex',gap:'8px'}}><button onClick={() => setTaxSettings(p => ({...p, taxOption: '8percent'}))} style={{...btnOutline,flex:1,backgroundColor:taxSettings.taxOption==='8percent'?'#8b5cf6':'transparent',color:taxSettings.taxOption==='8percent'?'#fff':theme.text,borderColor:taxSettings.taxOption==='8percent'?'#8b5cf6':theme.cardBorder}}>8% Flat</button><button onClick={() => setTaxSettings(p => ({...p, taxOption: 'graduated'}))} style={{...btnOutline,flex:1,backgroundColor:taxSettings.taxOption==='graduated'?'#8b5cf6':'transparent',color:taxSettings.taxOption==='graduated'?'#fff':theme.text,borderColor:taxSettings.taxOption==='graduated'?'#8b5cf6':theme.cardBorder}}>Graduated</button></div></div></div></div>
+            <div style={{...card,marginBottom:'24px'}}><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 16px'}}>Tax Settings</h3><div style={{display:'grid',gridTemplateColumns:isSmall?'1fr':'1fr 1fr',gap:'16px'}}><div><label style={label}>TIN Number</label><input type="text" placeholder="XXX-XXX-XXX-XXX" value={taxSettings.tinNumber} onChange={(e) => setTaxSettings(p => ({...p, tinNumber: e.target.value}))} style={input}/></div><div><label style={label}>Tax Option</label><div style={{display:'flex',gap:'8px'}}><button onClick={() => setTaxSettings(p => ({...p, taxOption: '8percent'}))} style={{...btnOutline,flex:1,backgroundColor:taxSettings.taxOption==='8percent'?'#004AAC':'transparent',color:taxSettings.taxOption==='8percent'?'#fff':theme.text,borderColor:taxSettings.taxOption==='8percent'?'#004AAC':theme.cardBorder}}>8% Flat</button><button onClick={() => setTaxSettings(p => ({...p, taxOption: 'graduated'}))} style={{...btnOutline,flex:1,backgroundColor:taxSettings.taxOption==='graduated'?'#004AAC':'transparent',color:taxSettings.taxOption==='graduated'?'#fff':theme.text,borderColor:taxSettings.taxOption==='graduated'?'#004AAC':theme.cardBorder}}>Graduated</button></div></div></div></div>
             <div style={{display:'grid',gridTemplateColumns:isSmall?'1fr':'repeat(2, 1fr)',gap:'16px',marginBottom:'24px'}}>
               <div style={{...card,background:isDark?'linear-gradient(135deg, rgba(139,92,246,0.1), rgba(139,92,246,0.05))':'linear-gradient(135deg, rgba(139,92,246,0.08), rgba(139,92,246,0.02))'}}><p style={{fontSize:'14px',color:theme.textMuted,margin:'0 0 8px'}}>Q{quarterlyTax.quarter} {quarterlyTax.year} Gross</p><p style={{fontSize:'32px',fontWeight:'700',color:theme.text,margin:'0 0 8px'}}>₱{formatAmount(quarterlyTax.qGross)}</p><p style={{fontSize:'13px',color:theme.textMuted}}>YTD: ₱{formatAmount(quarterlyTax.yearGross)}</p></div>
               <div style={{...card,background:isDark?'linear-gradient(135deg, rgba(239,68,68,0.1), rgba(239,68,68,0.05))':'linear-gradient(135deg, rgba(239,68,68,0.08), rgba(239,68,68,0.02))'}}><p style={{fontSize:'14px',color:theme.textMuted,margin:'0 0 8px'}}>Est. Tax Due ({taxSettings.taxOption === '8percent' ? '8%' : 'Grad'})</p><p style={{fontSize:'32px',fontWeight:'700',color:'#ef4444',margin:'0 0 8px'}}>₱{formatAmount(quarterlyTax.tax)}</p><p style={{fontSize:'13px',color:theme.textMuted}}>Due: {quarterlyTax.due}</p></div>
             </div>
-            <div style={{...card,marginBottom:'24px'}}><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 16px'}}>Tax Comparison</h3><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}}><div style={{padding:'16px',backgroundColor:taxSettings.taxOption==='8percent'?(isDark?'#8b5cf615':'#8b5cf610'):theme.statBg,borderRadius:'8px',border:taxSettings.taxOption==='8percent'?'2px solid #8b5cf6':'1px solid ' + theme.cardBorder}}><p style={{fontSize:'13px',fontWeight:'600',color:taxSettings.taxOption==='8percent'?'#8b5cf6':theme.textMuted,margin:'0 0 8px'}}>8% Flat Rate {taxSettings.taxOption==='8percent'&&'✓'}</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.tax8)}</p></div><div style={{padding:'16px',backgroundColor:taxSettings.taxOption==='graduated'?(isDark?'#8b5cf615':'#8b5cf610'):theme.statBg,borderRadius:'8px',border:taxSettings.taxOption==='graduated'?'2px solid #8b5cf6':'1px solid ' + theme.cardBorder}}><p style={{fontSize:'13px',fontWeight:'600',color:taxSettings.taxOption==='graduated'?'#8b5cf6':theme.textMuted,margin:'0 0 8px'}}>Graduated {taxSettings.taxOption==='graduated'&&'✓'}</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.taxGrad)}</p></div></div></div>
+            <div style={{...card,marginBottom:'24px'}}><h3 style={{fontSize:'16px',fontWeight:'600',color:theme.text,margin:'0 0 16px'}}>Tax Comparison</h3><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'16px'}}><div style={{padding:'16px',backgroundColor:taxSettings.taxOption==='8percent'?(isDark?'#004AAC15':'#004AAC10'):theme.statBg,borderRadius:'8px',border:taxSettings.taxOption==='8percent'?'2px solid #004AAC':'1px solid ' + theme.cardBorder}}><p style={{fontSize:'13px',fontWeight:'600',color:taxSettings.taxOption==='8percent'?'#004AAC':theme.textMuted,margin:'0 0 8px'}}>8% Flat Rate {taxSettings.taxOption==='8percent'&&'✓'}</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.tax8)}</p></div><div style={{padding:'16px',backgroundColor:taxSettings.taxOption==='graduated'?(isDark?'#004AAC15':'#004AAC10'):theme.statBg,borderRadius:'8px',border:taxSettings.taxOption==='graduated'?'2px solid #004AAC':'1px solid ' + theme.cardBorder}}><p style={{fontSize:'13px',fontWeight:'600',color:taxSettings.taxOption==='graduated'?'#004AAC':theme.textMuted,margin:'0 0 8px'}}>Graduated {taxSettings.taxOption==='graduated'&&'✓'}</p><p style={{fontSize:'24px',fontWeight:'700',color:theme.text,margin:0}}>₱{formatAmount(quarterlyTax.taxGrad)}</p></div></div></div>
             
             {/* BIR Policy Source Links */}
             <div style={{...card,background:isDark?'linear-gradient(135deg, rgba(34,197,94,0.1), rgba(34,197,94,0.05))':'linear-gradient(135deg, rgba(34,197,94,0.08), rgba(34,197,94,0.02))',border:'1px solid #22c55e40'}}>
@@ -1425,8 +1583,8 @@ ${senderName}`;
           <div style={{width:'100%',maxWidth:'600px',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder,maxHeight:'90vh',overflow:'auto'}} onClick={e=>e.stopPropagation()}>
             <div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center'}}>
               <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
-                <div style={{width:'40px',height:'40px',backgroundColor:isDark?'#8b5cf620':'#8b5cf610',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                  <Mail style={{width:'20px',height:'20px',color:'#8b5cf6'}}/>
+                <div style={{width:'40px',height:'40px',backgroundColor:isDark?'#004AAC20':'#004AAC10',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  <Mail style={{width:'20px',height:'20px',color:'#004AAC'}}/>
                 </div>
                 <div>
                   <h3 style={{fontSize:'18px',fontWeight:'600',color:theme.text,margin:0}}>Invoice Email Template</h3>
@@ -1635,8 +1793,8 @@ ${senderName}`;
           <div style={{width:'100%',maxWidth:'480px',maxHeight:'90vh',backgroundColor:theme.cardBg,borderRadius:'12px',border:'1px solid ' + theme.cardBorder,overflow:'hidden',display:'flex',flexDirection:'column'}} onClick={e=>e.stopPropagation()}>
             <div style={{padding:'20px',borderBottom:'1px solid ' + theme.cardBorder,display:'flex',justifyContent:'space-between',alignItems:'center',flexShrink:0}}>
               <div style={{display:'flex',alignItems:'center',gap:'12px'}}>
-                <div style={{width:'40px',height:'40px',backgroundColor:isDark?'#8b5cf620':'#8b5cf610',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
-                  <Settings style={{width:'20px',height:'20px',color:'#8b5cf6'}}/>
+                <div style={{width:'40px',height:'40px',backgroundColor:isDark?'#004AAC20':'#004AAC10',borderRadius:'10px',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                  <Settings style={{width:'20px',height:'20px',color:'#004AAC'}}/>
                 </div>
                 <div>
                   <h3 style={{fontSize:'18px',fontWeight:'600',color:theme.text,margin:0}}>VAKita Profile</h3>

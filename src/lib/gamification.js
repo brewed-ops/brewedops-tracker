@@ -1,10 +1,11 @@
-// ============================================
-// GAMIFICATION - XP, Levels, Frames, Achievements helpers
-// ============================================
+// lib/gamification.js - Gamification utilities for BrewedOps
+import { LEVEL_THRESHOLDS, PROFILE_FRAMES } from './constants';
 
-import { LEVEL_THRESHOLDS, PROFILE_FRAMES, BADGE_TIERS } from './constants';
-
-// Calculate level from XP
+/**
+ * Calculate user level from XP
+ * @param {number} xp - User's total XP
+ * @returns {number} - User's level (1-25+)
+ */
 export const calculateLevel = (xp) => {
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
     if (xp >= LEVEL_THRESHOLDS[i]) {
@@ -14,187 +15,301 @@ export const calculateLevel = (xp) => {
   return 1;
 };
 
-// Get XP needed for next level
-export const getXPForNextLevel = (currentLevel) => {
+/**
+ * Get XP needed for next level
+ * @param {number} xp - User's current XP
+ * @returns {number} - XP needed for next level
+ */
+export const getXPForNextLevel = (xp) => {
+  const currentLevel = calculateLevel(xp);
   if (currentLevel >= LEVEL_THRESHOLDS.length) {
-    const lastThreshold = LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1];
-    const extraLevels = currentLevel - LEVEL_THRESHOLDS.length;
-    return Math.floor(lastThreshold * Math.pow(1.3, extraLevels + 1));
+    return LEVEL_THRESHOLDS[LEVEL_THRESHOLDS.length - 1] + 50000; // Continue pattern
   }
   return LEVEL_THRESHOLDS[currentLevel];
 };
 
-// Get current level progress percentage
+/**
+ * Get progress percentage to next level
+ * @param {number} xp - User's current XP
+ * @returns {number} - Progress percentage (0-100)
+ */
 export const getLevelProgress = (xp) => {
-  const level = calculateLevel(xp);
-  const currentLevelXP = LEVEL_THRESHOLDS[level - 1] || 0;
-  const nextLevelXP = getXPForNextLevel(level);
+  const currentLevel = calculateLevel(xp);
+  const currentLevelXP = LEVEL_THRESHOLDS[currentLevel - 1] || 0;
+  const nextLevelXP = getXPForNextLevel(xp);
   const progress = ((xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
   return Math.min(Math.max(progress, 0), 100);
 };
 
-// Get unlocked frames for a level
+/**
+ * Get all unlocked frames for a given level
+ * @param {number} level - User's level
+ * @returns {Array} - Array of unlocked frame objects
+ */
 export const getUnlockedFrames = (level) => {
   return PROFILE_FRAMES.filter(frame => frame.level <= level);
 };
 
-// Get frame by ID
+/**
+ * Get frame by ID
+ * @param {string} frameId - Frame ID
+ * @returns {Object|null} - Frame object or null
+ */
 export const getFrameById = (frameId) => {
-  return PROFILE_FRAMES.find(f => f.id === frameId) || PROFILE_FRAMES[0];
+  return PROFILE_FRAMES.find(frame => frame.id === frameId) || null;
 };
 
-// Get avatar wrapper style with animated frame
+/**
+ * Get animated frame style (outer container)
+ * Supports both CSS-based and image-based frames
+ * @param {Object} frame - Frame object
+ * @param {number} size - Size in pixels
+ * @returns {Object} - CSS style object
+ */
 export const getAnimatedFrameStyle = (frame, size = 48) => {
+  if (!frame || frame.id === 'none') {
+    return {
+      width: `${size}px`,
+      height: `${size}px`,
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+    };
+  }
+
+  // Image-based frame
+  if (frame.type === 'image' && frame.image) {
+    return {
+      width: `${size}px`,
+      height: `${size}px`,
+      borderRadius: '50%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      position: 'relative',
+      boxShadow: frame.glow || 'none',
+    };
+  }
+
+  // CSS-based frame
   const baseStyle = {
-    position: 'relative',
     width: `${size}px`,
     height: `${size}px`,
     borderRadius: '50%',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
+    border: frame.border || 'none',
+    boxShadow: frame.glow || 'none',
   };
-  
-  if (frame.id === 'none') {
-    return { ...baseStyle };
-  }
-  
-  // For gradient borders, we use a pseudo-element approach via wrapper
+
+  // Add gradient border if present
   if (frame.gradient) {
-    return {
-      ...baseStyle,
-      background: frame.gradient,
-      backgroundSize: '200% 200%',
-      padding: frame.border?.split(' ')[0] || '3px',
-      boxShadow: frame.glow !== 'none' ? frame.glow : 'none',
-      animation: frame.animation ? `${frame.animation} ${frame.animation.includes('rotate') || frame.animation.includes('holo') ? '3s' : frame.animation.includes('glitch') ? '2s' : '2s'} linear infinite` : 'none',
-    };
+    baseStyle.background = frame.gradient;
+    baseStyle.padding = '3px';
   }
-  
-  // For solid borders with animations
-  return {
-    ...baseStyle,
-    border: frame.border,
-    boxShadow: frame.glow !== 'none' ? frame.glow : 'none',
-    animation: frame.animation ? `${frame.animation} 2s ease-in-out infinite` : 'none',
-  };
+
+  // Add animation class reference
+  if (frame.animation) {
+    baseStyle.animation = `${frame.animation} 2s ease-in-out infinite`;
+  }
+
+  return baseStyle;
 };
 
-// Get inner avatar style (the actual avatar circle inside the frame)
+/**
+ * Get inner avatar style
+ * @param {Object} frame - Frame object
+ * @param {number} size - Size in pixels
+ * @param {string} bgColor - Background color for avatar
+ * @returns {Object} - CSS style object
+ */
 export const getAvatarInnerStyle = (frame, size = 48, bgColor = '#3b82f6') => {
-  const borderWidth = frame.gradient ? (parseInt(frame.border?.split(' ')[0]) || 3) : 0;
-  const innerSize = frame.gradient ? size - (borderWidth * 2) : size;
+  const innerSize = frame && frame.gradient ? size - 6 : size - (frame?.border ? 6 : 0);
   
   return {
-    width: `${innerSize}px`,
-    height: `${innerSize}px`,
+    width: `${Math.max(innerSize, size - 8)}px`,
+    height: `${Math.max(innerSize, size - 8)}px`,
     borderRadius: '50%',
     backgroundColor: bgColor,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
-    color: '#fff',
-    fontSize: `${Math.floor(innerSize * 0.4)}px`,
-    fontWeight: '600',
+    position: 'relative',
+    zIndex: 1,
   };
 };
 
-// Get tier styling from BADGE_TIERS
-export const getTierStyle = (tier) => {
-  return BADGE_TIERS[tier] || BADGE_TIERS.bronze;
+/**
+ * Get image frame overlay style
+ * For image-based frames, this creates the overlay element
+ * @param {Object} frame - Frame object
+ * @param {number} size - Size in pixels
+ * @returns {Object} - CSS style object for the overlay image
+ */
+export const getFrameOverlayStyle = (frame, size = 48) => {
+  if (!frame || frame.type !== 'image' || !frame.image) {
+    return null;
+  }
+
+  // Frame overlay is slightly larger than avatar to create border effect
+  const overlaySize = size + 16;
+  
+  return {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: `${overlaySize}px`,
+    height: `${overlaySize}px`,
+    backgroundImage: `url(${frame.image})`,
+    backgroundSize: 'contain',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    pointerEvents: 'none',
+    zIndex: 2,
+  };
 };
 
-// Frame animation keyframes CSS (to be injected into the page)
-export const frameAnimationStyles = `
+/**
+ * Get tier styling for achievements
+ * @param {string} tier - Tier name (bronze, silver, gold, etc.)
+ * @returns {Object} - Tier style object
+ */
+export const getTierStyle = (tier) => {
+  const tiers = {
+    bronze: { name: 'Bronze', color: '#cd7f32', bgGradient: 'linear-gradient(135deg, #cd7f32, #8b4513)' },
+    silver: { name: 'Silver', color: '#c0c0c0', bgGradient: 'linear-gradient(135deg, #e8e8e8, #a8a8a8)' },
+    gold: { name: 'Gold', color: '#ffd700', bgGradient: 'linear-gradient(135deg, #ffd700, #ff8c00)' },
+    platinum: { name: 'Platinum', color: '#e5e4e2', bgGradient: 'linear-gradient(135deg, #e5e4e2, #8fbcbb)' },
+    diamond: { name: 'Diamond', color: '#b9f2ff', bgGradient: 'linear-gradient(135deg, #b9f2ff, #87ceeb, #00bfff)' },
+    legendary: { name: 'Legendary', color: '#ff6b35', bgGradient: 'linear-gradient(135deg, #ff6b35, #f7931e, #ffd700)' },
+  };
+  return tiers[tier] || tiers.bronze;
+};
+
+/**
+ * CSS Keyframes for frame animations
+ * Add this to your global styles or inject via styled-components
+ */
+export const FRAME_ANIMATIONS_CSS = `
   @keyframes pulse-bronze {
     0%, 100% { box-shadow: 0 0 10px #cd7f32; }
-    50% { box-shadow: 0 0 20px #cd7f32, 0 0 30px #cd7f32; }
+    50% { box-shadow: 0 0 20px #cd7f32, 0 0 30px #cd7f3280; }
   }
   
   @keyframes shimmer-silver {
-    0% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; }
-    50% { box-shadow: 0 0 20px #e8e8e8, 0 0 30px #fff; }
-    100% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; }
+    0%, 100% { box-shadow: 0 0 12px #c0c0c0, 0 0 20px #e8e8e8; }
+    50% { box-shadow: 0 0 20px #c0c0c0, 0 0 35px #e8e8e8, 0 0 50px #ffffff40; }
   }
   
   @keyframes drip-gold {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
+    0%, 100% { box-shadow: 0 0 15px #ffd700, 0 0 25px #ffaa00; }
+    50% { box-shadow: 0 0 25px #ffd700, 0 0 40px #ffaa00, 0 0 60px #ffd70040; }
   }
   
   @keyframes matrix-glow {
     0%, 100% { box-shadow: 0 0 15px #00ff41, 0 0 30px #003d00; }
-    50% { box-shadow: 0 0 25px #00ff41, 0 0 50px #00ff41; }
+    50% { box-shadow: 0 0 25px #00ff41, 0 0 45px #00ff4180, 0 0 60px #003d00; }
   }
   
   @keyframes ice-pulse {
-    0%, 100% { box-shadow: 0 0 20px #00f7ff, 0 0 40px #0080ff, 0 0 60px #00f7ff33; }
-    50% { box-shadow: 0 0 30px #00f7ff, 0 0 60px #0080ff, 0 0 80px #00f7ff66; }
+    0%, 100% { box-shadow: 0 0 20px #00f7ff, 0 0 40px #0080ff; }
+    50% { box-shadow: 0 0 30px #00f7ff, 0 0 60px #0080ff, 0 0 80px #00f7ff40; }
   }
   
   @keyframes fire-border {
-    0%, 100% { background-position: 0% 50%; filter: brightness(1); }
-    50% { background-position: 100% 50%; filter: brightness(1.2); }
+    0%, 100% { box-shadow: 0 0 20px #ff4500, 0 0 40px #ff6600; }
+    25% { box-shadow: 0 0 25px #ff6600, 0 0 50px #ff4500; }
+    50% { box-shadow: 0 0 30px #ff4500, 0 0 60px #ff6600, 0 0 80px #ff000080; }
+    75% { box-shadow: 0 0 25px #ff6600, 0 0 50px #ff4500; }
   }
   
   @keyframes neon-flicker {
-    0%, 100% { opacity: 1; }
-    92% { opacity: 1; }
-    93% { opacity: 0.8; }
-    94% { opacity: 1; }
-    95% { opacity: 0.9; }
-    96% { opacity: 1; }
+    0%, 100% { box-shadow: 0 0 10px #ff00ff, 0 0 20px #00ffff; }
+    25% { box-shadow: 0 0 15px #00ffff, 0 0 30px #ff00ff; }
+    50% { box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff, 0 0 60px #ff00ff40; }
+    75% { box-shadow: 0 0 15px #00ffff, 0 0 30px #ff00ff; }
   }
   
   @keyframes galaxy-rotate {
-    from { background-position: 0deg; }
-    to { background-position: 360deg; }
+    0% { filter: hue-rotate(0deg); }
+    100% { filter: hue-rotate(360deg); }
   }
   
   @keyframes rgb-rotate {
-    from { filter: hue-rotate(0deg); }
-    to { filter: hue-rotate(360deg); }
+    0% { filter: hue-rotate(0deg); box-shadow: 0 0 20px #ff0000; }
+    33% { box-shadow: 0 0 20px #00ff00; }
+    66% { box-shadow: 0 0 20px #0000ff; }
+    100% { filter: hue-rotate(360deg); box-shadow: 0 0 20px #ff0000; }
   }
   
-  @keyframes legendary-crown {
-    0%, 100% { background-position: 0% 50%; box-shadow: 0 0 30px #ffd700, 0 0 60px #ff8c00; }
-    50% { background-position: 100% 50%; box-shadow: 0 0 40px #fff, 0 0 80px #ffd700; }
+  @keyframes pulse-purple {
+    0%, 100% { box-shadow: 0 0 15px #8b5cf6, 0 0 30px #6d28d9; }
+    50% { box-shadow: 0 0 25px #8b5cf6, 0 0 50px #6d28d9, 0 0 70px #8b5cf640; }
   }
   
-  @keyframes void-pulse {
-    0%, 100% { box-shadow: 0 0 30px #000, 0 0 50px #1a0033, 0 0 70px #330066, inset 0 0 20px #000; }
-    50% { box-shadow: 0 0 40px #1a0033, 0 0 70px #330066, 0 0 100px #4d0099, inset 0 0 30px #1a0033; }
+  @keyframes money-glow {
+    0%, 100% { box-shadow: 0 0 20px #22c55e, 0 0 40px #16a34a; }
+    50% { box-shadow: 0 0 30px #22c55e, 0 0 60px #16a34a, 0 0 80px #22c55e40; }
   }
   
-  @keyframes holo-shift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
   }
   
-  @keyframes glitch-border {
-    0%, 100% { box-shadow: 0 0 10px #00ff00, -3px 0 #ff0000, 3px 0 #0000ff; }
-    25% { box-shadow: 0 0 10px #00ff00, 3px 0 #ff0000, -3px 0 #0000ff; }
-    50% { box-shadow: 0 0 15px #00ff00, -2px 2px #ff0000, 2px -2px #0000ff; }
-    75% { box-shadow: 0 0 10px #00ff00, 2px -2px #ff0000, -2px 2px #0000ff; }
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
   }
   
-  @keyframes godmode-aura {
-    0%, 100% { 
-      background-position: 0deg;
-      box-shadow: 0 0 40px #ffd700, 0 0 80px #fff, 0 0 120px #ffd700;
-      filter: brightness(1);
-    }
-    50% { 
-      background-position: 180deg;
-      box-shadow: 0 0 60px #fff, 0 0 100px #ffd700, 0 0 150px #fff;
-      filter: brightness(1.1);
-    }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-2px); }
   }
   
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+  @keyframes flash {
+    0%, 90%, 100% { opacity: 1; }
+    95% { opacity: 0.7; }
+  }
+  
+  @keyframes breathe {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+  
+  @keyframes cosmic-pulse {
+    0%, 100% { box-shadow: 0 0 30px #8b5cf6, 0 0 60px #6366f1; filter: hue-rotate(0deg); }
+    50% { box-shadow: 0 0 40px #8b5cf6, 0 0 80px #6366f1; filter: hue-rotate(30deg); }
+  }
+  
+  @keyframes legendary-glow {
+    0%, 100% { box-shadow: 0 0 30px #ffd700, 0 0 60px #f59e0b; }
+    25% { box-shadow: 0 0 40px #fbbf24, 0 0 80px #ffd700; }
+    50% { box-shadow: 0 0 50px #ffd700, 0 0 100px #f59e0b, 0 0 120px #fbbf2450; }
+    75% { box-shadow: 0 0 40px #fbbf24, 0 0 80px #ffd700; }
+  }
+  
+  @keyframes champion-pulse {
+    0%, 100% { box-shadow: 0 0 20px #8b5cf6, 0 0 40px #6d28d9; transform: scale(1); }
+    50% { box-shadow: 0 0 35px #8b5cf6, 0 0 70px #6d28d9; transform: scale(1.02); }
   }
 `;
+
+export default {
+  calculateLevel,
+  getXPForNextLevel,
+  getLevelProgress,
+  getUnlockedFrames,
+  getFrameById,
+  getAnimatedFrameStyle,
+  getAvatarInnerStyle,
+  getFrameOverlayStyle,
+  getTierStyle,
+  FRAME_ANIMATIONS_CSS,
+};

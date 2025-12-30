@@ -2,6 +2,10 @@
 import React from 'react';
 import { ArrowLeft, Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target } from 'lucide-react';
 
+// BREWEDOPS BRAND
+const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
+const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
+
 const AboutUs = ({ onBack, onNavigate, isDark }) => {
   const theme = {
     bg: isDark ? '#09090b' : '#ffffff',
@@ -70,14 +74,14 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
             <div style={{
               width: '80px',
               height: '80px',
-              backgroundColor: isDark ? '#8b5cf620' : '#8b5cf615',
+              backgroundColor: isDark ? '#004AAC20' : '#004AAC15',
               borderRadius: '20px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 24px'
             }}>
-              <Sparkles style={{ width: '40px', height: '40px', color: '#8b5cf6' }} />
+              <Sparkles style={{ width: '40px', height: '40px', color: '#004AAC' }} />
             </div>
             <h1 style={{ 
               fontSize: '40px', 
@@ -193,7 +197,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               border: '1px solid ' + theme.cardBorder,
               textAlign: 'center'
             }}>
-              <Target style={{ width: '32px', height: '32px', color: '#8b5cf6', margin: '0 auto 12px' }} />
+              <Target style={{ width: '32px', height: '32px', color: '#004AAC', margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
                 Goal-Oriented
               </h3>
@@ -206,22 +210,22 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
           {/* Contact Section */}
           <div style={{
             padding: '32px',
-            backgroundColor: isDark ? '#8b5cf615' : '#8b5cf610',
+            backgroundColor: isDark ? '#004AAC15' : '#004AAC10',
             borderRadius: '16px',
-            border: '1px solid #8b5cf640',
+            border: '1px solid #004AAC40',
             textAlign: 'center'
           }}>
             <div style={{
               width: '56px',
               height: '56px',
-              backgroundColor: isDark ? '#8b5cf630' : '#8b5cf620',
+              backgroundColor: isDark ? '#004AAC30' : '#004AAC20',
               borderRadius: '14px',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               margin: '0 auto 20px'
             }}>
-              <Heart style={{ width: '28px', height: '28px', color: '#8b5cf6' }} />
+              <Heart style={{ width: '28px', height: '28px', color: '#004AAC' }} />
             </div>
             <h2 style={{ fontSize: '24px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>
               Get in Touch
@@ -260,7 +264,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
                   transition: 'all 0.2s'
                 }}
               >
-                <Mail style={{ width: '20px', height: '20px', color: '#8b5cf6' }} />
+                <Mail style={{ width: '20px', height: '20px', color: '#004AAC' }} />
                 brewedops@gmail.com
               </a>
               <a 
@@ -333,7 +337,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
             style={{ 
               background: 'none', 
               border: 'none', 
-              color: '#8b5cf6', 
+              color: '#004AAC', 
               fontSize: '13px', 
               cursor: 'pointer',
               padding: '4px 0',
