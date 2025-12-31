@@ -1058,11 +1058,11 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' }}>
                             <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
                               <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Total Expenses</p>
-                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#ef4444', margin: 0 }}>₱{formatAmount(selectedUser.totalSpent)}</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#ef4444', margin: 0 }}>{formatAmount(selectedUser.totalSpent)}</p>
                             </div>
                             <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
                               <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Wallets Balance</p>
-                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#22c55e', margin: 0 }}>₱{formatAmount(userWallets.reduce((sum, w) => sum + (parseFloat(w.balance) || 0), 0))}</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#22c55e', margin: 0 }}>{formatAmount(userWallets.reduce((sum, w) => sum + (parseFloat(w.balance) || 0), 0))}</p>
                             </div>
                           </div>
 
@@ -1071,7 +1071,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '10px', marginBottom: '20px' }}>
                             <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
                               <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Total Income</p>
-                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#22c55e', margin: 0 }}>₱{formatAmount(userVAKitaData?.income?.reduce((sum, i) => sum + (parseFloat(i.amountPHP) || 0), 0) || 0)}</p>
+                              <p style={{ fontSize: '18px', fontWeight: '700', color: '#22c55e', margin: 0 }}>{formatAmount(userVAKitaData?.income?.reduce((sum, i) => sum + (parseFloat(i.amountPHP) || 0), 0) || 0)}</p>
                             </div>
                             <div style={{ padding: '14px', backgroundColor: theme.statBg, borderRadius: '10px' }}>
                               <p style={{ fontSize: '11px', color: theme.textMuted, margin: '0 0 4px' }}>Clients</p>
@@ -1120,7 +1120,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                   <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>{expense.category} • {new Date(expense.date).toLocaleDateString()}</p>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>₱{formatAmount(expense.amount)}</span>
+                                  <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>{formatAmount(expense.amount)}</span>
                                   <button onClick={() => handleDeleteExpense(expense.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Trash2 style={{ width: '12px', height: '12px' }} />
                                   </button>
@@ -1131,7 +1131,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           {userExpenses.length > 0 && (
                             <div style={{ marginTop: '12px', padding: '12px', backgroundColor: isDark ? '#1e3a5f20' : '#dbeafe20', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <span style={{ fontSize: '13px', color: theme.textMuted }}>Total: {userExpenses.length} expenses</span>
-                              <span style={{ fontSize: '15px', fontWeight: '600', color: theme.text }}>₱{formatAmount(userExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0))}</span>
+                              <span style={{ fontSize: '15px', fontWeight: '600', color: theme.text }}>{formatAmount(userExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0))}</span>
                             </div>
                           )}
                         </div>
@@ -1154,7 +1154,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                   </div>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <span style={{ fontSize: '14px', fontWeight: '600', color: (wallet.balance || 0) >= 0 ? '#22c55e' : '#ef4444' }}>₱{formatAmount(wallet.balance || 0)}</span>
+                                  <span style={{ fontSize: '14px', fontWeight: '600', color: (wallet.balance || 0) >= 0 ? '#22c55e' : '#ef4444' }}>{formatAmount(wallet.balance || 0)}</span>
                                   <button onClick={() => handleDeleteWallet(wallet.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Trash2 style={{ width: '12px', height: '12px' }} />
                                   </button>
@@ -1165,7 +1165,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                           {userWallets.length > 0 && (
                             <div style={{ marginTop: '12px', padding: '12px', backgroundColor: isDark ? '#1e3a5f20' : '#dbeafe20', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                               <span style={{ fontSize: '13px', color: theme.textMuted }}>Total Balance ({userWallets.length} wallets)</span>
-                              <span style={{ fontSize: '15px', fontWeight: '600', color: '#22c55e' }}>₱{formatAmount(userWallets.reduce((sum, w) => sum + (parseFloat(w.balance) || 0), 0))}</span>
+                              <span style={{ fontSize: '15px', fontWeight: '600', color: '#22c55e' }}>{formatAmount(userWallets.reduce((sum, w) => sum + (parseFloat(w.balance) || 0), 0))}</span>
                             </div>
                           )}
                         </div>
@@ -1231,7 +1231,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                   <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>{income.platform} • {new Date(income.date).toLocaleDateString()}</p>
                                 </div>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#22c55e' }}>₱{formatAmount(income.amountPHP)}</span>
+                                  <span style={{ fontSize: '14px', fontWeight: '600', color: '#22c55e' }}>{formatAmount(income.amountPHP)}</span>
                                   <button onClick={() => handleDeleteIncome(income.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <Trash2 style={{ width: '12px', height: '12px' }} />
                                   </button>
@@ -1346,7 +1346,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               { label: 'Total Expenses', value: stats.totalExpenses, icon: Receipt, color: '#f59e0b' },
               { label: 'Total Clients', value: stats.totalClients, icon: Briefcase, color: '#8b5cf6' },
               { label: 'Total Invoices', value: stats.totalInvoices, icon: FileText, color: '#ec4899' },
-              { label: 'Total Income', value: `₱${formatAmount(stats.totalIncome)}`, icon: DollarSign, color: '#22c55e' },
+              { label: 'Total Income', value: `${formatAmount(stats.totalIncome)}`, icon: DollarSign, color: '#22c55e' },
             ].map((stat, i) => (
               <div key={i} style={{ ...card, padding: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>

@@ -1,171 +1,44 @@
-import React from 'react';
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva } from "class-variance-authority";
 
-// ============================================
-// BADGE COMPONENT
-// Variants: default, secondary, destructive, outline, success, warning
-// ============================================
+import { cn } from "@/lib/utils"
 
-const Badge = React.forwardRef(({ 
-  children, 
-  variant = 'default',
-  size = 'default',
-  dot = false,
-  className = '',
-  style = {},
-  ...props 
-}, ref) => {
-  const baseStyles = {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '6px',
-    borderRadius: '9999px',
-    fontWeight: '500',
-    lineHeight: '1',
-    whiteSpace: 'nowrap',
-    transition: 'all 0.15s ease',
-  };
+const badgeVariants = cva(
+  "inline-flex items-center justify-center rounded-full border px-2 py-0.5 text-xs font-medium w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive transition-[color,box-shadow] overflow-hidden",
+  {
+    variants: {
+      variant: {
+        default:
+          "border-transparent bg-primary text-primary-foreground [a&]:hover:bg-primary/90",
+        secondary:
+          "border-transparent bg-secondary text-secondary-foreground [a&]:hover:bg-secondary/90",
+        destructive:
+          "border-transparent bg-destructive text-white [a&]:hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60",
+        outline:
+          "text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
 
-  const sizeStyles = {
-    sm: { padding: '2px 8px', fontSize: '11px' },
-    default: { padding: '4px 10px', fontSize: '12px' },
-    lg: { padding: '6px 14px', fontSize: '13px' },
-  };
-
-  const variantStyles = {
-    default: {
-      backgroundColor: 'var(--primary)',
-      color: 'var(--primary-foreground)',
-      border: 'none',
-    },
-    secondary: {
-      backgroundColor: 'var(--secondary)',
-      color: 'var(--secondary-foreground)',
-      border: 'none',
-    },
-    destructive: {
-      backgroundColor: 'var(--destructive)',
-      color: 'var(--destructive-foreground)',
-      border: 'none',
-    },
-    outline: {
-      backgroundColor: 'transparent',
-      color: 'var(--foreground)',
-      border: '1px solid var(--border)',
-    },
-    success: {
-      backgroundColor: 'hsl(142 76% 36% / 0.15)',
-      color: 'hsl(142 76% 36%)',
-      border: '1px solid hsl(142 76% 36% / 0.3)',
-    },
-    warning: {
-      backgroundColor: 'hsl(38 92% 50% / 0.15)',
-      color: 'hsl(38 92% 50%)',
-      border: '1px solid hsl(38 92% 50% / 0.3)',
-    },
-    info: {
-      backgroundColor: 'hsl(221 83% 53% / 0.15)',
-      color: 'hsl(221 83% 53%)',
-      border: '1px solid hsl(221 83% 53% / 0.3)',
-    },
-  };
+function Badge({
+  className,
+  variant,
+  asChild = false,
+  ...props
+}) {
+  const Comp = asChild ? Slot : "span"
 
   return (
-    <span
-      ref={ref}
-      style={{
-        ...baseStyles,
-        ...sizeStyles[size],
-        ...variantStyles[variant],
-        ...style,
-      }}
-      {...props}
-    >
-      {dot && (
-        <span style={{
-          width: '6px',
-          height: '6px',
-          borderRadius: '50%',
-          backgroundColor: 'currentColor',
-          flexShrink: 0,
-        }} />
-      )}
-      {children}
-    </span>
+    <Comp
+      data-slot="badge"
+      className={cn(badgeVariants({ variant }), className)}
+      {...props} />
   );
-});
+}
 
-Badge.displayName = 'Badge';
-
-// ============================================
-// CATEGORY BADGE (Pre-styled for expense categories)
-// ============================================
-
-const CategoryBadge = ({ 
-  category, // { value, label, color, emoji }
-  showEmoji = false,
-  size = 'default',
-  style = {},
-  isDark = false,
-  ...props 
-}) => {
-  if (!category) return null;
-
-  const badgeStyle = {
-    backgroundColor: `${category.color}${isDark ? '20' : '15'}`,
-    color: category.color,
-    border: `1px solid ${category.color}${isDark ? '40' : '30'}`,
-  };
-
-  return (
-    <Badge
-      variant="outline"
-      size={size}
-      style={{ ...badgeStyle, ...style }}
-      {...props}
-    >
-      {showEmoji && category.emoji && (
-        <span style={{ fontSize: size === 'sm' ? '10px' : '12px' }}>{category.emoji}</span>
-      )}
-      {category.label}
-    </Badge>
-  );
-};
-
-// ============================================
-// STATUS BADGE (For recurring, due soon, etc.)
-// ============================================
-
-const StatusBadge = ({ 
-  status, // 'recurring' | 'due-soon' | 'overdue' | 'paid' | 'pending'
-  label,
-  size = 'sm',
-  style = {},
-  ...props 
-}) => {
-  const statusConfig = {
-    recurring: { variant: 'info', defaultLabel: 'Recurring' },
-    'due-soon': { variant: 'warning', defaultLabel: 'Due Soon' },
-    overdue: { variant: 'destructive', defaultLabel: 'Overdue' },
-    paid: { variant: 'success', defaultLabel: 'Paid' },
-    pending: { variant: 'secondary', defaultLabel: 'Pending' },
-    weekly: { variant: 'info', defaultLabel: 'Weekly' },
-    monthly: { variant: 'info', defaultLabel: 'Monthly' },
-    yearly: { variant: 'info', defaultLabel: 'Yearly' },
-  };
-
-  const config = statusConfig[status] || statusConfig.pending;
-
-  return (
-    <Badge
-      variant={config.variant}
-      size={size}
-      style={style}
-      {...props}
-    >
-      {label || config.defaultLabel}
-    </Badge>
-  );
-};
-
-export { Badge, CategoryBadge, StatusBadge };
+export { Badge, badgeVariants }

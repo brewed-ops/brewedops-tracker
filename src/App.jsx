@@ -3,6 +3,12 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-ro
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
 import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import TaskManager from './components/TaskManager';
+import FinanceTracker from './components/FinanceTracker';
+
+// shadcn Sidebar imports
+import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { AppSidebar } from '@/components/layout/AppSidebar';
 
 // ============================================
 // BREWEDOPS BRAND CONFIGURATION
@@ -58,7 +64,6 @@ if (typeof document !== 'undefined' && !document.getElementById('brewedops-fonts
 }
 
 // Extracted components and utilities
-import Sidebar from './components/layout/Sidebar';
 import VAKita from './components/VAKita';
 import PrivacyPolicy from './components/PrivacyPolicy';
 import TermsOfService from './components/TermsOfService';
@@ -172,6 +177,8 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
     { icon: '📈', title: 'BIR Tax Calculator', desc: 'Calculate quarterly taxes automatically - choose between 8% flat rate or graduated rates' },
     { icon: '🏆', title: 'Gamification', desc: 'Earn XP, level up, unlock achievements and stay motivated to reach your financial goals' },
   ];
+
+
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#ffffff' }}>
@@ -835,8 +842,11 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   const [activeSection, setActiveSection] = useState(() => {
     try { 
       const saved = localStorage.getItem('brewedops_active_section');
-      return saved === 'vakita' ? 'vakita' : 'tracker'; 
-    } catch { return 'tracker'; }
+      if (['vakita', 'tasks', 'dashboard'].includes(saved)) {
+        return saved;
+      }
+      return 'dashboard'; 
+    } catch { return 'dashboard'; }
   });
   
   // Save activeSection to localStorage
@@ -2931,25 +2941,15 @@ const getBudgetStatus = () => {
   });
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
-      {/* Sidebar - Desktop Only */}
-      {!isMobile && (
-        <Sidebar
-          collapsed={sidebarCollapsed}
-          setCollapsed={setSidebarCollapsed}
-          activeSection={activeSection}
-          setActiveSection={setActiveSection}
-          isDark={isDark}
-          theme={theme}
-        />
-      )}
+    <div className={isDark ? 'dark' : ''} style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
+    <SidebarProvider>
+      {/* shadcn Sidebar - Handles desktop/mobile automatically */}
+      <AppSidebar 
+        activeSection={activeSection} 
+        setActiveSection={setActiveSection}
+      />
 
-      {/* Main Content */}
-      <div style={{ 
-        marginLeft: isMobile ? 0 : (sidebarCollapsed ? '70px' : '260px'),
-        transition: 'margin-left 0.3s ease',
-        minHeight: '100vh',
-      }}>
+      <SidebarInset style={{ flex: 1, minWidth: 0, width: '100%' }}>
       {/* Header */}
       <header style={{
         backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
@@ -2962,10 +2962,11 @@ const getBudgetStatus = () => {
         display: 'flex',
         alignItems: 'center',
       }}>
-        <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: isMobile ? 'space-between' : 'flex-end' }}>
-          {/* Show logo and section switcher on mobile */}
-          {isMobile && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          {/* Sidebar Trigger + Logo on mobile */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            
+            {isMobile && (
               <img 
                 src="https://i.imgur.com/R52jwPv.png" 
                 alt="BrewedOps Logo" 
@@ -2977,47 +2978,8 @@ const getBudgetStatus = () => {
                   flexShrink: 0 
                 }} 
               />
-              {/* Mobile Section Switcher */}
-              <div style={{ display: 'flex', backgroundColor: theme.statBg, borderRadius: '8px', padding: '3px', border: '1px solid ' + theme.cardBorder }}>
-                <button 
-                  onClick={() => setActiveSection('tracker')} 
-                  style={{ 
-                    padding: '6px 10px', 
-                    fontSize: '12px', 
-                    fontWeight: '600', 
-                    border: 'none', 
-                    borderRadius: '6px', 
-                    cursor: 'pointer',
-                    backgroundColor: activeSection === 'tracker' ? '#22c55e' : 'transparent',
-                    color: activeSection === 'tracker' ? '#fff' : theme.textMuted,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <Wallet style={{ width: '14px', height: '14px' }} /> Finance
-                </button>
-                <button 
-                  onClick={() => setActiveSection('vakita')} 
-                  style={{ 
-                    padding: '6px 10px', 
-                    fontSize: '12px', 
-                    fontWeight: '600', 
-                    border: 'none', 
-                    borderRadius: '6px', 
-                    cursor: 'pointer',
-                    backgroundColor: activeSection === 'vakita' ? '#004AAC' : 'transparent',
-                    color: activeSection === 'vakita' ? '#fff' : theme.textMuted,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}
-                >
-                  <Headset style={{ width: '14px', height: '14px' }} /> VAKita
-                </button>
-              </div>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Desktop Header Actions */}
           {!isMobile ? (
@@ -3546,11 +3508,14 @@ const getBudgetStatus = () => {
         </div>
       </header>
 
-      {/* Conditional Content based on activeSection */}
-      {activeSection === 'vakita' ? (
-        <VAKita user={user} isDark={isDark} />
-      ) : (
-      <>
+     {/* Conditional Content based on activeSection */}
+{activeSection === 'vakita' ? (
+  <VAKita user={user} isDark={isDark} />
+) : activeSection === 'tasks' ? (
+  <TaskManager user={user} isDark={isDark} clients={[]} />
+) : (
+
+     <>
       {/* Tab Navigation */}
       <div style={{
         backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
@@ -8672,7 +8637,8 @@ const getBudgetStatus = () => {
         </div>
       )}
 
-      </div>{/* End Main Content Wrapper */}
+      </SidebarInset>
+    </SidebarProvider>
     </div>
   );
 };
@@ -8755,6 +8721,16 @@ function AppContent() {
   // Save theme preference
   useEffect(() => {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  }, [isDark]);
+
+  // Apply dark class to document root for shadcn/ui compatibility
+  useEffect(() => {
+    const root = document.documentElement;
+    if (isDark) {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
   }, [isDark]);
   
   const handleLogin = (userData) => {

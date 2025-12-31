@@ -1746,7 +1746,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                       <span style={{ fontSize: '12px', fontWeight: '500', color: isDark ? '#34d399' : '#047857' }}>Extracted successfully</span>
                     </div>
                     <p style={{ fontSize: '14px', fontWeight: '500', color: theme.text, margin: '0 0 4px', wordBreak: 'break-word' }}>{pendingUpload.name}</p>
-                    <p style={{ fontSize: '13px', color: '#10b981', fontWeight: '600', margin: '0 0 12px' }}>{currency}{formatAmount(pendingUpload.amount)}</p>
+                    <p style={{ fontSize: '13px', color: '#10b981', fontWeight: '600', margin: '0 0 12px' }}>{formatAmount(pendingUpload.amount, currency)}</p>
                     <div style={{ display: 'flex', gap: '8px', flexDirection: isSmall ? 'column' : 'row' }}>
                       <button onClick={confirmPendingUpload} style={{ flex: 1, height: '40px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
                         <Check style={{ width: '14px', height: '14px' }} /> Save Entry
@@ -1898,7 +1898,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                             <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</p>
                           </td>
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle', textAlign: 'right' }}>
-                            <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(entry.amount)}</span>
+                            <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{formatAmount(entry.amount, currency)}</span>
                           </td>
                           <td style={{ padding: '10px 8px', verticalAlign: 'middle' }}>
                             <span style={{ fontSize: '12px', color: theme.textSubtle }}>{new Date(entry.date).toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' })}</span>
@@ -1999,7 +1999,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
             ].map(stat => (
               <div key={stat.label} style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
                 <p style={{ fontSize: isSmall ? '11px' : '13px', color: theme.textSubtle, margin: '0 0 4px' }}>{stat.label}</p>
-                <p style={{ fontSize: isSmall ? '18px' : '24px', fontWeight: '700', color: theme.text, margin: 0 }}>{currency}{formatAmount(stat.value)}</p>
+                <p style={{ fontSize: isSmall ? '18px' : '24px', fontWeight: '700', color: theme.text, margin: 0 }}>{formatAmount(stat.value, currency)}</p>
               </div>
             ))}
           </div>
@@ -2250,7 +2250,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                     <CreditCard style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(analyticsStats.total)}</p>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{formatAmount(analyticsStats.total, currency)}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <ArrowUpRight style={{ width: '14px', height: '14px', color: 'rgba(255,255,255,0.8)' }} />
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{analyticsStats.count} entries</span>
@@ -2271,7 +2271,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                     <Wallet style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(analyticsStats.month)}</p>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{formatAmount(analyticsStats.month, currency)}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <TrendingUp style={{ width: '14px', height: '14px', color: 'rgba(255,255,255,0.8)' }} />
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
@@ -2292,7 +2292,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                     <DollarSign style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(analyticsStats.count > 0 ? analyticsStats.total / analyticsStats.count : 0)}</p>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{formatAmount(analyticsStats.count > 0 ? analyticsStats.total / analyticsStats.count : 0, currency)}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{analyticsStats.count} entries</span>
                 </div>
@@ -2312,7 +2312,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                     <PiggyBank style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
-                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(analyticsStats.today)}</p>
+                <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{formatAmount(analyticsStats.today, currency)}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{new Date().toLocaleDateString('en-US', { weekday: 'long' })}</span>
                 </div>
@@ -2381,7 +2381,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                             <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: cat.color }} />
                             <span style={{ fontSize: '13px', color: theme.textMuted }}>{cat.name}</span>
                           </div>
-                          <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(cat.value)}</span>
+                          <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{formatAmount(cat.value, currency)}</span>
                         </div>
                       ))}
                     </div>
@@ -2427,7 +2427,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                           <p style={{ fontSize: '13px', fontWeight: '500', color: theme.text, margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</p>
                           <p style={{ fontSize: '11px', color: catInfo?.color || theme.textMuted, margin: '2px 0 0' }}>{catInfo?.label}</p>
                         </div>
-                        <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(entry.amount)}</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{formatAmount(entry.amount, currency)}</span>
                       </div>
                     );
                   })}
@@ -2482,7 +2482,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                               {daysUntil === 0 ? 'Due today' : daysUntil === 1 ? 'Due tomorrow' : `Due in ${daysUntil} days`}
                             </p>
                           </div>
-                          <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{currency}{formatAmount(entry.amount)}</span>
+                          <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{formatAmount(entry.amount, currency)}</span>
                         </div>
                       );
                     })}
@@ -2705,7 +2705,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
                             <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{entry.name}</div>
                           </td>
                           <td style={{ padding: '12px 8px', fontSize: '14px', fontWeight: '600', color: theme.text, textAlign: 'right' }}>
-                            {currency}{formatAmount(entry.amount)}
+                            {formatAmount(entry.amount, currency)}
                           </td>
                           <td style={{ padding: '12px 8px', textAlign: 'center' }}>
                             <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>

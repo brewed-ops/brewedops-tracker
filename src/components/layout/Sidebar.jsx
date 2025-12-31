@@ -1,6 +1,15 @@
-// Sidebar.jsx - BrewedOps Sidebar Navigation
 import React from 'react';
-import { LayoutDashboard, Headphones, Menu, ChevronLeft } from 'lucide-react';
+import { 
+  Wallet, 
+  Headset, 
+  CheckSquare, 
+  ChevronLeft, 
+  ChevronRight,
+  MoreHorizontal,
+  FileEdit,
+  Image,
+  Video,
+} from 'lucide-react';
 
 // ============================================
 // BREWEDOPS BRAND CONFIGURATION
@@ -10,6 +19,7 @@ const BRAND = {
   blue: '#004AAC',
   green: '#51AF43',
   cream: '#FFF0D4',
+  black: '#000000',
 };
 
 const FONTS = {
@@ -17,51 +27,55 @@ const FONTS = {
   body: "'Poppins', sans-serif",
 };
 
-const Sidebar = ({ 
-  collapsed, 
-  setCollapsed, 
-  activeSection, 
-  setActiveSection, 
-  isDark 
-}) => {
-  const theme = {
-    bg: isDark ? '#0a0a0a' : '#ffffff',
-    cardBg: isDark ? '#141414' : '#ffffff',
-    cardBorder: isDark ? '#262626' : '#e4e4e7',
-    text: isDark ? '#fafafa' : BRAND.brown,
-    textMuted: isDark ? '#a1a1aa' : '#71717a',
-  };
-
-  const menuItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Finance Tracker' },
-    { id: 'vakita', icon: Headphones, label: 'VAKita' },
+const Sidebar = ({ collapsed, setCollapsed, activeSection, setActiveSection, isDark, theme }) => {
+  
+  const navItems = [
+    { id: 'dashboard', label: 'Finance Tracker', icon: Wallet, color: '#22c55e' },
+    { id: 'vakita', label: 'VAKita', icon: Headset, color: BRAND.blue },
+    { id: 'tasks', label: 'Task Manager', icon: CheckSquare, color: '#f59e0b' },
   ];
+
+  const moreTools = [
+    { id: 'pdf-editor', label: 'PDF Editor', icon: FileEdit, color: '#ef4444', comingSoon: true },
+    { id: 'image-tools', label: 'Image Tools', icon: Image, color: '#8b5cf6', comingSoon: true },
+    { id: 'video-compress', label: 'Video Compressor', icon: Video, color: '#ec4899', comingSoon: true },
+  ];
+
+  const sidebarBg = isDark ? '#0a0a0b' : '#ffffff';
+  const borderColor = isDark ? '#27272a' : '#e4e4e7';
+  const hoverBg = isDark ? '#18181b' : '#f4f4f5';
+  const activeBg = isDark ? '#1f1f23' : '#f0f0f2';
+  const textColor = isDark ? '#fafafa' : '#18181b';
+  const mutedColor = isDark ? '#71717a' : '#a1a1aa';
+  const sectionLabelColor = isDark ? '#52525b' : '#a1a1aa';
 
   return (
     <div
       style={{
         width: collapsed ? '70px' : '260px',
         height: '100vh',
-        backgroundColor: isDark ? '#0a0a0a' : '#ffffff',
-        borderRight: `1px solid ${theme.cardBorder}`,
-        display: 'flex',
-        flexDirection: 'column',
-        transition: 'width 0.2s ease',
+        backgroundColor: sidebarBg,
+        borderRight: `1px solid ${borderColor}`,
         position: 'fixed',
         left: 0,
         top: 0,
-        zIndex: 40,
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'width 0.3s ease',
+        zIndex: 30,
+        fontFamily: FONTS.body,
       }}
     >
-      {/* Header */}
+      {/* Logo Header */}
       <div
         style={{
           padding: collapsed ? '16px 12px' : '16px 20px',
-          borderBottom: `1px solid ${theme.cardBorder}`,
+          borderBottom: `1px solid ${borderColor}`,
           display: 'flex',
           alignItems: 'center',
           justifyContent: collapsed ? 'center' : 'space-between',
-          minHeight: '64px',
+          height: '72px',
+          boxSizing: 'border-box',
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -72,37 +86,46 @@ const Sidebar = ({
               width: '36px',
               height: '36px',
               borderRadius: '10px',
-              flexShrink: 0,
+              objectFit: 'cover',
             }}
           />
           {!collapsed && (
-            <span
-              style={{
-                fontSize: '18px',
-                fontWeight: '700',
-                fontFamily: FONTS.heading,
-                letterSpacing: '-0.02em',
-              }}
-            >
-              <span style={{ color: isDark ? '#ffffff' : BRAND.brown }}>Brewed</span>
-              <span style={{ color: BRAND.blue }}>Ops</span>
-            </span>
+            <div>
+              <span
+                style={{
+                  fontSize: '18px',
+                  fontWeight: '700',
+                  fontFamily: FONTS.heading,
+                }}
+              >
+                <span style={{ color: textColor }}>Brewed</span>
+                <span style={{ color: BRAND.blue }}>Ops</span>
+              </span>
+            </div>
           )}
         </div>
+
         {!collapsed && (
           <button
             onClick={() => setCollapsed(true)}
             style={{
-              width: '32px',
-              height: '32px',
+              width: '28px',
+              height: '28px',
               backgroundColor: 'transparent',
-              border: `1px solid ${theme.cardBorder}`,
-              borderRadius: '8px',
-              color: theme.textMuted,
+              border: `1px solid ${borderColor}`,
+              borderRadius: '6px',
+              color: mutedColor,
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
+              transition: 'all 0.15s',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = hoverBg;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
             }}
           >
             <ChevronLeft style={{ width: '16px', height: '16px' }} />
@@ -116,80 +139,277 @@ const Sidebar = ({
           onClick={() => setCollapsed(false)}
           style={{
             width: '100%',
-            padding: '12px',
+            padding: '12px 0',
             backgroundColor: 'transparent',
             border: 'none',
-            color: theme.textMuted,
+            borderBottom: `1px solid ${borderColor}`,
+            color: mutedColor,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <Menu style={{ width: '20px', height: '20px' }} />
+          <ChevronRight style={{ width: '18px', height: '18px' }} />
         </button>
       )}
 
       {/* Navigation */}
-      <nav style={{ flex: 1, padding: '12px 8px' }}>
-        {menuItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeSection === item.id;
-          
-          return (
-            <button
-              key={item.id}
-              onClick={() => setActiveSection(item.id)}
+      <nav style={{ flex: 1, padding: '16px 12px', overflowY: 'auto' }}>
+        {/* Home Section */}
+        {!collapsed && (
+          <p
+            style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              color: sectionLabelColor,
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              margin: '0 0 8px 8px',
+            }}
+          >
+            Home
+          </p>
+        )}
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = activeSection === item.id;
+
+            return (
+              <button
+                key={item.id}
+                onClick={() => setActiveSection(item.id)}
+                style={{
+                  width: '100%',
+                  padding: collapsed ? '12px' : '10px 12px',
+                  backgroundColor: isActive ? activeBg : 'transparent',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: collapsed ? 'center' : 'flex-start',
+                  gap: '12px',
+                  transition: 'all 0.15s',
+                  position: 'relative',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = hoverBg;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }
+                }}
+                title={collapsed ? item.label : undefined}
+              >
+                {/* Active indicator */}
+                {isActive && (
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: '0',
+                      top: '50%',
+                      transform: 'translateY(-50%)',
+                      width: '3px',
+                      height: '20px',
+                      backgroundColor: item.color,
+                      borderRadius: '0 2px 2px 0',
+                    }}
+                  />
+                )}
+
+                <div
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    backgroundColor: isActive ? `${item.color}20` : 'transparent',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    transition: 'all 0.15s',
+                  }}
+                >
+                  <Icon
+                    style={{
+                      width: '18px',
+                      height: '18px',
+                      color: isActive ? item.color : mutedColor,
+                    }}
+                  />
+                </div>
+
+                {!collapsed && (
+                  <span
+                    style={{
+                      fontSize: '14px',
+                      fontWeight: isActive ? '600' : '500',
+                      color: isActive ? textColor : mutedColor,
+                    }}
+                  >
+                    {item.label}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* More Tools Section */}
+        <div style={{ marginTop: '24px' }}>
+          {!collapsed && (
+            <p
               style={{
-                width: '100%',
-                padding: collapsed ? '12px' : '12px 16px',
-                backgroundColor: isActive ? BRAND.blue : 'transparent',
-                border: 'none',
-                borderRadius: '10px',
-                color: isActive ? '#ffffff' : theme.textMuted,
-                cursor: 'pointer',
+                fontSize: '11px',
+                fontWeight: '600',
+                color: sectionLabelColor,
+                textTransform: 'uppercase',
+                letterSpacing: '0.5px',
+                margin: '0 0 8px 8px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: collapsed ? 'center' : 'flex-start',
-                gap: '12px',
-                marginBottom: '4px',
-                transition: 'all 0.15s ease',
-                fontFamily: FONTS.body,
-                fontSize: '14px',
-                fontWeight: isActive ? '600' : '500',
-              }}
-              onMouseEnter={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = isDark ? '#1a1a1a' : '#f4f4f5';
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (!isActive) {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                }
+                gap: '6px',
               }}
             >
-              <Icon style={{ width: '20px', height: '20px', flexShrink: 0 }} />
-              {!collapsed && <span>{item.label}</span>}
-            </button>
-          );
-        })}
+              <MoreHorizontal style={{ width: '12px', height: '12px' }} />
+              More Tools
+            </p>
+          )}
+
+          {collapsed && (
+            <div
+              style={{
+                width: '100%',
+                height: '1px',
+                backgroundColor: borderColor,
+                margin: '8px 0',
+              }}
+            />
+          )}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            {moreTools.map((item) => {
+              const Icon = item.icon;
+
+              return (
+                <button
+                  key={item.id}
+                  disabled={item.comingSoon}
+                  style={{
+                    width: '100%',
+                    padding: collapsed ? '12px' : '10px 12px',
+                    backgroundColor: 'transparent',
+                    border: 'none',
+                    borderRadius: '8px',
+                    cursor: item.comingSoon ? 'not-allowed' : 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: collapsed ? 'center' : 'flex-start',
+                    gap: '12px',
+                    transition: 'all 0.15s',
+                    opacity: item.comingSoon ? 0.5 : 1,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!item.comingSoon) {
+                      e.currentTarget.style.backgroundColor = hoverBg;
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                  title={collapsed ? `${item.label}${item.comingSoon ? ' (Coming Soon)' : ''}` : undefined}
+                >
+                  <div
+                    style={{
+                      width: '32px',
+                      height: '32px',
+                      borderRadius: '8px',
+                      backgroundColor: 'transparent',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Icon
+                      style={{
+                        width: '18px',
+                        height: '18px',
+                        color: mutedColor,
+                      }}
+                    />
+                  </div>
+
+                  {!collapsed && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1 }}>
+                      <span
+                        style={{
+                          fontSize: '14px',
+                          fontWeight: '500',
+                          color: mutedColor,
+                        }}
+                      >
+                        {item.label}
+                      </span>
+                      {item.comingSoon && (
+                        <span
+                          style={{
+                            fontSize: '9px',
+                            fontWeight: '600',
+                            color: isDark ? '#a1a1aa' : '#71717a',
+                            backgroundColor: isDark ? '#27272a' : '#e4e4e7',
+                            padding: '2px 6px',
+                            borderRadius: '4px',
+                            textTransform: 'uppercase',
+                          }}
+                        >
+                          Soon
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </nav>
 
       {/* Footer */}
-      {!collapsed && (
-        <div
-          style={{
-            padding: '16px 20px',
-            borderTop: `1px solid ${theme.cardBorder}`,
-            fontSize: '11px',
-            color: theme.textMuted,
-            fontFamily: FONTS.body,
-          }}
-        >
-          © 2025 BrewedOps
-        </div>
-      )}
+      <div
+        style={{
+          padding: collapsed ? '12px' : '16px 20px',
+          borderTop: `1px solid ${borderColor}`,
+        }}
+      >
+        {!collapsed ? (
+          <p
+            style={{
+              fontSize: '11px',
+              color: mutedColor,
+              margin: 0,
+              textAlign: 'center',
+            }}
+          >
+            © 2025 BrewedOps
+          </p>
+        ) : (
+          <div
+            style={{
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%',
+              backgroundColor: '#22c55e',
+              margin: '0 auto',
+            }}
+            title="BrewedOps"
+          />
+        )}
+      </div>
     </div>
   );
 };
