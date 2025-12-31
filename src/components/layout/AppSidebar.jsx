@@ -26,19 +26,27 @@ import {
 } from "@/components/ui/sidebar"
 import { cn } from "@/lib/utils"
 
+// BrewedOps Brand Colors
+const BRAND = {
+  brown: '#3F200C',
+  blue: '#004AAC',
+  green: '#51AF43',
+  cream: '#FFF0D4'
+}
+
 // Navigation items with colors for active state
 const homeItems = [
   {
     id: "dashboard",
     title: "Finance Tracker",
     icon: Wallet,
-    activeColor: "#22c55e", // green
+    activeColor: BRAND.green,
   },
   {
     id: "vakita",
     title: "VAKita",
     icon: Headset,
-    activeColor: "#004AAC", // brand blue
+    activeColor: BRAND.blue,
   },
   {
     id: "tasks",
@@ -53,7 +61,7 @@ const moreToolsItems = [
     id: "pdf-editor",
     title: "PDF Editor",
     icon: FileEdit,
-    comingSoon: true,
+    comingSoon: false,
   },
   {
     id: "image-tools",
@@ -69,7 +77,7 @@ const moreToolsItems = [
   },
 ]
 
-export function AppSidebar({ activeSection, setActiveSection, ...props }) {
+export function AppSidebar({ activeSection, setActiveSection, isDark, ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -77,7 +85,7 @@ export function AppSidebar({ activeSection, setActiveSection, ...props }) {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden">
                 <img
@@ -86,8 +94,12 @@ export function AppSidebar({ activeSection, setActiveSection, ...props }) {
                   className="size-8 object-cover"
                 />
               </div>
-              <span className="truncate font-bold text-base" style={{ fontFamily: "'Montserrat', sans-serif" }}>
-                BrewedOps
+              <span 
+                className="truncate font-bold text-base"
+                style={{ fontFamily: "'Montserrat', sans-serif" }}
+              >
+                <span style={{ color: isDark ? '#ffffff' : BRAND.brown }}>Brewed</span>
+                <span style={{ color: BRAND.blue }}>Ops</span>
               </span>
             </SidebarMenuButton>
           </SidebarMenuItem>

@@ -4,6 +4,7 @@ import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveCo
 import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import TaskManager from './components/TaskManager';
+import PDFEditor from './components/PDFEditor';
 import FinanceTracker from './components/FinanceTracker';
 
 // shadcn Sidebar imports
@@ -744,8 +745,8 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
 
   const theme = getTheme(isDark);
   const { width } = useWindowSize();
-  const isMobile = width < 768;
-  const isSmall = width < 480;
+  const isMobile = width < 1024;  // Account for sidebar width
+  const isSmall = width < 768;    // Account for sidebar width
   
   // Form states
   const [uploadMode, setUploadMode] = useState('file');
@@ -2947,6 +2948,7 @@ const getBudgetStatus = () => {
       <AppSidebar 
         activeSection={activeSection} 
         setActiveSection={setActiveSection}
+        isDark={isDark}
       />
 
       <SidebarInset style={{ flex: 1, minWidth: 0, width: '100%' }}>
@@ -3513,6 +3515,8 @@ const getBudgetStatus = () => {
   <VAKita user={user} isDark={isDark} />
 ) : activeSection === 'tasks' ? (
   <TaskManager user={user} isDark={isDark} clients={[]} />
+) : activeSection === 'pdf-editor' ? (
+  <PDFEditor isDark={isDark} onNavigateHome={() => setActiveSection('dashboard')} />
 ) : (
 
      <>
@@ -3522,7 +3526,7 @@ const getBudgetStatus = () => {
         borderBottom: `1px solid ${theme.cardBorder}`,
         padding: isSmall ? '0 12px' : '0 24px'
       }}>
-        <div style={{ maxWidth: '1600px', margin: '0 auto', display: 'flex', gap: '4px', padding: '0 16px', overflowX: 'auto' }}>
+        <div style={{ width: '100%', display: 'flex', gap: '4px', padding: '0 16px', overflowX: 'auto' }}>
           <button
             onClick={() => setActiveTab('dashboard')}
             style={{
@@ -3609,7 +3613,7 @@ const getBudgetStatus = () => {
           borderBottom: `1px solid ${theme.cardBorder}`,
           padding: isSmall ? '0 12px' : '0 24px'
         }}>
-          <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '12px 16px' }}>
+          <div style={{ width: '100%', padding: '12px 16px' }}>
             <div style={{ display: 'flex', gap: '6px', backgroundColor: theme.toggleBg, borderRadius: '8px', padding: '4px', width: 'fit-content' }}>
               <button
                 onClick={() => setDashboardSubTab('add-entry')}
@@ -3685,7 +3689,7 @@ const getBudgetStatus = () => {
         </div>
       )}
 
-      <main style={{ maxWidth: '1600px', margin: '0 auto', padding: isSmall ? '8px' : '24px 40px', boxSizing: 'border-box', overflow: 'hidden' }}>
+      <main style={{ width: '100%', padding: isSmall ? '8px' : '24px 40px', boxSizing: 'border-box', overflow: 'hidden' }}>
         
         {activeTab === 'dashboard' && dashboardSubTab === 'add-entry' ? (
           <>
@@ -8835,6 +8839,7 @@ function AppContent() {
       <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
       <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
       <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+      <Route path="/pdfeditor" element={<PDFEditor isDark={isDark} onNavigateHome={() => navigate('/')} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );

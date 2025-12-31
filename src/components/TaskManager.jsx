@@ -660,13 +660,13 @@ const TaskManager = ({ user, isDark, clients = [] }) => {
           { label: 'DONE', value: stats.done, icon: CheckCircle2, color: BRAND.green },
           { label: 'TIME', value: `${Math.floor(stats.totalTime / 60)}h`, icon: Clock },
         ].map((stat, i) => (
-          <Card key={i} className={cn("py-3", isMobile && "min-w-[100px] flex-shrink-0")}>
-            <CardContent className="p-3 text-center">
-              <p className="text-[10px] font-medium text-muted-foreground flex items-center justify-center gap-1">
-                <stat.icon className="size-3" style={{ color: stat.color }} />
+          <Card key={i} className={cn("py-4", isMobile && "min-w-[120px] flex-shrink-0")}>
+            <CardContent className="p-4 text-center">
+              <p className="text-xs font-semibold text-muted-foreground flex items-center justify-center gap-1.5 tracking-wide">
+                <stat.icon className="size-4" style={{ color: stat.color }} />
                 {stat.label}
               </p>
-              <p className="text-2xl font-bold mt-1" style={{ color: stat.color }}>{stat.value}</p>
+              <p className="text-3xl font-bold mt-2" style={{ color: stat.color }}>{stat.value}</p>
             </CardContent>
           </Card>
         ))}
@@ -681,17 +681,17 @@ const TaskManager = ({ user, isDark, clients = [] }) => {
           
           {/* Filter & Add */}
           <Card>
-            <CardContent className="p-4">
+            <CardContent className="px-4 py-2">
               <div className={cn("flex gap-3", isMobile ? "flex-col" : "items-center justify-between")}>
                 <Tabs value={filter} onValueChange={setFilter} className={isMobile ? "w-full" : ""}>
                   <TabsList>
-                    <TabsTrigger value="todo" className="text-xs">
+                    <TabsTrigger value="todo" className="text-sm px-4">
                       To Do {stats.todo > 0 && `(${stats.todo})`}
                     </TabsTrigger>
-                    <TabsTrigger value="in-progress" className="text-xs">
+                    <TabsTrigger value="in-progress" className="text-sm px-4">
                       Progress {stats.inProgress > 0 && `(${stats.inProgress})`}
                     </TabsTrigger>
-                    <TabsTrigger value="done" className="text-xs">
+                    <TabsTrigger value="done" className="text-sm px-4">
                       Done {stats.done > 0 && `(${stats.done})`}
                     </TabsTrigger>
                   </TabsList>
