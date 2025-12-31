@@ -8,6 +8,7 @@ import {
   FileEdit,
   Image,
   Video,
+  Sparkles,
   MoreHorizontal,
 } from "lucide-react"
 
@@ -23,44 +24,39 @@ import {
   SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "@/components/ui/sidebar"
-import { cn } from "@/lib/utils"
 
-// BrewedOps Brand Colors
-const BRAND = {
-  brown: '#3F200C',
-  blue: '#004AAC',
-  green: '#51AF43',
-  cream: '#FFF0D4'
-}
-
-// Navigation items with colors for active state
+// Navigation items
 const homeItems = [
   {
     id: "dashboard",
     title: "Finance Tracker",
     icon: Wallet,
-    activeColor: BRAND.green,
   },
   {
     id: "vakita",
     title: "VAKita",
     icon: Headset,
-    activeColor: BRAND.blue,
   },
   {
     id: "tasks",
     title: "Task Manager",
     icon: CheckSquare,
-    activeColor: "#f59e0b", // amber
   },
 ]
 
 const moreToolsItems = [
   {
-    id: "pdf-editor",
+    id: "pdfeditor",
     title: "PDF Editor",
     icon: FileEdit,
+    comingSoon: false,
+  },
+  {
+    id: "bgremover",
+    title: "BG Remover",
+    icon: Sparkles,
     comingSoon: false,
   },
   {
@@ -77,7 +73,7 @@ const moreToolsItems = [
   },
 ]
 
-export function AppSidebar({ activeSection, setActiveSection, isDark, ...props }) {
+export function AppSidebar({ activeSection, setActiveSection, ...props }) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -85,22 +81,19 @@ export function AppSidebar({ activeSection, setActiveSection, isDark, ...props }
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-transparent"
+              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <img
                   src="https://i.imgur.com/R52jwPv.png"
                   alt="BrewedOps"
-                  className="size-8 object-cover"
+                  className="size-6 rounded"
                 />
               </div>
-              <span 
-                className="truncate font-bold text-base"
-                style={{ fontFamily: "'Montserrat', sans-serif" }}
-              >
-                <span style={{ color: isDark ? '#ffffff' : BRAND.brown }}>Brewed</span>
-                <span style={{ color: BRAND.blue }}>Ops</span>
-              </span>
+              <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">BrewedOps</span>
+                <span className="truncate text-xs text-muted-foreground">Dashboard</span>
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -112,38 +105,18 @@ export function AppSidebar({ activeSection, setActiveSection, isDark, ...props }
           <SidebarGroupLabel>Home</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {homeItems.map((item) => {
-                const isActive = activeSection === item.id
-                return (
-                  <SidebarMenuItem key={item.id}>
-                    <SidebarMenuButton
-                      tooltip={item.title}
-                      isActive={isActive}
-                      onClick={() => setActiveSection(item.id)}
-                      className={cn(
-                        "transition-all duration-200 relative",
-                        isActive && "font-semibold"
-                      )}
-                      style={isActive ? {
-                        backgroundColor: `${item.activeColor}20`,
-                        color: item.activeColor,
-                      } : {}}
-                    >
-                      {/* Active indicator bar */}
-                      {isActive && (
-                        <div 
-                          className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
-                          style={{ backgroundColor: item.activeColor }}
-                        />
-                      )}
-                      <item.icon 
-                        style={isActive ? { color: item.activeColor } : {}}
-                      />
-                      <span>{item.title}</span>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
+              {homeItems.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    tooltip={item.title}
+                    isActive={activeSection === item.id}
+                    onClick={() => setActiveSection(item.id)}
+                  >
+                    <item.icon />
+                    <span>{item.title}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -161,6 +134,7 @@ export function AppSidebar({ activeSection, setActiveSection, isDark, ...props }
                   <SidebarMenuButton
                     tooltip={item.comingSoon ? `${item.title} (Coming Soon)` : item.title}
                     disabled={item.comingSoon}
+                    isActive={activeSection === item.id}
                     onClick={() => !item.comingSoon && setActiveSection(item.id)}
                     className={item.comingSoon ? "opacity-50 cursor-not-allowed" : ""}
                   >
@@ -179,16 +153,17 @@ export function AppSidebar({ activeSection, setActiveSection, isDark, ...props }
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="mt-auto">
-        {/* Copyright */}
+      <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="sm" className="text-xs text-muted-foreground justify-center pointer-events-none">
+            <SidebarMenuButton size="sm" className="text-xs text-muted-foreground justify-center">
               <span>© 2025 BrewedOps</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
+
+      <SidebarRail />
     </Sidebar>
   )
 }

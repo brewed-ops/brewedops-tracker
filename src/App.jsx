@@ -5,7 +5,9 @@ import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Ey
 import { supabase } from './lib/supabase';
 import TaskManager from './components/TaskManager';
 import PDFEditor from './components/PDFEditor';
+import BackgroundRemover from './components/BackgroundRemover';
 import FinanceTracker from './components/FinanceTracker';
+
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
@@ -3515,8 +3517,10 @@ const getBudgetStatus = () => {
   <VAKita user={user} isDark={isDark} />
 ) : activeSection === 'tasks' ? (
   <TaskManager user={user} isDark={isDark} clients={[]} />
-) : activeSection === 'pdf-editor' ? (
+) : activeSection === 'pdfeditor' ? (
   <PDFEditor isDark={isDark} onNavigateHome={() => setActiveSection('dashboard')} />
+) : activeSection === 'bgremover' ? (
+  <BackgroundRemover isDark={isDark} onNavigateHome={() => setActiveSection('dashboard')} />
 ) : (
 
      <>
