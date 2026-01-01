@@ -85,30 +85,6 @@ const BrewedNotes = ({ isDark, user }) => {
     if (user?.id) loadNotes();
   }, [user?.id]);
 
-  // Handle checkbox changes for strikethrough
-  useEffect(() => {
-    const handleCheckboxChange = (e) => {
-      if (e.target.type === 'checkbox' && e.target.closest('.brewed-editor')) {
-        const checkItem = e.target.closest('.checklist-item');
-        if (checkItem) {
-          const textSpan = checkItem.querySelector('span');
-          if (textSpan) {
-            if (e.target.checked) {
-              textSpan.style.textDecoration = 'line-through';
-              textSpan.style.opacity = '0.6';
-            } else {
-              textSpan.style.textDecoration = 'none';
-              textSpan.style.opacity = '1';
-            }
-          }
-        }
-      }
-    };
-
-    document.addEventListener('change', handleCheckboxChange);
-    return () => document.removeEventListener('change', handleCheckboxChange);
-  }, []);
-
   const loadNotes = async () => {
     try {
       setLoading(true);
@@ -320,6 +296,64 @@ const BrewedNotes = ({ isDark, user }) => {
       setTimeout(() => editorRef.current?.focus(), 10);
     }
   };
+
+  // Handle keyboard shortcuts - prevent sidebar from capturing them
+  const handleEditorKeyDown = useCallback((e) => {
+    if (!isEditing) return;
+    
+    // Stop propagation for formatting shortcuts so sidebar doesn't capture them
+    if (e.ctrlKey || e.metaKey) {
+      switch (e.key.toLowerCase()) {
+        case 'b': // Bold
+          e.preventDefault();
+          e.stopPropagation();
+          document.execCommand('bold', false, null);
+          break;
+        case 'i': // Italic
+          e.preventDefault();
+          e.stopPropagation();
+          document.execCommand('italic', false, null);
+          break;
+        case 'u': // Underline
+          e.preventDefault();
+          e.stopPropagation();
+          document.execCommand('underline', false, null);
+          break;
+        case 's': // Save
+          e.preventDefault();
+          e.stopPropagation();
+          saveNote();
+          break;
+        default:
+          break;
+      }
+    }
+  }, [isEditing, saveNote]);
+
+  // Handle checkbox click for strikethrough - using event delegation
+  const handleEditorClick = useCallback((e) => {
+    const target = e.target;
+    if (target.type === 'checkbox') {
+      const checkItem = target.closest('.checklist-item');
+      if (checkItem) {
+        const textSpan = checkItem.querySelector('span');
+        if (textSpan) {
+          // Use setTimeout to ensure checkbox state is updated first
+          setTimeout(() => {
+            if (target.checked) {
+              textSpan.style.textDecoration = 'line-through';
+              textSpan.style.opacity = '0.6';
+              textSpan.style.color = isDark ? '#9ca3af' : '#6b7280';
+            } else {
+              textSpan.style.textDecoration = 'none';
+              textSpan.style.opacity = '1';
+              textSpan.style.color = '';
+            }
+          }, 0);
+        }
+      }
+    }
+  }, [isDark]);
 
   const handleNoteSelect = async (note) => {
     if (isEditing && selectedNote) await saveNote();
@@ -548,6 +582,8 @@ const BrewedNotes = ({ isDark, user }) => {
                   ref={editorRef}
                   contentEditable={isEditing}
                   onDoubleClick={handleEditorDoubleClick}
+                  onKeyDown={handleEditorKeyDown}
+                  onClick={handleEditorClick}
                   className="brewed-editor h-full p-4 overflow-y-auto outline-none"
                   style={{ fontSize: '15px', lineHeight: '1.7', minHeight: '300px', cursor: isEditing ? 'text' : 'default' }}
                   suppressContentEditableWarning={true}
