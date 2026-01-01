@@ -141,144 +141,139 @@ const getBadgeStyle = (type, isDark) => {
 };
 
 // ============================================
-// ICON CLOUD COMPONENT - Interactive 3D Tool Icons
+// ICON CLOUD COMPONENT - Animated Tool Icons (Pure CSS)
 // ============================================
 const IconCloud = ({ isDark }) => {
-  const canvasRef = useRef(null);
-  const [isLoaded, setIsLoaded] = useState(false);
-  
   // Tool icons with colors matching brand categories
   const toolIcons = [
     // Productivity (Blue)
-    { emoji: '💰', label: 'Finance Tracker', color: '#004AAC' },
-    { emoji: '🎧', label: 'VAKita', color: '#004AAC' },
-    { emoji: '✅', label: 'Task Manager', color: '#004AAC' },
-    { emoji: '📝', label: 'Brewed Notes', color: '#004AAC' },
+    { emoji: '💰', label: 'Finance Tracker' },
+    { emoji: '🎧', label: 'VAKita' },
+    { emoji: '✅', label: 'Task Manager' },
+    { emoji: '📝', label: 'Brewed Notes' },
     // Image Tools (Purple)
-    { emoji: '🖼️', label: 'BG Remover', color: '#8b5cf6' },
-    { emoji: '✂️', label: 'Image Cropper', color: '#8b5cf6' },
-    { emoji: '📐', label: 'Image Resizer', color: '#8b5cf6' },
-    { emoji: '📦', label: 'Compressor', color: '#8b5cf6' },
-    { emoji: '🔄', label: 'Converter', color: '#8b5cf6' },
-    { emoji: '🎨', label: 'Color Picker', color: '#8b5cf6' },
-    { emoji: '📄', label: 'Image to PDF', color: '#8b5cf6' },
+    { emoji: '🖼️', label: 'BG Remover' },
+    { emoji: '✂️', label: 'Image Cropper' },
+    { emoji: '📐', label: 'Image Resizer' },
+    { emoji: '📦', label: 'Compressor' },
+    { emoji: '🔄', label: 'Converter' },
+    { emoji: '🎨', label: 'Color Picker' },
+    { emoji: '📄', label: 'Image to PDF' },
     // Video Tools (Red)
-    { emoji: '🎬', label: 'Video Compress', color: '#ef4444' },
-    { emoji: '🎞️', label: 'Video Trimmer', color: '#ef4444' },
+    { emoji: '🎬', label: 'Video Compress' },
+    { emoji: '🎞️', label: 'Video Trimmer' },
     // Document Tools (Green)
-    { emoji: '📑', label: 'PDF Editor', color: '#22c55e' },
-    { emoji: '📚', label: 'PDF Merge', color: '#22c55e' },
-    { emoji: '📂', label: 'PDF Split', color: '#22c55e' },
+    { emoji: '📑', label: 'PDF Editor' },
+    { emoji: '📚', label: 'PDF Merge' },
+    { emoji: '📂', label: 'PDF Split' },
     // Other Tools (Orange)
-    { emoji: '📱', label: 'QR Generator', color: '#f59e0b' },
-    { emoji: '🔍', label: 'Find Replace', color: '#f59e0b' },
-    { emoji: '🔠', label: 'Case Converter', color: '#f59e0b' },
-    { emoji: '🔢', label: 'Word Counter', color: '#f59e0b' },
+    { emoji: '📱', label: 'QR Generator' },
+    { emoji: '🔍', label: 'Find Replace' },
+    { emoji: '🔠', label: 'Case Converter' },
+    { emoji: '🔢', label: 'Word Counter' },
   ];
 
+  // Add keyframes for floating animation
   useEffect(() => {
-    // Load TagCanvas library
-    const script = document.createElement('script');
-    script.src = 'https://cdn.jsdelivr.net/npm/TagCanvas@2.11.20230714/TagCanvas.min.js';
-    script.async = true;
-    script.onload = () => setIsLoaded(true);
-    document.body.appendChild(script);
-    
-    return () => {
-      if (document.body.contains(script)) {
-        document.body.removeChild(script);
-      }
-    };
+    if (!document.getElementById('icon-cloud-styles')) {
+      const style = document.createElement('style');
+      style.id = 'icon-cloud-styles';
+      style.textContent = `
+        @keyframes float-1 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(10px, -15px) scale(1.1); } }
+        @keyframes float-2 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-12px, 12px) scale(1.05); } }
+        @keyframes float-3 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(8px, 10px) scale(1.08); } }
+        @keyframes float-4 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(-10px, -8px) scale(1.12); } }
+        @keyframes float-5 { 0%, 100% { transform: translate(0, 0) scale(1); } 50% { transform: translate(15px, 5px) scale(1.05); } }
+        .icon-cloud-item { transition: transform 0.3s ease, filter 0.3s ease; }
+        .icon-cloud-item:hover { transform: scale(1.3) !important; filter: drop-shadow(0 4px 12px rgba(0,74,172,0.3)); z-index: 10; }
+      `;
+      document.head.appendChild(style);
+    }
   }, []);
 
-  useEffect(() => {
-    if (!isLoaded || !canvasRef.current) return;
-    
-    try {
-      // @ts-ignore
-      window.TagCanvas.Start('iconCloudCanvas', 'iconCloudTags', {
-        textColour: isDark ? '#ffffff' : '#3F200C',
-        outlineColour: 'transparent',
-        reverse: true,
-        depth: 0.8,
-        maxSpeed: 0.04,
-        minSpeed: 0.02,
-        initial: [0.1, -0.1],
-        decel: 0.95,
-        textFont: 'Poppins, sans-serif',
-        textHeight: 18,
-        imageScale: 1.5,
-        fadeIn: 800,
-        wheelZoom: false,
-        pinchZoom: false,
-        shuffleTags: true,
-        shape: 'sphere',
-        lock: 'xy',
-        zoom: 1,
-        noSelect: true,
-        noMouse: false,
-        imageRadius: 8,
-      });
-    } catch (e) {
-      console.log('TagCanvas error:', e);
-    }
-    
-    return () => {
-      try {
-        // @ts-ignore
-        window.TagCanvas && window.TagCanvas.Delete('iconCloudCanvas');
-      } catch (e) {}
+  // Position icons in a cloud-like pattern
+  const getPosition = (index, total) => {
+    const positions = [
+      // Center area
+      { top: '45%', left: '50%' },
+      { top: '30%', left: '40%' },
+      { top: '35%', left: '60%' },
+      { top: '55%', left: '35%' },
+      { top: '60%', left: '55%' },
+      // Inner ring
+      { top: '20%', left: '50%' },
+      { top: '40%', left: '25%' },
+      { top: '40%', left: '75%' },
+      { top: '65%', left: '45%' },
+      { top: '50%', left: '65%' },
+      // Outer positions
+      { top: '15%', left: '30%' },
+      { top: '15%', left: '65%' },
+      { top: '70%', left: '25%' },
+      { top: '75%', left: '60%' },
+      { top: '25%', left: '20%' },
+      { top: '30%', left: '80%' },
+      { top: '70%', left: '75%' },
+      { top: '80%', left: '40%' },
+      { top: '10%', left: '48%' },
+      { top: '55%', left: '15%' },
+    ];
+    return positions[index] || { top: '50%', left: '50%' };
+  };
+
+  const getAnimation = (index) => {
+    const animations = ['float-1', 'float-2', 'float-3', 'float-4', 'float-5'];
+    const durations = ['4s', '5s', '6s', '4.5s', '5.5s'];
+    return {
+      animation: `${animations[index % 5]} ${durations[index % 5]} ease-in-out infinite`,
+      animationDelay: `${(index * 0.2) % 2}s`
     };
-  }, [isLoaded, isDark]);
+  };
+
+  const getSizeAndOpacity = (index) => {
+    // Vary sizes to create depth effect
+    const sizes = [42, 38, 45, 36, 40, 44, 34, 42, 38, 46, 35, 40, 43, 37, 41, 39, 44, 36, 42, 38];
+    const opacities = [1, 0.9, 0.95, 0.85, 0.92, 1, 0.88, 0.95, 0.9, 1, 0.85, 0.92, 0.97, 0.88, 0.93, 0.9, 1, 0.87, 0.94, 0.91];
+    return {
+      fontSize: `${sizes[index % sizes.length]}px`,
+      opacity: opacities[index % opacities.length]
+    };
+  };
 
   return (
-    <div style={{ position: 'relative', width: '100%', maxWidth: '500px', height: '350px' }}>
-      <canvas 
-        ref={canvasRef}
-        id="iconCloudCanvas" 
-        width="500" 
-        height="350"
-        style={{ 
-          width: '100%', 
-          height: '100%',
-          maxWidth: '500px',
-          display: isLoaded ? 'block' : 'none'
-        }}
-      />
-      <div id="iconCloudTags" style={{ display: 'none' }}>
-        {toolIcons.map((tool, i) => (
-          <a 
-            key={i} 
-            href="#" 
-            onClick={(e) => e.preventDefault()}
-            style={{ 
-              fontSize: '32px',
-              textDecoration: 'none',
-              padding: '8px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '6px'
+    <div style={{ 
+      position: 'relative', 
+      width: '100%', 
+      maxWidth: '450px', 
+      height: '320px',
+      margin: '0 auto'
+    }}>
+      {toolIcons.map((tool, i) => {
+        const pos = getPosition(i, toolIcons.length);
+        const anim = getAnimation(i);
+        const sizeOpacity = getSizeAndOpacity(i);
+        
+        return (
+          <div
+            key={i}
+            className="icon-cloud-item"
+            title={tool.label}
+            style={{
+              position: 'absolute',
+              top: pos.top,
+              left: pos.left,
+              transform: 'translate(-50%, -50%)',
+              fontSize: sizeOpacity.fontSize,
+              opacity: sizeOpacity.opacity,
+              cursor: 'pointer',
+              userSelect: 'none',
+              ...anim
             }}
           >
-            <span style={{ fontSize: '28px' }}>{tool.emoji}</span>
-          </a>
-        ))}
-      </div>
-      {!isLoaded && (
-        <div style={{ 
-          position: 'absolute', 
-          top: '50%', 
-          left: '50%', 
-          transform: 'translate(-50%, -50%)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
-          <Loader2 style={{ width: '32px', height: '32px', color: '#004AAC', animation: 'spin 1s linear infinite' }} />
-          <span style={{ fontSize: '14px', color: isDark ? '#a1a1aa' : '#71717a' }}>Loading tools...</span>
-        </div>
-      )}
+            {tool.emoji}
+          </div>
+        );
+      })}
     </div>
   );
 };
