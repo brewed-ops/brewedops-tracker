@@ -4,13 +4,14 @@ import React, { useState, useRef, useCallback } from 'react';
 import { 
   Upload, Download, Trash2, Loader2, CheckCircle, 
   Clock, AlertTriangle, RefreshCw, Image, FileImage,
-  Settings, ChevronDown, X, Plus, Check, Info
+  Settings, ChevronDown, X, Plus, Check, Info, PanelLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
+import { SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { getTheme } from '../lib/theme';
 
@@ -302,15 +303,15 @@ const ImageConverter = ({ isDark }) => {
   return (
     <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: FONTS.body }}>
       {/* Header */}
-      <div className="mb-6">
-        <h1 
-          className="text-2xl md:text-3xl font-bold mb-1 flex items-center gap-2" 
-          style={{ color: theme.text, fontFamily: FONTS.heading }}
-        >
-          <RefreshCw className="size-6 md:size-8" style={{ color: BRAND.blue }} />
-          Image Converter
-        </h1>
-        <p className="text-sm text-muted-foreground">Convert images between PNG, JPEG, WebP, GIF, and BMP</p>
+      <div className="mb-6 flex items-center gap-3">
+        <SidebarTrigger className="md:hidden shrink-0" />
+        <div className="flex-1 min-w-0">
+          <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
+            <RefreshCw className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+            <span className="truncate">Image Converter</span>
+          </h1>
+          <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">Convert images between PNG, JPEG, WebP, GIF, and BMP</p>
+        </div>
       </div>
 
       {/* Main Content */}

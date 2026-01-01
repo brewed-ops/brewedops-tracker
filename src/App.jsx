@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset } from 'lucide-react';
+import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset, PanelLeft } from 'lucide-react';
 import { supabase } from './lib/supabase';
 import TaskManager from './components/TaskManager';
 import PDFEditor from './components/PDFEditor';
@@ -15,7 +15,7 @@ import FinanceTracker from './components/FinanceTracker';
 
 
 // shadcn Sidebar imports
-import { SidebarProvider, SidebarInset } from '@/components/ui/sidebar';
+import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 
 // ============================================
@@ -2997,20 +2997,43 @@ const getBudgetStatus = () => {
       }}>
         <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Sidebar Trigger + Logo on mobile */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Mobile Sidebar Trigger */}
+            <SidebarTrigger className="md:hidden" style={{ 
+              width: '40px', 
+              height: '40px', 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'center',
+              borderRadius: '8px',
+              border: `1px solid ${theme.cardBorder}`,
+              backgroundColor: 'transparent',
+              color: theme.text,
+              cursor: 'pointer'
+            }} />
             
             {isMobile && (
-              <img 
-                src="https://i.imgur.com/R52jwPv.png" 
-                alt="BrewedOps Logo" 
-                style={{ 
-                  width: '32px', 
-                  height: '32px', 
-                  borderRadius: '50%', 
-                  objectFit: 'cover',
-                  flexShrink: 0 
-                }} 
-              />
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <img 
+                  src="https://i.imgur.com/R52jwPv.png" 
+                  alt="BrewedOps Logo" 
+                  style={{ 
+                    width: '32px', 
+                    height: '32px', 
+                    borderRadius: '8px', 
+                    objectFit: 'cover',
+                    flexShrink: 0 
+                  }} 
+                />
+                <span style={{ 
+                  fontFamily: "'Montserrat', sans-serif", 
+                  fontWeight: '700', 
+                  fontSize: '16px' 
+                }}>
+                  <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
+                  <span style={{ color: BRAND.blue }}>Ops</span>
+                </span>
+              </div>
             )}
           </div>
 
