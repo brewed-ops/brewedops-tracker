@@ -2996,21 +2996,25 @@ const getBudgetStatus = () => {
         alignItems: 'center',
       }}>
         <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          {/* Sidebar Trigger + Logo on mobile */}
+          {/* Left side - Sidebar Trigger + Logo on mobile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Mobile Sidebar Trigger */}
-            <SidebarTrigger className="md:hidden" style={{ 
-              width: '40px', 
-              height: '40px', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center',
-              borderRadius: '8px',
-              border: `1px solid ${theme.cardBorder}`,
-              backgroundColor: 'transparent',
-              color: theme.text,
-              cursor: 'pointer'
-            }} />
+            {/* Mobile Sidebar Trigger - uses Sheet on mobile */}
+            <SidebarTrigger 
+              className="md:hidden" 
+              style={{ 
+                width: '36px', 
+                height: '36px', 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'center',
+                borderRadius: '8px',
+                border: `1px solid ${theme.cardBorder}`,
+                backgroundColor: 'transparent',
+                color: theme.text,
+                cursor: 'pointer',
+                flexShrink: 0
+              }} 
+            />
             
             {isMobile && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -3018,9 +3022,9 @@ const getBudgetStatus = () => {
                   src="https://i.imgur.com/R52jwPv.png" 
                   alt="BrewedOps Logo" 
                   style={{ 
-                    width: '32px', 
-                    height: '32px', 
-                    borderRadius: '8px', 
+                    width: '28px', 
+                    height: '28px', 
+                    borderRadius: '6px', 
                     objectFit: 'cover',
                     flexShrink: 0 
                   }} 
@@ -3028,7 +3032,7 @@ const getBudgetStatus = () => {
                 <span style={{ 
                   fontFamily: "'Montserrat', sans-serif", 
                   fontWeight: '700', 
-                  fontSize: '16px' 
+                  fontSize: '14px' 
                 }}>
                   <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
                   <span style={{ color: BRAND.blue }}>Ops</span>

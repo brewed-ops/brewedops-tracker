@@ -1,7 +1,7 @@
 // PDFEditor.jsx - Full-featured PDF Editor for BrewedOps
 // Mobile detection, clear all modal, proper dialogs
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Upload, Download, Save, Trash2, Type, Square, Circle, Minus, PenTool, MousePointer, RotateCcw, RotateCw, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, AlertTriangle, Clock, Bold, Italic, Underline, Palette, FileText, Loader2, CheckCircle, ArrowRight, Monitor, Smartphone, X, PanelLeft } from 'lucide-react';
+import { Upload, Download, Save, Trash2, Type, Square, Circle, Minus, PenTool, MousePointer, RotateCcw, RotateCw, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, AlertTriangle, Clock, Bold, Italic, Underline, Palette, FileText, Loader2, CheckCircle, ArrowRight, Monitor, Smartphone, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -11,7 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { SidebarTrigger } from '@/components/ui/sidebar';
 import { cn } from '@/lib/utils';
 import { getTheme } from '../lib/theme';
 
@@ -69,9 +68,11 @@ const MobileWarningScreen = ({ isDark }) => {
   
   return (
     <div className="p-4 md:p-6 w-full min-h-screen flex flex-col" style={{ backgroundColor: theme.bg }}>
-      <div className="mb-6 flex items-center gap-3">
-        <SidebarTrigger className="md:hidden shrink-0" />
-        <h1 className="text-xl font-bold" style={{ color: theme.text }}>PDF Editor</h1>
+      <div className="mb-6">
+        <h1 className="text-xl font-bold flex items-center gap-2" style={{ color: theme.text }}>
+          <FileText className="size-5" style={{ color: BRAND.blue }} />
+          PDF Editor
+        </h1>
       </div>
       
       <Card className="max-w-md mx-auto mt-8">
@@ -743,15 +744,12 @@ const PDFEditor = ({ isDark }) => {
   // Upload screen
   if (!pdfFile) return (
     <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg }}>
-      <div className="mb-6 flex items-center gap-3">
-        <SidebarTrigger className="md:hidden shrink-0" />
-        <div className="flex-1 min-w-0">
-          <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text }}>
-            <FileText className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
-            <span className="truncate">PDF Editor</span>
-          </h1>
-          <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">Edit PDFs with text, shapes, and drawings</p>
-        </div>
+      <div className="mb-6">
+        <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text }}>
+          <FileText className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          PDF Editor
+        </h1>
+        <p className="text-xs md:text-sm text-muted-foreground">Edit PDFs with text, shapes, and drawings</p>
       </div>
       <Card className="max-w-2xl mx-auto">
         <CardContent className="p-6 md:p-12">

@@ -138,7 +138,7 @@ export function AppSidebar({ isDark, ...props }) {
   }
 
   return (
-    <Sidebar collapsible="icon" {...props}>
+    <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
