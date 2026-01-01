@@ -1,9 +1,11 @@
-// BrewedNotes.jsx - Rich Text Notes App using React Quill
-import React, { useState, useEffect, useMemo } from 'react';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+// BrewedNotes.jsx - Rich Text Notes App for BrewedOps
+// Custom implementation with proper list/heading handling
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
-  Plus, Trash2, Edit3, Save, FileText, AlertTriangle, Loader2
+  Plus, Trash2, Edit3, Save, FileText, AlertTriangle,
+  Bold, Italic, Underline, Strikethrough, List, ListOrdered, CheckSquare,
+  AlignLeft, AlignCenter, AlignRight, Type, Heading1, Heading2, Heading3,
+  X, Loader2, Highlighter, Undo, Redo
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/label';
@@ -27,11 +29,21 @@ const NOTE_COLORS = [
   { name: 'Gray', value: '#6b7280' },
 ];
 
+const TEXT_COLORS = [
+  '#000000', '#374151', '#6b7280', '#ef4444', '#f97316', '#eab308',
+  '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff'
+];
+
+const HIGHLIGHT_COLORS = [
+  '#fef08a', '#fde047', '#fcd34d', '#fdba74', '#fca5a5', 
+  '#d8b4fe', '#c4b5fd', '#a5b4fc', '#93c5fd', '#6ee7b7'
+];
+
 const BrewedNotes = ({ isDark, user }) => {
   const theme = getTheme(isDark);
   const [notes, setNotes] = useState([]);
   const [selectedNote, setSelectedNote] = useState(null);
-  const [editorContent, setEditorContent] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
@@ -43,43 +55,15 @@ const BrewedNotes = ({ isDark, user }) => {
   
   const [newNoteName, setNewNoteName] = useState('');
   const [newNoteColor, setNewNoteColor] = useState(NOTE_COLORS[0].value);
-
-  // Quill modules configuration
-  const modules = useMemo(() => ({
-    toolbar: [
-      [{ 'font': [] }],
-      [{ 'size': ['small', false, 'large', 'huge'] }],
-      ['bold', 'italic', 'underline', 'strike'],
-      [{ 'color': [] }, { 'background': [] }],
-      [{ 'align': [] }],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }, { 'list': 'check' }],
-      [{ 'header': 1 }, { 'header': 2 }, { 'header': 3 }],
-      ['blockquote', 'code-block'],
-      ['link', 'image'],
-      ['clean']
-    ],
-  }), []);
-
-  const formats = [
-    'font', 'size',
-    'bold', 'italic', 'underline', 'strike',
-    'color', 'background',
-    'align',
-    'list', 'bullet', 'check',
-    'header',
-    'blockquote', 'code-block',
-    'link', 'image'
-  ];
+  
+  const [showTextColorPicker, setShowTextColorPicker] = useState(false);
+  const [showHighlightPicker, setShowHighlightPicker] = useState(false);
+  
+  const editorRef = useRef(null);
 
   useEffect(() => {
     if (user?.id) loadNotes();
   }, [user?.id]);
-
-  useEffect(() => {
-    if (selectedNote) {
-      setEditorContent(selectedNote.content || '');
-    }
-  }, [selectedNote?.id]);
 
   const loadNotes = async () => {
     try {
@@ -92,10 +76,7 @@ const BrewedNotes = ({ isDark, user }) => {
 
       if (error) throw error;
       setNotes(data || []);
-      if (data?.length > 0 && !selectedNote) {
-        setSelectedNote(data[0]);
-        setEditorContent(data[0].content || '');
-      }
+      if (data?.length > 0 && !selectedNote) setSelectedNote(data[0]);
     } catch (error) {
       console.error('Error loading notes:', error);
     } finally {
@@ -119,7 +100,7 @@ const BrewedNotes = ({ isDark, user }) => {
       if (error) throw error;
       setNotes(prev => [data, ...prev]);
       setSelectedNote(data);
-      setEditorContent('');
+      setIsEditing(true);
       setShowAddModal(false);
       setNewNoteName('');
       setNewNoteColor(NOTE_COLORS[0].value);
@@ -131,16 +112,18 @@ const BrewedNotes = ({ isDark, user }) => {
   };
 
   const saveNote = async () => {
-    if (!selectedNote) return;
+    if (!selectedNote || !editorRef.current) return;
     try {
       setSaving(true);
+      const content = editorRef.current.innerHTML;
       const { error } = await supabase
         .from('brewed_notes')
-        .update({ content: editorContent, updated_at: new Date().toISOString() })
+        .update({ content, updated_at: new Date().toISOString() })
         .eq('id', selectedNote.id);
       if (error) throw error;
-      setNotes(prev => prev.map(n => n.id === selectedNote.id ? { ...n, content: editorContent, updated_at: new Date().toISOString() } : n));
-      setSelectedNote(prev => ({ ...prev, content: editorContent, updated_at: new Date().toISOString() }));
+      setNotes(prev => prev.map(n => n.id === selectedNote.id ? { ...n, content, updated_at: new Date().toISOString() } : n));
+      setSelectedNote(prev => ({ ...prev, content }));
+      setIsEditing(false);
     } catch (error) {
       console.error('Error saving note:', error);
     } finally {
@@ -152,7 +135,11 @@ const BrewedNotes = ({ isDark, user }) => {
     if (!noteToEdit || !newNoteName.trim()) return;
     try {
       setSaving(true);
-      const { error } = await supabase.from('brewed_notes').update({ name: newNoteName.trim(), color: newNoteColor, updated_at: new Date().toISOString() }).eq('id', noteToEdit.id);
+      const { error } = await supabase.from('brewed_notes').update({ 
+        name: newNoteName.trim(), 
+        color: newNoteColor, 
+        updated_at: new Date().toISOString() 
+      }).eq('id', noteToEdit.id);
       if (error) throw error;
       setNotes(prev => prev.map(n => n.id === noteToEdit.id ? { ...n, name: newNoteName.trim(), color: newNoteColor } : n));
       if (selectedNote?.id === noteToEdit.id) setSelectedNote(prev => ({ ...prev, name: newNoteName.trim(), color: newNoteColor }));
@@ -176,7 +163,6 @@ const BrewedNotes = ({ isDark, user }) => {
       if (selectedNote?.id === noteToDelete.id) {
         const remaining = notes.filter(n => n.id !== noteToDelete.id);
         setSelectedNote(remaining.length > 0 ? remaining[0] : null);
-        setEditorContent(remaining.length > 0 ? remaining[0].content || '' : '');
       }
       setShowDeleteModal(false);
       setNoteToDelete(null);
@@ -187,16 +173,167 @@ const BrewedNotes = ({ isDark, user }) => {
     }
   };
 
-  const handleNoteSelect = async (note) => {
-    // Auto-save current note before switching
-    if (selectedNote && editorContent !== selectedNote.content) {
-      await saveNote();
+  // Get selected text
+  const getSelectedText = () => {
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return '';
+    return selection.toString();
+  };
+
+  // Insert HTML at cursor position, replacing selection
+  const insertHTML = (html) => {
+    editorRef.current?.focus();
+    document.execCommand('insertHTML', false, html);
+  };
+
+  // Simple exec command
+  const execCmd = (cmd, value = null) => {
+    editorRef.current?.focus();
+    document.execCommand(cmd, false, value);
+  };
+
+  // Format as heading - converts selected text or current line to heading
+  const formatAsHeading = useCallback((level) => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    if (selectedText) {
+      // Replace selection with heading
+      const headingHTML = `<${level} style="margin: 0.5em 0;">${selectedText}</${level}>`;
+      document.execCommand('insertHTML', false, headingHTML);
+    } else {
+      // Format current block
+      document.execCommand('formatBlock', false, level);
     }
+  }, []);
+
+  // Format as bullet list - splits text by lines if multiple words selected
+  const formatAsBulletList = useCallback(() => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    if (selectedText) {
+      // Check if text has newlines
+      const lines = selectedText.split(/\n/).filter(line => line.trim());
+      
+      if (lines.length > 1) {
+        // Multiple lines - make each a list item
+        const listItems = lines.map(line => `<li>${line.trim()}</li>`).join('');
+        const html = `<ul>${listItems}</ul>`;
+        document.execCommand('insertHTML', false, html);
+      } else {
+        // Single line/selection - wrap in list
+        const html = `<ul><li>${selectedText}</li></ul>`;
+        document.execCommand('insertHTML', false, html);
+      }
+    } else {
+      // No selection - use native command
+      document.execCommand('insertUnorderedList', false, null);
+    }
+  }, []);
+
+  // Format as numbered list
+  const formatAsNumberedList = useCallback(() => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    if (selectedText) {
+      const lines = selectedText.split(/\n/).filter(line => line.trim());
+      
+      if (lines.length > 1) {
+        const listItems = lines.map(line => `<li>${line.trim()}</li>`).join('');
+        const html = `<ol>${listItems}</ol>`;
+        document.execCommand('insertHTML', false, html);
+      } else {
+        const html = `<ol><li>${selectedText}</li></ol>`;
+        document.execCommand('insertHTML', false, html);
+      }
+    } else {
+      document.execCommand('insertOrderedList', false, null);
+    }
+  }, []);
+
+  // Format as checklist
+  const formatAsChecklist = useCallback(() => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim();
+    
+    const createCheckItem = (text) => 
+      `<div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><input type="checkbox" style="width:16px;height:16px;cursor:pointer;"/><span>${text}</span></div>`;
+    
+    if (selectedText) {
+      const lines = selectedText.split(/\n/).filter(line => line.trim());
+      
+      if (lines.length > 1) {
+        const items = lines.map(line => createCheckItem(line.trim())).join('');
+        document.execCommand('insertHTML', false, items);
+      } else {
+        document.execCommand('insertHTML', false, createCheckItem(selectedText));
+      }
+    } else {
+      document.execCommand('insertHTML', false, createCheckItem('Task item'));
+    }
+  }, []);
+
+  // Apply color to selection
+  const applyTextColor = useCallback((color) => {
+    editorRef.current?.focus();
+    document.execCommand('foreColor', false, color);
+    setShowTextColorPicker(false);
+  }, []);
+
+  // Apply highlight to selection
+  const applyHighlight = useCallback((color) => {
+    editorRef.current?.focus();
+    document.execCommand('hiliteColor', false, color);
+    setShowHighlightPicker(false);
+  }, []);
+
+  // Toolbar button
+  const ToolbarBtn = ({ onClick, disabled, title, children, active }) => (
+    <button
+      type="button"
+      onMouseDown={(e) => { e.preventDefault(); if (!disabled) onClick?.(); }}
+      disabled={disabled}
+      className={`p-1.5 rounded hover:bg-muted disabled:opacity-40 transition-colors flex items-center justify-center min-w-[28px] h-7 ${active ? 'bg-muted' : ''}`}
+      title={title}
+    >
+      {children}
+    </button>
+  );
+
+  const handleEditorDoubleClick = () => {
+    if (!isEditing && selectedNote) {
+      setIsEditing(true);
+      setTimeout(() => editorRef.current?.focus(), 10);
+    }
+  };
+
+  const handleNoteSelect = async (note) => {
+    if (isEditing && selectedNote) await saveNote();
     setSelectedNote(note);
-    setEditorContent(note.content || '');
+    setIsEditing(false);
   };
 
   const getNoteGradient = (color) => `linear-gradient(135deg, ${color}40 0%, ${color}20 100%)`;
+
+  useEffect(() => {
+    if (editorRef.current && selectedNote) {
+      editorRef.current.innerHTML = selectedNote.content || '';
+    }
+  }, [selectedNote?.id]);
 
   if (loading) {
     return (
@@ -208,73 +345,14 @@ const BrewedNotes = ({ isDark, user }) => {
 
   return (
     <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: FONTS.body }}>
-      {/* Custom styles for Quill */}
+      {/* Custom editor styles */}
       <style>{`
-        .brewed-notes-editor .ql-toolbar {
-          background: ${isDark ? '#1f2937' : '#f9fafb'};
-          border-color: ${isDark ? '#374151' : '#e5e7eb'};
-          border-radius: 8px 8px 0 0;
-        }
-        .brewed-notes-editor .ql-container {
-          background: ${isDark ? '#111827' : '#ffffff'};
-          border-color: ${isDark ? '#374151' : '#e5e7eb'};
-          border-radius: 0 0 8px 8px;
-          font-size: 15px;
-          min-height: 300px;
-        }
-        .brewed-notes-editor .ql-editor {
-          color: ${isDark ? '#f3f4f6' : '#111827'};
-          min-height: 300px;
-        }
-        .brewed-notes-editor .ql-editor.ql-blank::before {
-          color: ${isDark ? '#6b7280' : '#9ca3af'};
-        }
-        .brewed-notes-editor .ql-snow .ql-stroke {
-          stroke: ${isDark ? '#9ca3af' : '#374151'};
-        }
-        .brewed-notes-editor .ql-snow .ql-fill {
-          fill: ${isDark ? '#9ca3af' : '#374151'};
-        }
-        .brewed-notes-editor .ql-snow .ql-picker {
-          color: ${isDark ? '#9ca3af' : '#374151'};
-        }
-        .brewed-notes-editor .ql-snow .ql-picker-options {
-          background: ${isDark ? '#1f2937' : '#ffffff'};
-          border-color: ${isDark ? '#374151' : '#e5e7eb'};
-        }
-        .brewed-notes-editor .ql-toolbar button:hover,
-        .brewed-notes-editor .ql-toolbar button:focus,
-        .brewed-notes-editor .ql-toolbar .ql-picker-label:hover {
-          color: ${BRAND.blue};
-        }
-        .brewed-notes-editor .ql-toolbar button:hover .ql-stroke,
-        .brewed-notes-editor .ql-toolbar button:focus .ql-stroke {
-          stroke: ${BRAND.blue};
-        }
-        .brewed-notes-editor .ql-toolbar button:hover .ql-fill,
-        .brewed-notes-editor .ql-toolbar button:focus .ql-fill {
-          fill: ${BRAND.blue};
-        }
-        .brewed-notes-editor .ql-snow.ql-toolbar button.ql-active,
-        .brewed-notes-editor .ql-snow.ql-toolbar .ql-picker-label.ql-active {
-          color: ${BRAND.blue};
-        }
-        .brewed-notes-editor .ql-snow.ql-toolbar button.ql-active .ql-stroke {
-          stroke: ${BRAND.blue};
-        }
-        .brewed-notes-editor .ql-snow.ql-toolbar button.ql-active .ql-fill {
-          fill: ${BRAND.blue};
-        }
-        .brewed-notes-editor .ql-editor h1 { font-size: 2em; font-weight: bold; margin: 0.5em 0; }
-        .brewed-notes-editor .ql-editor h2 { font-size: 1.5em; font-weight: bold; margin: 0.5em 0; }
-        .brewed-notes-editor .ql-editor h3 { font-size: 1.17em; font-weight: bold; margin: 0.5em 0; }
-        .brewed-notes-editor .ql-editor ul, .brewed-notes-editor .ql-editor ol {
-          padding-left: 1.5em;
-        }
-        .brewed-notes-editor .ql-editor ul[data-checked="true"] > li::before,
-        .brewed-notes-editor .ql-editor ul[data-checked="false"] > li::before {
-          color: ${BRAND.blue};
-        }
+        .brewed-editor h1 { font-size: 2em; font-weight: bold; margin: 0.5em 0; }
+        .brewed-editor h2 { font-size: 1.5em; font-weight: bold; margin: 0.5em 0; }
+        .brewed-editor h3 { font-size: 1.25em; font-weight: bold; margin: 0.5em 0; }
+        .brewed-editor ul, .brewed-editor ol { padding-left: 1.5em; margin: 0.5em 0; }
+        .brewed-editor li { margin: 0.25em 0; }
+        .brewed-editor p { margin: 0.5em 0; }
       `}</style>
 
       <div className="mb-4 md:mb-6">
@@ -317,32 +395,98 @@ const BrewedNotes = ({ isDark, user }) => {
         </div>
 
         {/* Editor */}
-        <div className="flex-1 flex flex-col min-h-[500px]" style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}` }}>
+        <div className="flex-1 flex flex-col min-h-[400px]" style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}` }}>
           {selectedNote ? (
             <>
-              {/* Header with Save */}
-              <div className="p-3 border-b flex items-center justify-between" style={{ borderColor: theme.cardBorder }}>
-                <div>
-                  <h2 className="font-semibold" style={{ color: theme.text }}>{selectedNote.name}</h2>
-                  <p className="text-xs text-muted-foreground">Last saved: {new Date(selectedNote.updated_at).toLocaleString()}</p>
+              {/* Toolbar */}
+              <div className="p-2 border-b flex flex-wrap items-center gap-0.5" style={{ borderColor: theme.cardBorder }}>
+                {/* Undo/Redo */}
+                <ToolbarBtn onClick={() => execCmd('undo')} disabled={!isEditing} title="Undo"><Undo className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('redo')} disabled={!isEditing} title="Redo"><Redo className="size-3.5" /></ToolbarBtn>
+                
+                <div className="w-px h-5 bg-border mx-1" />
+
+                {/* Basic formatting */}
+                <ToolbarBtn onClick={() => execCmd('bold')} disabled={!isEditing} title="Bold (Ctrl+B)"><Bold className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('italic')} disabled={!isEditing} title="Italic (Ctrl+I)"><Italic className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('underline')} disabled={!isEditing} title="Underline (Ctrl+U)"><Underline className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('strikeThrough')} disabled={!isEditing} title="Strikethrough"><Strikethrough className="size-3.5" /></ToolbarBtn>
+
+                <div className="w-px h-5 bg-border mx-1" />
+
+                {/* Text Color */}
+                <div className="relative">
+                  <ToolbarBtn onClick={() => setShowTextColorPicker(!showTextColorPicker)} disabled={!isEditing} title="Text Color">
+                    <div className="flex flex-col items-center"><Type className="size-3.5" /><div className="w-3 h-0.5 rounded" style={{ backgroundColor: '#ef4444' }} /></div>
+                  </ToolbarBtn>
+                  {showTextColorPicker && isEditing && (
+                    <div className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-6 gap-1" style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}>
+                      {TEXT_COLORS.map(color => (
+                        <button key={color} onMouseDown={(e) => { e.preventDefault(); applyTextColor(color); }} className="w-5 h-5 rounded border hover:scale-110 transition-transform" style={{ backgroundColor: color, borderColor: theme.cardBorder }} />
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <Button onClick={saveNote} disabled={saving} size="sm" style={{ backgroundColor: BRAND.green }}>
-                  {saving ? <Loader2 className="size-4 mr-1 animate-spin" /> : <Save className="size-4 mr-1" />}
-                  Save
-                </Button>
+
+                {/* Highlight */}
+                <div className="relative">
+                  <ToolbarBtn onClick={() => setShowHighlightPicker(!showHighlightPicker)} disabled={!isEditing} title="Highlight"><Highlighter className="size-3.5" /></ToolbarBtn>
+                  {showHighlightPicker && isEditing && (
+                    <div className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-5 gap-1" style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}>
+                      {HIGHLIGHT_COLORS.map(color => (
+                        <button key={color} onMouseDown={(e) => { e.preventDefault(); applyHighlight(color); }} className="w-5 h-5 rounded border hover:scale-110 transition-transform" style={{ backgroundColor: color, borderColor: theme.cardBorder }} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="w-px h-5 bg-border mx-1" />
+
+                {/* Alignment */}
+                <ToolbarBtn onClick={() => execCmd('justifyLeft')} disabled={!isEditing} title="Align Left"><AlignLeft className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('justifyCenter')} disabled={!isEditing} title="Center"><AlignCenter className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('justifyRight')} disabled={!isEditing} title="Align Right"><AlignRight className="size-3.5" /></ToolbarBtn>
+
+                <div className="w-px h-5 bg-border mx-1" />
+
+                {/* Lists */}
+                <ToolbarBtn onClick={formatAsBulletList} disabled={!isEditing} title="Bullet List"><List className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={formatAsNumberedList} disabled={!isEditing} title="Numbered List"><ListOrdered className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={formatAsChecklist} disabled={!isEditing} title="Checklist"><CheckSquare className="size-3.5" /></ToolbarBtn>
+
+                <div className="w-px h-5 bg-border mx-1" />
+
+                {/* Headings */}
+                <ToolbarBtn onClick={() => formatAsHeading('h1')} disabled={!isEditing} title="Heading 1"><Heading1 className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => formatAsHeading('h2')} disabled={!isEditing} title="Heading 2"><Heading2 className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => formatAsHeading('h3')} disabled={!isEditing} title="Heading 3"><Heading3 className="size-3.5" /></ToolbarBtn>
+
+                {/* Save */}
+                <div className="ml-auto">
+                  {isEditing && (
+                    <Button onClick={saveNote} disabled={saving} size="sm" className="h-7 text-xs" style={{ backgroundColor: BRAND.green }}>
+                      {saving ? <Loader2 className="size-3 mr-1 animate-spin" /> : <Save className="size-3 mr-1" />}Save
+                    </Button>
+                  )}
+                </div>
               </div>
 
-              {/* Quill Editor */}
-              <div className="flex-1 p-3 overflow-hidden brewed-notes-editor">
-                <ReactQuill
-                  theme="snow"
-                  value={editorContent}
-                  onChange={setEditorContent}
-                  modules={modules}
-                  formats={formats}
-                  placeholder="Start writing your note..."
-                  style={{ height: 'calc(100% - 42px)' }}
+              {/* Editor */}
+              <div className="flex-1 overflow-hidden">
+                <div
+                  ref={editorRef}
+                  contentEditable={isEditing}
+                  onDoubleClick={handleEditorDoubleClick}
+                  className="brewed-editor h-full p-4 overflow-y-auto outline-none"
+                  style={{ color: theme.text, fontSize: '15px', lineHeight: '1.7', minHeight: '300px', cursor: isEditing ? 'text' : 'default' }}
+                  suppressContentEditableWarning={true}
                 />
+              </div>
+
+              {/* Status */}
+              <div className="px-4 py-2 border-t text-xs text-muted-foreground flex justify-between" style={{ borderColor: theme.cardBorder }}>
+                <span>{isEditing ? '✏️ Editing - Select text then click formatting buttons' : '👁️ View mode - Double-click to edit'}</span>
+                <span>Saved: {new Date(selectedNote.updated_at).toLocaleString()}</span>
               </div>
             </>
           ) : (
@@ -351,6 +495,12 @@ const BrewedNotes = ({ isDark, user }) => {
             </div>
           )}
         </div>
+      </div>
+
+      {/* Help tooltip */}
+      <div className="fixed bottom-4 right-4 max-w-xs p-3 rounded-lg shadow-lg text-xs" style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}`, display: isEditing ? 'block' : 'none' }}>
+        <p className="font-medium mb-1" style={{ color: BRAND.blue }}>💡 Tip: Creating Lists</p>
+        <p className="text-muted-foreground">For multiple list items, put each item on a <strong>separate line</strong> (press Enter after each), select all lines, then click the list button.</p>
       </div>
 
       {/* Modals */}
@@ -382,6 +532,8 @@ const BrewedNotes = ({ isDark, user }) => {
           <DialogFooter className="gap-2 sm:gap-0"><Button variant="outline" onClick={() => setShowDeleteModal(false)}>Cancel</Button><Button variant="destructive" onClick={deleteNote} disabled={saving}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Trash2 className="size-4 mr-2" />}Delete</Button></DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {(showTextColorPicker || showHighlightPicker) && <div className="fixed inset-0 z-40" onClick={() => { setShowTextColorPicker(false); setShowHighlightPicker(false); }} />}
     </div>
   );
 };
