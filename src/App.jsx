@@ -359,7 +359,8 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           src="https://i.imgur.com/z2WaRiA.png" 
           alt="BrewedOps Logo" 
           style={{ 
-            maxWidth: isSmall ? '200px' : 'none', 
+            maxWidth: isSmall ? '200px' : '320px', 
+            width: '100%',
             height: 'auto', 
             marginBottom: '32px',
             display: 'block',
