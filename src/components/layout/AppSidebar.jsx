@@ -28,6 +28,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 // Brand colors
@@ -106,6 +107,7 @@ const moreToolsItems = [
 export function AppSidebar({ isDark, ...props }) {
   const navigate = useNavigate()
   const location = useLocation()
+  const { setOpenMobile, isMobile } = useSidebar()
 
   // Check if current path matches item path
   const isActive = (path) => {
@@ -115,8 +117,13 @@ export function AppSidebar({ isDark, ...props }) {
     return location.pathname === path
   }
 
+  // Handle navigation and close sidebar on mobile
   const handleNavigation = (path) => {
     navigate(path)
+    // Close sidebar on mobile after navigation
+    if (isMobile) {
+      setOpenMobile(false)
+    }
   }
 
   // Active item styles
@@ -138,14 +145,14 @@ export function AppSidebar({ isDark, ...props }) {
   }
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-              onClick={() => navigate("/")}
+              onClick={() => handleNavigation("/")}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <img

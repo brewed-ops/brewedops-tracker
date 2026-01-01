@@ -2978,7 +2978,7 @@ const getBudgetStatus = () => {
 
   return (
     <div className={isDark ? 'dark' : ''} style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={!isMobile}>
       {/* shadcn Sidebar - Uses URL routing internally */}
       <AppSidebar isDark={isDark} />
 
