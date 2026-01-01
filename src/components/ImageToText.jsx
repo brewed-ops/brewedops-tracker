@@ -1,13 +1,12 @@
 // ImageToText.jsx - OCR Text Extraction Tool for BrewedOps
-// Uses Tesseract.js with image preprocessing for better accuracy
+// Uses OCR.space API for better accuracy with ID cards, documents, etc.
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Copy, Check, ScanText, Loader2, Download, Trash2, AlertTriangle, Languages, Wand2 } from 'lucide-react';
+import { Upload, Copy, Check, ScanText, Loader2, Download, Trash2, AlertTriangle, Languages, Wand2, Info } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { getTheme } from '../lib/theme';
-import { createWorker } from 'tesseract.js';
 
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
 const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
@@ -15,11 +14,12 @@ const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-seri
 const LANGUAGES = [
   { code: 'eng', name: 'English' },
   { code: 'spa', name: 'Spanish' },
-  { code: 'fra', name: 'French' },
-  { code: 'deu', name: 'German' },
+  { code: 'fre', name: 'French' },
+  { code: 'ger', name: 'German' },
   { code: 'ita', name: 'Italian' },
   { code: 'por', name: 'Portuguese' },
-  { code: 'chi_sim', name: 'Chinese (Simplified)' },
+  { code: 'chs', name: 'Chinese (Simplified)' },
+  { code: 'cht', name: 'Chinese (Traditional)' },
   { code: 'jpn', name: 'Japanese' },
   { code: 'kor', name: 'Korean' },
   { code: 'ara', name: 'Arabic' },
@@ -27,167 +27,108 @@ const LANGUAGES = [
   { code: 'hin', name: 'Hindi' },
   { code: 'tha', name: 'Thai' },
   { code: 'vie', name: 'Vietnamese' },
+  { code: 'tgl', name: 'Tagalog' },
+];
+
+const OCR_ENGINES = [
+  { id: '1', name: 'Standard (Fast)', description: 'Good for printed text' },
+  { id: '2', name: 'Advanced (Accurate)', description: 'Better for complex layouts, IDs' },
 ];
 
 const ImageToText = ({ isDark }) => {
   const theme = getTheme(isDark);
+  const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
-  const [originalFile, setOriginalFile] = useState(null);
   const [extractedText, setExtractedText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [progressStatus, setProgressStatus] = useState('');
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [language, setLanguage] = useState('eng');
+  const [ocrEngine, setOcrEngine] = useState('2');
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [enhanceImage, setEnhanceImage] = useState(true);
   
   const fileInputRef = useRef(null);
-  const canvasRef = useRef(null);
 
-  // Preprocess image for better OCR results
-  const preprocessImage = useCallback((file) => {
-    return new Promise((resolve) => {
-      const img = new window.Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        // Scale up small images for better OCR
-        let width = img.width;
-        let height = img.height;
-        const minDimension = 1500;
-        
-        if (width < minDimension && height < minDimension) {
-          const scale = minDimension / Math.max(width, height);
-          width *= scale;
-          height *= scale;
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Draw image with white background
-        ctx.fillStyle = '#FFFFFF';
-        ctx.fillRect(0, 0, width, height);
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        if (enhanceImage) {
-          const imageData = ctx.getImageData(0, 0, width, height);
-          const data = imageData.data;
-          
-          // Convert to grayscale and apply contrast enhancement
-          for (let i = 0; i < data.length; i += 4) {
-            // Grayscale using luminosity method
-            const gray = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
-            
-            // Increase contrast
-            const contrast = 1.4;
-            const factor = (259 * (contrast * 255 + 255)) / (255 * (259 - contrast * 255));
-            let newValue = factor * (gray - 128) + 128;
-            newValue = Math.max(0, Math.min(255, newValue));
-            
-            data[i] = newValue;
-            data[i + 1] = newValue;
-            data[i + 2] = newValue;
-          }
-          
-          ctx.putImageData(imageData, 0, 0);
-        }
-        
-        canvas.toBlob((blob) => {
-          resolve(URL.createObjectURL(blob));
-        }, 'image/png', 1.0);
-      };
-      img.src = URL.createObjectURL(file);
-    });
-  }, [enhanceImage]);
-
-  const handleFileUpload = useCallback(async (file) => {
+  const handleFileUpload = useCallback((file) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       setError('Please upload an image file (PNG, JPG, WebP)');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      setError('File size must be less than 10MB');
+    if (file.size > 5 * 1024 * 1024) {
+      setError('File size must be less than 5MB for OCR processing');
       return;
     }
     
     setError(null);
     setExtractedText('');
-    setOriginalFile(file);
+    setImageFile(file);
     
-    const url = URL.createObjectURL(file);
-    setImageUrl(url);
-  }, []);
+    if (imageUrl) URL.revokeObjectURL(imageUrl);
+    setImageUrl(URL.createObjectURL(file));
+  }, [imageUrl]);
 
   const extractText = useCallback(async () => {
-    if (!originalFile) return;
+    if (!imageFile) return;
     
     setIsProcessing(true);
-    setProgress(0);
-    setProgressStatus('Initializing...');
     setError(null);
     
-    let worker = null;
-    let processedUrl = null;
-    
     try {
-      setProgressStatus('Preprocessing image...');
-      setProgress(10);
-      processedUrl = await preprocessImage(originalFile);
-      
-      setProgressStatus('Loading OCR engine...');
-      setProgress(20);
-      
-      worker = await createWorker(language, 1, {
-        logger: (m) => {
-          if (m.status === 'recognizing text') {
-            setProgress(30 + Math.round(m.progress * 60));
-            setProgressStatus('Recognizing text...');
-          } else if (m.status === 'loading language traineddata') {
-            setProgressStatus('Loading language data...');
-            setProgress(25);
-          }
-        }
+      // Convert image to base64
+      const base64 = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(imageFile);
       });
-      
-      const result = await worker.recognize(processedUrl);
-      
-      setProgress(95);
-      setProgressStatus('Finalizing...');
-      
-      // Clean up the text
-      let text = result.data.text || '';
-      text = text
-        .replace(/\n{3,}/g, '\n\n')
-        .replace(/[ \t]+/g, ' ')
-        .split('\n')
-        .map(line => line.trim())
-        .join('\n')
-        .trim();
-      
-      if (!text) {
-        setError('No text was detected in this image. Try a clearer image or different settings.');
-      } else {
-        setExtractedText(text);
+
+      // Use OCR.space free API
+      const formData = new FormData();
+      formData.append('base64Image', base64);
+      formData.append('language', language);
+      formData.append('OCREngine', ocrEngine);
+      formData.append('isTable', 'true');
+      formData.append('detectOrientation', 'true');
+      formData.append('scale', 'true');
+
+      const response = await fetch('https://api.ocr.space/parse/image', {
+        method: 'POST',
+        headers: {
+          'apikey': 'K85482751488957', // Free tier API key
+        },
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (result.IsErroredOnProcessing) {
+        throw new Error(result.ErrorMessage?.[0] || 'OCR processing failed');
       }
-      
-      setProgress(100);
+
+      if (result.ParsedResults && result.ParsedResults.length > 0) {
+        const text = result.ParsedResults.map(r => r.ParsedText).join('\n').trim();
+        
+        if (!text) {
+          setError('No text was detected in this image. Try a clearer image or different settings.');
+        } else {
+          // Clean up the text
+          const cleanedText = text
+            .replace(/\r\n/g, '\n')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
+          setExtractedText(cleanedText);
+        }
+      } else {
+        setError('No text could be extracted from this image.');
+      }
       
     } catch (err) {
       console.error('OCR Error:', err);
-      setError('Failed to extract text. Please try with a clearer image.');
+      setError(err.message || 'Failed to extract text. Please try again.');
     } finally {
-      if (worker) await worker.terminate();
-      if (processedUrl) URL.revokeObjectURL(processedUrl);
       setIsProcessing(false);
-      setProgress(0);
-      setProgressStatus('');
     }
-  }, [originalFile, language, preprocessImage]);
+  }, [imageFile, language, ocrEngine]);
 
   const copyText = () => {
     navigator.clipboard.writeText(extractedText);
@@ -208,7 +149,7 @@ const ImageToText = ({ isDark }) => {
   const clearAll = () => {
     if (imageUrl) URL.revokeObjectURL(imageUrl);
     setImageUrl(null);
-    setOriginalFile(null);
+    setImageFile(null);
     setExtractedText('');
     setError(null);
     setShowClearConfirm(false);
@@ -224,7 +165,7 @@ const ImageToText = ({ isDark }) => {
           <ScanText className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Image to Text (OCR)
         </h1>
-        <p className="text-xs md:text-sm text-muted-foreground">Extract text from images, screenshots, and documents</p>
+        <p className="text-xs md:text-sm text-muted-foreground">Extract text from images, IDs, screenshots, and documents</p>
       </div>
 
       <div className="max-w-5xl mx-auto">
@@ -241,7 +182,7 @@ const ImageToText = ({ isDark }) => {
                 <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>Upload Image</h3>
                 <p className="text-muted-foreground mb-4">Drag & drop or click to select an image</p>
                 <Button style={{ backgroundColor: BRAND.blue }}><Upload className="size-4 mr-2" />Select Image</Button>
-                <p className="text-xs text-muted-foreground mt-4">PNG, JPG, WebP • Max 10MB</p>
+                <p className="text-xs text-muted-foreground mt-4">PNG, JPG, WebP, GIF, BMP • Max 5MB</p>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files?.[0])} className="hidden" />
               
@@ -250,8 +191,8 @@ const ImageToText = ({ isDark }) => {
                   <div className="flex gap-3">
                     <Languages className="size-5 shrink-0 mt-0.5" style={{ color: BRAND.blue }} />
                     <div>
-                      <p className="text-sm font-medium" style={{ color: BRAND.blue }}>Multi-Language</p>
-                      <p className="text-xs text-muted-foreground mt-1">Supports 14+ languages</p>
+                      <p className="text-sm font-medium" style={{ color: BRAND.blue }}>16+ Languages</p>
+                      <p className="text-xs text-muted-foreground mt-1">English, Chinese, Japanese, Korean, Arabic, Tagalog, and more</p>
                     </div>
                   </div>
                 </div>
@@ -259,8 +200,8 @@ const ImageToText = ({ isDark }) => {
                   <div className="flex gap-3">
                     <Wand2 className="size-5 shrink-0 mt-0.5" style={{ color: BRAND.green }} />
                     <div>
-                      <p className="text-sm font-medium" style={{ color: BRAND.green }}>Auto Enhancement</p>
-                      <p className="text-xs text-muted-foreground mt-1">Better text recognition</p>
+                      <p className="text-sm font-medium" style={{ color: BRAND.green }}>Advanced OCR</p>
+                      <p className="text-xs text-muted-foreground mt-1">Works with IDs, receipts, documents, and complex layouts</p>
                     </div>
                   </div>
                 </div>
@@ -291,27 +232,30 @@ const ImageToText = ({ isDark }) => {
                     </select>
                   </div>
                   
-                  <label className="flex items-center gap-3 cursor-pointer p-3 rounded-lg border" style={{ borderColor: theme.cardBorder }}>
-                    <input type="checkbox" checked={enhanceImage} onChange={(e) => setEnhanceImage(e.target.checked)} className="rounded" />
-                    <div className="flex-1">
-                      <p className="text-sm font-medium" style={{ color: theme.text }}>Enhance Image</p>
-                      <p className="text-xs text-muted-foreground">Improve contrast for better OCR</p>
+                  <div>
+                    <Label className="text-sm mb-2 block">OCR Engine</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {OCR_ENGINES.map(engine => (
+                        <button
+                          key={engine.id}
+                          onClick={() => setOcrEngine(engine.id)}
+                          className={`p-3 rounded-lg border text-left transition-all ${ocrEngine === engine.id ? 'border-blue-500 bg-blue-500/10' : 'border-muted hover:border-blue-300'}`}
+                        >
+                          <p className="text-sm font-medium" style={{ color: theme.text }}>{engine.name}</p>
+                          <p className="text-xs text-muted-foreground">{engine.description}</p>
+                        </button>
+                      ))}
                     </div>
-                    <Wand2 className="size-4 text-muted-foreground" />
-                  </label>
+                  </div>
                   
                   <Button onClick={extractText} disabled={isProcessing} className="w-full" style={{ backgroundColor: BRAND.blue }}>
-                    {isProcessing ? <><Loader2 className="size-4 mr-2 animate-spin" />{progressStatus}</> : <><ScanText className="size-4 mr-2" />Extract Text</>}
+                    {isProcessing ? <><Loader2 className="size-4 mr-2 animate-spin" />Extracting...</> : <><ScanText className="size-4 mr-2" />Extract Text</>}
                   </Button>
                   
-                  {isProcessing && (
-                    <div className="space-y-2">
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div className="h-2 rounded-full transition-all" style={{ width: `${progress}%`, backgroundColor: BRAND.blue }} />
-                      </div>
-                      <p className="text-xs text-center text-muted-foreground">{progress}%</p>
-                    </div>
-                  )}
+                  <div className="p-3 rounded-lg bg-muted/50 text-xs text-muted-foreground">
+                    <Info className="size-3 inline mr-1" />
+                    Tip: For ID cards and complex documents, use "Advanced (Accurate)" engine
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -336,9 +280,9 @@ const ImageToText = ({ isDark }) => {
                 <textarea
                   value={extractedText}
                   onChange={(e) => setExtractedText(e.target.value)}
-                  placeholder={isProcessing ? "Extracting text..." : "Extracted text will appear here...\n\nFor best results:\n• Use clear, high-resolution images\n• Ensure text is not blurry or rotated\n• Select the correct language"}
+                  placeholder={isProcessing ? "Extracting text..." : "Extracted text will appear here...\n\nFor best results:\n• Use clear, high-resolution images\n• Make sure text is readable\n• Select the correct language\n• Try 'Advanced' engine for IDs"}
                   className="flex-1 w-full min-h-[300px] p-3 border rounded-lg bg-background resize-none text-sm"
-                  style={{ borderColor: theme.cardBorder, fontFamily: 'monospace' }}
+                  style={{ borderColor: theme.cardBorder }}
                   readOnly={isProcessing}
                 />
                 
