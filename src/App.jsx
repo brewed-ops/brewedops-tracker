@@ -19,6 +19,9 @@ import ImageToPDF from './components/ImageToPDF';
 import VideoCompressor from './components/VideoCompressor';
 import VideoTrimmer from './components/VideoTrimmer';
 import BrewedNotes from './components/BrewedNotes';
+import FindReplace from './components/FindReplace';
+import CaseConverter from './components/CaseConverter';
+import WordCounter from './components/WordCounter';
 import FinanceTracker from './components/FinanceTracker';
 
 
@@ -883,6 +886,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case '/imagetopdf': return 'imagetopdf';
       case '/videocompressor': return 'videocompressor';
       case '/videotrimmer': return 'videotrimmer';
+      case '/findreplace': return 'findreplace';
+      case '/caseconverter': return 'caseconverter';
+      case '/wordcounter': return 'wordcounter';
       default: return 'dashboard';
     }
   };
@@ -910,6 +916,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case 'imagetopdf': navigate('/imagetopdf'); break;
       case 'videocompressor': navigate('/videocompressor'); break;
       case 'videotrimmer': navigate('/videotrimmer'); break;
+      case 'findreplace': navigate('/findreplace'); break;
+      case 'caseconverter': navigate('/caseconverter'); break;
+      case 'wordcounter': navigate('/wordcounter'); break;
       default: navigate('/'); break;
     }
   };
@@ -3431,6 +3440,12 @@ const getBudgetStatus = () => {
   <VideoCompressor isDark={isDark} />
 ) : activeSection === 'videotrimmer' ? (
   <VideoTrimmer isDark={isDark} />
+) : activeSection === 'findreplace' ? (
+  <FindReplace isDark={isDark} />
+) : activeSection === 'caseconverter' ? (
+  <CaseConverter isDark={isDark} />
+) : activeSection === 'wordcounter' ? (
+  <WordCounter isDark={isDark} />
 ) : (
 
      <>
@@ -8771,6 +8786,9 @@ function AppContent() {
       <Route path="/imagetopdf" element={<ImageToPDF isDark={isDark} />} />
       <Route path="/videocompressor" element={<VideoCompressor isDark={isDark} />} />
       <Route path="/videotrimmer" element={<VideoTrimmer isDark={isDark} />} />
+      <Route path="/findreplace" element={<FindReplace isDark={isDark} />} />
+      <Route path="/caseconverter" element={<CaseConverter isDark={isDark} />} />
+      <Route path="/wordcounter" element={<WordCounter isDark={isDark} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );

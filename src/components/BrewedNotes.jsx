@@ -87,24 +87,6 @@ const BrewedNotes = ({ isDark, user }) => {
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
   
   const editorRef = useRef(null);
-  const savedSelectionRef = useRef(null);
-
-  // Save selection before clicking toolbar
-  const saveSelection = () => {
-    const sel = window.getSelection();
-    if (sel.rangeCount > 0) {
-      savedSelectionRef.current = sel.getRangeAt(0).cloneRange();
-    }
-  };
-
-  // Restore selection
-  const restoreSelection = () => {
-    if (savedSelectionRef.current) {
-      const sel = window.getSelection();
-      sel.removeAllRanges();
-      sel.addRange(savedSelectionRef.current);
-    }
-  };
 
   // Load notes from Supabase
   useEffect(() => {
@@ -257,75 +239,63 @@ const BrewedNotes = ({ isDark, user }) => {
     }
   };
 
-  // Execute command
-  const execCommand = useCallback((command, value = null) => {
-    restoreSelection();
-    editorRef.current?.focus();
-    
-    // Small delay to ensure focus
-    setTimeout(() => {
-      document.execCommand(command, false, value);
-    }, 0);
+  // Execute formatting command
+  const execFormat = useCallback((command, value = null) => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand(command, false, value);
   }, []);
 
-  // Format block (for headings)
-  const formatBlock = useCallback((tag) => {
-    restoreSelection();
-    editorRef.current?.focus();
-    
-    setTimeout(() => {
-      document.execCommand('formatBlock', false, `<${tag}>`);
-    }, 0);
+  // Format as heading
+  const formatHeading = useCallback((tag) => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand('formatBlock', false, tag);
   }, []);
 
-  // Insert list
-  const insertList = useCallback((type) => {
-    restoreSelection();
-    editorRef.current?.focus();
-    
-    setTimeout(() => {
-      if (type === 'ul') {
-        document.execCommand('insertUnorderedList', false, null);
-      } else {
-        document.execCommand('insertOrderedList', false, null);
-      }
-    }, 0);
+  // Insert bullet list
+  const insertBulletList = useCallback(() => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand('insertUnorderedList', false, null);
   }, []);
 
-  // Insert checklist
+  // Insert numbered list
+  const insertNumberedList = useCallback(() => {
+    if (!editorRef.current) return;
+    editorRef.current.focus();
+    document.execCommand('insertOrderedList', false, null);
+  }, []);
+
+  // Insert checklist item
   const insertChecklist = useCallback(() => {
-    restoreSelection();
-    editorRef.current?.focus();
+    if (!editorRef.current) return;
+    editorRef.current.focus();
     
-    setTimeout(() => {
-      const sel = window.getSelection();
-      if (sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        const selectedText = range.toString() || 'Task item';
-        
-        // Create checklist HTML
-        const checklistHtml = `<div style="display:flex;align-items:flex-start;gap:8px;margin:4px 0;"><input type="checkbox" style="margin-top:4px;cursor:pointer;" /><span>${selectedText}</span></div>`;
-        
-        document.execCommand('insertHTML', false, checklistHtml);
-      }
-    }, 0);
+    const selection = window.getSelection();
+    const selectedText = selection.toString().trim() || 'Task item';
+    
+    // Delete selected content first
+    if (selection.toString()) {
+      document.execCommand('delete', false, null);
+    }
+    
+    // Insert checklist HTML
+    const html = `<div class="checklist-item" style="display:flex;align-items:flex-start;gap:8px;margin:8px 0;"><input type="checkbox" style="margin-top:3px;width:16px;height:16px;cursor:pointer;"/><span>${selectedText}</span></div>`;
+    document.execCommand('insertHTML', false, html);
   }, []);
 
-  // Toolbar button component
-  const ToolbarButton = ({ onClick, disabled, title, children, className = '' }) => (
+  // Toolbar button component - uses onMouseDown to prevent blur
+  const ToolbarBtn = ({ onClick, disabled, title, children }) => (
     <button
+      type="button"
       onMouseDown={(e) => {
         e.preventDefault();
-        saveSelection();
-      }}
-      onClick={(e) => {
-        e.preventDefault();
-        if (!disabled) onClick();
+        if (!disabled && onClick) onClick();
       }}
       disabled={disabled}
-      className={`p-1.5 rounded hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center ${className}`}
+      className="p-1.5 rounded hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center min-w-[32px] h-8"
       title={title}
-      type="button"
     >
       {children}
     </button>
@@ -334,13 +304,8 @@ const BrewedNotes = ({ isDark, user }) => {
   const handleEditorDoubleClick = () => {
     if (!isEditing && selectedNote) {
       setIsEditing(true);
-      setTimeout(() => editorRef.current?.focus(), 0);
+      setTimeout(() => editorRef.current?.focus(), 10);
     }
-  };
-
-  const handleEditorMouseUp = () => {
-    // Save selection whenever user selects text
-    saveSelection();
   };
 
   const handleNoteSelect = (note) => {
@@ -468,14 +433,15 @@ const BrewedNotes = ({ isDark, user }) => {
         <div className="flex-1 flex flex-col min-h-[400px] lg:min-h-0" style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}` }}>
           {selectedNote ? (
             <>
-              {/* Toolbar - Responsive */}
-              <div className="p-2 border-b flex flex-wrap items-center gap-1" style={{ borderColor: theme.cardBorder }}>
-                {/* Row 1: Font controls + Basic formatting */}
-                <div className="flex flex-wrap items-center gap-1 w-full sm:w-auto">
+              {/* Toolbar */}
+              <div className="p-2 border-b" style={{ borderColor: theme.cardBorder }}>
+                <div className="flex flex-wrap items-center gap-1">
                   {/* Font Family */}
                   <select
-                    onMouseDown={saveSelection}
-                    onChange={(e) => execCommand('fontName', e.target.value)}
+                    onChange={(e) => {
+                      editorRef.current?.focus();
+                      document.execCommand('fontName', false, e.target.value);
+                    }}
                     disabled={!isEditing}
                     className="h-8 px-2 text-xs border rounded bg-background disabled:opacity-40"
                     style={{ borderColor: theme.cardBorder, width: '100px' }}
@@ -488,8 +454,10 @@ const BrewedNotes = ({ isDark, user }) => {
 
                   {/* Font Size */}
                   <select
-                    onMouseDown={saveSelection}
-                    onChange={(e) => execCommand('fontSize', e.target.value)}
+                    onChange={(e) => {
+                      editorRef.current?.focus();
+                      document.execCommand('fontSize', false, e.target.value);
+                    }}
                     disabled={!isEditing}
                     className="h-8 px-2 text-xs border rounded bg-background disabled:opacity-40"
                     style={{ borderColor: theme.cardBorder, width: '70px' }}
@@ -500,27 +468,27 @@ const BrewedNotes = ({ isDark, user }) => {
                     ))}
                   </select>
 
-                  <div className="hidden sm:block w-px h-6 bg-border mx-1" />
+                  <div className="w-px h-6 bg-border mx-0.5" />
 
-                  {/* Text Formatting */}
-                  <ToolbarButton onClick={() => execCommand('bold')} disabled={!isEditing} title="Bold">
+                  {/* Basic Formatting */}
+                  <ToolbarBtn onClick={() => execFormat('bold')} disabled={!isEditing} title="Bold">
                     <Bold className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => execCommand('italic')} disabled={!isEditing} title="Italic">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={() => execFormat('italic')} disabled={!isEditing} title="Italic">
                     <Italic className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => execCommand('underline')} disabled={!isEditing} title="Underline">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={() => execFormat('underline')} disabled={!isEditing} title="Underline">
                     <Underline className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => execCommand('strikeThrough')} disabled={!isEditing} title="Strikethrough">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={() => execFormat('strikeThrough')} disabled={!isEditing} title="Strikethrough">
                     <Strikethrough className="size-4" />
-                  </ToolbarButton>
+                  </ToolbarBtn>
 
-                  <div className="hidden sm:block w-px h-6 bg-border mx-1" />
+                  <div className="w-px h-6 bg-border mx-0.5" />
 
                   {/* Text Color */}
                   <div className="relative">
-                    <ToolbarButton 
+                    <ToolbarBtn 
                       onClick={() => setShowTextColorPicker(!showTextColorPicker)} 
                       disabled={!isEditing} 
                       title="Text Color"
@@ -529,7 +497,7 @@ const BrewedNotes = ({ isDark, user }) => {
                         <Type className="size-4" />
                         <div className="w-4 h-1 rounded" style={{ backgroundColor: '#ef4444' }} />
                       </div>
-                    </ToolbarButton>
+                    </ToolbarBtn>
                     {showTextColorPicker && isEditing && (
                       <div 
                         className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-6 gap-1"
@@ -538,8 +506,9 @@ const BrewedNotes = ({ isDark, user }) => {
                         {TEXT_COLORS.map(color => (
                           <button
                             key={color}
-                            onClick={() => {
-                              execCommand('foreColor', color);
+                            onMouseDown={(e) => {
+                              e.preventDefault();
+                              execFormat('foreColor', color);
                               setShowTextColorPicker(false);
                             }}
                             className="w-6 h-6 rounded border hover:scale-110 transition-transform"
@@ -550,15 +519,15 @@ const BrewedNotes = ({ isDark, user }) => {
                     )}
                   </div>
 
-                  {/* Highlight Color */}
+                  {/* Highlight */}
                   <div className="relative">
-                    <ToolbarButton 
+                    <ToolbarBtn 
                       onClick={() => setShowHighlightPicker(!showHighlightPicker)} 
                       disabled={!isEditing} 
                       title="Highlight"
                     >
                       <Highlighter className="size-4" />
-                    </ToolbarButton>
+                    </ToolbarBtn>
                     {showHighlightPicker && isEditing && (
                       <div 
                         className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-6 gap-1"
@@ -567,11 +536,12 @@ const BrewedNotes = ({ isDark, user }) => {
                         {HIGHLIGHT_COLORS.map((color, i) => (
                           <button
                             key={i}
-                            onClick={() => {
+                            onMouseDown={(e) => {
+                              e.preventDefault();
                               if (color === 'transparent') {
-                                execCommand('removeFormat');
+                                execFormat('removeFormat');
                               } else {
-                                execCommand('hiliteColor', color);
+                                execFormat('hiliteColor', color);
                               }
                               setShowHighlightPicker(false);
                             }}
@@ -584,53 +554,50 @@ const BrewedNotes = ({ isDark, user }) => {
                       </div>
                     )}
                   </div>
-                </div>
 
-                {/* Row 2: Alignment, Lists, Headings */}
-                <div className="flex flex-wrap items-center gap-1 w-full sm:w-auto mt-1 sm:mt-0">
-                  <div className="hidden sm:block w-px h-6 bg-border mx-1" />
+                  <div className="w-px h-6 bg-border mx-0.5" />
 
                   {/* Alignment */}
-                  <ToolbarButton onClick={() => execCommand('justifyLeft')} disabled={!isEditing} title="Align Left">
+                  <ToolbarBtn onClick={() => execFormat('justifyLeft')} disabled={!isEditing} title="Align Left">
                     <AlignLeft className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => execCommand('justifyCenter')} disabled={!isEditing} title="Align Center">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={() => execFormat('justifyCenter')} disabled={!isEditing} title="Align Center">
                     <AlignCenter className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => execCommand('justifyRight')} disabled={!isEditing} title="Align Right">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={() => execFormat('justifyRight')} disabled={!isEditing} title="Align Right">
                     <AlignRight className="size-4" />
-                  </ToolbarButton>
+                  </ToolbarBtn>
 
-                  <div className="w-px h-6 bg-border mx-1" />
+                  <div className="w-px h-6 bg-border mx-0.5" />
 
                   {/* Lists */}
-                  <ToolbarButton onClick={() => insertList('ul')} disabled={!isEditing} title="Bullet List">
+                  <ToolbarBtn onClick={insertBulletList} disabled={!isEditing} title="Bullet List">
                     <List className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => insertList('ol')} disabled={!isEditing} title="Numbered List">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={insertNumberedList} disabled={!isEditing} title="Numbered List">
                     <ListOrdered className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={insertChecklist} disabled={!isEditing} title="Checklist">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={insertChecklist} disabled={!isEditing} title="Checklist">
                     <CheckSquare className="size-4" />
-                  </ToolbarButton>
+                  </ToolbarBtn>
 
-                  <div className="w-px h-6 bg-border mx-1" />
+                  <div className="w-px h-6 bg-border mx-0.5" />
 
                   {/* Headings */}
-                  <ToolbarButton onClick={() => formatBlock('h1')} disabled={!isEditing} title="Heading 1">
+                  <ToolbarBtn onClick={() => formatHeading('h1')} disabled={!isEditing} title="Heading 1">
                     <Heading1 className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => formatBlock('h2')} disabled={!isEditing} title="Heading 2">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={() => formatHeading('h2')} disabled={!isEditing} title="Heading 2">
                     <Heading2 className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => formatBlock('h3')} disabled={!isEditing} title="Heading 3">
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={() => formatHeading('h3')} disabled={!isEditing} title="Heading 3">
                     <Heading3 className="size-4" />
-                  </ToolbarButton>
-                  <ToolbarButton onClick={() => formatBlock('p')} disabled={!isEditing} title="Paragraph">
-                    <span className="text-xs font-bold px-1">P</span>
-                  </ToolbarButton>
+                  </ToolbarBtn>
+                  <ToolbarBtn onClick={() => formatHeading('p')} disabled={!isEditing} title="Paragraph">
+                    <span className="text-xs font-bold">P</span>
+                  </ToolbarBtn>
 
-                  {/* Save Button - Push to right */}
+                  {/* Save Button */}
                   <div className="ml-auto">
                     {isEditing && (
                       <Button
@@ -653,8 +620,6 @@ const BrewedNotes = ({ isDark, user }) => {
                   ref={editorRef}
                   contentEditable={isEditing}
                   onDoubleClick={handleEditorDoubleClick}
-                  onMouseUp={handleEditorMouseUp}
-                  onKeyUp={handleEditorMouseUp}
                   className="h-full p-4 overflow-y-auto outline-none"
                   style={{
                     color: theme.text,

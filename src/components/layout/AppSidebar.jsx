@@ -21,6 +21,9 @@ import {
   Film,
   ScissorsLineDashed,
   FileText,
+  Replace,
+  CaseSensitive,
+  Hash,
 } from "lucide-react"
 
 import {
@@ -71,6 +74,9 @@ const documentTools = [
 
 const otherTools = [
   { id: "qrgenerator", title: "QR Generator", icon: QrCode, path: "/qrgenerator" },
+  { id: "findreplace", title: "Find & Replace", icon: Replace, path: "/findreplace" },
+  { id: "caseconverter", title: "Case Converter", icon: CaseSensitive, path: "/caseconverter" },
+  { id: "wordcounter", title: "Word Counter", icon: Hash, path: "/wordcounter" },
 ]
 
 export function AppSidebar({ isDark, ...props }) {
