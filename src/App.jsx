@@ -747,7 +747,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
         <div style={{ width: '100%', maxWidth: '380px' }}>
           {/* Logo & Title */}
           <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '64px', height: '64px', borderRadius: '14px', marginBottom: '16px' }} />
+            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '64px', height: '64px', borderRadius: '14px', marginBottom: '16px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
             <h1 style={{ fontSize: '26px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 6px', fontFamily: FONTS.heading }}>
               {isSignup ? 'Create Account' : 'Welcome Back'}
             </h1>
