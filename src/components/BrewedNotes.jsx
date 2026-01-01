@@ -244,8 +244,7 @@ const BrewedNotes = ({ isDark, user }) => {
       return `<label class="checklist-item" style="display:flex;align-items:flex-start;gap:12px;margin:8px 0;padding:6px 0;cursor:pointer;user-select:none;">
         <input type="checkbox" ${checked ? 'checked' : ''} style="display:none;" />
         <span class="custom-checkbox" style="width:20px;height:20px;border:2px solid ${checked ? '#004AAC' : (isDark ? '#4b5563' : '#d1d5db')};border-radius:6px;background:${checked ? '#004AAC' : (isDark ? '#1f2937' : '#ffffff')};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}</span>
-        <span class="checklist-text" style="${checkedStyle}flex:1;line-height:1.5;padding-top:1px;">${text}</span>
-        <span class="done-label" style="display:${checked ? 'inline' : 'none'};font-size:12px;color:#22c55e;font-weight:500;padding-top:2px;">(done)</span>
+        <span style="display:flex;align-items:center;gap:6px;line-height:1.5;padding-top:1px;"><span class="checklist-text" style="${checkedStyle}">${text}</span><span class="done-label" style="display:${checked ? 'inline' : 'none'};font-size:10px;color:#22c55e;font-weight:500;">(done)</span></span>
       </label>`;
     };
     
