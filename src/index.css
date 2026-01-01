@@ -282,3 +282,19 @@ main[data-slot="sidebar-inset"] {
   max-width: 100% !important;
   width: 100% !important;
 }
+
+/* Mobile sidebar - solid background with overlay */
+@media (max-width: 768px) {
+  [data-sidebar="sidebar"] {
+    background-color: hsl(var(--background)) !important;
+  }
+  
+  .dark [data-sidebar="sidebar"] {
+    background-color: #09090b !important;
+  }
+}
+
+[data-radix-dialog-overlay],
+.fixed.inset-0.z-50.bg-black\/80 {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}

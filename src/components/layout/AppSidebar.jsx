@@ -114,9 +114,17 @@ export function AppSidebar({ isDark, ...props }) {
     padding: '4px 8px 2px 8px',
   }
 
+  // Solid background for sidebar
+  const sidebarBg = isDark ? '#09090b' : '#ffffff'
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader className="p-2">
+    <Sidebar 
+      collapsible="icon" 
+      {...props}
+      className="border-r"
+      style={{ backgroundColor: sidebarBg }}
+    >
+      <SidebarHeader className="p-2" style={{ backgroundColor: sidebarBg }}>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -136,7 +144,7 @@ export function AppSidebar({ isDark, ...props }) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="gap-0 px-1">
+      <SidebarContent className="gap-0 px-1" style={{ backgroundColor: sidebarBg }}>
         <SidebarGroup className="py-0.5">
           <div style={categoryStyle}>Home</div>
           <SidebarGroupContent>{renderMenuItems(homeItems)}</SidebarGroupContent>
@@ -163,7 +171,7 @@ export function AppSidebar({ isDark, ...props }) {
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className="p-1">
+      <SidebarFooter className="p-1" style={{ backgroundColor: sidebarBg }}>
         <div className="text-[9px] text-muted-foreground text-center py-1">
           © 2025 BrewedOps
         </div>
