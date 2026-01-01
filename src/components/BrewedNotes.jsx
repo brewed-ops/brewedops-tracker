@@ -1,13 +1,12 @@
 // BrewedNotes.jsx - Rich Text Notes App for BrewedOps
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
-  Plus, Trash2, Edit3, Save, FileText, AlertTriangle, Palette,
+  Plus, Trash2, Edit3, Save, FileText, AlertTriangle,
   Bold, Italic, Underline, Strikethrough, List, ListOrdered, CheckSquare,
   AlignLeft, AlignCenter, AlignRight, Type, Heading1, Heading2, Heading3,
   X, Loader2, Highlighter
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { getTheme } from '../lib/theme';
@@ -32,17 +31,24 @@ const NOTE_COLORS = [
 
 // Font families
 const FONT_FAMILIES = [
-  { name: 'Arial', value: 'Arial, sans-serif' },
-  { name: 'Verdana', value: 'Verdana, sans-serif' },
-  { name: 'Georgia', value: 'Georgia, serif' },
-  { name: 'Times New Roman', value: 'Times New Roman, serif' },
-  { name: 'Courier New', value: 'Courier New, monospace' },
-  { name: 'Trebuchet MS', value: 'Trebuchet MS, sans-serif' },
+  { name: 'Arial', value: 'Arial' },
+  { name: 'Verdana', value: 'Verdana' },
+  { name: 'Georgia', value: 'Georgia' },
+  { name: 'Times New Roman', value: 'Times New Roman' },
+  { name: 'Courier New', value: 'Courier New' },
+  { name: 'Trebuchet MS', value: 'Trebuchet MS' },
 ];
 
-// Font sizes
-const FONT_SIZES = ['1', '2', '3', '4', '5', '6', '7'];
-const FONT_SIZE_LABELS = ['10px', '13px', '16px', '18px', '24px', '32px', '48px'];
+// Font sizes (using browser's 1-7 scale)
+const FONT_SIZES = [
+  { label: '10px', value: '1' },
+  { label: '13px', value: '2' },
+  { label: '16px', value: '3' },
+  { label: '18px', value: '4' },
+  { label: '24px', value: '5' },
+  { label: '32px', value: '6' },
+  { label: '48px', value: '7' },
+];
 
 // Text colors
 const TEXT_COLORS = [
@@ -53,7 +59,8 @@ const TEXT_COLORS = [
 // Highlight colors
 const HIGHLIGHT_COLORS = [
   '#fef08a', '#fde047', '#fcd34d', '#fdba74', '#fca5a5', 
-  '#d8b4fe', '#c4b5fd', '#a5b4fc', '#93c5fd', '#6ee7b7'
+  '#d8b4fe', '#c4b5fd', '#a5b4fc', '#93c5fd', '#6ee7b7',
+  'transparent'
 ];
 
 const BrewedNotes = ({ isDark, user }) => {
@@ -80,6 +87,24 @@ const BrewedNotes = ({ isDark, user }) => {
   const [showHighlightPicker, setShowHighlightPicker] = useState(false);
   
   const editorRef = useRef(null);
+  const savedSelectionRef = useRef(null);
+
+  // Save selection before clicking toolbar
+  const saveSelection = () => {
+    const sel = window.getSelection();
+    if (sel.rangeCount > 0) {
+      savedSelectionRef.current = sel.getRangeAt(0).cloneRange();
+    }
+  };
+
+  // Restore selection
+  const restoreSelection = () => {
+    if (savedSelectionRef.current) {
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(savedSelectionRef.current);
+    }
+  };
 
   // Load notes from Supabase
   useEffect(() => {
@@ -119,7 +144,7 @@ const BrewedNotes = ({ isDark, user }) => {
         user_id: user.id,
         name: newNoteName.trim(),
         color: newNoteColor,
-        content: '<p><br></p>',
+        content: '',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -232,22 +257,75 @@ const BrewedNotes = ({ isDark, user }) => {
     }
   };
 
-  // Execute command and refocus
+  // Execute command
   const execCommand = useCallback((command, value = null) => {
+    restoreSelection();
     editorRef.current?.focus();
-    document.execCommand(command, false, value);
+    
+    // Small delay to ensure focus
+    setTimeout(() => {
+      document.execCommand(command, false, value);
+    }, 0);
+  }, []);
+
+  // Format block (for headings)
+  const formatBlock = useCallback((tag) => {
+    restoreSelection();
+    editorRef.current?.focus();
+    
+    setTimeout(() => {
+      document.execCommand('formatBlock', false, `<${tag}>`);
+    }, 0);
+  }, []);
+
+  // Insert list
+  const insertList = useCallback((type) => {
+    restoreSelection();
+    editorRef.current?.focus();
+    
+    setTimeout(() => {
+      if (type === 'ul') {
+        document.execCommand('insertUnorderedList', false, null);
+      } else {
+        document.execCommand('insertOrderedList', false, null);
+      }
+    }, 0);
+  }, []);
+
+  // Insert checklist
+  const insertChecklist = useCallback(() => {
+    restoreSelection();
+    editorRef.current?.focus();
+    
+    setTimeout(() => {
+      const sel = window.getSelection();
+      if (sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        const selectedText = range.toString() || 'Task item';
+        
+        // Create checklist HTML
+        const checklistHtml = `<div style="display:flex;align-items:flex-start;gap:8px;margin:4px 0;"><input type="checkbox" style="margin-top:4px;cursor:pointer;" /><span>${selectedText}</span></div>`;
+        
+        document.execCommand('insertHTML', false, checklistHtml);
+      }
+    }, 0);
   }, []);
 
   // Toolbar button component
-  const ToolbarButton = ({ onClick, disabled, title, active, children }) => (
+  const ToolbarButton = ({ onClick, disabled, title, children, className = '' }) => (
     <button
       onMouseDown={(e) => {
-        e.preventDefault(); // Prevent losing selection
+        e.preventDefault();
+        saveSelection();
+      }}
+      onClick={(e) => {
+        e.preventDefault();
         if (!disabled) onClick();
       }}
       disabled={disabled}
-      className={`p-1.5 rounded hover:bg-muted disabled:opacity-50 transition-colors ${active ? 'bg-muted' : ''}`}
+      className={`p-1.5 rounded hover:bg-muted disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex items-center justify-center ${className}`}
       title={title}
+      type="button"
     >
       {children}
     </button>
@@ -258,6 +336,11 @@ const BrewedNotes = ({ isDark, user }) => {
       setIsEditing(true);
       setTimeout(() => editorRef.current?.focus(), 0);
     }
+  };
+
+  const handleEditorMouseUp = () => {
+    // Save selection whenever user selects text
+    saveSelection();
   };
 
   const handleNoteSelect = (note) => {
@@ -293,7 +376,7 @@ const BrewedNotes = ({ isDark, user }) => {
   // Update editor content when note changes
   useEffect(() => {
     if (editorRef.current && selectedNote) {
-      editorRef.current.innerHTML = selectedNote.content || '<p><br></p>';
+      editorRef.current.innerHTML = selectedNote.content || '';
     }
   }, [selectedNote?.id]);
 
@@ -308,7 +391,7 @@ const BrewedNotes = ({ isDark, user }) => {
   return (
     <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: FONTS.body }}>
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-4 md:mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
           <FileText className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Brewed Notes
@@ -316,9 +399,9 @@ const BrewedNotes = ({ isDark, user }) => {
         <p className="text-xs md:text-sm text-muted-foreground">Create and organize your notes with rich text formatting</p>
       </div>
 
-      <div className="flex gap-4 h-[calc(100vh-180px)]">
+      <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[calc(100vh-180px)]">
         {/* Notes Sidebar */}
-        <div className="w-64 shrink-0 flex flex-col" style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}` }}>
+        <div className="w-full lg:w-64 shrink-0 flex flex-col" style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}` }}>
           {/* Add Note Button */}
           <div className="p-3 border-b" style={{ borderColor: theme.cardBorder }}>
             <Button 
@@ -332,7 +415,7 @@ const BrewedNotes = ({ isDark, user }) => {
           </div>
 
           {/* Notes List */}
-          <div className="flex-1 overflow-y-auto p-2 space-y-1">
+          <div className="flex-1 overflow-y-auto p-2 space-y-1 max-h-48 lg:max-h-none">
             {notes.length === 0 ? (
               <div className="text-center py-8 text-muted-foreground text-sm">
                 No notes yet.<br />Create your first note!
@@ -382,191 +465,185 @@ const BrewedNotes = ({ isDark, user }) => {
         </div>
 
         {/* Editor Area */}
-        <div className="flex-1 flex flex-col" style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}` }}>
+        <div className="flex-1 flex flex-col min-h-[400px] lg:min-h-0" style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}` }}>
           {selectedNote ? (
             <>
-              {/* Toolbar */}
+              {/* Toolbar - Responsive */}
               <div className="p-2 border-b flex flex-wrap items-center gap-1" style={{ borderColor: theme.cardBorder }}>
-                {/* Font Family */}
-                <select
-                  onChange={(e) => execCommand('fontName', e.target.value)}
-                  disabled={!isEditing}
-                  className="h-8 px-2 text-xs border rounded bg-background"
-                  style={{ borderColor: theme.cardBorder, minWidth: '110px' }}
-                  defaultValue="Arial, sans-serif"
-                >
-                  {FONT_FAMILIES.map(f => (
-                    <option key={f.value} value={f.value}>{f.name}</option>
-                  ))}
-                </select>
-
-                {/* Font Size */}
-                <select
-                  onChange={(e) => execCommand('fontSize', e.target.value)}
-                  disabled={!isEditing}
-                  className="h-8 px-2 text-xs border rounded bg-background w-20"
-                  style={{ borderColor: theme.cardBorder }}
-                  defaultValue="3"
-                >
-                  {FONT_SIZES.map((s, i) => (
-                    <option key={s} value={s}>{FONT_SIZE_LABELS[i]}</option>
-                  ))}
-                </select>
-
-                <div className="w-px h-6 bg-border mx-1" />
-
-                {/* Text Formatting */}
-                <ToolbarButton onClick={() => execCommand('bold')} disabled={!isEditing} title="Bold (Ctrl+B)">
-                  <Bold className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('italic')} disabled={!isEditing} title="Italic (Ctrl+I)">
-                  <Italic className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('underline')} disabled={!isEditing} title="Underline (Ctrl+U)">
-                  <Underline className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('strikeThrough')} disabled={!isEditing} title="Strikethrough">
-                  <Strikethrough className="size-4" />
-                </ToolbarButton>
-
-                <div className="w-px h-6 bg-border mx-1" />
-
-                {/* Text Color */}
-                <div className="relative">
-                  <ToolbarButton 
-                    onClick={() => setShowTextColorPicker(!showTextColorPicker)} 
-                    disabled={!isEditing} 
-                    title="Text Color"
+                {/* Row 1: Font controls + Basic formatting */}
+                <div className="flex flex-wrap items-center gap-1 w-full sm:w-auto">
+                  {/* Font Family */}
+                  <select
+                    onMouseDown={saveSelection}
+                    onChange={(e) => execCommand('fontName', e.target.value)}
+                    disabled={!isEditing}
+                    className="h-8 px-2 text-xs border rounded bg-background disabled:opacity-40"
+                    style={{ borderColor: theme.cardBorder, width: '100px' }}
+                    defaultValue="Arial"
                   >
-                    <div className="flex flex-col items-center">
-                      <Type className="size-4" />
-                      <div className="w-4 h-1 rounded mt-0.5" style={{ backgroundColor: '#ef4444' }} />
-                    </div>
-                  </ToolbarButton>
-                  {showTextColorPicker && isEditing && (
-                    <div 
-                      className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-6 gap-1"
-                      style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
-                    >
-                      {TEXT_COLORS.map(color => (
-                        <button
-                          key={color}
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            execCommand('foreColor', color);
-                            setShowTextColorPicker(false);
-                          }}
-                          className="w-6 h-6 rounded border hover:scale-110 transition-transform"
-                          style={{ backgroundColor: color, borderColor: theme.cardBorder }}
-                        />
-                      ))}
-                    </div>
-                  )}
-                </div>
+                    {FONT_FAMILIES.map(f => (
+                      <option key={f.value} value={f.value}>{f.name}</option>
+                    ))}
+                  </select>
 
-                {/* Highlight Color */}
-                <div className="relative">
-                  <ToolbarButton 
-                    onClick={() => setShowHighlightPicker(!showHighlightPicker)} 
-                    disabled={!isEditing} 
-                    title="Highlight Color"
+                  {/* Font Size */}
+                  <select
+                    onMouseDown={saveSelection}
+                    onChange={(e) => execCommand('fontSize', e.target.value)}
+                    disabled={!isEditing}
+                    className="h-8 px-2 text-xs border rounded bg-background disabled:opacity-40"
+                    style={{ borderColor: theme.cardBorder, width: '70px' }}
+                    defaultValue="3"
                   >
-                    <Highlighter className="size-4" />
+                    {FONT_SIZES.map(s => (
+                      <option key={s.value} value={s.value}>{s.label}</option>
+                    ))}
+                  </select>
+
+                  <div className="hidden sm:block w-px h-6 bg-border mx-1" />
+
+                  {/* Text Formatting */}
+                  <ToolbarButton onClick={() => execCommand('bold')} disabled={!isEditing} title="Bold">
+                    <Bold className="size-4" />
                   </ToolbarButton>
-                  {showHighlightPicker && isEditing && (
-                    <div 
-                      className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-5 gap-1"
-                      style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
+                  <ToolbarButton onClick={() => execCommand('italic')} disabled={!isEditing} title="Italic">
+                    <Italic className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={() => execCommand('underline')} disabled={!isEditing} title="Underline">
+                    <Underline className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={() => execCommand('strikeThrough')} disabled={!isEditing} title="Strikethrough">
+                    <Strikethrough className="size-4" />
+                  </ToolbarButton>
+
+                  <div className="hidden sm:block w-px h-6 bg-border mx-1" />
+
+                  {/* Text Color */}
+                  <div className="relative">
+                    <ToolbarButton 
+                      onClick={() => setShowTextColorPicker(!showTextColorPicker)} 
+                      disabled={!isEditing} 
+                      title="Text Color"
                     >
-                      {HIGHLIGHT_COLORS.map(color => (
-                        <button
-                          key={color}
-                          onMouseDown={(e) => {
-                            e.preventDefault();
-                            execCommand('hiliteColor', color);
-                            setShowHighlightPicker(false);
-                          }}
-                          className="w-6 h-6 rounded border hover:scale-110 transition-transform"
-                          style={{ backgroundColor: color, borderColor: theme.cardBorder }}
-                        />
-                      ))}
-                      <button
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          execCommand('removeFormat');
-                          setShowHighlightPicker(false);
-                        }}
-                        className="w-6 h-6 rounded border hover:scale-110 transition-transform flex items-center justify-center text-xs"
-                        style={{ borderColor: theme.cardBorder }}
-                        title="Remove highlight"
+                      <div className="flex flex-col items-center">
+                        <Type className="size-4" />
+                        <div className="w-4 h-1 rounded" style={{ backgroundColor: '#ef4444' }} />
+                      </div>
+                    </ToolbarButton>
+                    {showTextColorPicker && isEditing && (
+                      <div 
+                        className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-6 gap-1"
+                        style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
                       >
-                        <X className="size-3" />
-                      </button>
-                    </div>
-                  )}
+                        {TEXT_COLORS.map(color => (
+                          <button
+                            key={color}
+                            onClick={() => {
+                              execCommand('foreColor', color);
+                              setShowTextColorPicker(false);
+                            }}
+                            className="w-6 h-6 rounded border hover:scale-110 transition-transform"
+                            style={{ backgroundColor: color, borderColor: theme.cardBorder }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Highlight Color */}
+                  <div className="relative">
+                    <ToolbarButton 
+                      onClick={() => setShowHighlightPicker(!showHighlightPicker)} 
+                      disabled={!isEditing} 
+                      title="Highlight"
+                    >
+                      <Highlighter className="size-4" />
+                    </ToolbarButton>
+                    {showHighlightPicker && isEditing && (
+                      <div 
+                        className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-6 gap-1"
+                        style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
+                      >
+                        {HIGHLIGHT_COLORS.map((color, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              if (color === 'transparent') {
+                                execCommand('removeFormat');
+                              } else {
+                                execCommand('hiliteColor', color);
+                              }
+                              setShowHighlightPicker(false);
+                            }}
+                            className="w-6 h-6 rounded border hover:scale-110 transition-transform flex items-center justify-center"
+                            style={{ backgroundColor: color === 'transparent' ? theme.cardBg : color, borderColor: theme.cardBorder }}
+                          >
+                            {color === 'transparent' && <X className="size-3 text-muted-foreground" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="w-px h-6 bg-border mx-1" />
+                {/* Row 2: Alignment, Lists, Headings */}
+                <div className="flex flex-wrap items-center gap-1 w-full sm:w-auto mt-1 sm:mt-0">
+                  <div className="hidden sm:block w-px h-6 bg-border mx-1" />
 
-                {/* Alignment */}
-                <ToolbarButton onClick={() => execCommand('justifyLeft')} disabled={!isEditing} title="Align Left">
-                  <AlignLeft className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('justifyCenter')} disabled={!isEditing} title="Align Center">
-                  <AlignCenter className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('justifyRight')} disabled={!isEditing} title="Align Right">
-                  <AlignRight className="size-4" />
-                </ToolbarButton>
+                  {/* Alignment */}
+                  <ToolbarButton onClick={() => execCommand('justifyLeft')} disabled={!isEditing} title="Align Left">
+                    <AlignLeft className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={() => execCommand('justifyCenter')} disabled={!isEditing} title="Align Center">
+                    <AlignCenter className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={() => execCommand('justifyRight')} disabled={!isEditing} title="Align Right">
+                    <AlignRight className="size-4" />
+                  </ToolbarButton>
 
-                <div className="w-px h-6 bg-border mx-1" />
+                  <div className="w-px h-6 bg-border mx-1" />
 
-                {/* Lists */}
-                <ToolbarButton onClick={() => execCommand('insertUnorderedList')} disabled={!isEditing} title="Bullet List">
-                  <List className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('insertOrderedList')} disabled={!isEditing} title="Numbered List">
-                  <ListOrdered className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton 
-                  onClick={() => {
-                    execCommand('insertHTML', '<div style="display:flex;align-items:center;gap:8px;"><input type="checkbox" /><span>Item</span></div>');
-                  }} 
-                  disabled={!isEditing} 
-                  title="Checklist"
-                >
-                  <CheckSquare className="size-4" />
-                </ToolbarButton>
+                  {/* Lists */}
+                  <ToolbarButton onClick={() => insertList('ul')} disabled={!isEditing} title="Bullet List">
+                    <List className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={() => insertList('ol')} disabled={!isEditing} title="Numbered List">
+                    <ListOrdered className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={insertChecklist} disabled={!isEditing} title="Checklist">
+                    <CheckSquare className="size-4" />
+                  </ToolbarButton>
 
-                <div className="w-px h-6 bg-border mx-1" />
+                  <div className="w-px h-6 bg-border mx-1" />
 
-                {/* Headings */}
-                <ToolbarButton onClick={() => execCommand('formatBlock', 'h1')} disabled={!isEditing} title="Heading 1">
-                  <Heading1 className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('formatBlock', 'h2')} disabled={!isEditing} title="Heading 2">
-                  <Heading2 className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('formatBlock', 'h3')} disabled={!isEditing} title="Heading 3">
-                  <Heading3 className="size-4" />
-                </ToolbarButton>
-                <ToolbarButton onClick={() => execCommand('formatBlock', 'p')} disabled={!isEditing} title="Paragraph">
-                  <span className="text-xs font-bold">P</span>
-                </ToolbarButton>
+                  {/* Headings */}
+                  <ToolbarButton onClick={() => formatBlock('h1')} disabled={!isEditing} title="Heading 1">
+                    <Heading1 className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={() => formatBlock('h2')} disabled={!isEditing} title="Heading 2">
+                    <Heading2 className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={() => formatBlock('h3')} disabled={!isEditing} title="Heading 3">
+                    <Heading3 className="size-4" />
+                  </ToolbarButton>
+                  <ToolbarButton onClick={() => formatBlock('p')} disabled={!isEditing} title="Paragraph">
+                    <span className="text-xs font-bold px-1">P</span>
+                  </ToolbarButton>
 
-                {/* Save Button */}
-                <div className="ml-auto">
-                  {isEditing && (
-                    <Button
-                      onClick={saveNote}
-                      disabled={saving}
-                      size="sm"
-                      style={{ backgroundColor: BRAND.green }}
-                    >
-                      {saving ? <Loader2 className="size-4 mr-1 animate-spin" /> : <Save className="size-4 mr-1" />}
-                      Save
-                    </Button>
-                  )}
+                  {/* Save Button - Push to right */}
+                  <div className="ml-auto">
+                    {isEditing && (
+                      <Button
+                        onClick={saveNote}
+                        disabled={saving}
+                        size="sm"
+                        style={{ backgroundColor: BRAND.green }}
+                      >
+                        {saving ? <Loader2 className="size-4 mr-1 animate-spin" /> : <Save className="size-4 mr-1" />}
+                        Save
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -576,12 +653,14 @@ const BrewedNotes = ({ isDark, user }) => {
                   ref={editorRef}
                   contentEditable={isEditing}
                   onDoubleClick={handleEditorDoubleClick}
+                  onMouseUp={handleEditorMouseUp}
+                  onKeyUp={handleEditorMouseUp}
                   className="h-full p-4 overflow-y-auto outline-none"
                   style={{
                     color: theme.text,
                     fontSize: '16px',
-                    lineHeight: '1.6',
-                    minHeight: '100%',
+                    lineHeight: '1.8',
+                    minHeight: '300px',
                     cursor: isEditing ? 'text' : 'default'
                   }}
                   suppressContentEditableWarning={true}
@@ -589,7 +668,7 @@ const BrewedNotes = ({ isDark, user }) => {
               </div>
 
               {/* Status Bar */}
-              <div className="px-4 py-2 border-t text-xs text-muted-foreground flex justify-between" style={{ borderColor: theme.cardBorder }}>
+              <div className="px-4 py-2 border-t text-xs text-muted-foreground flex flex-col sm:flex-row justify-between gap-1" style={{ borderColor: theme.cardBorder }}>
                 <span>{isEditing ? '✏️ Editing mode' : '👁️ View mode - Double-click to edit'}</span>
                 <span>Last saved: {new Date(selectedNote.updated_at).toLocaleString()}</span>
               </div>
