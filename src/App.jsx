@@ -353,16 +353,16 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       </nav>
 
       {/* Hero */}
-      <section style={{ padding: isSmall ? '48px 20px 56px' : '72px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+      <section style={{ padding: isSmall ? '24px 20px 56px' : '32px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
         {/* Logo */}
         <img 
           src="https://i.imgur.com/z2WaRiA.png" 
           alt="BrewedOps Logo" 
           style={{ 
-            maxWidth: isSmall ? '200px' : '320px', 
+            maxWidth: isSmall ? '240px' : '400px', 
             width: '100%',
             height: 'auto', 
-            marginBottom: '32px',
+            marginBottom: '16px',
             display: 'block',
             marginLeft: 'auto',
             marginRight: 'auto'
