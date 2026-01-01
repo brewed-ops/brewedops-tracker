@@ -6,6 +6,7 @@ import { supabase } from './lib/supabase';
 import TaskManager from './components/TaskManager';
 import PDFEditor from './components/PDFEditor';
 import BackgroundRemover from './components/BackgroundRemover';
+import ImageCropper from './components/ImageCropper';
 import FinanceTracker from './components/FinanceTracker';
 
 
@@ -857,6 +858,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case '/taskmanager': return 'taskmanager';
       case '/pdfeditor': return 'pdfeditor';
       case '/bgremover': return 'bgremover';
+      case '/imagecropper': return 'imagecropper';
       default: return 'dashboard';
     }
   };
@@ -871,6 +873,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case 'tasks': navigate('/taskmanager'); break; // Alias for backwards compatibility
       case 'pdfeditor': navigate('/pdfeditor'); break;
       case 'bgremover': navigate('/bgremover'); break;
+      case 'imagecropper': navigate('/imagecropper'); break;
       default: navigate('/'); break;
     }
   };
@@ -3535,6 +3538,8 @@ const getBudgetStatus = () => {
   <PDFEditor isDark={isDark} />
 ) : activeSection === 'bgremover' ? (
   <BackgroundRemover isDark={isDark} />
+) : activeSection === 'imagecropper' ? (
+  <ImageCropper isDark={isDark} />
 ) : (
 
      <>
@@ -8862,6 +8867,7 @@ function AppContent() {
       <Route path="/taskmanager" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
       <Route path="/pdfeditor" element={<PDFEditor isDark={isDark} />} />
       <Route path="/bgremover" element={<BackgroundRemover isDark={isDark} />} />
+      <Route path="/imagecropper" element={<ImageCropper isDark={isDark} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );
