@@ -7,9 +7,8 @@ import {
   Headset,
   CheckSquare,
   FileEdit,
-  Image,
-  Video,
   Sparkles,
+  Crop,
   MoreHorizontal,
 } from "lucide-react"
 
@@ -22,7 +21,6 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
@@ -62,28 +60,18 @@ const moreToolsItems = [
     title: "PDF Editor",
     icon: FileEdit,
     path: "/pdfeditor",
-    comingSoon: false,
   },
   {
     id: "bgremover",
     title: "BG Remover",
     icon: Sparkles,
     path: "/bgremover",
-    comingSoon: false,
   },
   {
-    id: "image-tools",
-    title: "Image Tools",
-    icon: Image,
-    path: "/imagetools",
-    comingSoon: true,
-  },
-  {
-    id: "video-compress",
-    title: "Video Compressor",
-    icon: Video,
-    path: "/videocompress",
-    comingSoon: true,
+    id: "imagecropper",
+    title: "Image Cropper",
+    icon: Crop,
+    path: "/imagecropper",
   },
 ]
 
@@ -169,20 +157,13 @@ export function AppSidebar({ isDark, ...props }) {
               {moreToolsItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
-                    tooltip={item.comingSoon ? `${item.title} (Coming Soon)` : item.title}
-                    disabled={item.comingSoon}
+                    tooltip={item.title}
                     isActive={isActive(item.path)}
-                    onClick={() => handleNavigation(item.path, item.comingSoon)}
-                    className={item.comingSoon ? "opacity-50 cursor-not-allowed" : ""}
+                    onClick={() => handleNavigation(item.path)}
                   >
                     <item.icon />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
-                  {item.comingSoon && (
-                    <SidebarMenuBadge className="bg-muted text-muted-foreground text-[10px] px-1.5">
-                      Soon
-                    </SidebarMenuBadge>
-                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
