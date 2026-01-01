@@ -12,7 +12,6 @@ import ImageCompressor from './components/ImageCompressor';
 import ImageResizer from './components/ImageResizer';
 import QRGenerator from './components/QRGenerator';
 import ColorPicker from './components/ColorPicker';
-import ImageToText from './components/ImageToText';
 import PDFMerge from './components/PDFMerge';
 import PDFSplit from './components/PDFSplit';
 import ImageToPDF from './components/ImageToPDF';
@@ -880,7 +879,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case '/imageresizer': return 'imageresizer';
       case '/qrgenerator': return 'qrgenerator';
       case '/colorpicker': return 'colorpicker';
-      case '/imagetotext': return 'imagetotext';
       case '/pdfmerge': return 'pdfmerge';
       case '/pdfsplit': return 'pdfsplit';
       case '/imagetopdf': return 'imagetopdf';
@@ -910,7 +908,6 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case 'imageresizer': navigate('/imageresizer'); break;
       case 'qrgenerator': navigate('/qrgenerator'); break;
       case 'colorpicker': navigate('/colorpicker'); break;
-      case 'imagetotext': navigate('/imagetotext'); break;
       case 'pdfmerge': navigate('/pdfmerge'); break;
       case 'pdfsplit': navigate('/pdfsplit'); break;
       case 'imagetopdf': navigate('/imagetopdf'); break;
@@ -3428,8 +3425,6 @@ const getBudgetStatus = () => {
   <QRGenerator isDark={isDark} />
 ) : activeSection === 'colorpicker' ? (
   <ColorPicker isDark={isDark} />
-) : activeSection === 'imagetotext' ? (
-  <ImageToText isDark={isDark} />
 ) : activeSection === 'pdfmerge' ? (
   <PDFMerge isDark={isDark} />
 ) : activeSection === 'pdfsplit' ? (
@@ -8780,7 +8775,6 @@ function AppContent() {
       <Route path="/imageresizer" element={<ImageResizer isDark={isDark} />} />
       <Route path="/qrgenerator" element={<QRGenerator isDark={isDark} />} />
       <Route path="/colorpicker" element={<ColorPicker isDark={isDark} />} />
-      <Route path="/imagetotext" element={<ImageToText isDark={isDark} />} />
       <Route path="/pdfmerge" element={<PDFMerge isDark={isDark} />} />
       <Route path="/pdfsplit" element={<PDFSplit isDark={isDark} />} />
       <Route path="/imagetopdf" element={<ImageToPDF isDark={isDark} />} />

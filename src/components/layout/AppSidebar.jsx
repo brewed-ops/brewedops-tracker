@@ -14,7 +14,6 @@ import {
   QrCode,
   ImageDown,
   Palette,
-  ScanText,
   FileStack,
   Scissors,
   ImagePlus,
@@ -57,7 +56,6 @@ const imageTools = [
   { id: "imagecompressor", title: "Image Compressor", icon: ImageDown, path: "/imagecompressor" },
   { id: "imageconverter", title: "Image Converter", icon: RefreshCw, path: "/imageconverter" },
   { id: "colorpicker", title: "Color Picker", icon: Palette, path: "/colorpicker" },
-  { id: "imagetotext", title: "Image to Text", icon: ScanText, path: "/imagetotext" },
   { id: "imagetopdf", title: "Image to PDF", icon: ImagePlus, path: "/imagetopdf" },
 ]
 
