@@ -8,6 +8,9 @@ import PDFEditor from './components/PDFEditor';
 import BackgroundRemover from './components/BackgroundRemover';
 import ImageCropper from './components/ImageCropper';
 import ImageConverter from './components/ImageConverter';
+import ImageCompressor from './components/ImageCompressor';
+import ImageResizer from './components/ImageResizer';
+import QRGenerator from './components/QRGenerator';
 import FinanceTracker from './components/FinanceTracker';
 
 
@@ -861,6 +864,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case '/bgremover': return 'bgremover';
       case '/imagecropper': return 'imagecropper';
       case '/imageconverter': return 'imageconverter';
+      case '/imagecompressor': return 'imagecompressor';
+      case '/imageresizer': return 'imageresizer';
+      case '/qrgenerator': return 'qrgenerator';
       default: return 'dashboard';
     }
   };
@@ -877,6 +883,9 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case 'bgremover': navigate('/bgremover'); break;
       case 'imagecropper': navigate('/imagecropper'); break;
       case 'imageconverter': navigate('/imageconverter'); break;
+      case 'imagecompressor': navigate('/imagecompressor'); break;
+      case 'imageresizer': navigate('/imageresizer'); break;
+      case 'qrgenerator': navigate('/qrgenerator'); break;
       default: navigate('/'); break;
     }
   };
@@ -3545,6 +3554,12 @@ const getBudgetStatus = () => {
   <ImageCropper isDark={isDark} />
 ) : activeSection === 'imageconverter' ? (
   <ImageConverter isDark={isDark} />
+) : activeSection === 'imagecompressor' ? (
+  <ImageCompressor isDark={isDark} />
+) : activeSection === 'imageresizer' ? (
+  <ImageResizer isDark={isDark} />
+) : activeSection === 'qrgenerator' ? (
+  <QRGenerator isDark={isDark} />
 ) : (
 
      <>
@@ -8874,6 +8889,9 @@ function AppContent() {
       <Route path="/bgremover" element={<BackgroundRemover isDark={isDark} />} />
       <Route path="/imagecropper" element={<ImageCropper isDark={isDark} />} />
       <Route path="/imageconverter" element={<ImageConverter isDark={isDark} />} />
+      <Route path="/imagecompressor" element={<ImageCompressor isDark={isDark} />} />
+      <Route path="/imageresizer" element={<ImageResizer isDark={isDark} />} />
+      <Route path="/qrgenerator" element={<QRGenerator isDark={isDark} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );

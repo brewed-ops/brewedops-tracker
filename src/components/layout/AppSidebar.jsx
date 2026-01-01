@@ -10,6 +10,9 @@ import {
   Sparkles,
   Crop,
   RefreshCw,
+  Minimize2,
+  QrCode,
+  ImageDown,
   MoreHorizontal,
 } from "lucide-react"
 
@@ -79,6 +82,24 @@ const moreToolsItems = [
     title: "Image Converter",
     icon: RefreshCw,
     path: "/imageconverter",
+  },
+  {
+    id: "imagecompressor",
+    title: "Image Compressor",
+    icon: ImageDown,
+    path: "/imagecompressor",
+  },
+  {
+    id: "imageresizer",
+    title: "Image Resizer",
+    icon: Minimize2,
+    path: "/imageresizer",
+  },
+  {
+    id: "qrgenerator",
+    title: "QR Generator",
+    icon: QrCode,
+    path: "/qrgenerator",
   },
 ]
 
