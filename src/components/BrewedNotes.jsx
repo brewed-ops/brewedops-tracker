@@ -235,13 +235,23 @@ const BrewedNotes = ({ isDark, user }) => {
     const selection = window.getSelection();
     const selectedText = selection.toString().trim();
     
+    // Create checklist item with onclick handler embedded
     const createCheckItem = (text, checked = false) => {
-      const strikeStyle = checked ? 'text-decoration: line-through; opacity: 0.5; color: #9ca3af;' : '';
-      const uniqueId = `check-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-      return `<div class="checklist-item" data-checked="${checked}" style="display:flex;align-items:flex-start;gap:12px;margin:8px 0;padding:8px 12px;background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'};border-radius:8px;border:1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'};transition:all 0.2s ease;">
-        <input type="checkbox" id="${uniqueId}" ${checked ? 'checked' : ''} style="width:20px;height:20px;cursor:pointer;accent-color:#004AAC;flex-shrink:0;margin-top:2px;border-radius:4px;"/>
-        <span class="checklist-text" style="${strikeStyle}flex:1;line-height:1.5;">${text}</span>
-      </div>`;
+      const checkedStyle = checked 
+        ? 'text-decoration: line-through; opacity: 0.5; color: #9ca3af;' 
+        : '';
+      const bgColor = checked 
+        ? (isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)')
+        : (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)');
+      const borderColor = checked
+        ? 'rgba(34, 197, 94, 0.2)'
+        : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)');
+      
+      return `<label class="checklist-item" style="display:flex;align-items:flex-start;gap:12px;margin:8px 0;padding:10px 12px;background:${bgColor};border-radius:8px;border:1px solid ${borderColor};cursor:pointer;user-select:none;">
+        <input type="checkbox" ${checked ? 'checked' : ''} style="display:none;" />
+        <span class="custom-checkbox" style="width:20px;height:20px;border:2px solid ${checked ? '#004AAC' : (isDark ? '#4b5563' : '#d1d5db')};border-radius:6px;background:${checked ? '#004AAC' : (isDark ? '#1f2937' : '#ffffff')};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}</span>
+        <span class="checklist-text" style="${checkedStyle}flex:1;line-height:1.5;padding-top:1px;">${text}</span>
+      </label>`;
     };
     
     if (selectedText) {
@@ -333,69 +343,48 @@ const BrewedNotes = ({ isDark, user }) => {
 
   // Handle checkbox click for strikethrough - using event delegation
   const handleEditorClick = useCallback((e) => {
-    const target = e.target;
-    if (target.type === 'checkbox' && target.tagName === 'INPUT') {
-      const checkItem = target.closest('.checklist-item');
-      if (checkItem) {
-        const textSpan = checkItem.querySelector('.checklist-text') || checkItem.querySelector('span');
-        if (textSpan) {
-          // Toggle happens after click, so we check the NEW state
-          const willBeChecked = target.checked;
-          
-          if (willBeChecked) {
-            textSpan.style.textDecoration = 'line-through';
-            textSpan.style.opacity = '0.5';
-            textSpan.style.color = isDark ? '#6b7280' : '#9ca3af';
-            checkItem.setAttribute('data-checked', 'true');
-            checkItem.style.background = isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)';
-            checkItem.style.borderColor = isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.2)';
-          } else {
-            textSpan.style.textDecoration = 'none';
-            textSpan.style.opacity = '1';
-            textSpan.style.color = '';
-            checkItem.setAttribute('data-checked', 'false');
-            checkItem.style.background = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
-            checkItem.style.borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-          }
-        }
-      }
+    // Find if we clicked on a checklist item or its children
+    const checkItem = e.target.closest('.checklist-item');
+    if (!checkItem) return;
+    
+    const checkbox = checkItem.querySelector('input[type="checkbox"]');
+    const customCheckbox = checkItem.querySelector('.custom-checkbox');
+    const textSpan = checkItem.querySelector('.checklist-text');
+    
+    if (!checkbox || !customCheckbox || !textSpan) return;
+    
+    // Toggle the checkbox
+    checkbox.checked = !checkbox.checked;
+    const isChecked = checkbox.checked;
+    
+    // Update visual state
+    if (isChecked) {
+      // Checked state
+      textSpan.style.textDecoration = 'line-through';
+      textSpan.style.opacity = '0.5';
+      textSpan.style.color = isDark ? '#6b7280' : '#9ca3af';
+      customCheckbox.style.background = '#004AAC';
+      customCheckbox.style.borderColor = '#004AAC';
+      customCheckbox.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+      checkItem.style.background = isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)';
+      checkItem.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+    } else {
+      // Unchecked state
+      textSpan.style.textDecoration = 'none';
+      textSpan.style.opacity = '1';
+      textSpan.style.color = '';
+      customCheckbox.style.background = isDark ? '#1f2937' : '#ffffff';
+      customCheckbox.style.borderColor = isDark ? '#4b5563' : '#d1d5db';
+      customCheckbox.innerHTML = '';
+      checkItem.style.background = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+      checkItem.style.borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
     }
+    
+    // Prevent default label behavior since we're handling it manually
+    e.preventDefault();
   }, [isDark]);
 
-  // Also handle change event for checkboxes (backup)
-  useEffect(() => {
-    const editor = editorRef.current;
-    if (!editor) return;
-    
-    const handleChange = (e) => {
-      if (e.target.type === 'checkbox') {
-        const checkItem = e.target.closest('.checklist-item');
-        if (checkItem) {
-          const textSpan = checkItem.querySelector('.checklist-text') || checkItem.querySelector('span');
-          if (textSpan) {
-            if (e.target.checked) {
-              textSpan.style.textDecoration = 'line-through';
-              textSpan.style.opacity = '0.5';
-              textSpan.style.color = isDark ? '#6b7280' : '#9ca3af';
-              checkItem.setAttribute('data-checked', 'true');
-              checkItem.style.background = isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)';
-              checkItem.style.borderColor = isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.2)';
-            } else {
-              textSpan.style.textDecoration = 'none';
-              textSpan.style.opacity = '1';
-              textSpan.style.color = '';
-              checkItem.setAttribute('data-checked', 'false');
-              checkItem.style.background = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
-              checkItem.style.borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
-            }
-          }
-        }
-      }
-    };
-    
-    editor.addEventListener('change', handleChange, true);
-    return () => editor.removeEventListener('change', handleChange, true);
-  }, [isDark]);
+  // Remove the old change event listener - not needed anymore
 
   const handleNoteSelect = async (note) => {
     if (isEditing && selectedNote) await saveNote();
