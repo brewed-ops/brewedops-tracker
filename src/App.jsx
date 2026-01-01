@@ -7,6 +7,7 @@ import TaskManager from './components/TaskManager';
 import PDFEditor from './components/PDFEditor';
 import BackgroundRemover from './components/BackgroundRemover';
 import ImageCropper from './components/ImageCropper';
+import ImageConverter from './components/ImageConverter';
 import FinanceTracker from './components/FinanceTracker';
 
 
@@ -859,6 +860,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case '/pdfeditor': return 'pdfeditor';
       case '/bgremover': return 'bgremover';
       case '/imagecropper': return 'imagecropper';
+      case '/imageconverter': return 'imageconverter';
       default: return 'dashboard';
     }
   };
@@ -874,6 +876,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case 'pdfeditor': navigate('/pdfeditor'); break;
       case 'bgremover': navigate('/bgremover'); break;
       case 'imagecropper': navigate('/imagecropper'); break;
+      case 'imageconverter': navigate('/imageconverter'); break;
       default: navigate('/'); break;
     }
   };
@@ -3540,6 +3543,8 @@ const getBudgetStatus = () => {
   <BackgroundRemover isDark={isDark} />
 ) : activeSection === 'imagecropper' ? (
   <ImageCropper isDark={isDark} />
+) : activeSection === 'imageconverter' ? (
+  <ImageConverter isDark={isDark} />
 ) : (
 
      <>
@@ -8868,6 +8873,7 @@ function AppContent() {
       <Route path="/pdfeditor" element={<PDFEditor isDark={isDark} />} />
       <Route path="/bgremover" element={<BackgroundRemover isDark={isDark} />} />
       <Route path="/imagecropper" element={<ImageCropper isDark={isDark} />} />
+      <Route path="/imageconverter" element={<ImageConverter isDark={isDark} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );

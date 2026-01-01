@@ -9,6 +9,7 @@ import {
   FileEdit,
   Sparkles,
   Crop,
+  RefreshCw,
   MoreHorizontal,
 } from "lucide-react"
 
@@ -72,6 +73,12 @@ const moreToolsItems = [
     title: "Image Cropper",
     icon: Crop,
     path: "/imagecropper",
+  },
+  {
+    id: "imageconverter",
+    title: "Image Converter",
+    icon: RefreshCw,
+    path: "/imageconverter",
   },
 ]
 
