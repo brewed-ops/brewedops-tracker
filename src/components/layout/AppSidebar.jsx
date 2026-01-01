@@ -94,10 +94,26 @@ export function AppSidebar({ isDark, ...props }) {
     return location.pathname === path
   }
 
-  const handleNavigation = (path, comingSoon = false) => {
-    if (!comingSoon) {
-      navigate(path)
+  const handleNavigation = (path) => {
+    navigate(path)
+  }
+
+  // Active item styles
+  const getItemStyle = (path) => {
+    if (isActive(path)) {
+      return {
+        backgroundColor: BRAND.blue,
+        color: '#ffffff',
+      }
     }
+    return {}
+  }
+
+  const getIconStyle = (path) => {
+    if (isActive(path)) {
+      return { color: '#ffffff' }
+    }
+    return {}
   }
 
   return (
@@ -143,8 +159,10 @@ export function AppSidebar({ isDark, ...props }) {
                     tooltip={item.title}
                     isActive={isActive(item.path)}
                     onClick={() => handleNavigation(item.path)}
+                    style={getItemStyle(item.path)}
+                    className={isActive(item.path) ? "font-medium" : ""}
                   >
-                    <item.icon />
+                    <item.icon style={getIconStyle(item.path)} />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -167,8 +185,10 @@ export function AppSidebar({ isDark, ...props }) {
                     tooltip={item.title}
                     isActive={isActive(item.path)}
                     onClick={() => handleNavigation(item.path)}
+                    style={getItemStyle(item.path)}
+                    className={isActive(item.path) ? "font-medium" : ""}
                   >
-                    <item.icon />
+                    <item.icon style={getIconStyle(item.path)} />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
