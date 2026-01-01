@@ -1,11 +1,10 @@
 // BrewedNotes.jsx - Rich Text Notes App for BrewedOps
-// Custom implementation with proper list/heading handling
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Plus, Trash2, Edit3, Save, FileText, AlertTriangle,
   Bold, Italic, Underline, Strikethrough, List, ListOrdered, CheckSquare,
   AlignLeft, AlignCenter, AlignRight, Type, Heading1, Heading2, Heading3,
-  X, Loader2, Highlighter, Undo, Redo
+  X, Loader2, Highlighter, Undo, Redo, RemoveFormatting
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/label';
@@ -27,6 +26,25 @@ const NOTE_COLORS = [
   { name: 'Teal', value: '#14b8a6' },
   { name: 'Cyan', value: '#06b6d4' },
   { name: 'Gray', value: '#6b7280' },
+];
+
+const FONT_FAMILIES = [
+  { name: 'Arial', value: 'Arial, sans-serif' },
+  { name: 'Verdana', value: 'Verdana, sans-serif' },
+  { name: 'Georgia', value: 'Georgia, serif' },
+  { name: 'Times New Roman', value: 'Times New Roman, serif' },
+  { name: 'Courier New', value: 'Courier New, monospace' },
+  { name: 'Trebuchet MS', value: 'Trebuchet MS, sans-serif' },
+];
+
+const FONT_SIZES = [
+  { label: '10px', value: '1' },
+  { label: '13px', value: '2' },
+  { label: '16px', value: '3' },
+  { label: '18px', value: '4' },
+  { label: '24px', value: '5' },
+  { label: '32px', value: '6' },
+  { label: '48px', value: '7' },
 ];
 
 const TEXT_COLORS = [
@@ -173,93 +191,41 @@ const BrewedNotes = ({ isDark, user }) => {
     }
   };
 
-  // Get selected text
-  const getSelectedText = () => {
-    const selection = window.getSelection();
-    if (!selection || selection.rangeCount === 0) return '';
-    return selection.toString();
-  };
-
-  // Insert HTML at cursor position, replacing selection
-  const insertHTML = (html) => {
-    editorRef.current?.focus();
-    document.execCommand('insertHTML', false, html);
-  };
-
   // Simple exec command
   const execCmd = (cmd, value = null) => {
     editorRef.current?.focus();
     document.execCommand(cmd, false, value);
   };
 
-  // Format as heading - converts selected text or current line to heading
+  // Format as heading - toggle between heading and paragraph
   const formatAsHeading = useCallback((level) => {
     if (!editorRef.current) return;
     editorRef.current.focus();
     
-    const selection = window.getSelection();
-    const selectedText = selection.toString().trim();
+    // Check if current block is already this heading
+    const currentBlock = document.queryCommandValue('formatBlock');
     
-    if (selectedText) {
-      // Replace selection with heading
-      const headingHTML = `<${level} style="margin: 0.5em 0;">${selectedText}</${level}>`;
-      document.execCommand('insertHTML', false, headingHTML);
+    if (currentBlock.toLowerCase() === level.toLowerCase()) {
+      // Already this heading - convert back to paragraph
+      document.execCommand('formatBlock', false, 'p');
     } else {
-      // Format current block
+      // Apply heading
       document.execCommand('formatBlock', false, level);
     }
   }, []);
 
-  // Format as bullet list - splits text by lines if multiple words selected
+  // Format as bullet list
   const formatAsBulletList = useCallback(() => {
     if (!editorRef.current) return;
     editorRef.current.focus();
-    
-    const selection = window.getSelection();
-    const selectedText = selection.toString().trim();
-    
-    if (selectedText) {
-      // Check if text has newlines
-      const lines = selectedText.split(/\n/).filter(line => line.trim());
-      
-      if (lines.length > 1) {
-        // Multiple lines - make each a list item
-        const listItems = lines.map(line => `<li>${line.trim()}</li>`).join('');
-        const html = `<ul>${listItems}</ul>`;
-        document.execCommand('insertHTML', false, html);
-      } else {
-        // Single line/selection - wrap in list
-        const html = `<ul><li>${selectedText}</li></ul>`;
-        document.execCommand('insertHTML', false, html);
-      }
-    } else {
-      // No selection - use native command
-      document.execCommand('insertUnorderedList', false, null);
-    }
+    document.execCommand('insertUnorderedList', false, null);
   }, []);
 
   // Format as numbered list
   const formatAsNumberedList = useCallback(() => {
     if (!editorRef.current) return;
     editorRef.current.focus();
-    
-    const selection = window.getSelection();
-    const selectedText = selection.toString().trim();
-    
-    if (selectedText) {
-      const lines = selectedText.split(/\n/).filter(line => line.trim());
-      
-      if (lines.length > 1) {
-        const listItems = lines.map(line => `<li>${line.trim()}</li>`).join('');
-        const html = `<ol>${listItems}</ol>`;
-        document.execCommand('insertHTML', false, html);
-      } else {
-        const html = `<ol><li>${selectedText}</li></ol>`;
-        document.execCommand('insertHTML', false, html);
-      }
-    } else {
-      document.execCommand('insertOrderedList', false, null);
-    }
+    document.execCommand('insertOrderedList', false, null);
   }, []);
 
   // Format as checklist
@@ -271,11 +237,10 @@ const BrewedNotes = ({ isDark, user }) => {
     const selectedText = selection.toString().trim();
     
     const createCheckItem = (text) => 
-      `<div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><input type="checkbox" style="width:16px;height:16px;cursor:pointer;"/><span>${text}</span></div>`;
+      `<div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:${BRAND.blue};"/><span>${text}</span></div>`;
     
     if (selectedText) {
       const lines = selectedText.split(/\n/).filter(line => line.trim());
-      
       if (lines.length > 1) {
         const items = lines.map(line => createCheckItem(line.trim())).join('');
         document.execCommand('insertHTML', false, items);
@@ -287,18 +252,25 @@ const BrewedNotes = ({ isDark, user }) => {
     }
   }, []);
 
-  // Apply color to selection
+  // Apply text color
   const applyTextColor = useCallback((color) => {
     editorRef.current?.focus();
     document.execCommand('foreColor', false, color);
     setShowTextColorPicker(false);
   }, []);
 
-  // Apply highlight to selection
+  // Apply highlight
   const applyHighlight = useCallback((color) => {
     editorRef.current?.focus();
     document.execCommand('hiliteColor', false, color);
     setShowHighlightPicker(false);
+  }, []);
+
+  // Remove all formatting
+  const removeFormatting = useCallback(() => {
+    editorRef.current?.focus();
+    document.execCommand('removeFormat', false, null);
+    document.execCommand('formatBlock', false, 'p');
   }, []);
 
   // Toolbar button
@@ -345,14 +317,43 @@ const BrewedNotes = ({ isDark, user }) => {
 
   return (
     <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: FONTS.body }}>
-      {/* Custom editor styles */}
+      {/* Custom editor styles - IMPORTANT: Makes bullets and numbers visible */}
       <style>{`
+        .brewed-editor {
+          color: ${isDark ? '#f3f4f6' : '#111827'};
+        }
         .brewed-editor h1 { font-size: 2em; font-weight: bold; margin: 0.5em 0; }
         .brewed-editor h2 { font-size: 1.5em; font-weight: bold; margin: 0.5em 0; }
         .brewed-editor h3 { font-size: 1.25em; font-weight: bold; margin: 0.5em 0; }
-        .brewed-editor ul, .brewed-editor ol { padding-left: 1.5em; margin: 0.5em 0; }
-        .brewed-editor li { margin: 0.25em 0; }
         .brewed-editor p { margin: 0.5em 0; }
+        
+        /* BULLET LIST - Make bullets visible */
+        .brewed-editor ul {
+          list-style-type: disc !important;
+          padding-left: 2em !important;
+          margin: 0.5em 0 !important;
+        }
+        .brewed-editor ul li {
+          display: list-item !important;
+          margin: 0.25em 0 !important;
+        }
+        
+        /* NUMBERED LIST - Make numbers visible */
+        .brewed-editor ol {
+          list-style-type: decimal !important;
+          padding-left: 2em !important;
+          margin: 0.5em 0 !important;
+        }
+        .brewed-editor ol li {
+          display: list-item !important;
+          margin: 0.25em 0 !important;
+        }
+        
+        /* Nested lists */
+        .brewed-editor ul ul { list-style-type: circle !important; }
+        .brewed-editor ul ul ul { list-style-type: square !important; }
+        .brewed-editor ol ol { list-style-type: lower-alpha !important; }
+        .brewed-editor ol ol ol { list-style-type: lower-roman !important; }
       `}</style>
 
       <div className="mb-4 md:mb-6">
@@ -400,6 +401,32 @@ const BrewedNotes = ({ isDark, user }) => {
             <>
               {/* Toolbar */}
               <div className="p-2 border-b flex flex-wrap items-center gap-0.5" style={{ borderColor: theme.cardBorder }}>
+                {/* Font Family */}
+                <select
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onChange={(e) => { editorRef.current?.focus(); document.execCommand('fontName', false, e.target.value); }}
+                  disabled={!isEditing}
+                  className="h-7 px-1 text-xs border rounded bg-background disabled:opacity-40"
+                  style={{ borderColor: theme.cardBorder, width: '90px' }}
+                  defaultValue="Arial, sans-serif"
+                >
+                  {FONT_FAMILIES.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                </select>
+
+                {/* Font Size */}
+                <select
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onChange={(e) => { editorRef.current?.focus(); document.execCommand('fontSize', false, e.target.value); }}
+                  disabled={!isEditing}
+                  className="h-7 px-1 text-xs border rounded bg-background disabled:opacity-40"
+                  style={{ borderColor: theme.cardBorder, width: '65px' }}
+                  defaultValue="3"
+                >
+                  {FONT_SIZES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                </select>
+
+                <div className="w-px h-5 bg-border mx-1" />
+
                 {/* Undo/Redo */}
                 <ToolbarBtn onClick={() => execCmd('undo')} disabled={!isEditing} title="Undo"><Undo className="size-3.5" /></ToolbarBtn>
                 <ToolbarBtn onClick={() => execCmd('redo')} disabled={!isEditing} title="Redo"><Redo className="size-3.5" /></ToolbarBtn>
@@ -456,10 +483,13 @@ const BrewedNotes = ({ isDark, user }) => {
 
                 <div className="w-px h-5 bg-border mx-1" />
 
-                {/* Headings */}
-                <ToolbarBtn onClick={() => formatAsHeading('h1')} disabled={!isEditing} title="Heading 1"><Heading1 className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => formatAsHeading('h2')} disabled={!isEditing} title="Heading 2"><Heading2 className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => formatAsHeading('h3')} disabled={!isEditing} title="Heading 3"><Heading3 className="size-3.5" /></ToolbarBtn>
+                {/* Headings - click again to remove */}
+                <ToolbarBtn onClick={() => formatAsHeading('h1')} disabled={!isEditing} title="Heading 1 (click again to remove)"><Heading1 className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => formatAsHeading('h2')} disabled={!isEditing} title="Heading 2 (click again to remove)"><Heading2 className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => formatAsHeading('h3')} disabled={!isEditing} title="Heading 3 (click again to remove)"><Heading3 className="size-3.5" /></ToolbarBtn>
+
+                {/* Clear Formatting */}
+                <ToolbarBtn onClick={removeFormatting} disabled={!isEditing} title="Clear Formatting"><X className="size-3.5" /></ToolbarBtn>
 
                 {/* Save */}
                 <div className="ml-auto">
@@ -478,14 +508,14 @@ const BrewedNotes = ({ isDark, user }) => {
                   contentEditable={isEditing}
                   onDoubleClick={handleEditorDoubleClick}
                   className="brewed-editor h-full p-4 overflow-y-auto outline-none"
-                  style={{ color: theme.text, fontSize: '15px', lineHeight: '1.7', minHeight: '300px', cursor: isEditing ? 'text' : 'default' }}
+                  style={{ fontSize: '15px', lineHeight: '1.7', minHeight: '300px', cursor: isEditing ? 'text' : 'default' }}
                   suppressContentEditableWarning={true}
                 />
               </div>
 
               {/* Status */}
               <div className="px-4 py-2 border-t text-xs text-muted-foreground flex justify-between" style={{ borderColor: theme.cardBorder }}>
-                <span>{isEditing ? '✏️ Editing - Select text then click formatting buttons' : '👁️ View mode - Double-click to edit'}</span>
+                <span>{isEditing ? '✏️ Editing - Click H1/H2/H3 again to remove heading format' : '👁️ View mode - Double-click to edit'}</span>
                 <span>Saved: {new Date(selectedNote.updated_at).toLocaleString()}</span>
               </div>
             </>
@@ -495,12 +525,6 @@ const BrewedNotes = ({ isDark, user }) => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Help tooltip */}
-      <div className="fixed bottom-4 right-4 max-w-xs p-3 rounded-lg shadow-lg text-xs" style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}`, display: isEditing ? 'block' : 'none' }}>
-        <p className="font-medium mb-1" style={{ color: BRAND.blue }}>💡 Tip: Creating Lists</p>
-        <p className="text-muted-foreground">For multiple list items, put each item on a <strong>separate line</strong> (press Enter after each), select all lines, then click the list button.</p>
       </div>
 
       {/* Modals */}
