@@ -20,6 +20,7 @@ import {
   ImagePlus,
   Film,
   ScissorsLineDashed,
+  FileText,
 } from "lucide-react"
 
 import {
@@ -43,6 +44,7 @@ const homeItems = [
   { id: "dashboard", title: "Finance Tracker", icon: Wallet, path: "/" },
   { id: "vakita", title: "VAKita", icon: Headset, path: "/vakita" },
   { id: "taskmanager", title: "Task Manager", icon: CheckSquare, path: "/taskmanager" },
+  { id: "brewednotes", title: "Brewed Notes", icon: FileText, path: "/brewednotes" },
 ]
 
 const imageTools = [

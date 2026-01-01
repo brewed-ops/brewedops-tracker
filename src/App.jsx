@@ -18,6 +18,7 @@ import PDFSplit from './components/PDFSplit';
 import ImageToPDF from './components/ImageToPDF';
 import VideoCompressor from './components/VideoCompressor';
 import VideoTrimmer from './components/VideoTrimmer';
+import BrewedNotes from './components/BrewedNotes';
 import FinanceTracker from './components/FinanceTracker';
 
 
@@ -867,6 +868,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     switch (pathname) {
       case '/vakita': return 'vakita';
       case '/taskmanager': return 'taskmanager';
+      case '/brewednotes': return 'brewednotes';
       case '/pdfeditor': return 'pdfeditor';
       case '/bgremover': return 'bgremover';
       case '/imagecropper': return 'imagecropper';
@@ -893,6 +895,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case 'vakita': navigate('/vakita'); break;
       case 'taskmanager': navigate('/taskmanager'); break;
       case 'tasks': navigate('/taskmanager'); break;
+      case 'brewednotes': navigate('/brewednotes'); break;
       case 'pdfeditor': navigate('/pdfeditor'); break;
       case 'bgremover': navigate('/bgremover'); break;
       case 'imagecropper': navigate('/imagecropper'); break;
@@ -3398,6 +3401,8 @@ const getBudgetStatus = () => {
   <VAKita user={user} isDark={isDark} />
 ) : activeSection === 'taskmanager' ? (
   <TaskManager user={user} isDark={isDark} clients={[]} />
+) : activeSection === 'brewednotes' ? (
+  <BrewedNotes user={user} isDark={isDark} />
 ) : activeSection === 'pdfeditor' ? (
   <PDFEditor isDark={isDark} />
 ) : activeSection === 'bgremover' ? (
@@ -8751,6 +8756,7 @@ function AppContent() {
       {/* Public tool routes - redirect to login */}
       <Route path="/vakita" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
       <Route path="/taskmanager" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
+      <Route path="/brewednotes" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
       <Route path="/pdfeditor" element={<PDFEditor isDark={isDark} />} />
       <Route path="/bgremover" element={<BackgroundRemover isDark={isDark} />} />
       <Route path="/imagecropper" element={<ImageCropper isDark={isDark} />} />
