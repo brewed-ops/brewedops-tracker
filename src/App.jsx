@@ -732,6 +732,10 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
 // MAIN APP
 // ============================================
 const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
+  // URL routing hooks
+  const navigate = useNavigate();
+  const location = useLocation();
+  
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState(() => {
@@ -842,20 +846,34 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
   
   // Sidebar State
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [activeSection, setActiveSection] = useState(() => {
-    try { 
-      const saved = localStorage.getItem('brewedops_active_section');
-      if (['vakita', 'tasks', 'dashboard'].includes(saved)) {
-        return saved;
-      }
-      return 'dashboard'; 
-    } catch { return 'dashboard'; }
-  });
   
-  // Save activeSection to localStorage
-  useEffect(() => {
-    try { localStorage.setItem('brewedops_active_section', activeSection); } catch {}
-  }, [activeSection]);
+  // URL-based routing for sections
+  // (navigate and location are declared at the top of the component)
+  
+  // Derive activeSection from URL path
+  const getActiveSectionFromPath = (pathname) => {
+    switch (pathname) {
+      case '/vakita': return 'vakita';
+      case '/taskmanager': return 'taskmanager';
+      case '/pdfeditor': return 'pdfeditor';
+      case '/bgremover': return 'bgremover';
+      default: return 'dashboard';
+    }
+  };
+  
+  const activeSection = getActiveSectionFromPath(location.pathname);
+  
+  // Navigation function that updates URL
+  const setActiveSection = (section) => {
+    switch (section) {
+      case 'vakita': navigate('/vakita'); break;
+      case 'taskmanager': navigate('/taskmanager'); break;
+      case 'tasks': navigate('/taskmanager'); break; // Alias for backwards compatibility
+      case 'pdfeditor': navigate('/pdfeditor'); break;
+      case 'bgremover': navigate('/bgremover'); break;
+      default: navigate('/'); break;
+    }
+  };
   
   // Multi-Wallet System
   const [wallets, setWallets] = useState([]);
@@ -2946,12 +2964,8 @@ const getBudgetStatus = () => {
   return (
     <div className={isDark ? 'dark' : ''} style={{ minHeight: '100vh', backgroundColor: theme.bg }}>
     <SidebarProvider>
-      {/* shadcn Sidebar - Handles desktop/mobile automatically */}
-      <AppSidebar 
-        activeSection={activeSection} 
-        setActiveSection={setActiveSection}
-        isDark={isDark}
-      />
+      {/* shadcn Sidebar - Uses URL routing internally */}
+      <AppSidebar isDark={isDark} />
 
       <SidebarInset style={{ flex: 1, minWidth: 0, width: '100%' }}>
       {/* Header */}
@@ -3515,7 +3529,7 @@ const getBudgetStatus = () => {
      {/* Conditional Content based on activeSection */}
 {activeSection === 'vakita' ? (
   <VAKita user={user} isDark={isDark} />
-) : activeSection === 'tasks' ? (
+) : activeSection === 'taskmanager' ? (
   <TaskManager user={user} isDark={isDark} clients={[]} />
 ) : activeSection === 'pdfeditor' ? (
   <PDFEditor isDark={isDark} onNavigateHome={() => setActiveSection('dashboard')} />
@@ -8843,7 +8857,11 @@ function AppContent() {
       <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
       <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
       <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+      {/* Public tool routes - redirect to login */}
+      <Route path="/vakita" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
+      <Route path="/taskmanager" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
       <Route path="/pdfeditor" element={<PDFEditor isDark={isDark} onNavigateHome={() => navigate('/')} />} />
+      <Route path="/bgremover" element={<BackgroundRemover isDark={isDark} onNavigateHome={() => navigate('/')} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );

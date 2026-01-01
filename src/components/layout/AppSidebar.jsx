@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useNavigate, useLocation } from "react-router-dom"
 import {
   Wallet,
   Headset,
@@ -27,22 +28,25 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
-// Navigation items
+// Navigation items with URL paths
 const homeItems = [
   {
     id: "dashboard",
     title: "Finance Tracker",
     icon: Wallet,
+    path: "/",
   },
   {
     id: "vakita",
     title: "VAKita",
     icon: Headset,
+    path: "/vakita",
   },
   {
-    id: "tasks",
+    id: "taskmanager",
     title: "Task Manager",
     icon: CheckSquare,
+    path: "/taskmanager",
   },
 ]
 
@@ -51,29 +55,50 @@ const moreToolsItems = [
     id: "pdfeditor",
     title: "PDF Editor",
     icon: FileEdit,
+    path: "/pdfeditor",
     comingSoon: false,
   },
   {
     id: "bgremover",
     title: "BG Remover",
     icon: Sparkles,
+    path: "/bgremover",
     comingSoon: false,
   },
   {
     id: "image-tools",
     title: "Image Tools",
     icon: Image,
+    path: "/imagetools",
     comingSoon: true,
   },
   {
     id: "video-compress",
     title: "Video Compressor",
     icon: Video,
+    path: "/videocompress",
     comingSoon: true,
   },
 ]
 
-export function AppSidebar({ activeSection, setActiveSection, ...props }) {
+export function AppSidebar({ isDark, ...props }) {
+  const navigate = useNavigate()
+  const location = useLocation()
+
+  // Check if current path matches item path
+  const isActive = (path) => {
+    if (path === "/") {
+      return location.pathname === "/"
+    }
+    return location.pathname === path
+  }
+
+  const handleNavigation = (path, comingSoon = false) => {
+    if (!comingSoon) {
+      navigate(path)
+    }
+  }
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -82,6 +107,7 @@ export function AppSidebar({ activeSection, setActiveSection, ...props }) {
             <SidebarMenuButton
               size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              onClick={() => navigate("/")}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                 <img
@@ -109,8 +135,8 @@ export function AppSidebar({ activeSection, setActiveSection, ...props }) {
                 <SidebarMenuItem key={item.id}>
                   <SidebarMenuButton
                     tooltip={item.title}
-                    isActive={activeSection === item.id}
-                    onClick={() => setActiveSection(item.id)}
+                    isActive={isActive(item.path)}
+                    onClick={() => handleNavigation(item.path)}
                   >
                     <item.icon />
                     <span>{item.title}</span>
@@ -134,8 +160,8 @@ export function AppSidebar({ activeSection, setActiveSection, ...props }) {
                   <SidebarMenuButton
                     tooltip={item.comingSoon ? `${item.title} (Coming Soon)` : item.title}
                     disabled={item.comingSoon}
-                    isActive={activeSection === item.id}
-                    onClick={() => !item.comingSoon && setActiveSection(item.id)}
+                    isActive={isActive(item.path)}
+                    onClick={() => handleNavigation(item.path, item.comingSoon)}
                     className={item.comingSoon ? "opacity-50 cursor-not-allowed" : ""}
                   >
                     <item.icon />
