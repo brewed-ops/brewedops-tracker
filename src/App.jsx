@@ -13,12 +13,11 @@ import ImageResizer from './components/ImageResizer';
 import QRGenerator from './components/QRGenerator';
 import ColorPicker from './components/ColorPicker';
 import ImageToText from './components/ImageToText';
-import VideoToGif from './components/VideoToGif';
-import MemeGenerator from './components/MemeGenerator';
 import PDFMerge from './components/PDFMerge';
 import PDFSplit from './components/PDFSplit';
-import WatermarkMaker from './components/WatermarkMaker';
 import ImageToPDF from './components/ImageToPDF';
+import VideoCompressor from './components/VideoCompressor';
+import VideoTrimmer from './components/VideoTrimmer';
 import FinanceTracker from './components/FinanceTracker';
 
 
@@ -877,12 +876,11 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case '/qrgenerator': return 'qrgenerator';
       case '/colorpicker': return 'colorpicker';
       case '/imagetotext': return 'imagetotext';
-      case '/videotogif': return 'videotogif';
-      case '/memegenerator': return 'memegenerator';
       case '/pdfmerge': return 'pdfmerge';
       case '/pdfsplit': return 'pdfsplit';
-      case '/watermarkmaker': return 'watermarkmaker';
       case '/imagetopdf': return 'imagetopdf';
+      case '/videocompressor': return 'videocompressor';
+      case '/videotrimmer': return 'videotrimmer';
       default: return 'dashboard';
     }
   };
@@ -904,12 +902,11 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case 'qrgenerator': navigate('/qrgenerator'); break;
       case 'colorpicker': navigate('/colorpicker'); break;
       case 'imagetotext': navigate('/imagetotext'); break;
-      case 'videotogif': navigate('/videotogif'); break;
-      case 'memegenerator': navigate('/memegenerator'); break;
       case 'pdfmerge': navigate('/pdfmerge'); break;
       case 'pdfsplit': navigate('/pdfsplit'); break;
-      case 'watermarkmaker': navigate('/watermarkmaker'); break;
       case 'imagetopdf': navigate('/imagetopdf'); break;
+      case 'videocompressor': navigate('/videocompressor'); break;
+      case 'videotrimmer': navigate('/videotrimmer'); break;
       default: navigate('/'); break;
     }
   };
@@ -3615,18 +3612,16 @@ const getBudgetStatus = () => {
   <ColorPicker isDark={isDark} />
 ) : activeSection === 'imagetotext' ? (
   <ImageToText isDark={isDark} />
-) : activeSection === 'videotogif' ? (
-  <VideoToGif isDark={isDark} />
-) : activeSection === 'memegenerator' ? (
-  <MemeGenerator isDark={isDark} />
 ) : activeSection === 'pdfmerge' ? (
   <PDFMerge isDark={isDark} />
 ) : activeSection === 'pdfsplit' ? (
   <PDFSplit isDark={isDark} />
-) : activeSection === 'watermarkmaker' ? (
-  <WatermarkMaker isDark={isDark} />
 ) : activeSection === 'imagetopdf' ? (
   <ImageToPDF isDark={isDark} />
+) : activeSection === 'videocompressor' ? (
+  <VideoCompressor isDark={isDark} />
+) : activeSection === 'videotrimmer' ? (
+  <VideoTrimmer isDark={isDark} />
 ) : (
 
      <>
@@ -8961,12 +8956,11 @@ function AppContent() {
       <Route path="/qrgenerator" element={<QRGenerator isDark={isDark} />} />
       <Route path="/colorpicker" element={<ColorPicker isDark={isDark} />} />
       <Route path="/imagetotext" element={<ImageToText isDark={isDark} />} />
-      <Route path="/videotogif" element={<VideoToGif isDark={isDark} />} />
-      <Route path="/memegenerator" element={<MemeGenerator isDark={isDark} />} />
       <Route path="/pdfmerge" element={<PDFMerge isDark={isDark} />} />
       <Route path="/pdfsplit" element={<PDFSplit isDark={isDark} />} />
-      <Route path="/watermarkmaker" element={<WatermarkMaker isDark={isDark} />} />
       <Route path="/imagetopdf" element={<ImageToPDF isDark={isDark} />} />
+      <Route path="/videocompressor" element={<VideoCompressor isDark={isDark} />} />
+      <Route path="/videotrimmer" element={<VideoTrimmer isDark={isDark} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );

@@ -13,18 +13,13 @@ import {
   Minimize2,
   QrCode,
   ImageDown,
-  MoreHorizontal,
-  Image,
-  Video,
-  FileText,
   Palette,
   ScanText,
-  Film,
-  Smile,
   FileStack,
   Scissors,
   ImagePlus,
-  Stamp,
+  Film,
+  ScissorsLineDashed,
 } from "lucide-react"
 
 import {
@@ -50,130 +45,39 @@ const BRAND = {
 
 // Navigation items with URL paths
 const homeItems = [
-  {
-    id: "dashboard",
-    title: "Finance Tracker",
-    icon: Wallet,
-    path: "/",
-  },
-  {
-    id: "vakita",
-    title: "VAKita",
-    icon: Headset,
-    path: "/vakita",
-  },
-  {
-    id: "taskmanager",
-    title: "Task Manager",
-    icon: CheckSquare,
-    path: "/taskmanager",
-  },
+  { id: "dashboard", title: "Finance Tracker", icon: Wallet, path: "/" },
+  { id: "vakita", title: "VAKita", icon: Headset, path: "/vakita" },
+  { id: "taskmanager", title: "Task Manager", icon: CheckSquare, path: "/taskmanager" },
 ]
 
 // Image Tools
 const imageTools = [
-  {
-    id: "bgremover",
-    title: "BG Remover",
-    icon: Sparkles,
-    path: "/bgremover",
-  },
-  {
-    id: "imagecropper",
-    title: "Image Cropper",
-    icon: Crop,
-    path: "/imagecropper",
-  },
-  {
-    id: "imageresizer",
-    title: "Image Resizer",
-    icon: Minimize2,
-    path: "/imageresizer",
-  },
-  {
-    id: "imagecompressor",
-    title: "Image Compressor",
-    icon: ImageDown,
-    path: "/imagecompressor",
-  },
-  {
-    id: "imageconverter",
-    title: "Image Converter",
-    icon: RefreshCw,
-    path: "/imageconverter",
-  },
-  {
-    id: "colorpicker",
-    title: "Color Picker",
-    icon: Palette,
-    path: "/colorpicker",
-  },
-  {
-    id: "imagetotext",
-    title: "Image to Text",
-    icon: ScanText,
-    path: "/imagetotext",
-  },
-  {
-    id: "memegenerator",
-    title: "Meme Generator",
-    icon: Smile,
-    path: "/memegenerator",
-  },
-  {
-    id: "watermarkmaker",
-    title: "Watermark Maker",
-    icon: Stamp,
-    path: "/watermarkmaker",
-  },
-  {
-    id: "imagetopdf",
-    title: "Image to PDF",
-    icon: ImagePlus,
-    path: "/imagetopdf",
-  },
+  { id: "bgremover", title: "BG Remover", icon: Sparkles, path: "/bgremover" },
+  { id: "imagecropper", title: "Image Cropper", icon: Crop, path: "/imagecropper" },
+  { id: "imageresizer", title: "Image Resizer", icon: Minimize2, path: "/imageresizer" },
+  { id: "imagecompressor", title: "Image Compressor", icon: ImageDown, path: "/imagecompressor" },
+  { id: "imageconverter", title: "Image Converter", icon: RefreshCw, path: "/imageconverter" },
+  { id: "colorpicker", title: "Color Picker", icon: Palette, path: "/colorpicker" },
+  { id: "imagetotext", title: "Image to Text", icon: ScanText, path: "/imagetotext" },
+  { id: "imagetopdf", title: "Image to PDF", icon: ImagePlus, path: "/imagetopdf" },
 ]
 
 // Video Tools
 const videoTools = [
-  {
-    id: "videotogif",
-    title: "Video to GIF",
-    icon: Film,
-    path: "/videotogif",
-  },
+  { id: "videocompressor", title: "Video Compressor", icon: Film, path: "/videocompressor" },
+  { id: "videotrimmer", title: "Video Trimmer", icon: ScissorsLineDashed, path: "/videotrimmer" },
 ]
 
 // Document Tools
 const documentTools = [
-  {
-    id: "pdfeditor",
-    title: "PDF Editor",
-    icon: FileEdit,
-    path: "/pdfeditor",
-  },
-  {
-    id: "pdfmerge",
-    title: "PDF Merge",
-    icon: FileStack,
-    path: "/pdfmerge",
-  },
-  {
-    id: "pdfsplit",
-    title: "PDF Split",
-    icon: Scissors,
-    path: "/pdfsplit",
-  },
+  { id: "pdfeditor", title: "PDF Editor", icon: FileEdit, path: "/pdfeditor" },
+  { id: "pdfmerge", title: "PDF Merge", icon: FileStack, path: "/pdfmerge" },
+  { id: "pdfsplit", title: "PDF Split", icon: Scissors, path: "/pdfsplit" },
 ]
 
 // Other Tools
 const otherTools = [
-  {
-    id: "qrgenerator",
-    title: "QR Generator",
-    icon: QrCode,
-    path: "/qrgenerator",
-  },
+  { id: "qrgenerator", title: "QR Generator", icon: QrCode, path: "/qrgenerator" },
 ]
 
 export function AppSidebar({ isDark, ...props }) {
@@ -181,41 +85,28 @@ export function AppSidebar({ isDark, ...props }) {
   const location = useLocation()
   const { setOpenMobile, isMobile } = useSidebar()
 
-  // Check if current path matches item path
   const isActive = (path) => {
-    if (path === "/") {
-      return location.pathname === "/"
-    }
+    if (path === "/") return location.pathname === "/"
     return location.pathname === path
   }
 
-  // Handle navigation and close sidebar on mobile
   const handleNavigation = (path) => {
     navigate(path)
-    if (isMobile) {
-      setOpenMobile(false)
-    }
+    if (isMobile) setOpenMobile(false)
   }
 
-  // Active item styles
   const getItemStyle = (path) => {
     if (isActive(path)) {
-      return {
-        backgroundColor: BRAND.blue,
-        color: '#ffffff',
-      }
+      return { backgroundColor: BRAND.blue, color: '#ffffff' }
     }
     return {}
   }
 
   const getIconStyle = (path) => {
-    if (isActive(path)) {
-      return { color: '#ffffff' }
-    }
+    if (isActive(path)) return { color: '#ffffff' }
     return {}
   }
 
-  // Render menu items helper
   const renderMenuItems = (items) => (
     <SidebarMenu>
       {items.map((item) => (
@@ -226,14 +117,25 @@ export function AppSidebar({ isDark, ...props }) {
             onClick={() => handleNavigation(item.path)}
             style={getItemStyle(item.path)}
             className={isActive(item.path) ? "font-medium" : ""}
+            size="sm"
           >
-            <item.icon style={getIconStyle(item.path)} />
-            <span>{item.title}</span>
+            <item.icon className="size-4" style={getIconStyle(item.path)} />
+            <span className="text-sm">{item.title}</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       ))}
     </SidebarMenu>
   )
+
+  // Category label style
+  const categoryStyle = {
+    fontSize: '11px',
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    letterSpacing: '0.5px',
+    color: isDark ? '#6b7280' : '#9ca3af',
+    padding: '8px 12px 4px 12px',
+  }
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -246,17 +148,10 @@ export function AppSidebar({ isDark, ...props }) {
               onClick={() => handleNavigation("/")}
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
-                <img
-                  src="https://i.imgur.com/R52jwPv.png"
-                  alt="BrewedOps"
-                  className="size-6 rounded"
-                />
+                <img src="https://i.imgur.com/R52jwPv.png" alt="BrewedOps" className="size-6 rounded" />
               </div>
               <div className="flex-1 text-left text-sm leading-tight">
-                <span 
-                  className="truncate font-bold text-base"
-                  style={{ fontFamily: "'Montserrat', sans-serif" }}
-                >
+                <span className="truncate font-bold text-base" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                   <span style={{ color: isDark ? '#ffffff' : BRAND.brown }}>Brewed</span>
                   <span style={{ color: BRAND.blue }}>Ops</span>
                 </span>
@@ -266,76 +161,52 @@ export function AppSidebar({ isDark, ...props }) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="gap-0">
         {/* Home Section */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Home</SidebarGroupLabel>
-          <SidebarGroupContent>
+        <SidebarGroup className="py-2">
+          <div style={categoryStyle}>Home</div>
+          <SidebarGroupContent className="px-2">
             {renderMenuItems(homeItems)}
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* More Tools Header */}
-        <SidebarGroup>
-          <SidebarGroupLabel>
-            <MoreHorizontal className="mr-2 size-4" />
-            More Tools
-          </SidebarGroupLabel>
-        </SidebarGroup>
-
         {/* Image Tools */}
-        <SidebarGroup>
-          <SidebarGroupLabel>
-            <Image className="mr-2 size-4" />
-            Image Tools
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
+        <SidebarGroup className="py-2">
+          <div style={categoryStyle}>Image Tools</div>
+          <SidebarGroupContent className="px-2">
             {renderMenuItems(imageTools)}
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Video Tools */}
-        <SidebarGroup>
-          <SidebarGroupLabel>
-            <Video className="mr-2 size-4" />
-            Video Tools
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
+        <SidebarGroup className="py-2">
+          <div style={categoryStyle}>Video Tools</div>
+          <SidebarGroupContent className="px-2">
             {renderMenuItems(videoTools)}
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Document Tools */}
-        <SidebarGroup>
-          <SidebarGroupLabel>
-            <FileText className="mr-2 size-4" />
-            Document Tools
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
+        <SidebarGroup className="py-2">
+          <div style={categoryStyle}>Document Tools</div>
+          <SidebarGroupContent className="px-2">
             {renderMenuItems(documentTools)}
           </SidebarGroupContent>
         </SidebarGroup>
 
         {/* Other Tools */}
-        <SidebarGroup>
-          <SidebarGroupLabel>
-            <MoreHorizontal className="mr-2 size-4" />
-            Other Tools
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
+        <SidebarGroup className="py-2">
+          <div style={categoryStyle}>Other Tools</div>
+          <SidebarGroupContent className="px-2">
             {renderMenuItems(otherTools)}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton size="sm" className="text-xs text-muted-foreground justify-center">
-              <span>© 2025 BrewedOps</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+      <SidebarFooter className="p-2">
+        <div className="text-[10px] text-muted-foreground text-center py-2">
+          © 2025 BrewedOps
+        </div>
       </SidebarFooter>
 
       <SidebarRail />
