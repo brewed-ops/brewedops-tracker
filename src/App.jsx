@@ -141,6 +141,149 @@ const getBadgeStyle = (type, isDark) => {
 };
 
 // ============================================
+// ICON CLOUD COMPONENT - Interactive 3D Tool Icons
+// ============================================
+const IconCloud = ({ isDark }) => {
+  const canvasRef = useRef(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  
+  // Tool icons with colors matching brand categories
+  const toolIcons = [
+    // Productivity (Blue)
+    { emoji: '💰', label: 'Finance Tracker', color: '#004AAC' },
+    { emoji: '🎧', label: 'VAKita', color: '#004AAC' },
+    { emoji: '✅', label: 'Task Manager', color: '#004AAC' },
+    { emoji: '📝', label: 'Brewed Notes', color: '#004AAC' },
+    // Image Tools (Purple)
+    { emoji: '🖼️', label: 'BG Remover', color: '#8b5cf6' },
+    { emoji: '✂️', label: 'Image Cropper', color: '#8b5cf6' },
+    { emoji: '📐', label: 'Image Resizer', color: '#8b5cf6' },
+    { emoji: '📦', label: 'Compressor', color: '#8b5cf6' },
+    { emoji: '🔄', label: 'Converter', color: '#8b5cf6' },
+    { emoji: '🎨', label: 'Color Picker', color: '#8b5cf6' },
+    { emoji: '📄', label: 'Image to PDF', color: '#8b5cf6' },
+    // Video Tools (Red)
+    { emoji: '🎬', label: 'Video Compress', color: '#ef4444' },
+    { emoji: '🎞️', label: 'Video Trimmer', color: '#ef4444' },
+    // Document Tools (Green)
+    { emoji: '📑', label: 'PDF Editor', color: '#22c55e' },
+    { emoji: '📚', label: 'PDF Merge', color: '#22c55e' },
+    { emoji: '📂', label: 'PDF Split', color: '#22c55e' },
+    // Other Tools (Orange)
+    { emoji: '📱', label: 'QR Generator', color: '#f59e0b' },
+    { emoji: '🔍', label: 'Find Replace', color: '#f59e0b' },
+    { emoji: '🔠', label: 'Case Converter', color: '#f59e0b' },
+    { emoji: '🔢', label: 'Word Counter', color: '#f59e0b' },
+  ];
+
+  useEffect(() => {
+    // Load TagCanvas library
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/TagCanvas@2.11.20230714/TagCanvas.min.js';
+    script.async = true;
+    script.onload = () => setIsLoaded(true);
+    document.body.appendChild(script);
+    
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded || !canvasRef.current) return;
+    
+    try {
+      // @ts-ignore
+      window.TagCanvas.Start('iconCloudCanvas', 'iconCloudTags', {
+        textColour: isDark ? '#ffffff' : '#3F200C',
+        outlineColour: 'transparent',
+        reverse: true,
+        depth: 0.8,
+        maxSpeed: 0.04,
+        minSpeed: 0.02,
+        initial: [0.1, -0.1],
+        decel: 0.95,
+        textFont: 'Poppins, sans-serif',
+        textHeight: 18,
+        imageScale: 1.5,
+        fadeIn: 800,
+        wheelZoom: false,
+        pinchZoom: false,
+        shuffleTags: true,
+        shape: 'sphere',
+        lock: 'xy',
+        zoom: 1,
+        noSelect: true,
+        noMouse: false,
+        imageRadius: 8,
+      });
+    } catch (e) {
+      console.log('TagCanvas error:', e);
+    }
+    
+    return () => {
+      try {
+        // @ts-ignore
+        window.TagCanvas && window.TagCanvas.Delete('iconCloudCanvas');
+      } catch (e) {}
+    };
+  }, [isLoaded, isDark]);
+
+  return (
+    <div style={{ position: 'relative', width: '100%', maxWidth: '500px', height: '350px' }}>
+      <canvas 
+        ref={canvasRef}
+        id="iconCloudCanvas" 
+        width="500" 
+        height="350"
+        style={{ 
+          width: '100%', 
+          height: '100%',
+          maxWidth: '500px',
+          display: isLoaded ? 'block' : 'none'
+        }}
+      />
+      <div id="iconCloudTags" style={{ display: 'none' }}>
+        {toolIcons.map((tool, i) => (
+          <a 
+            key={i} 
+            href="#" 
+            onClick={(e) => e.preventDefault()}
+            style={{ 
+              fontSize: '32px',
+              textDecoration: 'none',
+              padding: '8px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px'
+            }}
+          >
+            <span style={{ fontSize: '28px' }}>{tool.emoji}</span>
+          </a>
+        ))}
+      </div>
+      {!isLoaded && (
+        <div style={{ 
+          position: 'absolute', 
+          top: '50%', 
+          left: '50%', 
+          transform: 'translate(-50%, -50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <Loader2 style={{ width: '32px', height: '32px', color: '#004AAC', animation: 'spin 1s linear infinite' }} />
+          <span style={{ fontSize: '14px', color: isDark ? '#a1a1aa' : '#71717a' }}>Loading tools...</span>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
 // HOME PAGE (Landing) - BrewedOps Brand Design
 // ============================================
 
@@ -412,6 +555,17 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 <div style={{ fontSize: '13px', color: theme.textMuted, fontWeight: '500', fontFamily: FONTS.body }}>{stat.label}</div>
               </div>
             ))}
+          </div>
+          
+          {/* Icon Cloud */}
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            alignItems: 'center', 
+            marginBottom: '40px',
+            minHeight: isSmall ? '280px' : '350px'
+          }}>
+            <IconCloud isDark={isDark} />
           </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : 'repeat(2, 1fr)', gap: '20px', textAlign: 'left' }}>
