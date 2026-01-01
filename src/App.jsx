@@ -143,162 +143,40 @@ const getBadgeStyle = (type, isDark) => {
 // ============================================
 // ICON CLOUD COMPONENT - Using Magic UI
 // ============================================
+// Note: Make sure you have installed: npx shadcn@latest add "https://magicui.design/r/icon-cloud.json"
 import { IconCloud } from "@/components/ui/icon-cloud";
 
-// Tool icons as SVG components for the cloud
-const ToolIcons = {
-  // Finance/Money
-  wallet: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>
-    </svg>
-  ),
-  // Headphones/VA
-  headset: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/>
-    </svg>
-  ),
-  // Task/Check
-  checkSquare: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-    </svg>
-  ),
-  // Notes/File
-  fileText: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="16" x2="8" y1="13" y2="13"/><line x1="16" x2="8" y1="17" y2="17"/><line x1="10" x2="8" y1="9" y2="9"/>
-    </svg>
-  ),
-  // Image
-  image: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>
-    </svg>
-  ),
-  // Crop
-  crop: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/>
-    </svg>
-  ),
-  // Resize
-  minimize: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/>
-    </svg>
-  ),
-  // Compress
-  archive: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>
-    </svg>
-  ),
-  // Convert/Refresh
-  refresh: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>
-    </svg>
-  ),
-  // Color/Palette
-  palette: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.555C21.965 6.012 17.461 2 12 2z"/>
-    </svg>
-  ),
-  // Video
-  video: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2" ry="2"/>
-    </svg>
-  ),
-  // Scissors
-  scissors: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" x2="8.12" y1="4" y2="15.88"/><line x1="14.47" x2="20" y1="14.48" y2="20"/><line x1="8.12" x2="12" y1="8.12" y2="12"/>
-    </svg>
-  ),
-  // PDF/File
-  filePdf: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/>
-    </svg>
-  ),
-  // Merge/Stack
-  layers: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 12.5-8.58 3.91a2 2 0 0 1-1.66 0L2 12.5"/><path d="m22 17.5-8.58 3.91a2 2 0 0 1-1.66 0L2 17.5"/>
-    </svg>
-  ),
-  // Split
-  split: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M12 22v-8.3a4 4 0 0 0-1.172-2.872L3 3"/><path d="m15 9 6-6"/>
-    </svg>
-  ),
-  // QR Code
-  qrCode: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>
-    </svg>
-  ),
-  // Search/Find
-  search: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
-    </svg>
-  ),
-  // Case/Text
-  type: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="4 7 4 4 20 4 20 7"/><line x1="9" x2="15" y1="20" y2="20"/><line x1="12" x2="12" y1="4" y2="20"/>
-    </svg>
-  ),
-  // Hash/Counter
-  hash: () => (
-    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/><line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>
-    </svg>
-  ),
-};
-
 const IconCloudDemo = () => {
+  // Using Simple Icons CDN for recognizable tool-related icons
+  const slugs = [
+    "amazonaws", // cloud/storage
+    "adobephotoshop", // image editing
+    "adobepremierepro", // video
+    "adobeacrobatreader", // PDF
+    "notion", // notes
+    "todoist", // tasks
+    "stripe", // finance
+    "googlesheets", // spreadsheets
+    "canva", // design
+    "figma", // design
+    "github", // productivity
+    "slack", // productivity
+    "trello", // tasks
+    "asana", // tasks
+    "dropbox", // files
+    "googledrive", // files
+    "evernote", // notes
+    "microsoft", // office
+  ];
+
+  const images = slugs.map(
+    (slug) => `https://cdn.simpleicons.org/${slug}/${slug}`
+  );
+
   return (
-    <IconCloud
-      icons={[
-        // Productivity Tools (repeat for density)
-        <ToolIcons.wallet key="wallet1" />,
-        <ToolIcons.headset key="headset1" />,
-        <ToolIcons.checkSquare key="check1" />,
-        <ToolIcons.fileText key="notes1" />,
-        // Image Tools
-        <ToolIcons.image key="image1" />,
-        <ToolIcons.crop key="crop1" />,
-        <ToolIcons.minimize key="resize1" />,
-        <ToolIcons.archive key="compress1" />,
-        <ToolIcons.refresh key="convert1" />,
-        <ToolIcons.palette key="palette1" />,
-        <ToolIcons.filePdf key="imgpdf1" />,
-        // Video Tools
-        <ToolIcons.video key="video1" />,
-        <ToolIcons.scissors key="scissors1" />,
-        // Document Tools
-        <ToolIcons.filePdf key="pdf1" />,
-        <ToolIcons.layers key="merge1" />,
-        <ToolIcons.split key="split1" />,
-        // Other Tools
-        <ToolIcons.qrCode key="qr1" />,
-        <ToolIcons.search key="search1" />,
-        <ToolIcons.type key="type1" />,
-        <ToolIcons.hash key="hash1" />,
-        // Duplicates for fuller cloud
-        <ToolIcons.wallet key="wallet2" />,
-        <ToolIcons.headset key="headset2" />,
-        <ToolIcons.image key="image2" />,
-        <ToolIcons.video key="video2" />,
-      ]}
-    />
+    <div className="relative flex size-full items-center justify-center overflow-hidden">
+      <IconCloud images={images} />
+    </div>
   );
 };
 
