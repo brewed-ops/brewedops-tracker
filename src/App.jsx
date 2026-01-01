@@ -147,26 +147,78 @@ const getBadgeStyle = (type, isDark) => {
 import { IconCloud } from "@/components/ui/icon-cloud";
 
 const IconCloudDemo = () => {
-  // Using Simple Icons CDN for recognizable tool-related icons
+  // Maximum recognizable brand/tool icons
   const slugs = [
-    "amazonaws", // cloud/storage
-    "adobephotoshop", // image editing
-    "adobepremierepro", // video
-    "adobeacrobatreader", // PDF
-    "notion", // notes
-    "todoist", // tasks
-    "stripe", // finance
-    "googlesheets", // spreadsheets
-    "canva", // design
-    "figma", // design
-    "github", // productivity
-    "slack", // productivity
-    "trello", // tasks
-    "asana", // tasks
-    "dropbox", // files
-    "googledrive", // files
-    "evernote", // notes
-    "microsoft", // office
+    // Design & Creative
+    "adobephotoshop",
+    "adobeillustrator",
+    "adobepremierepro",
+    "adobeaftereffects",
+    "adobelightroom",
+    "adobexd",
+    "figma",
+    "canva",
+    "sketch",
+    // Productivity & Notes
+    "notion",
+    "evernote",
+    "todoist",
+    "trello",
+    "asana",
+    "slack",
+    "discord",
+    "zoom",
+    "microsoftteams",
+    // Development & Code
+    "github",
+    "gitlab",
+    "visualstudiocode",
+    "react",
+    "nodedotjs",
+    "javascript",
+    "typescript",
+    "html5",
+    "css3",
+    // Cloud & Storage
+    "googledrive",
+    "dropbox",
+    "icloud",
+    "amazonaws",
+    "googlecloud",
+    "firebase",
+    // Office & Documents
+    "microsoftword",
+    "microsoftexcel",
+    "microsoftpowerpoint",
+    "adobeacrobatreader",
+    "googledocs",
+    "googlesheets",
+    // Finance & Business
+    "stripe",
+    "paypal",
+    "shopify",
+    "quickbooks",
+    // Social & Communication
+    "gmail",
+    "whatsapp",
+    "telegram",
+    "linkedin",
+    "twitter",
+    "instagram",
+    "facebook",
+    "youtube",
+    "tiktok",
+    // Other Tools
+    "zapier",
+    "wordpress",
+    "wix",
+    "squarespace",
+    "mailchimp",
+    "hubspot",
+    "salesforce",
+    "monday",
+    "clickup",
+    "airtable",
   ];
 
   const images = slugs.map(
