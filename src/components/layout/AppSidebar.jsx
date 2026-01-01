@@ -14,6 +14,17 @@ import {
   QrCode,
   ImageDown,
   MoreHorizontal,
+  Image,
+  Video,
+  FileText,
+  Palette,
+  ScanText,
+  Film,
+  Smile,
+  FileStack,
+  Scissors,
+  ImagePlus,
+  Stamp,
 } from "lucide-react"
 
 import {
@@ -59,13 +70,8 @@ const homeItems = [
   },
 ]
 
-const moreToolsItems = [
-  {
-    id: "pdfeditor",
-    title: "PDF Editor",
-    icon: FileEdit,
-    path: "/pdfeditor",
-  },
+// Image Tools
+const imageTools = [
   {
     id: "bgremover",
     title: "BG Remover",
@@ -79,10 +85,10 @@ const moreToolsItems = [
     path: "/imagecropper",
   },
   {
-    id: "imageconverter",
-    title: "Image Converter",
-    icon: RefreshCw,
-    path: "/imageconverter",
+    id: "imageresizer",
+    title: "Image Resizer",
+    icon: Minimize2,
+    path: "/imageresizer",
   },
   {
     id: "imagecompressor",
@@ -91,11 +97,77 @@ const moreToolsItems = [
     path: "/imagecompressor",
   },
   {
-    id: "imageresizer",
-    title: "Image Resizer",
-    icon: Minimize2,
-    path: "/imageresizer",
+    id: "imageconverter",
+    title: "Image Converter",
+    icon: RefreshCw,
+    path: "/imageconverter",
   },
+  {
+    id: "colorpicker",
+    title: "Color Picker",
+    icon: Palette,
+    path: "/colorpicker",
+  },
+  {
+    id: "imagetotext",
+    title: "Image to Text",
+    icon: ScanText,
+    path: "/imagetotext",
+  },
+  {
+    id: "memegenerator",
+    title: "Meme Generator",
+    icon: Smile,
+    path: "/memegenerator",
+  },
+  {
+    id: "watermarkmaker",
+    title: "Watermark Maker",
+    icon: Stamp,
+    path: "/watermarkmaker",
+  },
+  {
+    id: "imagetopdf",
+    title: "Image to PDF",
+    icon: ImagePlus,
+    path: "/imagetopdf",
+  },
+]
+
+// Video Tools
+const videoTools = [
+  {
+    id: "videotogif",
+    title: "Video to GIF",
+    icon: Film,
+    path: "/videotogif",
+  },
+]
+
+// Document Tools
+const documentTools = [
+  {
+    id: "pdfeditor",
+    title: "PDF Editor",
+    icon: FileEdit,
+    path: "/pdfeditor",
+  },
+  {
+    id: "pdfmerge",
+    title: "PDF Merge",
+    icon: FileStack,
+    path: "/pdfmerge",
+  },
+  {
+    id: "pdfsplit",
+    title: "PDF Split",
+    icon: Scissors,
+    path: "/pdfsplit",
+  },
+]
+
+// Other Tools
+const otherTools = [
   {
     id: "qrgenerator",
     title: "QR Generator",
@@ -120,7 +192,6 @@ export function AppSidebar({ isDark, ...props }) {
   // Handle navigation and close sidebar on mobile
   const handleNavigation = (path) => {
     navigate(path)
-    // Close sidebar on mobile after navigation
     if (isMobile) {
       setOpenMobile(false)
     }
@@ -143,6 +214,26 @@ export function AppSidebar({ isDark, ...props }) {
     }
     return {}
   }
+
+  // Render menu items helper
+  const renderMenuItems = (items) => (
+    <SidebarMenu>
+      {items.map((item) => (
+        <SidebarMenuItem key={item.id}>
+          <SidebarMenuButton
+            tooltip={item.title}
+            isActive={isActive(item.path)}
+            onClick={() => handleNavigation(item.path)}
+            style={getItemStyle(item.path)}
+            className={isActive(item.path) ? "font-medium" : ""}
+          >
+            <item.icon style={getIconStyle(item.path)} />
+            <span>{item.title}</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      ))}
+    </SidebarMenu>
+  )
 
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -180,48 +271,59 @@ export function AppSidebar({ isDark, ...props }) {
         <SidebarGroup>
           <SidebarGroupLabel>Home</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {homeItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    isActive={isActive(item.path)}
-                    onClick={() => handleNavigation(item.path)}
-                    style={getItemStyle(item.path)}
-                    className={isActive(item.path) ? "font-medium" : ""}
-                  >
-                    <item.icon style={getIconStyle(item.path)} />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            {renderMenuItems(homeItems)}
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* More Tools Section */}
+        {/* More Tools Header */}
         <SidebarGroup>
           <SidebarGroupLabel>
             <MoreHorizontal className="mr-2 size-4" />
             More Tools
           </SidebarGroupLabel>
+        </SidebarGroup>
+
+        {/* Image Tools */}
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <Image className="mr-2 size-4" />
+            Image Tools
+          </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {moreToolsItems.map((item) => (
-                <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    tooltip={item.title}
-                    isActive={isActive(item.path)}
-                    onClick={() => handleNavigation(item.path)}
-                    style={getItemStyle(item.path)}
-                    className={isActive(item.path) ? "font-medium" : ""}
-                  >
-                    <item.icon style={getIconStyle(item.path)} />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            {renderMenuItems(imageTools)}
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Video Tools */}
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <Video className="mr-2 size-4" />
+            Video Tools
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            {renderMenuItems(videoTools)}
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Document Tools */}
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <FileText className="mr-2 size-4" />
+            Document Tools
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            {renderMenuItems(documentTools)}
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        {/* Other Tools */}
+        <SidebarGroup>
+          <SidebarGroupLabel>
+            <MoreHorizontal className="mr-2 size-4" />
+            Other Tools
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            {renderMenuItems(otherTools)}
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>

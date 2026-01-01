@@ -11,6 +11,14 @@ import ImageConverter from './components/ImageConverter';
 import ImageCompressor from './components/ImageCompressor';
 import ImageResizer from './components/ImageResizer';
 import QRGenerator from './components/QRGenerator';
+import ColorPicker from './components/ColorPicker';
+import ImageToText from './components/ImageToText';
+import VideoToGif from './components/VideoToGif';
+import MemeGenerator from './components/MemeGenerator';
+import PDFMerge from './components/PDFMerge';
+import PDFSplit from './components/PDFSplit';
+import WatermarkMaker from './components/WatermarkMaker';
+import ImageToPDF from './components/ImageToPDF';
 import FinanceTracker from './components/FinanceTracker';
 
 
@@ -867,6 +875,14 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case '/imagecompressor': return 'imagecompressor';
       case '/imageresizer': return 'imageresizer';
       case '/qrgenerator': return 'qrgenerator';
+      case '/colorpicker': return 'colorpicker';
+      case '/imagetotext': return 'imagetotext';
+      case '/videotogif': return 'videotogif';
+      case '/memegenerator': return 'memegenerator';
+      case '/pdfmerge': return 'pdfmerge';
+      case '/pdfsplit': return 'pdfsplit';
+      case '/watermarkmaker': return 'watermarkmaker';
+      case '/imagetopdf': return 'imagetopdf';
       default: return 'dashboard';
     }
   };
@@ -878,7 +894,7 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
     switch (section) {
       case 'vakita': navigate('/vakita'); break;
       case 'taskmanager': navigate('/taskmanager'); break;
-      case 'tasks': navigate('/taskmanager'); break; // Alias for backwards compatibility
+      case 'tasks': navigate('/taskmanager'); break;
       case 'pdfeditor': navigate('/pdfeditor'); break;
       case 'bgremover': navigate('/bgremover'); break;
       case 'imagecropper': navigate('/imagecropper'); break;
@@ -886,6 +902,14 @@ const ExpenseTrackerApp = ({ user, onLogout, isDark, setIsDark }) => {
       case 'imagecompressor': navigate('/imagecompressor'); break;
       case 'imageresizer': navigate('/imageresizer'); break;
       case 'qrgenerator': navigate('/qrgenerator'); break;
+      case 'colorpicker': navigate('/colorpicker'); break;
+      case 'imagetotext': navigate('/imagetotext'); break;
+      case 'videotogif': navigate('/videotogif'); break;
+      case 'memegenerator': navigate('/memegenerator'); break;
+      case 'pdfmerge': navigate('/pdfmerge'); break;
+      case 'pdfsplit': navigate('/pdfsplit'); break;
+      case 'watermarkmaker': navigate('/watermarkmaker'); break;
+      case 'imagetopdf': navigate('/imagetopdf'); break;
       default: navigate('/'); break;
     }
   };
@@ -3587,6 +3611,22 @@ const getBudgetStatus = () => {
   <ImageResizer isDark={isDark} />
 ) : activeSection === 'qrgenerator' ? (
   <QRGenerator isDark={isDark} />
+) : activeSection === 'colorpicker' ? (
+  <ColorPicker isDark={isDark} />
+) : activeSection === 'imagetotext' ? (
+  <ImageToText isDark={isDark} />
+) : activeSection === 'videotogif' ? (
+  <VideoToGif isDark={isDark} />
+) : activeSection === 'memegenerator' ? (
+  <MemeGenerator isDark={isDark} />
+) : activeSection === 'pdfmerge' ? (
+  <PDFMerge isDark={isDark} />
+) : activeSection === 'pdfsplit' ? (
+  <PDFSplit isDark={isDark} />
+) : activeSection === 'watermarkmaker' ? (
+  <WatermarkMaker isDark={isDark} />
+) : activeSection === 'imagetopdf' ? (
+  <ImageToPDF isDark={isDark} />
 ) : (
 
      <>
@@ -8919,6 +8959,14 @@ function AppContent() {
       <Route path="/imagecompressor" element={<ImageCompressor isDark={isDark} />} />
       <Route path="/imageresizer" element={<ImageResizer isDark={isDark} />} />
       <Route path="/qrgenerator" element={<QRGenerator isDark={isDark} />} />
+      <Route path="/colorpicker" element={<ColorPicker isDark={isDark} />} />
+      <Route path="/imagetotext" element={<ImageToText isDark={isDark} />} />
+      <Route path="/videotogif" element={<VideoToGif isDark={isDark} />} />
+      <Route path="/memegenerator" element={<MemeGenerator isDark={isDark} />} />
+      <Route path="/pdfmerge" element={<PDFMerge isDark={isDark} />} />
+      <Route path="/pdfsplit" element={<PDFSplit isDark={isDark} />} />
+      <Route path="/watermarkmaker" element={<WatermarkMaker isDark={isDark} />} />
+      <Route path="/imagetopdf" element={<ImageToPDF isDark={isDark} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );
