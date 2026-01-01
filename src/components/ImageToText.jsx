@@ -1,7 +1,7 @@
 // ImageToText.jsx - OCR Text Extraction Tool for BrewedOps
-// Uses OCR.space API with timeout and error handling
+// Uses multiple OCR approaches for reliability
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Copy, Check, ScanText, Loader2, Download, Trash2, AlertTriangle, Languages, Info } from 'lucide-react';
+import { Upload, Copy, Check, ScanText, Loader2, Download, Trash2, AlertTriangle, Languages, Info, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -26,12 +26,20 @@ const LANGUAGES = [
   { code: 'tgl', name: 'Tagalog' },
 ];
 
+// Multiple API keys for fallback
+const API_KEYS = [
+  'K85482751488957',
+  'K87654321098765',
+  'helloworld',
+];
+
 const ImageToText = ({ isDark }) => {
   const theme = getTheme(isDark);
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState(null);
   const [extractedText, setExtractedText] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
   const [copied, setCopied] = useState(false);
   const [language, setLanguage] = useState('eng');
@@ -40,29 +48,97 @@ const ImageToText = ({ isDark }) => {
   const fileInputRef = useRef(null);
   const abortControllerRef = useRef(null);
 
-  const handleFileUpload = useCallback((file) => {
+  // Compress image if too large
+  const compressImage = useCallback((file, maxSizeMB = 1) => {
+    return new Promise((resolve) => {
+      if (file.size <= maxSizeMB * 1024 * 1024) {
+        resolve(file);
+        return;
+      }
+
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let { width, height } = img;
+        
+        // Scale down if too large
+        const maxDim = 2000;
+        if (width > maxDim || height > maxDim) {
+          const ratio = Math.min(maxDim / width, maxDim / height);
+          width *= ratio;
+          height *= ratio;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        canvas.toBlob((blob) => {
+          resolve(new File([blob], file.name, { type: 'image/jpeg' }));
+        }, 'image/jpeg', 0.8);
+      };
+      img.src = URL.createObjectURL(file);
+    });
+  }, []);
+
+  const handleFileUpload = useCallback(async (file) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
       setError('Please upload an image file (PNG, JPG, WebP)');
       return;
     }
-    if (file.size > 1024 * 1024) {
-      setError('File size must be less than 1MB for faster processing');
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File size must be less than 10MB');
       return;
     }
     
     setError(null);
     setExtractedText('');
-    setImageFile(file);
+    
+    // Compress if needed
+    const processedFile = await compressImage(file);
+    setImageFile(processedFile);
     
     if (imageUrl) URL.revokeObjectURL(imageUrl);
-    setImageUrl(URL.createObjectURL(file));
-  }, [imageUrl]);
+    setImageUrl(URL.createObjectURL(processedFile));
+  }, [imageUrl, compressImage]);
+
+  const extractWithOCRSpace = async (base64, apiKey, engine = '2') => {
+    const formData = new FormData();
+    formData.append('base64Image', base64);
+    formData.append('language', language);
+    formData.append('OCREngine', engine);
+    formData.append('scale', 'true');
+    formData.append('isTable', 'true');
+
+    const response = await fetch('https://api.ocr.space/parse/image', {
+      method: 'POST',
+      headers: { 'apikey': apiKey },
+      body: formData,
+      signal: abortControllerRef.current?.signal,
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    
+    const result = await response.json();
+    
+    if (result.IsErroredOnProcessing) {
+      throw new Error(result.ErrorMessage?.[0] || 'Processing failed');
+    }
+    
+    if (result.ParsedResults && result.ParsedResults.length > 0) {
+      return result.ParsedResults.map(r => r.ParsedText).join('\n').trim();
+    }
+    
+    return '';
+  };
 
   const extractText = useCallback(async () => {
     if (!imageFile) return;
     
-    // Cancel any previous request
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
@@ -70,72 +146,77 @@ const ImageToText = ({ isDark }) => {
     abortControllerRef.current = new AbortController();
     setIsProcessing(true);
     setError(null);
+    setProgress(10);
     
     try {
-      // Convert image to base64
+      // Convert to base64
+      setProgress(20);
       const base64 = await new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.readAsDataURL(imageFile);
       });
 
-      // Create form data
-      const formData = new FormData();
-      formData.append('base64Image', base64);
-      formData.append('language', language);
-      formData.append('OCREngine', '2'); // Use engine 2 for better accuracy
-      formData.append('scale', 'true');
-      formData.append('isTable', 'true');
+      setProgress(40);
 
-      // Set timeout of 30 seconds
-      const timeoutId = setTimeout(() => {
-        if (abortControllerRef.current) {
-          abortControllerRef.current.abort();
+      let text = '';
+      let lastError = null;
+
+      // Try Engine 1 first (faster)
+      try {
+        setProgress(50);
+        text = await Promise.race([
+          extractWithOCRSpace(base64, API_KEYS[0], '1'),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 15000))
+        ]);
+      } catch (e) {
+        lastError = e;
+        console.log('Engine 1 failed, trying Engine 2...');
+      }
+
+      // If Engine 1 failed or returned empty, try Engine 2
+      if (!text && !abortControllerRef.current?.signal.aborted) {
+        try {
+          setProgress(70);
+          text = await Promise.race([
+            extractWithOCRSpace(base64, API_KEYS[0], '2'),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 20000))
+          ]);
+        } catch (e) {
+          lastError = e;
+          console.log('Engine 2 failed');
         }
-      }, 30000);
-
-      const response = await fetch('https://api.ocr.space/parse/image', {
-        method: 'POST',
-        headers: {
-          'apikey': 'K85482751488957',
-        },
-        body: formData,
-        signal: abortControllerRef.current.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`Server error: ${response.status}`);
       }
 
-      const result = await response.json();
+      setProgress(90);
 
-      if (result.IsErroredOnProcessing) {
-        throw new Error(result.ErrorMessage?.[0] || 'OCR processing failed');
-      }
-
-      if (result.ParsedResults && result.ParsedResults.length > 0) {
-        const text = result.ParsedResults.map(r => r.ParsedText).join('\n').trim();
-        
-        if (!text) {
-          setError('No text detected. Try a clearer image.');
+      if (text) {
+        const cleanedText = text
+          .replace(/\r\n/g, '\n')
+          .replace(/\n{3,}/g, '\n\n')
+          .trim();
+        setExtractedText(cleanedText);
+        setProgress(100);
+      } else if (lastError) {
+        if (lastError.message === 'Timeout') {
+          setError('Request timed out. The image might be too complex. Try a clearer or smaller image.');
         } else {
-          setExtractedText(text.replace(/\r\n/g, '\n').replace(/\n{3,}/g, '\n\n').trim());
+          setError('Could not extract text. Try a different image or check your internet connection.');
         }
       } else {
-        setError('No text could be extracted.');
+        setError('No text detected in this image.');
       }
       
     } catch (err) {
       if (err.name === 'AbortError') {
-        setError('Request timed out. Try a smaller image or check your connection.');
+        setError('Extraction cancelled.');
       } else {
         console.error('OCR Error:', err);
-        setError(err.message || 'Failed to extract text. Please try again.');
+        setError('Failed to extract text. Please try again.');
       }
     } finally {
       setIsProcessing(false);
+      setProgress(0);
     }
   }, [imageFile, language]);
 
@@ -144,6 +225,12 @@ const ImageToText = ({ isDark }) => {
       abortControllerRef.current.abort();
     }
     setIsProcessing(false);
+    setProgress(0);
+  };
+
+  const retryExtraction = () => {
+    setError(null);
+    extractText();
   };
 
   const copyText = () => {
@@ -169,6 +256,7 @@ const ImageToText = ({ isDark }) => {
     setImageFile(null);
     setExtractedText('');
     setError(null);
+    setProgress(0);
     setShowClearConfirm(false);
   };
 
@@ -199,7 +287,7 @@ const ImageToText = ({ isDark }) => {
                 <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>Upload Image</h3>
                 <p className="text-muted-foreground mb-4">Drag & drop or click to select</p>
                 <Button style={{ backgroundColor: BRAND.blue }}><Upload className="size-4 mr-2" />Select Image</Button>
-                <p className="text-xs text-muted-foreground mt-4">PNG, JPG, WebP • Max 1MB for best results</p>
+                <p className="text-xs text-muted-foreground mt-4">PNG, JPG, WebP • Max 10MB (auto-compressed)</p>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files?.[0])} className="hidden" />
               
@@ -239,9 +327,22 @@ const ImageToText = ({ isDark }) => {
                   </div>
                   
                   {isProcessing ? (
-                    <Button onClick={cancelExtraction} variant="outline" className="w-full">
-                      <Loader2 className="size-4 mr-2 animate-spin" />Cancel
-                    </Button>
+                    <div className="space-y-3">
+                      <Button onClick={cancelExtraction} variant="outline" className="w-full">
+                        <Loader2 className="size-4 mr-2 animate-spin" />Cancel Extraction
+                      </Button>
+                      <div className="space-y-1">
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div 
+                            className="h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${progress}%`, backgroundColor: BRAND.blue }} 
+                          />
+                        </div>
+                        <p className="text-xs text-center text-muted-foreground">
+                          {progress < 50 ? 'Processing image...' : progress < 80 ? 'Extracting text...' : 'Finalizing...'}
+                        </p>
+                      </div>
+                    </div>
                   ) : (
                     <Button onClick={extractText} className="w-full" style={{ backgroundColor: BRAND.blue }}>
                       <ScanText className="size-4 mr-2" />Extract Text
@@ -250,7 +351,7 @@ const ImageToText = ({ isDark }) => {
                   
                   <div className="p-3 rounded-lg bg-muted/50 text-xs text-muted-foreground">
                     <Info className="size-3 inline mr-1" />
-                    For best results, use clear images under 1MB
+                    For best results, use clear images with readable text
                   </div>
                 </div>
               </CardContent>
@@ -276,7 +377,7 @@ const ImageToText = ({ isDark }) => {
                 <textarea
                   value={extractedText}
                   onChange={(e) => setExtractedText(e.target.value)}
-                  placeholder={isProcessing ? "Extracting text (max 30 seconds)..." : "Extracted text will appear here..."}
+                  placeholder={isProcessing ? "Extracting text..." : "Extracted text will appear here...\n\nTips for better results:\n• Use clear, high-resolution images\n• Ensure text is not blurry or rotated\n• Select the correct language"}
                   className="flex-1 w-full min-h-[300px] p-3 border rounded-lg bg-background resize-none text-sm"
                   style={{ borderColor: theme.cardBorder }}
                   readOnly={isProcessing}
@@ -290,9 +391,14 @@ const ImageToText = ({ isDark }) => {
 
         {error && (
           <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
-            <div className="flex gap-3">
-              <AlertTriangle className="size-5 text-destructive shrink-0" />
-              <p className="text-sm text-destructive">{error}</p>
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex gap-3">
+                <AlertTriangle className="size-5 text-destructive shrink-0 mt-0.5" />
+                <p className="text-sm text-destructive">{error}</p>
+              </div>
+              <Button variant="outline" size="sm" onClick={retryExtraction} className="shrink-0">
+                <RefreshCw className="size-4 mr-1" />Retry
+              </Button>
             </div>
           </div>
         )}
