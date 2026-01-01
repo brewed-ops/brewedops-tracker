@@ -236,10 +236,11 @@ const BrewedNotes = ({ isDark, user }) => {
     const selectedText = selection.toString().trim();
     
     const createCheckItem = (text, checked = false) => {
-      const strikeStyle = checked ? 'text-decoration: line-through; opacity: 0.6;' : '';
-      return `<div class="checklist-item" style="display:flex;align-items:center;gap:8px;margin:6px 0;font-family: Montserrat, sans-serif;">
-        <input type="checkbox" ${checked ? 'checked' : ''} style="width:18px;height:18px;cursor:pointer;accent-color:${BRAND.blue};flex-shrink:0;"/>
-        <span style="${strikeStyle}">${text}</span>
+      const strikeStyle = checked ? 'text-decoration: line-through; opacity: 0.5; color: #9ca3af;' : '';
+      const uniqueId = `check-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      return `<div class="checklist-item" data-checked="${checked}" style="display:flex;align-items:flex-start;gap:12px;margin:8px 0;padding:8px 12px;background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)'};border-radius:8px;border:1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'};transition:all 0.2s ease;">
+        <input type="checkbox" id="${uniqueId}" ${checked ? 'checked' : ''} style="width:20px;height:20px;cursor:pointer;accent-color:#004AAC;flex-shrink:0;margin-top:2px;border-radius:4px;"/>
+        <span class="checklist-text" style="${strikeStyle}flex:1;line-height:1.5;">${text}</span>
       </div>`;
     };
     
@@ -254,7 +255,7 @@ const BrewedNotes = ({ isDark, user }) => {
     } else {
       document.execCommand('insertHTML', false, createCheckItem('Task item'));
     }
-  }, []);
+  }, [isDark]);
 
   // Apply text color
   const applyTextColor = useCallback((color) => {
@@ -333,26 +334,67 @@ const BrewedNotes = ({ isDark, user }) => {
   // Handle checkbox click for strikethrough - using event delegation
   const handleEditorClick = useCallback((e) => {
     const target = e.target;
-    if (target.type === 'checkbox') {
+    if (target.type === 'checkbox' && target.tagName === 'INPUT') {
       const checkItem = target.closest('.checklist-item');
       if (checkItem) {
-        const textSpan = checkItem.querySelector('span');
+        const textSpan = checkItem.querySelector('.checklist-text') || checkItem.querySelector('span');
         if (textSpan) {
-          // Use setTimeout to ensure checkbox state is updated first
-          setTimeout(() => {
-            if (target.checked) {
+          // Toggle happens after click, so we check the NEW state
+          const willBeChecked = target.checked;
+          
+          if (willBeChecked) {
+            textSpan.style.textDecoration = 'line-through';
+            textSpan.style.opacity = '0.5';
+            textSpan.style.color = isDark ? '#6b7280' : '#9ca3af';
+            checkItem.setAttribute('data-checked', 'true');
+            checkItem.style.background = isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)';
+            checkItem.style.borderColor = isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.2)';
+          } else {
+            textSpan.style.textDecoration = 'none';
+            textSpan.style.opacity = '1';
+            textSpan.style.color = '';
+            checkItem.setAttribute('data-checked', 'false');
+            checkItem.style.background = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+            checkItem.style.borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+          }
+        }
+      }
+    }
+  }, [isDark]);
+
+  // Also handle change event for checkboxes (backup)
+  useEffect(() => {
+    const editor = editorRef.current;
+    if (!editor) return;
+    
+    const handleChange = (e) => {
+      if (e.target.type === 'checkbox') {
+        const checkItem = e.target.closest('.checklist-item');
+        if (checkItem) {
+          const textSpan = checkItem.querySelector('.checklist-text') || checkItem.querySelector('span');
+          if (textSpan) {
+            if (e.target.checked) {
               textSpan.style.textDecoration = 'line-through';
-              textSpan.style.opacity = '0.6';
-              textSpan.style.color = isDark ? '#9ca3af' : '#6b7280';
+              textSpan.style.opacity = '0.5';
+              textSpan.style.color = isDark ? '#6b7280' : '#9ca3af';
+              checkItem.setAttribute('data-checked', 'true');
+              checkItem.style.background = isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)';
+              checkItem.style.borderColor = isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.2)';
             } else {
               textSpan.style.textDecoration = 'none';
               textSpan.style.opacity = '1';
               textSpan.style.color = '';
+              checkItem.setAttribute('data-checked', 'false');
+              checkItem.style.background = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
+              checkItem.style.borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
             }
-          }, 0);
+          }
         }
       }
-    }
+    };
+    
+    editor.addEventListener('change', handleChange, true);
+    return () => editor.removeEventListener('change', handleChange, true);
   }, [isDark]);
 
   const handleNoteSelect = async (note) => {
@@ -421,13 +463,61 @@ const BrewedNotes = ({ isDark, user }) => {
         .brewed-editor ol ol { list-style-type: lower-alpha !important; }
         .brewed-editor ol ol ol { list-style-type: lower-roman !important; }
 
-        /* Checklist styling */
+        /* Checklist styling - Modern look */
         .brewed-editor .checklist-item {
           font-family: 'Montserrat', sans-serif;
+          transition: all 0.2s ease;
         }
-        .brewed-editor .checklist-item input[type="checkbox"]:checked + span {
-          text-decoration: line-through;
-          opacity: 0.6;
+        .brewed-editor .checklist-item:hover {
+          background: ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'} !important;
+        }
+        
+        /* Custom checkbox styling */
+        .brewed-editor .checklist-item input[type="checkbox"] {
+          appearance: none;
+          -webkit-appearance: none;
+          width: 20px;
+          height: 20px;
+          border: 2px solid ${isDark ? '#4b5563' : '#d1d5db'};
+          border-radius: 6px;
+          background: ${isDark ? '#1f2937' : '#ffffff'};
+          cursor: pointer;
+          position: relative;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+          margin-top: 2px;
+        }
+        .brewed-editor .checklist-item input[type="checkbox"]:hover {
+          border-color: #004AAC;
+        }
+        .brewed-editor .checklist-item input[type="checkbox"]:checked {
+          background: #004AAC;
+          border-color: #004AAC;
+        }
+        .brewed-editor .checklist-item input[type="checkbox"]:checked::after {
+          content: '';
+          position: absolute;
+          left: 6px;
+          top: 2px;
+          width: 5px;
+          height: 10px;
+          border: solid white;
+          border-width: 0 2px 2px 0;
+          transform: rotate(45deg);
+        }
+        
+        /* Checked item text styling */
+        .brewed-editor .checklist-item[data-checked="true"] .checklist-text,
+        .brewed-editor .checklist-item[data-checked="true"] span {
+          text-decoration: line-through !important;
+          opacity: 0.5 !important;
+          color: ${isDark ? '#6b7280' : '#9ca3af'} !important;
+        }
+        .brewed-editor .checklist-item input[type="checkbox"]:checked + span,
+        .brewed-editor .checklist-item input[type="checkbox"]:checked + .checklist-text {
+          text-decoration: line-through !important;
+          opacity: 0.5 !important;
+          color: ${isDark ? '#6b7280' : '#9ca3af'} !important;
         }
       `}</style>
 
