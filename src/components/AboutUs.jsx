@@ -1,10 +1,13 @@
 // AboutUs.jsx - About Us page for BrewedOps
 import React from 'react';
-import { ArrowLeft, Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target } from 'lucide-react';
+import { 
+  Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target, 
+  Wallet, CheckSquare, FileText, Headset, Image, Film, FileEdit, QrCode,
+  Coffee, Globe, Shield
+} from 'lucide-react';
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
-const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
 
 const AboutUs = ({ onBack, onNavigate, isDark }) => {
   const theme = {
@@ -15,13 +18,32 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
     cardBorder: isDark ? '#27272a' : '#e4e4e7',
   };
 
+  const stats = [
+    { value: '18', label: 'Free Tools' },
+    { value: '5', label: 'Categories' },
+    { value: '100%', label: 'Free to Use' },
+    { value: '24/7', label: 'Available' },
+  ];
+
+  const toolCategories = [
+    { name: 'Productivity', count: 4, icon: Wallet, color: '#004AAC', tools: 'Finance Tracker, VAKita, Task Manager, Brewed Notes' },
+    { name: 'Image Tools', count: 7, icon: Image, color: '#8b5cf6', tools: 'BG Remover, Cropper, Resizer, Compressor, Converter, Color Picker, Image to PDF' },
+    { name: 'Video Tools', count: 2, icon: Film, color: '#ef4444', tools: 'Video Compressor, Video Trimmer' },
+    { name: 'Document Tools', count: 3, icon: FileEdit, color: '#22c55e', tools: 'PDF Editor, PDF Merge, PDF Split' },
+    { name: 'Other Tools', count: 4, icon: QrCode, color: '#f59e0b', tools: 'QR Generator, Find & Replace, Case Converter, Word Counter' },
+  ];
+
   return (
     <div style={{ 
       minHeight: '100vh', 
       backgroundColor: theme.bg,
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      fontFamily: "'Montserrat', sans-serif"
     }}>
+      {/* Import Google Fonts */}
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+      
       {/* Header */}
       <header style={{
         padding: '16px 24px',
@@ -49,11 +71,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
           <img 
             src="https://i.imgur.com/R52jwPv.png" 
             alt="BrewedOps Logo" 
-            style={{
-              width: '36px',
-              height: '36px',
-              borderRadius: '10px'
-            }}
+            style={{ width: '36px', height: '36px', borderRadius: '10px' }}
           />
           <span style={{ 
             fontSize: '20px', 
@@ -61,14 +79,14 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
             color: theme.text,
             letterSpacing: '-0.5px'
           }}>
-            BrewedOps
+            Brewed<span style={{ color: BRAND.blue }}>Ops</span>
           </span>
         </button>
       </header>
 
       {/* Main Content */}
       <main style={{ flex: 1, padding: '40px 24px' }}>
-        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           {/* Hero Section */}
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
             <div style={{
@@ -81,16 +99,16 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               justifyContent: 'center',
               margin: '0 auto 24px'
             }}>
-              <Sparkles style={{ width: '40px', height: '40px', color: '#004AAC' }} />
+              <Coffee style={{ width: '40px', height: '40px', color: '#004AAC' }} />
             </div>
             <h1 style={{ 
-              fontSize: '40px', 
-              fontWeight: '700', 
+              fontSize: '42px', 
+              fontWeight: '800', 
               color: theme.text, 
               margin: '0 0 16px',
               letterSpacing: '-1px'
             }}>
-              About BrewedOps
+              About <span style={{ color: BRAND.blue }}>BrewedOps</span>
             </h1>
             <p style={{ 
               fontSize: '18px', 
@@ -101,8 +119,33 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              A financial tracking and business management system built for Filipino Virtual Assistants and Freelancers
+              A comprehensive productivity platform with 18 free tools built specifically for Filipino Virtual Assistants and Freelancers
             </p>
+          </div>
+
+          {/* Stats */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(4, 1fr)',
+            gap: '16px',
+            marginBottom: '48px'
+          }}>
+            {stats.map((stat, idx) => (
+              <div key={idx} style={{
+                padding: '24px 16px',
+                backgroundColor: theme.cardBg,
+                borderRadius: '12px',
+                border: `1px solid ${theme.cardBorder}`,
+                textAlign: 'center'
+              }}>
+                <div style={{ fontSize: '32px', fontWeight: '800', color: BRAND.blue, marginBottom: '4px' }}>
+                  {stat.value}
+                </div>
+                <div style={{ fontSize: '13px', color: theme.textMuted, fontWeight: '500' }}>
+                  {stat.label}
+                </div>
+              </div>
+            ))}
           </div>
 
           {/* Story Section */}
@@ -125,7 +168,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               }}>
                 <Code style={{ width: '22px', height: '22px', color: '#22c55e' }} />
               </div>
-              <h2 style={{ fontSize: '24px', fontWeight: '600', color: theme.text, margin: 0 }}>
+              <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: 0 }}>
                 Built Through Vibe Coding
               </h2>
             </div>
@@ -137,8 +180,9 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
             }}>
               BrewedOps was created by <strong style={{ color: theme.text }}>Kenneth</strong> through the power of 
               vibe coding — a creative approach where ideas flow naturally into functional software. What started 
-              as a personal tool to manage freelance finances has evolved into a comprehensive platform designed 
-              specifically for the needs of Filipino VAs and freelancers.
+              as a personal tool to manage freelance finances has evolved into a comprehensive platform with 
+              <strong style={{ color: theme.text }}> 18 free tools</strong> designed specifically for the needs 
+              of Filipino VAs and freelancers.
             </p>
             <p style={{ 
               fontSize: '16px', 
@@ -146,17 +190,75 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               lineHeight: '1.8',
               margin: 0
             }}>
-              Every feature in BrewedOps was built with intention: from tracking income in multiple currencies to 
-              calculating Philippine taxes, from managing international clients across timezones to sending 
-              professional invoices. It's a system that understands the unique challenges of working remotely 
-              for clients around the world.
+              From financial tracking with multi-currency support to image editing, PDF manipulation, and productivity 
+              tools — every feature in BrewedOps was built with intention, understanding the unique challenges of 
+              working remotely for clients around the world.
             </p>
+          </div>
+
+          {/* Tools Overview */}
+          <div style={{
+            padding: '32px',
+            backgroundColor: isDark ? '#18181b' : '#f9fafb',
+            borderRadius: '16px',
+            border: '1px solid ' + theme.cardBorder,
+            marginBottom: '32px'
+          }}>
+            <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: '0 0 24px', textAlign: 'center' }}>
+              18 Tools Across 5 Categories
+            </h2>
+            <div style={{ display: 'grid', gap: '16px' }}>
+              {toolCategories.map((cat, idx) => (
+                <div key={idx} style={{
+                  padding: '20px',
+                  backgroundColor: theme.cardBg,
+                  borderRadius: '12px',
+                  border: `1px solid ${theme.cardBorder}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '16px'
+                }}>
+                  <div style={{
+                    width: '48px',
+                    height: '48px',
+                    backgroundColor: `${cat.color}15`,
+                    borderRadius: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0
+                  }}>
+                    <cat.icon size={24} style={{ color: cat.color }} />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0 }}>
+                        {cat.name}
+                      </h3>
+                      <span style={{
+                        padding: '2px 8px',
+                        backgroundColor: `${cat.color}20`,
+                        color: cat.color,
+                        borderRadius: '100px',
+                        fontSize: '12px',
+                        fontWeight: '600'
+                      }}>
+                        {cat.count} tools
+                      </span>
+                    </div>
+                    <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>
+                      {cat.tools}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Features Highlights */}
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: '16px',
             marginBottom: '32px'
           }}>
@@ -182,12 +284,12 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               border: '1px solid ' + theme.cardBorder,
               textAlign: 'center'
             }}>
-              <Users style={{ width: '32px', height: '32px', color: '#3b82f6', margin: '0 auto 12px' }} />
+              <Shield style={{ width: '32px', height: '32px', color: '#22c55e', margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-                Built for VAs
+                Secure & Private
               </h3>
               <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
-                Features tailored for virtual assistants
+                Your data stays safe with us
               </p>
             </div>
             <div style={{
@@ -197,12 +299,27 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               border: '1px solid ' + theme.cardBorder,
               textAlign: 'center'
             }}>
-              <Target style={{ width: '32px', height: '32px', color: '#004AAC', margin: '0 auto 12px' }} />
+              <Globe style={{ width: '32px', height: '32px', color: '#3b82f6', margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-                Goal-Oriented
+                Works Anywhere
               </h3>
               <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
-                Track progress and achieve your targets
+                Access from any device
+              </p>
+            </div>
+            <div style={{
+              padding: '24px',
+              backgroundColor: theme.cardBg,
+              borderRadius: '12px',
+              border: '1px solid ' + theme.cardBorder,
+              textAlign: 'center'
+            }}>
+              <Users style={{ width: '32px', height: '32px', color: '#004AAC', margin: '0 auto 12px' }} />
+              <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
+                Built for VAs
+              </h3>
+              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
+                Features tailored for freelancers
               </p>
             </div>
           </div>
@@ -227,7 +344,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
             }}>
               <Heart style={{ width: '28px', height: '28px', color: '#004AAC' }} />
             </div>
-            <h2 style={{ fontSize: '24px', fontWeight: '600', color: theme.text, margin: '0 0 12px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: '0 0 12px' }}>
               Get in Touch
             </h2>
             <p style={{ 
@@ -260,8 +377,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
                   textDecoration: 'none',
                   color: theme.text,
                   fontSize: '15px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s'
+                  fontWeight: '500'
                 }}
               >
                 <Mail style={{ width: '20px', height: '20px', color: '#004AAC' }} />
@@ -281,8 +397,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
                   textDecoration: 'none',
                   color: theme.text,
                   fontSize: '15px',
-                  fontWeight: '500',
-                  transition: 'all 0.2s'
+                  fontWeight: '500'
                 }}
               >
                 <Phone style={{ width: '20px', height: '20px', color: '#22c55e' }} />
@@ -314,7 +429,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               cursor: 'pointer',
-              padding: '4px 0'
+              fontFamily: "'Montserrat', sans-serif"
             }}
           >
             Privacy Policy
@@ -327,7 +442,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               cursor: 'pointer',
-              padding: '4px 0'
+              fontFamily: "'Montserrat', sans-serif"
             }}
           >
             Terms of Service
@@ -340,15 +455,15 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               color: '#004AAC', 
               fontSize: '13px', 
               cursor: 'pointer',
-              padding: '4px 0',
-              fontWeight: '500'
+              fontWeight: '600',
+              fontFamily: "'Montserrat', sans-serif"
             }}
           >
             About Us
           </button>
         </div>
         <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>
-          © {new Date().getFullYear()} BrewedOps by Kenneth V.
+          © {new Date().getFullYear()} BrewedOps by Kenneth V. All rights reserved.
         </p>
       </footer>
     </div>

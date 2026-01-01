@@ -185,16 +185,62 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
     transition: 'all 0.2s ease',
   };
 
-  const features = [
-    { icon: '💰', title: 'Income Tracking', desc: 'Track all your earnings in multiple currencies with automatic PHP conversion using live exchange rates' },
-    { icon: '📊', title: 'Expense Management', desc: 'Categorize and monitor your expenses, set budgets, and see where your money goes' },
-    { icon: '🎯', title: 'Lead Tracking', desc: 'Track prospects from LinkedIn, Upwork, OnlineJobsPH, and other platforms through your sales pipeline' },
-    { icon: '👥', title: 'Client Management', desc: 'Manage clients with timezone tracking, billing rates, and payment platform preferences' },
-    { icon: '🧾', title: 'Invoice Generation', desc: 'Create professional invoices and send them directly via Gmail integration' },
-    { icon: '🌍', title: 'ClientClock', desc: 'See all client timezones at a glance and find the best meeting overlap hours' },
-    { icon: '📈', title: 'BIR Tax Calculator', desc: 'Calculate quarterly taxes automatically - choose between 8% flat rate or graduated rates' },
-    { icon: '🏆', title: 'Gamification', desc: 'Earn XP, level up, unlock achievements and stay motivated to reach your financial goals' },
+  // All 18 tools organized by category
+  const toolCategories = [
+    {
+      name: 'Productivity',
+      color: '#004AAC',
+      tools: [
+        { icon: '💰', title: 'Finance Tracker', desc: 'Track income, expenses, invoices & BIR taxes' },
+        { icon: '🎧', title: 'VAKita', desc: 'VA earnings calculator & tracker' },
+        { icon: '✅', title: 'Task Manager', desc: 'Organize tasks & to-dos' },
+        { icon: '📝', title: 'Brewed Notes', desc: 'Rich text notes with formatting' },
+      ]
+    },
+    {
+      name: 'Image Tools',
+      color: '#8b5cf6',
+      tools: [
+        { icon: '🖼️', title: 'BG Remover', desc: 'Remove image backgrounds' },
+        { icon: '✂️', title: 'Image Cropper', desc: 'Crop & resize images' },
+        { icon: '📐', title: 'Image Resizer', desc: 'Resize to any dimensions' },
+        { icon: '📦', title: 'Image Compressor', desc: 'Compress without quality loss' },
+        { icon: '🔄', title: 'Image Converter', desc: 'Convert between formats' },
+        { icon: '🎨', title: 'Color Picker', desc: 'Extract colors from images' },
+        { icon: '📄', title: 'Image to PDF', desc: 'Convert images to PDF' },
+      ]
+    },
+    {
+      name: 'Video Tools',
+      color: '#ef4444',
+      tools: [
+        { icon: '🎬', title: 'Video Compressor', desc: 'Compress video files' },
+        { icon: '✂️', title: 'Video Trimmer', desc: 'Trim & cut videos' },
+      ]
+    },
+    {
+      name: 'Document Tools',
+      color: '#22c55e',
+      tools: [
+        { icon: '📑', title: 'PDF Editor', desc: 'Edit PDF documents' },
+        { icon: '📚', title: 'PDF Merge', desc: 'Combine multiple PDFs' },
+        { icon: '📂', title: 'PDF Split', desc: 'Split PDFs into parts' },
+      ]
+    },
+    {
+      name: 'Other Tools',
+      color: '#f59e0b',
+      tools: [
+        { icon: '📱', title: 'QR Generator', desc: 'Create QR codes' },
+        { icon: '🔍', title: 'Find & Replace', desc: 'Search & replace text' },
+        { icon: '🔠', title: 'Case Converter', desc: 'Change text case' },
+        { icon: '🔢', title: 'Word Counter', desc: 'Count words & characters' },
+      ]
+    }
   ];
+
+  // Flatten for simple feature display
+  const features = toolCategories.flatMap(cat => cat.tools);
 
 
 
@@ -309,18 +355,17 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       {/* Hero */}
       <section style={{ padding: isSmall ? '48px 20px 56px' : '72px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.cream, borderRadius: '100px', marginBottom: '24px', border: isDark ? 'none' : '1px solid ' + BRAND.blue + '20' }}>
-          <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>🇵🇭 Built for Filipino VAs & Freelancers</span>
+          <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 18 Free Tools for Filipino VAs & Freelancers</span>
         </div>
         
         <h1 style={{ fontSize: isSmall ? '32px' : '52px', fontWeight: '800', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 16px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
-          Your Complete Financial
+          Your All-in-One
           <br />
-          <span style={{ color: BRAND.blue }}>& Client Management Hub</span>
+          <span style={{ color: BRAND.blue }}>Productivity Hub</span>
         </h1>
         
         <p style={{ fontSize: isSmall ? '16px' : '18px', color: theme.textMuted, margin: '0 0 36px', lineHeight: '1.7', maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
-          Track your income & expenses, manage clients across timezones, send professional invoices, 
-          and calculate your BIR taxes — all in one powerful platform designed specifically for Filipino virtual assistants and freelancers.
+          Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business, all in one powerful platform.
         </p>
         
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
@@ -349,63 +394,112 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             What is BrewedOps?
           </h2>
           <p style={{ fontSize: '16px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.8', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
-            BrewedOps is an all-in-one financial tracking and client management system built specifically for 
-            Filipino Virtual Assistants and Freelancers. Whether you're managing multiple international clients, 
-            tracking income in different currencies, or preparing for your quarterly BIR tax filing — BrewedOps 
-            has everything you need to run your freelance business professionally.
+            BrewedOps is a comprehensive productivity platform with <strong style={{ color: isDark ? '#fff' : BRAND.brown }}>18 free tools</strong> built specifically for 
+            Filipino Virtual Assistants and Freelancers. From financial tracking and tax calculations to image editing, 
+            PDF manipulation, and productivity tools — everything you need to run your freelance business professionally.
           </p>
+          
+          {/* Stats */}
+          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
+            {[
+              { value: '18', label: 'Free Tools' },
+              { value: '5', label: 'Categories' },
+              { value: '100%', label: 'Free' },
+              { value: '24/7', label: 'Available' },
+            ].map((stat, i) => (
+              <div key={i} style={{ padding: '20px 16px', backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
+                <div style={{ fontSize: '28px', fontWeight: '800', color: BRAND.blue, marginBottom: '4px', fontFamily: FONTS.heading }}>{stat.value}</div>
+                <div style={{ fontSize: '13px', color: theme.textMuted, fontWeight: '500', fontFamily: FONTS.body }}>{stat.label}</div>
+              </div>
+            ))}
+          </div>
           
           <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : 'repeat(2, 1fr)', gap: '20px', textAlign: 'left' }}>
             <div style={{ padding: '24px', backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? BRAND.green + '20' : BRAND.green + '15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '22px' }}>💵</span>
+                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.blue + '15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '22px' }}>💼</span>
                 </div>
-                <h3 style={{ fontSize: '17px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>Financial Tracking</h3>
+                <h3 style={{ fontSize: '17px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>Productivity Suite</h3>
               </div>
               <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6', fontFamily: FONTS.body }}>
-                Monitor all your income streams and expenses. Support for multiple currencies (USD, EUR, GBP, AUD) 
-                with automatic PHP conversion using live exchange rates. Categorize transactions, set budgets, 
-                and get insights into your financial health.
+                Finance Tracker with multi-currency support, VAKita earnings calculator, Task Manager for organization, 
+                and Brewed Notes with rich text formatting — all synced to your account.
               </p>
             </div>
             
             <div style={{ padding: '24px', backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.blue + '15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '22px' }}>👥</span>
+                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? '#8b5cf6' + '20' : '#8b5cf6' + '15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <span style={{ fontSize: '22px' }}>🛠️</span>
                 </div>
-                <h3 style={{ fontSize: '17px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>VA Client Management</h3>
+                <h3 style={{ fontSize: '17px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>Media & Document Tools</h3>
               </div>
               <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6', fontFamily: FONTS.body }}>
-                Manage your entire client pipeline from lead to paying customer. Track prospects from job platforms, 
-                store client details with timezone info, manage billing rates, and never miss a follow-up with 
-                our prospecting pipeline.
+                7 image tools (BG remover, cropper, resizer, compressor, converter, color picker, image to PDF), 
+                2 video tools, 3 PDF tools, plus QR generator and text utilities.
               </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features */}
+      {/* All 18 Tools */}
       <section style={{ padding: isSmall ? '48px 16px' : '64px 32px', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#fff' }}>
-        <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <h2 style={{ fontSize: isSmall ? '24px' : '36px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, textAlign: 'center', margin: '0 0 12px', letterSpacing: '-0.02em', fontFamily: FONTS.heading }}>
-            Everything You Need to Succeed
+            All 18 Tools Included
           </h2>
           <p style={{ fontSize: '15px', color: theme.textMuted, textAlign: 'center', margin: '0 0 40px', fontFamily: FONTS.body }}>
-            Powerful tools designed specifically for Filipino VAs and freelancers
+            Everything you need to run your freelance business efficiently
           </p>
           
-          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px' }}>
-            {features.map((f, i) => (
-              <div key={i} style={{ backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '20px', transition: 'all 0.2s ease' }}>
-                <span style={{ fontSize: '28px', display: 'block', marginBottom: '12px' }}>{f.icon}</span>
-                <h3 style={{ fontSize: '15px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 6px', fontFamily: FONTS.heading }}>{f.title}</h3>
-                <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0, lineHeight: '1.5', fontFamily: FONTS.body }}>{f.desc}</p>
+          {/* Tools by Category */}
+          {toolCategories.map((category, catIdx) => (
+            <div key={catIdx} style={{ marginBottom: '32px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: category.color }} />
+                <h3 style={{ fontSize: '16px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>
+                  {category.name}
+                  <span style={{ fontSize: '13px', fontWeight: '400', color: theme.textMuted, marginLeft: '8px', fontFamily: FONTS.body }}>
+                    ({category.tools.length} tools)
+                  </span>
+                </h3>
               </div>
-            ))}
-          </div>
+              
+              <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '12px' }}>
+                {category.tools.map((tool, toolIdx) => (
+                  <div key={toolIdx} style={{ 
+                    backgroundColor: isDark ? theme.cardBg : '#fff', 
+                    borderRadius: '10px', 
+                    border: '1px solid ' + theme.cardBorder, 
+                    padding: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <div style={{ 
+                      width: '40px', 
+                      height: '40px', 
+                      backgroundColor: category.color + '15', 
+                      borderRadius: '10px', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
+                      <span style={{ fontSize: '20px' }}>{tool.icon}</span>
+                    </div>
+                    <div>
+                      <h4 style={{ fontSize: '14px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 2px', fontFamily: FONTS.heading }}>{tool.title}</h4>
+                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>{tool.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -417,10 +511,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {[
-            { num: '1', title: 'Sign Up for Free', desc: 'Create your account in seconds and start exploring all features immediately' },
-            { num: '2', title: 'Add Your Clients & Income', desc: 'Import your existing clients, track prospects, and record your income from various platforms' },
-            { num: '3', title: 'Send Invoices & Track Taxes', desc: 'Generate professional invoices, send via Gmail, and let BrewedOps calculate your quarterly BIR taxes' },
-            { num: '4', title: 'Level Up & Grow', desc: 'Earn XP for your activities, unlock achievements, and watch your freelance business thrive' },
+            { num: '1', title: 'Sign Up for Free', desc: 'Create your account in seconds and get instant access to all 18 tools' },
+            { num: '2', title: 'Choose Your Tools', desc: 'Use Finance Tracker for income/expenses, image tools for editing, PDF tools for documents — mix and match' },
+            { num: '3', title: 'Boost Your Productivity', desc: 'Manage your entire freelance business from one platform — track finances, organize tasks, process files' },
+            { num: '4', title: 'Grow Your Business', desc: 'Send professional invoices, calculate taxes, and watch your freelance business thrive' },
           ].map((step, i) => (
             <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
               <div style={{ width: '44px', height: '44px', borderRadius: '10px', backgroundColor: BRAND.blue, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: '700', flexShrink: 0, fontFamily: FONTS.heading }}>{step.num}</div>
@@ -437,10 +531,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       <section style={{ padding: isSmall ? '0 16px 48px' : '0 32px 64px', maxWidth: '800px', margin: '0 auto' }}>
         <div style={{ backgroundColor: BRAND.brown, borderRadius: '16px', padding: isSmall ? '40px 24px' : '48px', textAlign: 'center' }}>
           <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: '#fafafa', margin: '0 0 12px', fontFamily: FONTS.heading }}>
-            Ready to Take Control of Your Finances?
+            Ready to Boost Your Productivity?
           </h2>
           <p style={{ fontSize: '15px', color: '#d4d4d8', margin: '0 0 24px', fontFamily: FONTS.body }}>
-            Join Filipino VAs and freelancers who are managing their business smarter with BrewedOps
+            Join Filipino VAs and freelancers using all 18 tools to manage their business smarter
           </p>
           <button onClick={() => onNavigate('signup')} style={{ height: '48px', padding: '0 32px', backgroundColor: BRAND.green, color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', cursor: 'pointer', fontFamily: FONTS.body, transition: 'all 0.2s ease' }}>
             Get Started — It's Free
@@ -506,7 +600,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             Contact
           </a>
         </div>
-        <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>© 2025 BrewedOps by Kenneth V.</p>
+        <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>© {new Date().getFullYear()} BrewedOps by Kenneth V.</p>
       </footer>
     </div>
   );
