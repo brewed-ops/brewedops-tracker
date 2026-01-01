@@ -3019,23 +3019,24 @@ const getBudgetStatus = () => {
         <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           {/* Left side - Sidebar Trigger + Logo on mobile */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Mobile Sidebar Trigger - uses Sheet on mobile */}
-            <SidebarTrigger 
-              className="md:hidden" 
-              style={{ 
-                width: '36px', 
-                height: '36px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                borderRadius: '8px',
-                border: `1px solid ${theme.cardBorder}`,
-                backgroundColor: 'transparent',
-                color: theme.text,
-                cursor: 'pointer',
-                flexShrink: 0
-              }} 
-            />
+            {/* Mobile Sidebar Trigger - only visible on mobile */}
+            {isMobile && (
+              <SidebarTrigger 
+                style={{ 
+                  width: '36px', 
+                  height: '36px', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                  borderRadius: '8px',
+                  border: `1px solid ${theme.cardBorder}`,
+                  backgroundColor: 'transparent',
+                  color: theme.text,
+                  cursor: 'pointer',
+                  flexShrink: 0
+                }} 
+              />
+            )}
             
             {isMobile && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

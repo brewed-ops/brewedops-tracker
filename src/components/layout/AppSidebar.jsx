@@ -209,7 +209,8 @@ export function AppSidebar({ isDark, ...props }) {
         </div>
       </SidebarFooter>
 
-      <SidebarRail />
+      {/* Only show rail on mobile for collapse functionality */}
+      <SidebarRail className="md:hidden" />
     </Sidebar>
   )
 }
