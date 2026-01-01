@@ -129,13 +129,13 @@ export function AppSidebar({ isDark, ...props }) {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              className="h-9"
+              className="h-12"
               onClick={() => handleNavigation("/")}
             >
-              <div className="flex aspect-square size-6 items-center justify-center rounded-lg">
-                <img src="https://i.imgur.com/R52jwPv.png" alt="BrewedOps" className="size-5 rounded" />
+              <div className="flex aspect-square size-8 items-center justify-center rounded-lg">
+                <img src="https://i.imgur.com/R52jwPv.png" alt="BrewedOps" className="size-7 rounded" />
               </div>
-              <span className="font-bold text-sm" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+              <span className="font-bold text-base" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                 <span style={{ color: isDark ? '#ffffff' : BRAND.brown }}>Brewed</span>
                 <span style={{ color: BRAND.blue }}>Ops</span>
               </span>
