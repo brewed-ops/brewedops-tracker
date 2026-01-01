@@ -4,7 +4,7 @@ import {
   Plus, Trash2, Edit3, Save, FileText, AlertTriangle, Palette,
   Bold, Italic, Underline, Strikethrough, List, ListOrdered, CheckSquare,
   AlignLeft, AlignCenter, AlignRight, Type, Heading1, Heading2, Heading3,
-  MoreVertical, X, Loader2
+  X, Loader2, Highlighter
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
@@ -32,21 +32,28 @@ const NOTE_COLORS = [
 
 // Font families
 const FONT_FAMILIES = [
-  { name: 'Calibri', value: 'Calibri, sans-serif' },
   { name: 'Arial', value: 'Arial, sans-serif' },
-  { name: 'Times New Roman', value: 'Times New Roman, serif' },
-  { name: 'Georgia', value: 'Georgia, serif' },
   { name: 'Verdana', value: 'Verdana, sans-serif' },
+  { name: 'Georgia', value: 'Georgia, serif' },
+  { name: 'Times New Roman', value: 'Times New Roman, serif' },
   { name: 'Courier New', value: 'Courier New, monospace' },
+  { name: 'Trebuchet MS', value: 'Trebuchet MS, sans-serif' },
 ];
 
 // Font sizes
-const FONT_SIZES = [10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+const FONT_SIZES = ['1', '2', '3', '4', '5', '6', '7'];
+const FONT_SIZE_LABELS = ['10px', '13px', '16px', '18px', '24px', '32px', '48px'];
 
 // Text colors
 const TEXT_COLORS = [
   '#000000', '#374151', '#6b7280', '#ef4444', '#f97316', '#eab308',
   '#22c55e', '#14b8a6', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff'
+];
+
+// Highlight colors
+const HIGHLIGHT_COLORS = [
+  '#fef08a', '#fde047', '#fcd34d', '#fdba74', '#fca5a5', 
+  '#d8b4fe', '#c4b5fd', '#a5b4fc', '#93c5fd', '#6ee7b7'
 ];
 
 const BrewedNotes = ({ isDark, user }) => {
@@ -69,9 +76,8 @@ const BrewedNotes = ({ isDark, user }) => {
   const [newNoteColor, setNewNoteColor] = useState(NOTE_COLORS[0].value);
   
   // Editor state
-  const [fontSize, setFontSize] = useState(14);
-  const [fontFamily, setFontFamily] = useState(FONT_FAMILIES[0].value);
-  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showTextColorPicker, setShowTextColorPicker] = useState(false);
+  const [showHighlightPicker, setShowHighlightPicker] = useState(false);
   
   const editorRef = useRef(null);
 
@@ -94,7 +100,6 @@ const BrewedNotes = ({ isDark, user }) => {
       if (error) throw error;
       setNotes(data || []);
       
-      // Select first note if exists
       if (data && data.length > 0 && !selectedNote) {
         setSelectedNote(data[0]);
       }
@@ -114,7 +119,7 @@ const BrewedNotes = ({ isDark, user }) => {
         user_id: user.id,
         name: newNoteName.trim(),
         color: newNoteColor,
-        content: '',
+        content: '<p><br></p>',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       };
@@ -227,25 +232,36 @@ const BrewedNotes = ({ isDark, user }) => {
     }
   };
 
-  // Editor commands
-  const execCommand = (command, value = null) => {
-    document.execCommand(command, false, value);
+  // Execute command and refocus
+  const execCommand = useCallback((command, value = null) => {
     editorRef.current?.focus();
-  };
+    document.execCommand(command, false, value);
+  }, []);
 
-  const formatBlock = (tag) => {
-    execCommand('formatBlock', tag);
-  };
+  // Toolbar button component
+  const ToolbarButton = ({ onClick, disabled, title, active, children }) => (
+    <button
+      onMouseDown={(e) => {
+        e.preventDefault(); // Prevent losing selection
+        if (!disabled) onClick();
+      }}
+      disabled={disabled}
+      className={`p-1.5 rounded hover:bg-muted disabled:opacity-50 transition-colors ${active ? 'bg-muted' : ''}`}
+      title={title}
+    >
+      {children}
+    </button>
+  );
 
   const handleEditorDoubleClick = () => {
     if (!isEditing && selectedNote) {
       setIsEditing(true);
+      setTimeout(() => editorRef.current?.focus(), 0);
     }
   };
 
   const handleNoteSelect = (note) => {
     if (isEditing && selectedNote) {
-      // Auto-save before switching
       saveNote().then(() => {
         setSelectedNote(note);
         setIsEditing(false);
@@ -273,6 +289,13 @@ const BrewedNotes = ({ isDark, user }) => {
   const getNoteGradient = (color) => {
     return `linear-gradient(135deg, ${color}40 0%, ${color}20 100%)`;
   };
+
+  // Update editor content when note changes
+  useEffect(() => {
+    if (editorRef.current && selectedNote) {
+      editorRef.current.innerHTML = selectedNote.content || '<p><br></p>';
+    }
+  }, [selectedNote?.id]);
 
   if (loading) {
     return (
@@ -366,14 +389,11 @@ const BrewedNotes = ({ isDark, user }) => {
               <div className="p-2 border-b flex flex-wrap items-center gap-1" style={{ borderColor: theme.cardBorder }}>
                 {/* Font Family */}
                 <select
-                  value={fontFamily}
-                  onChange={(e) => {
-                    setFontFamily(e.target.value);
-                    execCommand('fontName', e.target.value);
-                  }}
+                  onChange={(e) => execCommand('fontName', e.target.value)}
                   disabled={!isEditing}
                   className="h-8 px-2 text-xs border rounded bg-background"
-                  style={{ borderColor: theme.cardBorder, minWidth: '100px' }}
+                  style={{ borderColor: theme.cardBorder, minWidth: '110px' }}
+                  defaultValue="Arial, sans-serif"
                 >
                   {FONT_FAMILIES.map(f => (
                     <option key={f.value} value={f.value}>{f.name}</option>
@@ -382,78 +402,48 @@ const BrewedNotes = ({ isDark, user }) => {
 
                 {/* Font Size */}
                 <select
-                  value={fontSize}
-                  onChange={(e) => {
-                    setFontSize(Number(e.target.value));
-                    execCommand('fontSize', '7');
-                    // Apply custom size via style
-                    const selection = window.getSelection();
-                    if (selection.rangeCount > 0) {
-                      const range = selection.getRangeAt(0);
-                      const span = document.createElement('span');
-                      span.style.fontSize = `${e.target.value}px`;
-                      range.surroundContents(span);
-                    }
-                  }}
+                  onChange={(e) => execCommand('fontSize', e.target.value)}
                   disabled={!isEditing}
-                  className="h-8 px-2 text-xs border rounded bg-background w-16"
+                  className="h-8 px-2 text-xs border rounded bg-background w-20"
                   style={{ borderColor: theme.cardBorder }}
+                  defaultValue="3"
                 >
-                  {FONT_SIZES.map(s => (
-                    <option key={s} value={s}>{s}</option>
+                  {FONT_SIZES.map((s, i) => (
+                    <option key={s} value={s}>{FONT_SIZE_LABELS[i]}</option>
                   ))}
                 </select>
 
                 <div className="w-px h-6 bg-border mx-1" />
 
                 {/* Text Formatting */}
-                <button
-                  onClick={() => execCommand('bold')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Bold"
-                >
+                <ToolbarButton onClick={() => execCommand('bold')} disabled={!isEditing} title="Bold (Ctrl+B)">
                   <Bold className="size-4" />
-                </button>
-                <button
-                  onClick={() => execCommand('italic')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Italic"
-                >
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('italic')} disabled={!isEditing} title="Italic (Ctrl+I)">
                   <Italic className="size-4" />
-                </button>
-                <button
-                  onClick={() => execCommand('underline')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Underline"
-                >
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('underline')} disabled={!isEditing} title="Underline (Ctrl+U)">
                   <Underline className="size-4" />
-                </button>
-                <button
-                  onClick={() => execCommand('strikeThrough')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Strikethrough"
-                >
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('strikeThrough')} disabled={!isEditing} title="Strikethrough">
                   <Strikethrough className="size-4" />
-                </button>
+                </ToolbarButton>
 
                 <div className="w-px h-6 bg-border mx-1" />
 
                 {/* Text Color */}
                 <div className="relative">
-                  <button
-                    onClick={() => setShowColorPicker(!showColorPicker)}
-                    disabled={!isEditing}
-                    className="p-1.5 rounded hover:bg-muted disabled:opacity-50 flex items-center gap-1"
+                  <ToolbarButton 
+                    onClick={() => setShowTextColorPicker(!showTextColorPicker)} 
+                    disabled={!isEditing} 
                     title="Text Color"
                   >
-                    <Type className="size-4" />
-                    <div className="w-4 h-1 rounded" style={{ backgroundColor: '#000' }} />
-                  </button>
-                  {showColorPicker && isEditing && (
+                    <div className="flex flex-col items-center">
+                      <Type className="size-4" />
+                      <div className="w-4 h-1 rounded mt-0.5" style={{ backgroundColor: '#ef4444' }} />
+                    </div>
+                  </ToolbarButton>
+                  {showTextColorPicker && isEditing && (
                     <div 
                       className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-6 gap-1"
                       style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
@@ -461,9 +451,10 @@ const BrewedNotes = ({ isDark, user }) => {
                       {TEXT_COLORS.map(color => (
                         <button
                           key={color}
-                          onClick={() => {
+                          onMouseDown={(e) => {
+                            e.preventDefault();
                             execCommand('foreColor', color);
-                            setShowColorPicker(false);
+                            setShowTextColorPicker(false);
                           }}
                           className="w-6 h-6 rounded border hover:scale-110 transition-transform"
                           style={{ backgroundColor: color, borderColor: theme.cardBorder }}
@@ -473,115 +464,95 @@ const BrewedNotes = ({ isDark, user }) => {
                   )}
                 </div>
 
-                {/* Background Color */}
+                {/* Highlight Color */}
                 <div className="relative">
-                  <button
-                    onClick={() => {
-                      const color = prompt('Enter background color (e.g., #ffff00 or yellow):');
-                      if (color) execCommand('hiliteColor', color);
-                    }}
-                    disabled={!isEditing}
-                    className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
+                  <ToolbarButton 
+                    onClick={() => setShowHighlightPicker(!showHighlightPicker)} 
+                    disabled={!isEditing} 
                     title="Highlight Color"
                   >
-                    <Palette className="size-4" />
-                  </button>
+                    <Highlighter className="size-4" />
+                  </ToolbarButton>
+                  {showHighlightPicker && isEditing && (
+                    <div 
+                      className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-5 gap-1"
+                      style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}
+                    >
+                      {HIGHLIGHT_COLORS.map(color => (
+                        <button
+                          key={color}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            execCommand('hiliteColor', color);
+                            setShowHighlightPicker(false);
+                          }}
+                          className="w-6 h-6 rounded border hover:scale-110 transition-transform"
+                          style={{ backgroundColor: color, borderColor: theme.cardBorder }}
+                        />
+                      ))}
+                      <button
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          execCommand('removeFormat');
+                          setShowHighlightPicker(false);
+                        }}
+                        className="w-6 h-6 rounded border hover:scale-110 transition-transform flex items-center justify-center text-xs"
+                        style={{ borderColor: theme.cardBorder }}
+                        title="Remove highlight"
+                      >
+                        <X className="size-3" />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div className="w-px h-6 bg-border mx-1" />
 
                 {/* Alignment */}
-                <button
-                  onClick={() => execCommand('justifyLeft')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Align Left"
-                >
+                <ToolbarButton onClick={() => execCommand('justifyLeft')} disabled={!isEditing} title="Align Left">
                   <AlignLeft className="size-4" />
-                </button>
-                <button
-                  onClick={() => execCommand('justifyCenter')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Align Center"
-                >
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('justifyCenter')} disabled={!isEditing} title="Align Center">
                   <AlignCenter className="size-4" />
-                </button>
-                <button
-                  onClick={() => execCommand('justifyRight')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Align Right"
-                >
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('justifyRight')} disabled={!isEditing} title="Align Right">
                   <AlignRight className="size-4" />
-                </button>
+                </ToolbarButton>
 
                 <div className="w-px h-6 bg-border mx-1" />
 
                 {/* Lists */}
-                <button
-                  onClick={() => execCommand('insertUnorderedList')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Bullet List"
-                >
+                <ToolbarButton onClick={() => execCommand('insertUnorderedList')} disabled={!isEditing} title="Bullet List">
                   <List className="size-4" />
-                </button>
-                <button
-                  onClick={() => execCommand('insertOrderedList')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Numbered List"
-                >
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('insertOrderedList')} disabled={!isEditing} title="Numbered List">
                   <ListOrdered className="size-4" />
-                </button>
-                <button
+                </ToolbarButton>
+                <ToolbarButton 
                   onClick={() => {
-                    const checkbox = '<input type="checkbox" style="margin-right: 8px;" />';
-                    execCommand('insertHTML', checkbox);
-                  }}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
+                    execCommand('insertHTML', '<div style="display:flex;align-items:center;gap:8px;"><input type="checkbox" /><span>Item</span></div>');
+                  }} 
+                  disabled={!isEditing} 
                   title="Checklist"
                 >
                   <CheckSquare className="size-4" />
-                </button>
+                </ToolbarButton>
 
                 <div className="w-px h-6 bg-border mx-1" />
 
                 {/* Headings */}
-                <button
-                  onClick={() => formatBlock('h1')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Heading 1"
-                >
+                <ToolbarButton onClick={() => execCommand('formatBlock', 'h1')} disabled={!isEditing} title="Heading 1">
                   <Heading1 className="size-4" />
-                </button>
-                <button
-                  onClick={() => formatBlock('h2')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Heading 2"
-                >
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('formatBlock', 'h2')} disabled={!isEditing} title="Heading 2">
                   <Heading2 className="size-4" />
-                </button>
-                <button
-                  onClick={() => formatBlock('h3')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50"
-                  title="Heading 3"
-                >
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('formatBlock', 'h3')} disabled={!isEditing} title="Heading 3">
                   <Heading3 className="size-4" />
-                </button>
-                <button
-                  onClick={() => formatBlock('p')}
-                  disabled={!isEditing}
-                  className="p-1.5 rounded hover:bg-muted disabled:opacity-50 text-xs font-medium"
-                  title="Normal Text"
-                >
-                  P
-                </button>
+                </ToolbarButton>
+                <ToolbarButton onClick={() => execCommand('formatBlock', 'p')} disabled={!isEditing} title="Paragraph">
+                  <span className="text-xs font-bold">P</span>
+                </ToolbarButton>
 
                 {/* Save Button */}
                 <div className="ml-auto">
@@ -608,19 +579,18 @@ const BrewedNotes = ({ isDark, user }) => {
                   className="h-full p-4 overflow-y-auto outline-none"
                   style={{
                     color: theme.text,
-                    fontSize: '14px',
+                    fontSize: '16px',
                     lineHeight: '1.6',
                     minHeight: '100%',
                     cursor: isEditing ? 'text' : 'default'
                   }}
-                  dangerouslySetInnerHTML={{ __html: selectedNote.content || '' }}
                   suppressContentEditableWarning={true}
                 />
               </div>
 
               {/* Status Bar */}
               <div className="px-4 py-2 border-t text-xs text-muted-foreground flex justify-between" style={{ borderColor: theme.cardBorder }}>
-                <span>{isEditing ? '✏️ Editing - Double-click to edit' : '👁️ View mode - Double-click to edit'}</span>
+                <span>{isEditing ? '✏️ Editing mode' : '👁️ View mode - Double-click to edit'}</span>
                 <span>Last saved: {new Date(selectedNote.updated_at).toLocaleString()}</span>
               </div>
             </>
@@ -771,11 +741,14 @@ const BrewedNotes = ({ isDark, user }) => {
         </DialogContent>
       </Dialog>
 
-      {/* Click outside color picker to close */}
-      {showColorPicker && (
+      {/* Click outside to close color pickers */}
+      {(showTextColorPicker || showHighlightPicker) && (
         <div 
           className="fixed inset-0 z-40" 
-          onClick={() => setShowColorPicker(false)}
+          onClick={() => {
+            setShowTextColorPicker(false);
+            setShowHighlightPicker(false);
+          }}
         />
       )}
     </div>
