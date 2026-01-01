@@ -354,6 +354,21 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 
       {/* Hero */}
       <section style={{ padding: isSmall ? '48px 20px 56px' : '72px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+        {/* Logo */}
+        <img 
+          src="https://i.imgur.com/z2WaRiA.png" 
+          alt="BrewedOps Logo" 
+          style={{ 
+            width: isSmall ? '80px' : '100px', 
+            height: isSmall ? '80px' : '100px', 
+            borderRadius: '20px', 
+            marginBottom: '24px',
+            display: 'block',
+            marginLeft: 'auto',
+            marginRight: 'auto'
+          }} 
+        />
+        
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.cream, borderRadius: '100px', marginBottom: '24px', border: isDark ? 'none' : '1px solid ' + BRAND.blue + '20' }}>
           <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 18 Free Tools for Filipino VAs & Freelancers</span>
         </div>
