@@ -240,17 +240,12 @@ const BrewedNotes = ({ isDark, user }) => {
       const checkedStyle = checked 
         ? 'text-decoration: line-through; opacity: 0.5; color: #9ca3af;' 
         : '';
-      const bgColor = checked 
-        ? (isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)')
-        : (isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)');
-      const borderColor = checked
-        ? 'rgba(34, 197, 94, 0.2)'
-        : (isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)');
       
-      return `<label class="checklist-item" style="display:flex;align-items:flex-start;gap:12px;margin:8px 0;padding:10px 12px;background:${bgColor};border-radius:8px;border:1px solid ${borderColor};cursor:pointer;user-select:none;">
+      return `<label class="checklist-item" style="display:flex;align-items:flex-start;gap:12px;margin:8px 0;padding:6px 0;cursor:pointer;user-select:none;">
         <input type="checkbox" ${checked ? 'checked' : ''} style="display:none;" />
         <span class="custom-checkbox" style="width:20px;height:20px;border:2px solid ${checked ? '#004AAC' : (isDark ? '#4b5563' : '#d1d5db')};border-radius:6px;background:${checked ? '#004AAC' : (isDark ? '#1f2937' : '#ffffff')};flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all 0.2s;">${checked ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>' : ''}</span>
         <span class="checklist-text" style="${checkedStyle}flex:1;line-height:1.5;padding-top:1px;">${text}</span>
+        <span class="done-label" style="display:${checked ? 'inline' : 'none'};font-size:12px;color:#22c55e;font-weight:500;padding-top:2px;">(done)</span>
       </label>`;
     };
     
@@ -350,6 +345,7 @@ const BrewedNotes = ({ isDark, user }) => {
     const checkbox = checkItem.querySelector('input[type="checkbox"]');
     const customCheckbox = checkItem.querySelector('.custom-checkbox');
     const textSpan = checkItem.querySelector('.checklist-text');
+    const doneLabel = checkItem.querySelector('.done-label');
     
     if (!checkbox || !customCheckbox || !textSpan) return;
     
@@ -366,8 +362,7 @@ const BrewedNotes = ({ isDark, user }) => {
       customCheckbox.style.background = '#004AAC';
       customCheckbox.style.borderColor = '#004AAC';
       customCheckbox.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
-      checkItem.style.background = isDark ? 'rgba(34, 197, 94, 0.1)' : 'rgba(34, 197, 94, 0.08)';
-      checkItem.style.borderColor = 'rgba(34, 197, 94, 0.2)';
+      if (doneLabel) doneLabel.style.display = 'inline';
     } else {
       // Unchecked state
       textSpan.style.textDecoration = 'none';
@@ -376,8 +371,7 @@ const BrewedNotes = ({ isDark, user }) => {
       customCheckbox.style.background = isDark ? '#1f2937' : '#ffffff';
       customCheckbox.style.borderColor = isDark ? '#4b5563' : '#d1d5db';
       customCheckbox.innerHTML = '';
-      checkItem.style.background = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)';
-      checkItem.style.borderColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+      if (doneLabel) doneLabel.style.display = 'none';
     }
     
     // Prevent default label behavior since we're handling it manually
