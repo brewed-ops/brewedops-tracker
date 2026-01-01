@@ -4,7 +4,7 @@ import {
   Plus, Trash2, Edit3, Save, FileText, AlertTriangle,
   Bold, Italic, Underline, Strikethrough, List, ListOrdered, CheckSquare,
   AlignLeft, AlignCenter, AlignRight, Type, Heading1, Heading2, Heading3,
-  X, Loader2, Highlighter, Undo, Redo, RemoveFormatting
+  X, Loader2, Highlighter, Undo, Redo
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/label';
@@ -29,12 +29,14 @@ const NOTE_COLORS = [
 ];
 
 const FONT_FAMILIES = [
+  { name: 'Montserrat', value: 'Montserrat, sans-serif' },
+  { name: 'Nunito', value: 'Nunito, sans-serif' },
+  { name: 'Poppins', value: 'Poppins, sans-serif' },
   { name: 'Arial', value: 'Arial, sans-serif' },
   { name: 'Verdana', value: 'Verdana, sans-serif' },
   { name: 'Georgia', value: 'Georgia, serif' },
   { name: 'Times New Roman', value: 'Times New Roman, serif' },
   { name: 'Courier New', value: 'Courier New, monospace' },
-  { name: 'Trebuchet MS', value: 'Trebuchet MS, sans-serif' },
 ];
 
 const FONT_SIZES = [
@@ -82,6 +84,30 @@ const BrewedNotes = ({ isDark, user }) => {
   useEffect(() => {
     if (user?.id) loadNotes();
   }, [user?.id]);
+
+  // Handle checkbox changes for strikethrough
+  useEffect(() => {
+    const handleCheckboxChange = (e) => {
+      if (e.target.type === 'checkbox' && e.target.closest('.brewed-editor')) {
+        const checkItem = e.target.closest('.checklist-item');
+        if (checkItem) {
+          const textSpan = checkItem.querySelector('span');
+          if (textSpan) {
+            if (e.target.checked) {
+              textSpan.style.textDecoration = 'line-through';
+              textSpan.style.opacity = '0.6';
+            } else {
+              textSpan.style.textDecoration = 'none';
+              textSpan.style.opacity = '1';
+            }
+          }
+        }
+      }
+    };
+
+    document.addEventListener('change', handleCheckboxChange);
+    return () => document.removeEventListener('change', handleCheckboxChange);
+  }, []);
 
   const loadNotes = async () => {
     try {
@@ -202,14 +228,11 @@ const BrewedNotes = ({ isDark, user }) => {
     if (!editorRef.current) return;
     editorRef.current.focus();
     
-    // Check if current block is already this heading
     const currentBlock = document.queryCommandValue('formatBlock');
     
     if (currentBlock.toLowerCase() === level.toLowerCase()) {
-      // Already this heading - convert back to paragraph
       document.execCommand('formatBlock', false, 'p');
     } else {
-      // Apply heading
       document.execCommand('formatBlock', false, level);
     }
   }, []);
@@ -228,7 +251,7 @@ const BrewedNotes = ({ isDark, user }) => {
     document.execCommand('insertOrderedList', false, null);
   }, []);
 
-  // Format as checklist
+  // Format as checklist with strikethrough functionality
   const formatAsChecklist = useCallback(() => {
     if (!editorRef.current) return;
     editorRef.current.focus();
@@ -236,8 +259,13 @@ const BrewedNotes = ({ isDark, user }) => {
     const selection = window.getSelection();
     const selectedText = selection.toString().trim();
     
-    const createCheckItem = (text) => 
-      `<div style="display:flex;align-items:center;gap:8px;margin:6px 0;"><input type="checkbox" style="width:16px;height:16px;cursor:pointer;accent-color:${BRAND.blue};"/><span>${text}</span></div>`;
+    const createCheckItem = (text, checked = false) => {
+      const strikeStyle = checked ? 'text-decoration: line-through; opacity: 0.6;' : '';
+      return `<div class="checklist-item" style="display:flex;align-items:center;gap:8px;margin:6px 0;font-family: Montserrat, sans-serif;">
+        <input type="checkbox" ${checked ? 'checked' : ''} style="width:18px;height:18px;cursor:pointer;accent-color:${BRAND.blue};flex-shrink:0;"/>
+        <span style="${strikeStyle}">${text}</span>
+      </div>`;
+    };
     
     if (selectedText) {
       const lines = selectedText.split(/\n/).filter(line => line.trim());
@@ -316,15 +344,19 @@ const BrewedNotes = ({ isDark, user }) => {
   }
 
   return (
-    <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: FONTS.body }}>
-      {/* Custom editor styles - IMPORTANT: Makes bullets and numbers visible */}
+    <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: "'Montserrat', sans-serif" }}>
+      {/* Import Google Fonts */}
+      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      
+      {/* Custom editor styles */}
       <style>{`
         .brewed-editor {
           color: ${isDark ? '#f3f4f6' : '#111827'};
+          font-family: 'Montserrat', sans-serif;
         }
-        .brewed-editor h1 { font-size: 2em; font-weight: bold; margin: 0.5em 0; }
-        .brewed-editor h2 { font-size: 1.5em; font-weight: bold; margin: 0.5em 0; }
-        .brewed-editor h3 { font-size: 1.25em; font-weight: bold; margin: 0.5em 0; }
+        .brewed-editor h1 { font-size: 2em; font-weight: bold; margin: 0.5em 0; font-family: 'Montserrat', sans-serif; }
+        .brewed-editor h2 { font-size: 1.5em; font-weight: bold; margin: 0.5em 0; font-family: 'Montserrat', sans-serif; }
+        .brewed-editor h3 { font-size: 1.25em; font-weight: bold; margin: 0.5em 0; font-family: 'Montserrat', sans-serif; }
         .brewed-editor p { margin: 0.5em 0; }
         
         /* BULLET LIST - Make bullets visible */
@@ -354,27 +386,36 @@ const BrewedNotes = ({ isDark, user }) => {
         .brewed-editor ul ul ul { list-style-type: square !important; }
         .brewed-editor ol ol { list-style-type: lower-alpha !important; }
         .brewed-editor ol ol ol { list-style-type: lower-roman !important; }
+
+        /* Checklist styling */
+        .brewed-editor .checklist-item {
+          font-family: 'Montserrat', sans-serif;
+        }
+        .brewed-editor .checklist-item input[type="checkbox"]:checked + span {
+          text-decoration: line-through;
+          opacity: 0.6;
+        }
       `}</style>
 
       <div className="mb-4 md:mb-6">
-        <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
+        <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: "'Montserrat', sans-serif" }}>
           <FileText className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Brewed Notes
         </h1>
-        <p className="text-xs md:text-sm text-muted-foreground">Create and organize your notes with rich text formatting</p>
+        <p className="text-xs md:text-sm text-muted-foreground" style={{ fontFamily: "'Montserrat', sans-serif" }}>Create and organize your notes with rich text formatting</p>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4 h-auto lg:h-[calc(100vh-180px)]">
         {/* Sidebar */}
         <div className="w-full lg:w-56 shrink-0 flex flex-col" style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}` }}>
           <div className="p-3 border-b" style={{ borderColor: theme.cardBorder }}>
-            <Button onClick={() => setShowAddModal(true)} className="w-full" style={{ backgroundColor: BRAND.blue }}>
+            <Button onClick={() => setShowAddModal(true)} className="w-full" style={{ backgroundColor: BRAND.blue, fontFamily: "'Montserrat', sans-serif" }}>
               <Plus className="size-4 mr-2" />Add New Note
             </Button>
           </div>
           <div className="flex-1 overflow-y-auto p-2 space-y-1 max-h-40 lg:max-h-none">
             {notes.length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground text-sm">No notes yet.</div>
+              <div className="text-center py-8 text-muted-foreground text-sm" style={{ fontFamily: "'Montserrat', sans-serif" }}>No notes yet.</div>
             ) : notes.map(note => (
               <div
                 key={note.id}
@@ -383,13 +424,13 @@ const BrewedNotes = ({ isDark, user }) => {
                 style={{ background: getNoteGradient(note.color), borderLeft: `4px solid ${note.color}`, ringColor: note.color }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="font-medium text-sm truncate pr-2" style={{ color: theme.text }}>{note.name}</span>
+                  <span className="font-medium text-sm truncate pr-2" style={{ color: theme.text, fontFamily: "'Montserrat', sans-serif" }}>{note.name}</span>
                   <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={(e) => { e.stopPropagation(); setNoteToEdit(note); setNewNoteName(note.name); setNewNoteColor(note.color); setShowEditNameModal(true); }} className="p-1 rounded hover:bg-black/10"><Edit3 className="size-3" style={{ color: theme.text }} /></button>
                     <button onClick={(e) => { e.stopPropagation(); setNoteToDelete(note); setShowDeleteModal(true); }} className="p-1 rounded hover:bg-black/10"><Trash2 className="size-3 text-red-500" /></button>
                   </div>
                 </div>
-                <p className="text-[10px] text-muted-foreground mt-0.5">{new Date(note.updated_at).toLocaleDateString()}</p>
+                <p className="text-[10px] text-muted-foreground mt-0.5" style={{ fontFamily: "'Montserrat', sans-serif" }}>{new Date(note.updated_at).toLocaleDateString()}</p>
               </div>
             ))}
           </div>
@@ -407,10 +448,10 @@ const BrewedNotes = ({ isDark, user }) => {
                   onChange={(e) => { editorRef.current?.focus(); document.execCommand('fontName', false, e.target.value); }}
                   disabled={!isEditing}
                   className="h-7 px-1 text-xs border rounded bg-background disabled:opacity-40"
-                  style={{ borderColor: theme.cardBorder, width: '90px' }}
-                  defaultValue="Arial, sans-serif"
+                  style={{ borderColor: theme.cardBorder, width: '100px', fontFamily: "'Montserrat', sans-serif" }}
+                  defaultValue="Montserrat, sans-serif"
                 >
-                  {FONT_FAMILIES.map(f => <option key={f.value} value={f.value}>{f.name}</option>)}
+                  {FONT_FAMILIES.map(f => <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>{f.name}</option>)}
                 </select>
 
                 {/* Font Size */}
@@ -419,7 +460,7 @@ const BrewedNotes = ({ isDark, user }) => {
                   onChange={(e) => { editorRef.current?.focus(); document.execCommand('fontSize', false, e.target.value); }}
                   disabled={!isEditing}
                   className="h-7 px-1 text-xs border rounded bg-background disabled:opacity-40"
-                  style={{ borderColor: theme.cardBorder, width: '65px' }}
+                  style={{ borderColor: theme.cardBorder, width: '65px', fontFamily: "'Montserrat', sans-serif" }}
                   defaultValue="3"
                 >
                   {FONT_SIZES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
@@ -479,11 +520,11 @@ const BrewedNotes = ({ isDark, user }) => {
                 {/* Lists */}
                 <ToolbarBtn onClick={formatAsBulletList} disabled={!isEditing} title="Bullet List"><List className="size-3.5" /></ToolbarBtn>
                 <ToolbarBtn onClick={formatAsNumberedList} disabled={!isEditing} title="Numbered List"><ListOrdered className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={formatAsChecklist} disabled={!isEditing} title="Checklist"><CheckSquare className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={formatAsChecklist} disabled={!isEditing} title="Checklist (checks will strikethrough)"><CheckSquare className="size-3.5" /></ToolbarBtn>
 
                 <div className="w-px h-5 bg-border mx-1" />
 
-                {/* Headings - click again to remove */}
+                {/* Headings */}
                 <ToolbarBtn onClick={() => formatAsHeading('h1')} disabled={!isEditing} title="Heading 1 (click again to remove)"><Heading1 className="size-3.5" /></ToolbarBtn>
                 <ToolbarBtn onClick={() => formatAsHeading('h2')} disabled={!isEditing} title="Heading 2 (click again to remove)"><Heading2 className="size-3.5" /></ToolbarBtn>
                 <ToolbarBtn onClick={() => formatAsHeading('h3')} disabled={!isEditing} title="Heading 3 (click again to remove)"><Heading3 className="size-3.5" /></ToolbarBtn>
@@ -494,7 +535,7 @@ const BrewedNotes = ({ isDark, user }) => {
                 {/* Save */}
                 <div className="ml-auto">
                   {isEditing && (
-                    <Button onClick={saveNote} disabled={saving} size="sm" className="h-7 text-xs" style={{ backgroundColor: BRAND.green }}>
+                    <Button onClick={saveNote} disabled={saving} size="sm" className="h-7 text-xs" style={{ backgroundColor: BRAND.green, fontFamily: "'Montserrat', sans-serif" }}>
                       {saving ? <Loader2 className="size-3 mr-1 animate-spin" /> : <Save className="size-3 mr-1" />}Save
                     </Button>
                   )}
@@ -514,14 +555,14 @@ const BrewedNotes = ({ isDark, user }) => {
               </div>
 
               {/* Status */}
-              <div className="px-4 py-2 border-t text-xs text-muted-foreground flex justify-between" style={{ borderColor: theme.cardBorder }}>
-                <span>{isEditing ? '✏️ Editing - Click H1/H2/H3 again to remove heading format' : '👁️ View mode - Double-click to edit'}</span>
+              <div className="px-4 py-2 border-t text-xs text-muted-foreground flex justify-between" style={{ borderColor: theme.cardBorder, fontFamily: "'Montserrat', sans-serif" }}>
+                <span>{isEditing ? '✏️ Editing - Checked items will be crossed out' : '👁️ View mode - Double-click to edit'}</span>
                 <span>Saved: {new Date(selectedNote.updated_at).toLocaleString()}</span>
               </div>
             </>
           ) : (
             <div className="flex-1 flex items-center justify-center text-muted-foreground">
-              <div className="text-center"><FileText className="size-12 mx-auto mb-3 opacity-20" /><p>Select or create a note</p></div>
+              <div className="text-center" style={{ fontFamily: "'Montserrat', sans-serif" }}><FileText className="size-12 mx-auto mb-3 opacity-20" /><p>Select or create a note</p></div>
             </div>
           )}
         </div>
@@ -530,30 +571,30 @@ const BrewedNotes = ({ isDark, user }) => {
       {/* Modals */}
       <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle className="flex items-center gap-2"><Plus className="size-5" style={{ color: BRAND.blue }} />Create New Note</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="flex items-center gap-2" style={{ fontFamily: "'Montserrat', sans-serif" }}><Plus className="size-5" style={{ color: BRAND.blue }} />Create New Note</DialogTitle></DialogHeader>
           <div className="space-y-4 py-4">
-            <div><Label className="text-sm mb-2 block">Note Name</Label><input type="text" value={newNoteName} onChange={(e) => setNewNoteName(e.target.value)} placeholder="Enter note name..." className="w-full h-10 px-3 border rounded-lg bg-background" style={{ borderColor: theme.cardBorder }} autoFocus /></div>
-            <div><Label className="text-sm mb-2 block">Color</Label><div className="grid grid-cols-5 gap-2">{NOTE_COLORS.map(color => (<button key={color.value} onClick={() => setNewNoteColor(color.value)} className={`h-8 rounded-lg transition-all ${newNoteColor === color.value ? 'ring-2 ring-offset-2 scale-105' : 'hover:scale-105'}`} style={{ background: getNoteGradient(color.value), borderLeft: `4px solid ${color.value}`, ringColor: color.value }} title={color.name} />))}</div></div>
+            <div><Label className="text-sm mb-2 block" style={{ fontFamily: "'Montserrat', sans-serif" }}>Note Name</Label><input type="text" value={newNoteName} onChange={(e) => setNewNoteName(e.target.value)} placeholder="Enter note name..." className="w-full h-10 px-3 border rounded-lg bg-background" style={{ borderColor: theme.cardBorder, fontFamily: "'Montserrat', sans-serif" }} autoFocus /></div>
+            <div><Label className="text-sm mb-2 block" style={{ fontFamily: "'Montserrat', sans-serif" }}>Color</Label><div className="grid grid-cols-5 gap-2">{NOTE_COLORS.map(color => (<button key={color.value} onClick={() => setNewNoteColor(color.value)} className={`h-8 rounded-lg transition-all ${newNoteColor === color.value ? 'ring-2 ring-offset-2 scale-105' : 'hover:scale-105'}`} style={{ background: getNoteGradient(color.value), borderLeft: `4px solid ${color.value}`, ringColor: color.value }} title={color.name} />))}</div></div>
           </div>
-          <DialogFooter><Button variant="outline" onClick={() => setShowAddModal(false)}>Cancel</Button><Button onClick={createNote} disabled={!newNoteName.trim() || saving} style={{ backgroundColor: BRAND.blue }}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Plus className="size-4 mr-2" />}Create</Button></DialogFooter>
+          <DialogFooter><Button variant="outline" onClick={() => setShowAddModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button onClick={createNote} disabled={!newNoteName.trim() || saving} style={{ backgroundColor: BRAND.blue, fontFamily: "'Montserrat', sans-serif" }}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Plus className="size-4 mr-2" />}Create</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showEditNameModal} onOpenChange={setShowEditNameModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle className="flex items-center gap-2"><Edit3 className="size-5" style={{ color: BRAND.blue }} />Edit Note</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="flex items-center gap-2" style={{ fontFamily: "'Montserrat', sans-serif" }}><Edit3 className="size-5" style={{ color: BRAND.blue }} />Edit Note</DialogTitle></DialogHeader>
           <div className="space-y-4 py-4">
-            <div><Label className="text-sm mb-2 block">Note Name</Label><input type="text" value={newNoteName} onChange={(e) => setNewNoteName(e.target.value)} className="w-full h-10 px-3 border rounded-lg bg-background" style={{ borderColor: theme.cardBorder }} autoFocus /></div>
-            <div><Label className="text-sm mb-2 block">Color</Label><div className="grid grid-cols-5 gap-2">{NOTE_COLORS.map(color => (<button key={color.value} onClick={() => setNewNoteColor(color.value)} className={`h-8 rounded-lg transition-all ${newNoteColor === color.value ? 'ring-2 ring-offset-2 scale-105' : 'hover:scale-105'}`} style={{ background: getNoteGradient(color.value), borderLeft: `4px solid ${color.value}`, ringColor: color.value }} />))}</div></div>
+            <div><Label className="text-sm mb-2 block" style={{ fontFamily: "'Montserrat', sans-serif" }}>Note Name</Label><input type="text" value={newNoteName} onChange={(e) => setNewNoteName(e.target.value)} className="w-full h-10 px-3 border rounded-lg bg-background" style={{ borderColor: theme.cardBorder, fontFamily: "'Montserrat', sans-serif" }} autoFocus /></div>
+            <div><Label className="text-sm mb-2 block" style={{ fontFamily: "'Montserrat', sans-serif" }}>Color</Label><div className="grid grid-cols-5 gap-2">{NOTE_COLORS.map(color => (<button key={color.value} onClick={() => setNewNoteColor(color.value)} className={`h-8 rounded-lg transition-all ${newNoteColor === color.value ? 'ring-2 ring-offset-2 scale-105' : 'hover:scale-105'}`} style={{ background: getNoteGradient(color.value), borderLeft: `4px solid ${color.value}`, ringColor: color.value }} />))}</div></div>
           </div>
-          <DialogFooter><Button variant="outline" onClick={() => setShowEditNameModal(false)}>Cancel</Button><Button onClick={updateNoteName} disabled={!newNoteName.trim() || saving} style={{ backgroundColor: BRAND.blue }}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}Save</Button></DialogFooter>
+          <DialogFooter><Button variant="outline" onClick={() => setShowEditNameModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button onClick={updateNoteName} disabled={!newNoteName.trim() || saving} style={{ backgroundColor: BRAND.blue, fontFamily: "'Montserrat', sans-serif" }}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}Save</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle className="flex items-center gap-2"><AlertTriangle className="size-5 text-red-500" />Delete Note?</DialogTitle><DialogDescription>Are you sure you want to delete "<strong>{noteToDelete?.name}</strong>"?</DialogDescription></DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0"><Button variant="outline" onClick={() => setShowDeleteModal(false)}>Cancel</Button><Button variant="destructive" onClick={deleteNote} disabled={saving}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Trash2 className="size-4 mr-2" />}Delete</Button></DialogFooter>
+          <DialogHeader><DialogTitle className="flex items-center gap-2" style={{ fontFamily: "'Montserrat', sans-serif" }}><AlertTriangle className="size-5 text-red-500" />Delete Note?</DialogTitle><DialogDescription style={{ fontFamily: "'Montserrat', sans-serif" }}>Are you sure you want to delete "<strong>{noteToDelete?.name}</strong>"?</DialogDescription></DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0"><Button variant="outline" onClick={() => setShowDeleteModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button variant="destructive" onClick={deleteNote} disabled={saving} style={{ fontFamily: "'Montserrat', sans-serif" }}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Trash2 className="size-4 mr-2" />}Delete</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
