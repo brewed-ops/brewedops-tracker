@@ -11,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { getTheme } from '../lib/theme';
-import { supabase } from '../lib/supabaseClient';
+import { supabase } from '../supabaseClient';
 
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
 const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
