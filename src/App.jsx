@@ -3532,9 +3532,9 @@ const getBudgetStatus = () => {
 ) : activeSection === 'taskmanager' ? (
   <TaskManager user={user} isDark={isDark} clients={[]} />
 ) : activeSection === 'pdfeditor' ? (
-  <PDFEditor isDark={isDark} onNavigateHome={() => setActiveSection('dashboard')} />
+  <PDFEditor isDark={isDark} />
 ) : activeSection === 'bgremover' ? (
-  <BackgroundRemover isDark={isDark} onNavigateHome={() => setActiveSection('dashboard')} />
+  <BackgroundRemover isDark={isDark} />
 ) : (
 
      <>
@@ -8860,8 +8860,8 @@ function AppContent() {
       {/* Public tool routes - redirect to login */}
       <Route path="/vakita" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
       <Route path="/taskmanager" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
-      <Route path="/pdfeditor" element={<PDFEditor isDark={isDark} onNavigateHome={() => navigate('/')} />} />
-      <Route path="/bgremover" element={<BackgroundRemover isDark={isDark} onNavigateHome={() => navigate('/')} />} />
+      <Route path="/pdfeditor" element={<PDFEditor isDark={isDark} />} />
+      <Route path="/bgremover" element={<BackgroundRemover isDark={isDark} />} />
       <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     </Routes>
   );

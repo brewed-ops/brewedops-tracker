@@ -28,6 +28,12 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 
+// Brand colors
+const BRAND = {
+  brown: '#3F200C',
+  blue: '#004AAC',
+}
+
 // Navigation items with URL paths
 const homeItems = [
   {
@@ -116,9 +122,14 @@ export function AppSidebar({ isDark, ...props }) {
                   className="size-6 rounded"
                 />
               </div>
-              <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">BrewedOps</span>
-                <span className="truncate text-xs text-muted-foreground">Dashboard</span>
+              <div className="flex-1 text-left text-sm leading-tight">
+                <span 
+                  className="truncate font-bold text-base"
+                  style={{ fontFamily: "'Montserrat', sans-serif" }}
+                >
+                  <span style={{ color: isDark ? '#ffffff' : BRAND.brown }}>Brewed</span>
+                  <span style={{ color: BRAND.blue }}>Ops</span>
+                </span>
               </div>
             </SidebarMenuButton>
           </SidebarMenuItem>

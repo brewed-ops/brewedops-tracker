@@ -1,7 +1,7 @@
 // PDFEditor.jsx - Full-featured PDF Editor for BrewedOps
 // Mobile detection, clear all modal, proper dialogs
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Upload, Download, Save, Trash2, Type, Square, Circle, Minus, PenTool, MousePointer, RotateCcw, RotateCw, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, AlertTriangle, Clock, Bold, Italic, Underline, Palette, FileText, Loader2, CheckCircle, ArrowRight, Home, Monitor, Smartphone, X } from 'lucide-react';
+import { Upload, Download, Save, Trash2, Type, Square, Circle, Minus, PenTool, MousePointer, RotateCcw, RotateCw, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, AlertTriangle, Clock, Bold, Italic, Underline, Palette, FileText, Loader2, CheckCircle, ArrowRight, Monitor, Smartphone, X } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -63,18 +63,13 @@ const ExpiryTimer = ({ expiryTime, onExpired }) => {
 const CheckmarkIcon = ({ className }) => <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>;
 
 // Mobile Warning Screen Component
-const MobileWarningScreen = ({ isDark, onNavigateHome }) => {
+const MobileWarningScreen = ({ isDark }) => {
   const theme = getTheme(isDark);
   
   return (
     <div className="p-6 w-full min-h-screen flex flex-col" style={{ backgroundColor: theme.bg }}>
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold" style={{ color: theme.text }}>PDF Editor</h1>
-        {onNavigateHome && (
-          <Button variant="outline" size="sm" onClick={onNavigateHome}>
-            <Home className="size-4 mr-2" />Back
-          </Button>
-        )}
       </div>
       
       <Card className="max-w-md mx-auto mt-8">
@@ -107,13 +102,6 @@ const MobileWarningScreen = ({ isDark, onNavigateHome }) => {
             <p className="text-xs text-muted-foreground">
               Features like drag, resize, and precise annotations require mouse input and more screen space.
             </p>
-            
-            {onNavigateHome && (
-              <Button onClick={onNavigateHome} style={{ backgroundColor: BRAND.blue }} className="w-full">
-                <Home className="size-4 mr-2" />
-                Return to Dashboard
-              </Button>
-            )}
           </div>
         </CardContent>
       </Card>
@@ -199,7 +187,7 @@ const ClearAllModal = ({ isOpen, onClose, onConfirm }) => (
   </Dialog>
 );
 
-const PDFEditor = ({ isDark, onNavigateHome }) => {
+const PDFEditor = ({ isDark }) => {
   const theme = getTheme(isDark);
   const [pdfJs, setPdfJs] = useState(null);
   const [pdfDoc, setPdfDoc] = useState(null);
@@ -747,18 +735,17 @@ const PDFEditor = ({ isDark, onNavigateHome }) => {
 
   // Show mobile warning screen if on mobile and no file loaded
   if (isMobile && !pdfFile) {
-    return <MobileWarningScreen isDark={isDark} onNavigateHome={onNavigateHome} />;
+    return <MobileWarningScreen isDark={isDark} />;
   }
 
   // Upload screen
   if (!pdfFile) return (
     <div className="p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg }}>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6">
         <div>
           <h1 className="text-3xl font-bold mb-1" style={{ color: theme.text }}>PDF Editor</h1>
           <p className="text-sm text-muted-foreground">Edit PDFs with text, shapes, and drawings</p>
         </div>
-        {onNavigateHome && <Button variant="outline" onClick={onNavigateHome}><Home className="size-4 mr-2" />Back to Dashboard</Button>}
       </div>
       <Card className="max-w-2xl mx-auto">
         <CardContent className="p-12">
@@ -839,7 +826,6 @@ const PDFEditor = ({ isDark, onNavigateHome }) => {
           <Button variant="ghost" size="icon" className="size-8" onClick={() => setCurrentPage(p => Math.min(numPages, p + 1))} disabled={currentPage >= numPages}><ChevronRight className="size-4" /></Button>
         </div>
         {expiryTime && (<><Separator orientation="vertical" className="h-6" /><div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">Expires:</span><ExpiryTimer expiryTime={expiryTime} onExpired={handleExpired} /></div></>)}
-        <div className="ml-auto">{onNavigateHome && <Button variant="outline" size="sm" onClick={onNavigateHome}><Home className="size-4 mr-1" />Dashboard</Button>}</div>
       </div>
 
       {/* Main content */}

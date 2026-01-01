@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { 
   Upload, Download, Trash2, Image, Loader2, CheckCircle, 
-  Home, Clock, AlertTriangle, RefreshCw, ZoomIn, ZoomOut,
+  Clock, AlertTriangle, RefreshCw, ZoomIn, ZoomOut,
   Smartphone, Monitor, Sparkles, ImageOff, Eye, EyeOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -86,7 +86,7 @@ const BG_OPTIONS = [
   { id: 'red', label: 'Red', color: '#ef4444' },
 ];
 
-const BackgroundRemover = ({ isDark, onNavigateHome }) => {
+const BackgroundRemover = ({ isDark }) => {
   const theme = getTheme(isDark);
   
   // State
@@ -298,11 +298,6 @@ const BackgroundRemover = ({ isDark, onNavigateHome }) => {
           </h1>
           <p className="text-sm text-muted-foreground">Remove image backgrounds instantly with AI</p>
         </div>
-        {onNavigateHome && (
-          <Button variant="outline" onClick={onNavigateHome} className="w-full sm:w-auto">
-            <Home className="size-4 mr-2" />Back to Dashboard
-          </Button>
-        )}
       </div>
 
       {/* Main Content */}
