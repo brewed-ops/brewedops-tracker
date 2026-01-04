@@ -24,6 +24,7 @@ import WordCounter from './components/WordCounter';
 import FinanceTracker from './components/FinanceTracker';
 import GuestToolLayout from './components/layout/GuestToolLayout';
 import HomePage from './components/HomePage';
+import MermaidReader from './components/MermaidReader';
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -734,8 +735,9 @@ return (
     <Route path="/qrgenerator" element={<GuestToolLayout toolName="QR Generator" isDark={isDark} setIsDark={setIsDark}><QRGenerator isDark={isDark} /></GuestToolLayout>} />
     <Route path="/findreplace" element={<GuestToolLayout toolName="Find & Replace" isDark={isDark} setIsDark={setIsDark}><FindReplace isDark={isDark} /></GuestToolLayout>} />
     <Route path="/caseconverter" element={<GuestToolLayout toolName="Case Converter" isDark={isDark} setIsDark={setIsDark}><CaseConverter isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/mermaid" element={<GuestToolLayout toolName="Mermaid Reader" isDark={isDark} setIsDark={setIsDark}><MermaidReader isDark={isDark} user={null} /></GuestToolLayout>} />
     <Route path="/wordcounter" element={<GuestToolLayout toolName="Word Counter" isDark={isDark} setIsDark={setIsDark}><WordCounter isDark={isDark} /></GuestToolLayout>} />
-    
+
     <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
   </Routes>
 );

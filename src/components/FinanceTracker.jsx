@@ -33,6 +33,7 @@ import FindReplace from './FindReplace';
 import CaseConverter from './CaseConverter';
 import WordCounter from './WordCounter';
 import VAKita from './VAKita';
+import MermaidReader from './MermaidReader';
 
 // Import constants and utilities
 import {
@@ -243,6 +244,7 @@ const FinanceTracker = ({ user, onLogout, isDark, setIsDark }) => {
       case '/findreplace': return 'findreplace';
       case '/caseconverter': return 'caseconverter';
       case '/wordcounter': return 'wordcounter';
+      case '/mermaid': return 'mermaid';
       default: return 'dashboard';
     }
   };
@@ -2797,6 +2799,8 @@ const getBudgetStatus = () => {
   <CaseConverter isDark={isDark} />
 ) : activeSection === 'wordcounter' ? (
   <WordCounter isDark={isDark} />
+) : activeSection === 'mermaid' ? (
+  <MermaidReader isDark={isDark} user={user} />
 ) : (
 
      <>

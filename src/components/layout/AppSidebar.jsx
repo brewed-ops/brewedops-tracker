@@ -23,6 +23,7 @@ import {
   Replace,
   CaseSensitive,
   Hash,
+  GitBranch,
 } from "lucide-react"
 
 import {
@@ -75,6 +76,7 @@ const otherTools = [
   { id: "findreplace", title: "Find & Replace", icon: Replace, path: "/findreplace" },
   { id: "caseconverter", title: "Case Converter", icon: CaseSensitive, path: "/caseconverter" },
   { id: "wordcounter", title: "Word Counter", icon: Hash, path: "/wordcounter" },
+  { id: "mermaid", title: "Mermaid Reader", icon: GitBranch, path: "/mermaid" },
 ]
 
 export function AppSidebar({ isDark, ...props }) {

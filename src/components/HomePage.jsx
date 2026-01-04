@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote } from 'lucide-react';
+import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch } from 'lucide-react';
 
 // ============================================
 // BRAND CONFIGURATION
@@ -56,6 +56,7 @@ const TOOL_CATEGORIES = [
       { icon: Scissors, title: 'Video Trimmer', path: '/videotrimmer' },
     ]
   },
+  
   {
     name: 'Document Tools',
     tools: [
@@ -65,14 +66,15 @@ const TOOL_CATEGORIES = [
     ]
   },
   {
-    name: 'Other Tools',
-    tools: [
-      { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
-      { icon: Search, title: 'Find & Replace', path: '/findreplace' },
-      { icon: Type, title: 'Case Converter', path: '/caseconverter' },
-      { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
-    ]
-  },
+  name: 'Other Tools',
+  tools: [
+    { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
+    { icon: Search, title: 'Find & Replace', path: '/findreplace' },
+    { icon: Type, title: 'Case Converter', path: '/caseconverter' },
+    { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
+    { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },  // ADD THIS
+  ]
+},
 ];
 
 const PRODUCTIVITY_TOOLS = [
