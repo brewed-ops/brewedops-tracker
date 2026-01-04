@@ -34,7 +34,7 @@ const getTheme = (isDark) => ({
 
 const MAX_SAVED_DIAGRAMS = 10;
 
-// BrewedOps Brand Color Classes for auto-coloring
+// BrewedOps Brand Color Classes
 const COLOR_CLASSES = `
     classDef start fill:#FFF0D4,stroke:#3F200C,stroke-width:2px,color:#3F200C
     classDef process fill:#e0edff,stroke:#004AAC,stroke-width:2px,color:#004AAC
@@ -131,26 +131,19 @@ const TEMPLATES = [
 // Auto-color function
 const autoColorFlowchart = (code) => {
   if (!code.trim().toLowerCase().startsWith('flowchart')) return code;
-
   let cleanCode = code.replace(/:::\w+/g, '').replace(/\n\s*classDef\s+.*/g, '').replace(/\n\s*class\s+.*/g, '').trim();
   const lines = cleanCode.split('\n');
-  
   const processedLines = lines.map(line => {
     if (line.trim().startsWith('%%') || !line.trim()) return line;
     let p = line;
-    
-    // Stadium shape ([...])
     p = p.replace(/(\w+)\(\[([^\]]*)\]\)(?!:::)/g, (m, id, txt) => {
       const l = txt.toLowerCase();
       if (l.includes('start') || l.includes('begin') || l.includes('new') || l.includes('🚀')) return `${m}:::start`;
       if (l.includes('end') || l.includes('done') || l.includes('close') || l.includes('🏁')) return `${m}:::endNode`;
       return `${m}:::process`;
     });
-    // Circle shape ((...))
     p = p.replace(/(\w+)\(\(([^)]*)\)\)(?!:::)/g, (m) => `${m}:::start`);
-    // Diamond shape {...}
     p = p.replace(/(\w+)\{([^}]*)\}(?!:::)/g, (m) => `${m}:::decision`);
-    // Rectangle shape [...]
     p = p.replace(/(\w+)\[([^\]]*)\](?!:::)/g, (m, id, txt) => {
       const l = txt.toLowerCase();
       if (l.includes('✅') || l.includes('success') || l.includes('save') || l.includes('complete') || l.includes('approve')) return `${m}:::success`;
@@ -160,7 +153,6 @@ const autoColorFlowchart = (code) => {
     });
     return p;
   });
-
   return processedLines.join('\n') + '\n' + COLOR_CLASSES;
 };
 
@@ -168,13 +160,8 @@ const autoColorFlowchart = (code) => {
 const SaveModal = ({ isOpen, onClose, onSave, isDark, theme, isLoading, currentName }) => {
   const [name, setName] = useState(currentName || '');
   const inputRef = useRef(null);
-
-  useEffect(() => {
-    if (isOpen) { setName(currentName || ''); setTimeout(() => inputRef.current?.focus(), 100); }
-  }, [isOpen, currentName]);
-
+  useEffect(() => { if (isOpen) { setName(currentName || ''); setTimeout(() => inputRef.current?.focus(), 100); } }, [isOpen, currentName]);
   if (!isOpen) return null;
-
   return (
     <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }} onClick={onClose}>
       <div style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '24px', width: '100%', maxWidth: '400px', margin: '20px' }} onClick={(e) => e.stopPropagation()}>
@@ -262,7 +249,6 @@ const MermaidReader = ({ isDark = true, user = null }) => {
   };
 
   const loadDiagram = (d) => { setCode(d.code); setCurrentDiagramId(d.id); setCurrentDiagramName(d.name); setKey((k) => k + 1); setIsSidebarOpen(false); };
-  
   const deleteDiagram = async (id) => {
     if (!confirm('Delete this diagram?')) return;
     try {
@@ -271,7 +257,6 @@ const MermaidReader = ({ isDark = true, user = null }) => {
       await loadSavedDiagrams();
     } catch (err) { console.error('Failed to delete:', err); }
   };
-
   const createNewDiagram = () => { setCode(TEMPLATES[1].code); setCurrentDiagramId(null); setCurrentDiagramName(''); setKey((k) => k + 1); setIsSidebarOpen(false); };
   const handleAutoColor = () => { setCode(autoColorFlowchart(code)); setKey((k) => k + 1); };
 
@@ -376,18 +361,18 @@ const MermaidReader = ({ isDark = true, user = null }) => {
   const btnStyle = { height: '32px', padding: '0 10px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', fontSize: '12px', fontFamily: FONTS.body };
 
   return (
-    <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
+    <div style={{ width: '100%', height: 'calc(100vh - 160px)', minHeight: '500px', display: 'flex', flexDirection: 'column', backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, overflow: 'hidden' }}>
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Header */}
-      <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderBottom: '1px solid ' + theme.cardBorder }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: `linear-gradient(135deg, ${BRAND.blue}, #8b5cf6)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <GitBranch size={16} style={{ color: '#fff' }} />
-            </div>
-            <h1 style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: 0, fontFamily: FONTS.heading }}>Mermaid Diagram Viewer</h1>
-            {currentDiagramName && <span style={{ fontSize: '12px', color: theme.textMuted }}>— {currentDiagramName}</span>}
+      <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', borderBottom: '1px solid ' + theme.cardBorder, flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: `linear-gradient(135deg, ${BRAND.blue}, #8b5cf6)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <GitBranch size={16} style={{ color: '#fff' }} />
+          </div>
+          <div>
+            <h1 style={{ fontSize: '16px', fontWeight: '700', color: theme.text, margin: 0, fontFamily: FONTS.heading }}>Mermaid Diagram Viewer</h1>
+            <p style={{ fontSize: '11px', color: theme.textMuted, margin: 0 }}>Create flowcharts, sequence diagrams, and more</p>
           </div>
         </div>
         {user && (
@@ -400,38 +385,38 @@ const MermaidReader = ({ isDark = true, user = null }) => {
         )}
       </div>
 
-      {/* Main - Full Height */}
-      <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
+      {/* Main Content */}
+      <div style={{ flex: 1, display: 'flex', overflow: 'hidden', minHeight: 0 }}>
         {/* Code Panel */}
         {!isCodeCollapsed && (
-          <div style={{ width: '300px', minWidth: '280px', borderRight: '1px solid ' + theme.cardBorder, display: 'flex', flexDirection: 'column', backgroundColor: theme.cardBg }}>
-            <div style={{ padding: '10px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ width: '300px', minWidth: '280px', borderRight: '1px solid ' + theme.cardBorder, display: 'flex', flexDirection: 'column', backgroundColor: theme.cardBg, flexShrink: 0 }}>
+            <div style={{ padding: '8px 10px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Code size={14} style={{ color: theme.textMuted }} /><span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>Code</span></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <div ref={templateRef} style={{ position: 'relative' }}>
-                  <button onClick={() => setShowTemplates(!showTemplates)} style={{ ...btnStyle, height: '28px', padding: '0 8px', fontSize: '11px' }}>Templates <ChevronDown size={10} /></button>
+                  <button onClick={() => setShowTemplates(!showTemplates)} style={{ ...btnStyle, height: '26px', padding: '0 8px', fontSize: '11px' }}>Templates <ChevronDown size={10} /></button>
                   {showTemplates && (
                     <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '4px', backgroundColor: theme.cardBg, border: '1px solid ' + theme.cardBorder, borderRadius: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', padding: '4px', zIndex: 100, minWidth: '160px' }}>
                       {TEMPLATES.map((t, i) => (<button key={i} onClick={() => loadTemplate(t)} style={{ width: '100%', padding: '6px 8px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', textAlign: 'left', fontSize: '11px', color: theme.text }}>{t.name}</button>))}
                     </div>
                   )}
                 </div>
-                <button onClick={handleCopy} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }} title="Copy">{copied ? <Check size={12} style={{ color: BRAND.green }} /> : <Copy size={12} />}</button>
-                <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); }} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }} title="Clear"><Trash2 size={12} /></button>
+                <button onClick={handleCopy} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Copy">{copied ? <Check size={12} style={{ color: BRAND.green }} /> : <Copy size={12} />}</button>
+                <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); }} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Clear"><Trash2 size={12} /></button>
               </div>
             </div>
-            <div style={{ padding: '8px' }}>
+            <div style={{ padding: '8px', flexShrink: 0 }}>
               <button onClick={handleAutoColor} style={{ width: '100%', height: '32px', backgroundColor: BRAND.blue, border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><Wand2 size={14} /> Auto Color</button>
             </div>
-            <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter Mermaid code..." spellCheck={false} style={{ flex: 1, padding: '12px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', border: 'none', outline: 'none', resize: 'none', fontSize: '11px', fontFamily: "'Fira Code', monospace", color: isDark ? '#e4e4e7' : '#27272a', lineHeight: '1.6' }} />
-            {error && <div style={{ padding: '8px 12px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', color: isDark ? '#fca5a5' : '#dc2626', fontSize: '10px' }}>⚠️ {error}</div>}
+            <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter Mermaid code..." spellCheck={false} style={{ flex: 1, padding: '10px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', border: 'none', outline: 'none', resize: 'none', fontSize: '11px', fontFamily: "'Fira Code', monospace", color: isDark ? '#e4e4e7' : '#27272a', lineHeight: '1.6', minHeight: 0 }} />
+            {error && <div style={{ padding: '8px 10px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', color: isDark ? '#fca5a5' : '#dc2626', fontSize: '10px', flexShrink: 0 }}>⚠️ {error}</div>}
           </div>
         )}
 
-        {/* Preview - Takes remaining space */}
+        {/* Preview Panel */}
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, backgroundColor: isDark ? '#0a0a0b' : '#f8fafc' }}>
           {/* Preview Header */}
-          <div style={{ padding: '8px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.cardBg, flexWrap: 'wrap', gap: '8px' }}>
+          <div style={{ padding: '8px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.cardBg, flexWrap: 'wrap', gap: '8px', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <button onClick={() => setIsCodeCollapsed(!isCodeCollapsed)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0, backgroundColor: isCodeCollapsed ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent' }} title={isCodeCollapsed ? 'Show Code' : 'Hide Code'}>{isCodeCollapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}</button>
               <Eye size={14} style={{ color: theme.textMuted }} />
@@ -451,7 +436,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           </div>
 
           {/* Canvas */}
-          <div ref={previewRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp} onWheel={handleWheel} style={{ flex: 1, overflow: 'hidden', cursor: isDragging ? 'grabbing' : 'grab', backgroundImage: isDark ? 'radial-gradient(circle, #27272a 1px, transparent 1px)' : 'radial-gradient(circle, #d4d4d8 1px, transparent 1px)', backgroundSize: '20px 20px', position: 'relative', userSelect: 'none' }}>
+          <div ref={previewRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp} onWheel={handleWheel} style={{ flex: 1, overflow: 'hidden', cursor: isDragging ? 'grabbing' : 'grab', backgroundImage: isDark ? 'radial-gradient(circle, #27272a 1px, transparent 1px)' : 'radial-gradient(circle, #d4d4d8 1px, transparent 1px)', backgroundSize: '20px 20px', position: 'relative', userSelect: 'none', minHeight: 0 }}>
             {svgContent ? (
               <div ref={svgRef} style={{ position: 'absolute', left: '50%', top: '50%', transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${scale})`, transformOrigin: 'center', transition: isDragging ? 'none' : 'transform 0.1s', padding: '20px', backgroundColor: isDark ? '#18181b' : '#fff', borderRadius: '8px', boxShadow: isDark ? '0 2px 16px rgba(0,0,0,0.4)' : '0 2px 16px rgba(0,0,0,0.08)' }} dangerouslySetInnerHTML={{ __html: svgContent }} />
             ) : (
@@ -463,7 +448,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           </div>
 
           {/* Footer */}
-          <div style={{ padding: '6px 12px', borderTop: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', backgroundColor: theme.cardBg }}>
+          <div style={{ padding: '6px 12px', borderTop: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', backgroundColor: theme.cardBg, flexShrink: 0 }}>
             <span style={{ fontSize: '10px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><Move size={10} /> Drag to pan</span>
             <span style={{ fontSize: '10px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><ZoomIn size={10} /> Scroll to zoom</span>
           </div>
