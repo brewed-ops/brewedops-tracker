@@ -9,7 +9,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import mermaid from 'mermaid';
 import { supabase } from '../lib/supabase';
-import { Copy, Check, Download, RefreshCw, Code, Eye, Trash2, ChevronDown, GitBranch, ZoomIn, ZoomOut, Move, PanelLeftClose, PanelLeft, RotateCcw, Save, X, FileText, Clock, Loader2, FolderOpen, Wand2 } from 'lucide-react';
+import { Copy, Check, Download, RefreshCw, Code, Eye, Trash2, ChevronDown, GitBranch, ZoomIn, ZoomOut, Move, PanelLeftClose, PanelLeft, RotateCcw, Save, X, FileText, Clock, Loader2, FolderOpen, Wand2, Undo2 } from 'lucide-react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -34,37 +34,38 @@ const getTheme = (isDark) => ({
 
 const MAX_SAVED_DIAGRAMS = 10;
 
-// Bright Color Classes for Auto-Coloring
+// BRIGHT Color Classes for Auto-Coloring
 const COLOR_CLASSES = `
-    classDef start fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#713f12
-    classDef process fill:#bfdbfe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
-    classDef decision fill:#e9d5ff,stroke:#9333ea,stroke-width:2px,color:#581c87
-    classDef success fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
-    classDef error fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
-    classDef warning fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
-    classDef endNode fill:#99f6e4,stroke:#0d9488,stroke-width:2px,color:#134e4a
-    classDef io fill:#fbcfe8,stroke:#db2777,stroke-width:2px,color:#831843`;
+    classDef startClass fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#713f12
+    classDef processClass fill:#bfdbfe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef decisionClass fill:#e9d5ff,stroke:#9333ea,stroke-width:2px,color:#581c87
+    classDef successClass fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef errorClass fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    classDef warningClass fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef endClass fill:#99f6e4,stroke:#0d9488,stroke-width:2px,color:#134e4a
+    classDef ioClass fill:#fbcfe8,stroke:#db2777,stroke-width:2px,color:#831843`;
 
 const TEMPLATES = [
   {
     name: 'Colorful Flowchart',
     code: `flowchart TD
-    A([🚀 Start]):::start --> B[Process Data]:::process
-    B --> C{Is Valid?}:::decision
-    C -->|Yes| D[✅ Save to DB]:::success
-    C -->|No| E[❌ Show Error]:::error
-    D --> F[Send Email]:::process
-    E --> G[⚠️ Log Error]:::warning
-    F --> H([🏁 End]):::endNode
+    A([🚀 Start]):::startClass --> B[Process Data]:::processClass
+    B --> C{Is Valid?}:::decisionClass
+    C -->|Yes| D[✅ Save to DB]:::successClass
+    C -->|No| E[❌ Show Error]:::errorClass
+    D --> F[Send Email]:::ioClass
+    E --> G[⚠️ Log Error]:::warningClass
+    F --> H([🏁 End]):::endClass
     G --> H
 
-    classDef start fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#713f12
-    classDef process fill:#bfdbfe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
-    classDef decision fill:#e9d5ff,stroke:#9333ea,stroke-width:2px,color:#581c87
-    classDef success fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
-    classDef error fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
-    classDef warning fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
-    classDef endNode fill:#99f6e4,stroke:#0d9488,stroke-width:2px,color:#134e4a`,
+    classDef startClass fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#713f12
+    classDef processClass fill:#bfdbfe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef decisionClass fill:#e9d5ff,stroke:#9333ea,stroke-width:2px,color:#581c87
+    classDef successClass fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef errorClass fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    classDef warningClass fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef endClass fill:#99f6e4,stroke:#0d9488,stroke-width:2px,color:#134e4a
+    classDef ioClass fill:#fbcfe8,stroke:#db2777,stroke-width:2px,color:#831843`,
   },
   {
     name: 'Simple Flowchart',
@@ -129,117 +130,116 @@ const TEMPLATES = [
   },
 ];
 
-// Auto-color function with improved detection
+// Completely rewritten auto-color function
 const autoColorFlowchart = (code) => {
-  if (!code.trim().toLowerCase().startsWith('flowchart')) return code;
-  
-  // Remove existing class assignments
+  // Only process flowcharts
+  const firstLine = code.trim().split('\n')[0].toLowerCase();
+  if (!firstLine.startsWith('flowchart')) {
+    return code;
+  }
+
+  // Step 1: Completely strip ALL existing class assignments and classDef lines
   let cleanCode = code
-    .replace(/:::[\w]+/g, '')
-    .replace(/\n\s*classDef\s+[^\n]*/g, '')
-    .replace(/\n\s*class\s+[^\n]*/g, '')
+    // Remove :::anything patterns
+    .replace(/:::[a-zA-Z_][a-zA-Z0-9_]*/g, '')
+    // Remove classDef lines completely
+    .replace(/^\s*classDef\s+.*$/gm, '')
+    // Remove class assignment lines
+    .replace(/^\s*class\s+.*$/gm, '')
+    // Clean up multiple blank lines
+    .replace(/\n\s*\n\s*\n/g, '\n\n')
     .trim();
-  
+
+  // Step 2: Parse and identify all nodes
   const lines = cleanCode.split('\n');
   const nodeClasses = new Map();
-  
-  // First pass: identify all nodes and assign classes
+
   lines.forEach(line => {
-    if (line.trim().startsWith('%%') || !line.trim()) return;
-    
-    // Match stadium shape ([...]) - typically start/end
-    const stadiumMatches = line.matchAll(/(\w+)\(\[([^\]]*)\]\)/g);
-    for (const match of stadiumMatches) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('%%') || trimmed.startsWith('flowchart')) return;
+
+    // Find all node definitions in this line
+    // Stadium shape ([text]) - start/end
+    const stadiums = [...line.matchAll(/([A-Za-z][A-Za-z0-9_]*)\s*\(\[([^\]]*)\]\)/g)];
+    stadiums.forEach(match => {
       const [, nodeId, text] = match;
       const lower = text.toLowerCase();
-      if (lower.includes('start') || lower.includes('begin') || lower.includes('new') || lower.includes('🚀') || lower.includes('init')) {
-        nodeClasses.set(nodeId, 'start');
-      } else if (lower.includes('end') || lower.includes('done') || lower.includes('close') || lower.includes('finish') || lower.includes('🏁') || lower.includes('complete') || lower.includes('archive')) {
-        nodeClasses.set(nodeId, 'endNode');
+      if (lower.includes('start') || lower.includes('begin') || lower.includes('new') || lower.includes('🚀')) {
+        nodeClasses.set(nodeId, 'startClass');
+      } else if (lower.includes('end') || lower.includes('done') || lower.includes('close') || lower.includes('🏁') || lower.includes('finish')) {
+        nodeClasses.set(nodeId, 'endClass');
       } else {
-        nodeClasses.set(nodeId, 'process');
+        nodeClasses.set(nodeId, 'processClass');
       }
-    }
-    
-    // Match circle shape ((...)) - typically start
-    const circleMatches = line.matchAll(/(\w+)\(\(([^)]*)\)\)/g);
-    for (const match of circleMatches) {
-      nodeClasses.set(match[1], 'start');
-    }
-    
-    // Match diamond shape {...} - decision
-    const diamondMatches = line.matchAll(/(\w+)\{([^}]*)\}/g);
-    for (const match of diamondMatches) {
-      nodeClasses.set(match[1], 'decision');
-    }
-    
-    // Match parallelogram [/...\] or [\.../ ] - I/O
-    const ioMatches = line.matchAll(/(\w+)\[[\\/]([^\]]*)[\\\/]\]/g);
-    for (const match of ioMatches) {
-      nodeClasses.set(match[1], 'io');
-    }
-    
-    // Match rectangle shape [...] - process/action
-    const rectMatches = line.matchAll(/(\w+)\[([^\]\/\\]*)\](?!\()/g);
-    for (const match of rectMatches) {
+    });
+
+    // Circle shape ((text)) - start
+    const circles = [...line.matchAll(/([A-Za-z][A-Za-z0-9_]*)\s*\(\(([^)]*)\)\)/g)];
+    circles.forEach(match => {
       const [, nodeId, text] = match;
-      if (nodeClasses.has(nodeId)) continue; // Don't override
+      const lower = text.toLowerCase();
+      if (lower.includes('end')) {
+        nodeClasses.set(nodeId, 'endClass');
+      } else {
+        nodeClasses.set(nodeId, 'startClass');
+      }
+    });
+
+    // Diamond shape {text} - decision
+    const diamonds = [...line.matchAll(/([A-Za-z][A-Za-z0-9_]*)\s*\{([^}]*)\}/g)];
+    diamonds.forEach(match => {
+      nodeClasses.set(match[1], 'decisionClass');
+    });
+
+    // Rectangle shape [text] - various types based on content
+    const rectangles = [...line.matchAll(/([A-Za-z][A-Za-z0-9_]*)\s*\[([^\[\]]*)\](?!\()/g)];
+    rectangles.forEach(match => {
+      const [, nodeId, text] = match;
+      if (nodeClasses.has(nodeId)) return; // Don't override
+
+      const lower = text.toLowerCase();
       
-      const lower = text.toLowerCase();
-      if (lower.includes('✅') || lower.includes('success') || lower.includes('save') || lower.includes('complete') || lower.includes('approve') || lower.includes('accept') || lower.includes('enroll') || lower.includes('won') || lower.includes('qualified')) {
-        nodeClasses.set(nodeId, 'success');
-      } else if (lower.includes('❌') || lower.includes('error') || lower.includes('fail') || lower.includes('reject') || lower.includes('cancel') || lower.includes('delete') || lower.includes('lost') || lower.includes('not qualified')) {
-        nodeClasses.set(nodeId, 'error');
-      } else if (lower.includes('⚠') || lower.includes('warn') || lower.includes('retry') || lower.includes('reschedule') || lower.includes('wait') || lower.includes('log') || lower.includes('pending') || lower.includes('follow') || lower.includes('remind')) {
-        nodeClasses.set(nodeId, 'warning');
-      } else if (lower.includes('send') || lower.includes('email') || lower.includes('notify') || lower.includes('sms') || lower.includes('call') || lower.includes('message')) {
-        nodeClasses.set(nodeId, 'io');
-      } else {
-        nodeClasses.set(nodeId, 'process');
+      // Success keywords - GREEN
+      if (lower.includes('✅') || lower.includes('success') || lower.includes('complete') || 
+          lower.includes('approve') || lower.includes('accept') || lower.includes('enroll') || 
+          lower.includes('won') || lower.includes('qualified') || lower.includes('closed') ||
+          lower.includes('save to') || lower.includes('saved')) {
+        nodeClasses.set(nodeId, 'successClass');
       }
-    }
+      // Error keywords - RED  
+      else if (lower.includes('❌') || lower.includes('error') || lower.includes('fail') || 
+               lower.includes('reject') || lower.includes('cancel') || lower.includes('delete') || 
+               lower.includes('lost') || lower.includes('not qualified') || lower.includes('disqualif')) {
+        nodeClasses.set(nodeId, 'errorClass');
+      }
+      // Warning keywords - ORANGE
+      else if (lower.includes('⚠') || lower.includes('warn') || lower.includes('retry') || 
+               lower.includes('reschedule') || lower.includes('wait') || lower.includes('log') || 
+               lower.includes('pending') || lower.includes('hold') || lower.includes('nurture') ||
+               lower.includes('follow-up') || lower.includes('follow up') || lower.includes('remind')) {
+        nodeClasses.set(nodeId, 'warningClass');
+      }
+      // I/O keywords - PINK
+      else if (lower.includes('send') || lower.includes('email') || lower.includes('notify') || 
+               lower.includes('sms') || lower.includes('call') || lower.includes('message') ||
+               lower.includes('webhook') || lower.includes('api') || lower.includes('notification')) {
+        nodeClasses.set(nodeId, 'ioClass');
+      }
+      // Default - BLUE
+      else {
+        nodeClasses.set(nodeId, 'processClass');
+      }
+    });
   });
-  
-  // Second pass: add class assignments to nodes in the code
-  let result = lines.map(line => {
-    if (line.trim().startsWith('%%') || !line.trim()) return line;
-    
-    let processedLine = line;
-    
-    // Add classes to stadium shapes
-    processedLine = processedLine.replace(/(\w+)(\(\[[^\]]*\]\))(?!:::)/g, (match, nodeId, shape) => {
-      const cls = nodeClasses.get(nodeId);
-      return cls ? `${nodeId}${shape}:::${cls}` : match;
-    });
-    
-    // Add classes to circle shapes
-    processedLine = processedLine.replace(/(\w+)(\(\([^)]*\)\))(?!:::)/g, (match, nodeId, shape) => {
-      const cls = nodeClasses.get(nodeId);
-      return cls ? `${nodeId}${shape}:::${cls}` : match;
-    });
-    
-    // Add classes to diamond shapes
-    processedLine = processedLine.replace(/(\w+)(\{[^}]*\})(?!:::)/g, (match, nodeId, shape) => {
-      const cls = nodeClasses.get(nodeId);
-      return cls ? `${nodeId}${shape}:::${cls}` : match;
-    });
-    
-    // Add classes to parallelogram shapes
-    processedLine = processedLine.replace(/(\w+)(\[[\\/][^\]]*[\\\/]\])(?!:::)/g, (match, nodeId, shape) => {
-      const cls = nodeClasses.get(nodeId);
-      return cls ? `${nodeId}${shape}:::${cls}` : match;
-    });
-    
-    // Add classes to rectangle shapes (be careful not to match already processed)
-    processedLine = processedLine.replace(/(\w+)(\[[^\]\/\\]*\])(?!:::|\()/g, (match, nodeId, shape) => {
-      const cls = nodeClasses.get(nodeId);
-      return cls ? `${nodeId}${shape}:::${cls}` : match;
-    });
-    
-    return processedLine;
-  }).join('\n');
-  
-  return result + '\n' + COLOR_CLASSES;
+
+  // Step 3: Build class assignment string
+  const classAssignments = [];
+  nodeClasses.forEach((className, nodeId) => {
+    classAssignments.push(`    class ${nodeId} ${className}`);
+  });
+
+  // Step 4: Return clean code + class assignments + class definitions
+  return cleanCode + '\n\n' + classAssignments.join('\n') + '\n' + COLOR_CLASSES;
 };
 
 // Save Modal
@@ -294,6 +294,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [codeBeforeColor, setCodeBeforeColor] = useState(null); // Store original code for revert
   
   const previewRef = useRef(null);
   const templateRef = useRef(null);
@@ -334,7 +335,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
     finally { setIsSaving(false); }
   };
 
-  const loadDiagram = (d) => { setCode(d.code); setCurrentDiagramId(d.id); setCurrentDiagramName(d.name); setKey((k) => k + 1); setIsSidebarOpen(false); };
+  const loadDiagram = (d) => { setCode(d.code); setCurrentDiagramId(d.id); setCurrentDiagramName(d.name); setCodeBeforeColor(null); setKey((k) => k + 1); setIsSidebarOpen(false); };
   const deleteDiagram = async (id) => {
     if (!confirm('Delete this diagram?')) return;
     try {
@@ -343,8 +344,24 @@ const MermaidReader = ({ isDark = true, user = null }) => {
       await loadSavedDiagrams();
     } catch (err) { console.error('Failed to delete:', err); }
   };
-  const createNewDiagram = () => { setCode(TEMPLATES[1].code); setCurrentDiagramId(null); setCurrentDiagramName(''); setKey((k) => k + 1); setIsSidebarOpen(false); };
-  const handleAutoColor = () => { setCode(autoColorFlowchart(code)); setKey((k) => k + 1); };
+  const createNewDiagram = () => { setCode(TEMPLATES[1].code); setCurrentDiagramId(null); setCurrentDiagramName(''); setCodeBeforeColor(null); setKey((k) => k + 1); setIsSidebarOpen(false); };
+  
+  const handleAutoColor = () => { 
+    // Only save original if we haven't already (prevents overwriting original with colored version)
+    if (!codeBeforeColor) {
+      setCodeBeforeColor(code);
+    }
+    setCode(autoColorFlowchart(code)); 
+    setKey((k) => k + 1); 
+  };
+  
+  const handleRevertColor = () => {
+    if (codeBeforeColor) {
+      setCode(codeBeforeColor);
+      setCodeBeforeColor(null);
+      setKey((k) => k + 1);
+    }
+  };
 
   useEffect(() => {
     mermaid.initialize({
@@ -436,7 +453,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
     img.src = url;
   };
 
-  const loadTemplate = (t) => { setCode(t.code); setCurrentDiagramId(null); setCurrentDiagramName(''); setShowTemplates(false); setKey((k) => k + 1); };
+  const loadTemplate = (t) => { setCode(t.code); setCurrentDiagramId(null); setCurrentDiagramName(''); setCodeBeforeColor(null); setShowTemplates(false); setKey((k) => k + 1); };
 
   useEffect(() => {
     const h = (e) => { if (templateRef.current && !templateRef.current.contains(e.target)) setShowTemplates(false); };
@@ -488,11 +505,14 @@ const MermaidReader = ({ isDark = true, user = null }) => {
                   )}
                 </div>
                 <button onClick={handleCopy} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Copy">{copied ? <Check size={12} style={{ color: BRAND.green }} /> : <Copy size={12} />}</button>
-                <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); }} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Clear"><Trash2 size={12} /></button>
+                <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); setCodeBeforeColor(null); }} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Clear"><Trash2 size={12} /></button>
               </div>
             </div>
-            <div style={{ padding: '8px', flexShrink: 0 }}>
-              <button onClick={handleAutoColor} style={{ width: '100%', height: '32px', backgroundColor: BRAND.blue, border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><Wand2 size={14} /> Auto Color</button>
+            <div style={{ padding: '8px', flexShrink: 0, display: 'flex', gap: '4px' }}>
+              <button onClick={handleAutoColor} style={{ flex: 1, height: '32px', backgroundColor: BRAND.green, border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><Wand2 size={14} /> Auto Color</button>
+              {codeBeforeColor && (
+                <button onClick={handleRevertColor} style={{ height: '32px', padding: '0 12px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '6px', color: theme.textMuted, fontSize: '12px', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}><Undo2 size={14} /> Revert</button>
+              )}
             </div>
             <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter Mermaid code..." spellCheck={false} style={{ flex: 1, padding: '10px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', border: 'none', outline: 'none', resize: 'none', fontSize: '11px', fontFamily: "'Fira Code', monospace", color: isDark ? '#e4e4e7' : '#27272a', lineHeight: '1.6', minHeight: 0 }} />
             {error && <div style={{ padding: '8px 10px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', color: isDark ? '#fca5a5' : '#dc2626', fontSize: '10px', flexShrink: 0 }}>⚠️ {error}</div>}
@@ -510,7 +530,14 @@ const MermaidReader = ({ isDark = true, user = null }) => {
               <span style={{ fontSize: '10px', color: theme.textMuted, backgroundColor: isDark ? '#27272a' : '#f4f4f5', padding: '2px 6px', borderRadius: '4px' }}>{Math.round(scale * 100)}%</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
-              {isCodeCollapsed && <button onClick={handleAutoColor} style={{ ...btnStyle, height: '28px', backgroundColor: BRAND.blue, borderColor: BRAND.blue, color: '#fff' }}><Wand2 size={12} /> Auto Color</button>}
+              {isCodeCollapsed && (
+                <>
+                  <button onClick={handleAutoColor} style={{ ...btnStyle, height: '28px', backgroundColor: BRAND.green, borderColor: BRAND.green, color: '#fff' }}><Wand2 size={12} /> Auto Color</button>
+                  {codeBeforeColor && (
+                    <button onClick={handleRevertColor} style={{ ...btnStyle, height: '28px' }}><Undo2 size={12} /> Revert</button>
+                  )}
+                </>
+              )}
               <button onClick={zoomOut} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ZoomOut size={14} /></button>
               <button onClick={zoomIn} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ZoomIn size={14} /></button>
               <button onClick={resetView} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><RotateCcw size={14} /></button>
