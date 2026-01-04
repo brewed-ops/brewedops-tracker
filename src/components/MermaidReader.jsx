@@ -1,7 +1,7 @@
 /**
  * MermaidReader Component
  * - Full-width preview (code collapsed by default)
- * - Auto-color with BrewedOps branding
+ * - Auto-color with bright, distinct colors
  * - Pan & zoom whiteboard preview
  * - Save diagrams (max 10 per user)
  */
@@ -34,15 +34,16 @@ const getTheme = (isDark) => ({
 
 const MAX_SAVED_DIAGRAMS = 10;
 
-// BrewedOps Brand Color Classes
+// Bright Color Classes for Auto-Coloring
 const COLOR_CLASSES = `
-    classDef start fill:#FFF0D4,stroke:#3F200C,stroke-width:2px,color:#3F200C
-    classDef process fill:#e0edff,stroke:#004AAC,stroke-width:2px,color:#004AAC
-    classDef decision fill:#f0e6ff,stroke:#7c3aed,stroke-width:2px,color:#5b21b6
-    classDef success fill:#dcfce7,stroke:#51AF43,stroke-width:2px,color:#166534
-    classDef error fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b
-    classDef warning fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
-    classDef endNode fill:#d1fae5,stroke:#51AF43,stroke-width:2px,color:#065f46`;
+    classDef start fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#713f12
+    classDef process fill:#bfdbfe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef decision fill:#e9d5ff,stroke:#9333ea,stroke-width:2px,color:#581c87
+    classDef success fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef error fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    classDef warning fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef endNode fill:#99f6e4,stroke:#0d9488,stroke-width:2px,color:#134e4a
+    classDef io fill:#fbcfe8,stroke:#db2777,stroke-width:2px,color:#831843`;
 
 const TEMPLATES = [
   {
@@ -53,17 +54,17 @@ const TEMPLATES = [
     C -->|Yes| D[✅ Save to DB]:::success
     C -->|No| E[❌ Show Error]:::error
     D --> F[Send Email]:::process
-    E --> G[Log Error]:::warning
+    E --> G[⚠️ Log Error]:::warning
     F --> H([🏁 End]):::endNode
     G --> H
 
-    classDef start fill:#FFF0D4,stroke:#3F200C,stroke-width:2px,color:#3F200C
-    classDef process fill:#e0edff,stroke:#004AAC,stroke-width:2px,color:#004AAC
-    classDef decision fill:#f0e6ff,stroke:#7c3aed,stroke-width:2px,color:#5b21b6
-    classDef success fill:#dcfce7,stroke:#51AF43,stroke-width:2px,color:#166534
-    classDef error fill:#fee2e2,stroke:#dc2626,stroke-width:2px,color:#991b1b
-    classDef warning fill:#fef3c7,stroke:#d97706,stroke-width:2px,color:#92400e
-    classDef endNode fill:#d1fae5,stroke:#51AF43,stroke-width:2px,color:#065f46`,
+    classDef start fill:#fef08a,stroke:#ca8a04,stroke-width:2px,color:#713f12
+    classDef process fill:#bfdbfe,stroke:#2563eb,stroke-width:2px,color:#1e3a8a
+    classDef decision fill:#e9d5ff,stroke:#9333ea,stroke-width:2px,color:#581c87
+    classDef success fill:#bbf7d0,stroke:#16a34a,stroke-width:2px,color:#14532d
+    classDef error fill:#fecaca,stroke:#dc2626,stroke-width:2px,color:#7f1d1d
+    classDef warning fill:#fed7aa,stroke:#ea580c,stroke-width:2px,color:#7c2d12
+    classDef endNode fill:#99f6e4,stroke:#0d9488,stroke-width:2px,color:#134e4a`,
   },
   {
     name: 'Simple Flowchart',
@@ -128,32 +129,117 @@ const TEMPLATES = [
   },
 ];
 
-// Auto-color function
+// Auto-color function with improved detection
 const autoColorFlowchart = (code) => {
   if (!code.trim().toLowerCase().startsWith('flowchart')) return code;
-  let cleanCode = code.replace(/:::\w+/g, '').replace(/\n\s*classDef\s+.*/g, '').replace(/\n\s*class\s+.*/g, '').trim();
+  
+  // Remove existing class assignments
+  let cleanCode = code
+    .replace(/:::[\w]+/g, '')
+    .replace(/\n\s*classDef\s+[^\n]*/g, '')
+    .replace(/\n\s*class\s+[^\n]*/g, '')
+    .trim();
+  
   const lines = cleanCode.split('\n');
-  const processedLines = lines.map(line => {
-    if (line.trim().startsWith('%%') || !line.trim()) return line;
-    let p = line;
-    p = p.replace(/(\w+)\(\[([^\]]*)\]\)(?!:::)/g, (m, id, txt) => {
-      const l = txt.toLowerCase();
-      if (l.includes('start') || l.includes('begin') || l.includes('new') || l.includes('🚀')) return `${m}:::start`;
-      if (l.includes('end') || l.includes('done') || l.includes('close') || l.includes('🏁')) return `${m}:::endNode`;
-      return `${m}:::process`;
-    });
-    p = p.replace(/(\w+)\(\(([^)]*)\)\)(?!:::)/g, (m) => `${m}:::start`);
-    p = p.replace(/(\w+)\{([^}]*)\}(?!:::)/g, (m) => `${m}:::decision`);
-    p = p.replace(/(\w+)\[([^\]]*)\](?!:::)/g, (m, id, txt) => {
-      const l = txt.toLowerCase();
-      if (l.includes('✅') || l.includes('success') || l.includes('save') || l.includes('complete') || l.includes('approve')) return `${m}:::success`;
-      if (l.includes('❌') || l.includes('error') || l.includes('fail') || l.includes('reject') || l.includes('cancel')) return `${m}:::error`;
-      if (l.includes('⚠') || l.includes('warn') || l.includes('retry') || l.includes('reschedule') || l.includes('wait') || l.includes('log') || l.includes('pending')) return `${m}:::warning`;
-      return `${m}:::process`;
-    });
-    return p;
+  const nodeClasses = new Map();
+  
+  // First pass: identify all nodes and assign classes
+  lines.forEach(line => {
+    if (line.trim().startsWith('%%') || !line.trim()) return;
+    
+    // Match stadium shape ([...]) - typically start/end
+    const stadiumMatches = line.matchAll(/(\w+)\(\[([^\]]*)\]\)/g);
+    for (const match of stadiumMatches) {
+      const [, nodeId, text] = match;
+      const lower = text.toLowerCase();
+      if (lower.includes('start') || lower.includes('begin') || lower.includes('new') || lower.includes('🚀') || lower.includes('init')) {
+        nodeClasses.set(nodeId, 'start');
+      } else if (lower.includes('end') || lower.includes('done') || lower.includes('close') || lower.includes('finish') || lower.includes('🏁') || lower.includes('complete') || lower.includes('archive')) {
+        nodeClasses.set(nodeId, 'endNode');
+      } else {
+        nodeClasses.set(nodeId, 'process');
+      }
+    }
+    
+    // Match circle shape ((...)) - typically start
+    const circleMatches = line.matchAll(/(\w+)\(\(([^)]*)\)\)/g);
+    for (const match of circleMatches) {
+      nodeClasses.set(match[1], 'start');
+    }
+    
+    // Match diamond shape {...} - decision
+    const diamondMatches = line.matchAll(/(\w+)\{([^}]*)\}/g);
+    for (const match of diamondMatches) {
+      nodeClasses.set(match[1], 'decision');
+    }
+    
+    // Match parallelogram [/...\] or [\.../ ] - I/O
+    const ioMatches = line.matchAll(/(\w+)\[[\\/]([^\]]*)[\\\/]\]/g);
+    for (const match of ioMatches) {
+      nodeClasses.set(match[1], 'io');
+    }
+    
+    // Match rectangle shape [...] - process/action
+    const rectMatches = line.matchAll(/(\w+)\[([^\]\/\\]*)\](?!\()/g);
+    for (const match of rectMatches) {
+      const [, nodeId, text] = match;
+      if (nodeClasses.has(nodeId)) continue; // Don't override
+      
+      const lower = text.toLowerCase();
+      if (lower.includes('✅') || lower.includes('success') || lower.includes('save') || lower.includes('complete') || lower.includes('approve') || lower.includes('accept') || lower.includes('enroll') || lower.includes('won') || lower.includes('qualified')) {
+        nodeClasses.set(nodeId, 'success');
+      } else if (lower.includes('❌') || lower.includes('error') || lower.includes('fail') || lower.includes('reject') || lower.includes('cancel') || lower.includes('delete') || lower.includes('lost') || lower.includes('not qualified')) {
+        nodeClasses.set(nodeId, 'error');
+      } else if (lower.includes('⚠') || lower.includes('warn') || lower.includes('retry') || lower.includes('reschedule') || lower.includes('wait') || lower.includes('log') || lower.includes('pending') || lower.includes('follow') || lower.includes('remind')) {
+        nodeClasses.set(nodeId, 'warning');
+      } else if (lower.includes('send') || lower.includes('email') || lower.includes('notify') || lower.includes('sms') || lower.includes('call') || lower.includes('message')) {
+        nodeClasses.set(nodeId, 'io');
+      } else {
+        nodeClasses.set(nodeId, 'process');
+      }
+    }
   });
-  return processedLines.join('\n') + '\n' + COLOR_CLASSES;
+  
+  // Second pass: add class assignments to nodes in the code
+  let result = lines.map(line => {
+    if (line.trim().startsWith('%%') || !line.trim()) return line;
+    
+    let processedLine = line;
+    
+    // Add classes to stadium shapes
+    processedLine = processedLine.replace(/(\w+)(\(\[[^\]]*\]\))(?!:::)/g, (match, nodeId, shape) => {
+      const cls = nodeClasses.get(nodeId);
+      return cls ? `${nodeId}${shape}:::${cls}` : match;
+    });
+    
+    // Add classes to circle shapes
+    processedLine = processedLine.replace(/(\w+)(\(\([^)]*\)\))(?!:::)/g, (match, nodeId, shape) => {
+      const cls = nodeClasses.get(nodeId);
+      return cls ? `${nodeId}${shape}:::${cls}` : match;
+    });
+    
+    // Add classes to diamond shapes
+    processedLine = processedLine.replace(/(\w+)(\{[^}]*\})(?!:::)/g, (match, nodeId, shape) => {
+      const cls = nodeClasses.get(nodeId);
+      return cls ? `${nodeId}${shape}:::${cls}` : match;
+    });
+    
+    // Add classes to parallelogram shapes
+    processedLine = processedLine.replace(/(\w+)(\[[\\/][^\]]*[\\\/]\])(?!:::)/g, (match, nodeId, shape) => {
+      const cls = nodeClasses.get(nodeId);
+      return cls ? `${nodeId}${shape}:::${cls}` : match;
+    });
+    
+    // Add classes to rectangle shapes (be careful not to match already processed)
+    processedLine = processedLine.replace(/(\w+)(\[[^\]\/\\]*\])(?!:::|\()/g, (match, nodeId, shape) => {
+      const cls = nodeClasses.get(nodeId);
+      return cls ? `${nodeId}${shape}:::${cls}` : match;
+    });
+    
+    return processedLine;
+  }).join('\n');
+  
+  return result + '\n' + COLOR_CLASSES;
 };
 
 // Save Modal
