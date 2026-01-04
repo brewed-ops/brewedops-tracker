@@ -22,7 +22,8 @@ import FindReplace from './components/FindReplace';
 import CaseConverter from './components/CaseConverter';
 import WordCounter from './components/WordCounter';
 import FinanceTracker from './components/FinanceTracker';
-
+import GuestToolLayout from './components/layout/GuestToolLayout';
+import HomePage from './components/HomePage';
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -232,484 +233,7 @@ const IconCloudDemo = () => {
   );
 };
 
-// ============================================
-// HOME PAGE (Landing) - BrewedOps Brand Design
-// ============================================
 
-const HomePage = ({ onNavigate, isDark, setIsDark }) => {
-  const theme = getTheme(isDark);
-  const { width } = useWindowSize();
-  const isMobile = width < 768;
-  const isSmall = width < 480;
-
-  const btnPrimary = {
-    height: '48px',
-    padding: '0 28px',
-    backgroundColor: BRAND.blue,
-    color: '#fff',
-    border: 'none',
-    borderRadius: '10px',
-    fontSize: '15px',
-    fontWeight: '600',
-    fontFamily: FONTS.body,
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: '8px',
-    transition: 'all 0.2s ease',
-  };
-
-  const btnOutline = {
-    height: '48px',
-    padding: '0 28px',
-    backgroundColor: 'transparent',
-    color: theme.text,
-    border: '1px solid ' + theme.cardBorder,
-    borderRadius: '10px',
-    fontSize: '15px',
-    fontWeight: '500',
-    fontFamily: FONTS.body,
-    cursor: 'pointer',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    transition: 'all 0.2s ease',
-  };
-
-  // All 18 tools organized by category
-  const toolCategories = [
-    {
-      name: 'Productivity',
-      color: '#004AAC',
-      tools: [
-        { icon: '💰', title: 'Finance Tracker', desc: 'Track income, expenses, invoices & BIR taxes' },
-        { icon: '🎧', title: 'VAKita', desc: 'VA earnings calculator & tracker' },
-        { icon: '✅', title: 'Task Manager', desc: 'Organize tasks & to-dos' },
-        { icon: '📝', title: 'Brewed Notes', desc: 'Rich text notes with formatting' },
-      ]
-    },
-    {
-      name: 'Image Tools',
-      color: '#8b5cf6',
-      tools: [
-        { icon: '🖼️', title: 'BG Remover', desc: 'Remove image backgrounds' },
-        { icon: '✂️', title: 'Image Cropper', desc: 'Crop & resize images' },
-        { icon: '📐', title: 'Image Resizer', desc: 'Resize to any dimensions' },
-        { icon: '📦', title: 'Image Compressor', desc: 'Compress without quality loss' },
-        { icon: '🔄', title: 'Image Converter', desc: 'Convert between formats' },
-        { icon: '🎨', title: 'Color Picker', desc: 'Extract colors from images' },
-        { icon: '📄', title: 'Image to PDF', desc: 'Convert images to PDF' },
-      ]
-    },
-    {
-      name: 'Video Tools',
-      color: '#ef4444',
-      tools: [
-        { icon: '🎬', title: 'Video Compressor', desc: 'Compress video files' },
-        { icon: '✂️', title: 'Video Trimmer', desc: 'Trim & cut videos' },
-      ]
-    },
-    {
-      name: 'Document Tools',
-      color: '#22c55e',
-      tools: [
-        { icon: '📑', title: 'PDF Editor', desc: 'Edit PDF documents' },
-        { icon: '📚', title: 'PDF Merge', desc: 'Combine multiple PDFs' },
-        { icon: '📂', title: 'PDF Split', desc: 'Split PDFs into parts' },
-      ]
-    },
-    {
-      name: 'Other Tools',
-      color: '#f59e0b',
-      tools: [
-        { icon: '📱', title: 'QR Generator', desc: 'Create QR codes' },
-        { icon: '🔍', title: 'Find & Replace', desc: 'Search & replace text' },
-        { icon: '🔠', title: 'Case Converter', desc: 'Change text case' },
-        { icon: '🔢', title: 'Word Counter', desc: 'Count words & characters' },
-      ]
-    }
-  ];
-
-  // Flatten for simple feature display
-  const features = toolCategories.flatMap(cat => cat.tools);
-
-
-
-  return (
-    <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#ffffff' }}>
-      {/* Nav */}
-      <nav style={{
-        padding: isSmall ? '12px 16px' : '16px 32px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        borderBottom: '1px solid ' + theme.cardBorder,
-        backgroundColor: isDark ? theme.bg : '#ffffff',
-        gap: '12px'
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0 }}>
-          <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: isSmall ? '32px' : '36px', height: isSmall ? '32px' : '36px', borderRadius: '8px' }} />
-          <span style={{ fontSize: isSmall ? '18px' : '20px', fontWeight: '700', fontFamily: FONTS.heading }}>
-            <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
-            <span style={{ color: BRAND.blue }}>Ops</span>
-          </span>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: isSmall ? '6px' : '8px' }}>
-          {/* Privacy - hide on mobile */}
-          {!isMobile && (
-          <a 
-            href="/privacy" 
-            style={{ 
-              height: '40px', 
-              padding: '0 14px', 
-              backgroundColor: 'transparent', 
-              color: theme.textMuted, 
-              border: 'none', 
-              fontSize: '14px', 
-              fontWeight: '500', 
-              fontFamily: FONTS.body,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              textDecoration: 'none'
-            }}
-          >
-            Privacy
-          </a>
-          )}
-          {/* About - hide on mobile */}
-          {!isMobile && (
-          <button 
-            onClick={() => onNavigate('about')} 
-            style={{ 
-              height: '40px', 
-              padding: '0 14px', 
-              backgroundColor: 'transparent', 
-              color: theme.textMuted, 
-              border: 'none', 
-              fontSize: '14px', 
-              fontWeight: '500', 
-              fontFamily: FONTS.body,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            About
-          </button>
-          )}
-          {/* Dark/Light Mode */}
-          <button onClick={() => setIsDark(!isDark)} style={{ width: isSmall ? '36px' : '40px', height: isSmall ? '36px' : '40px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-            {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
-          </button>
-          {/* Sign Up - always show */}
-          <button 
-            onClick={() => onNavigate('signup')} 
-            style={{ 
-              height: isSmall ? '36px' : '40px', 
-              padding: isSmall ? '0 12px' : '0 16px', 
-              backgroundColor: BRAND.blue, 
-              color: '#fff', 
-              border: 'none', 
-              borderRadius: '10px',
-              fontSize: '14px', 
-              fontWeight: '600',
-              fontFamily: FONTS.body,
-              cursor: 'pointer',
-              flexShrink: 0
-            }}
-          >
-            Sign Up
-          </button>
-          {/* Login - always show */}
-          <button 
-            onClick={() => onNavigate('login')} 
-            style={{ 
-              height: isSmall ? '36px' : '40px', 
-              padding: isSmall ? '0 12px' : '0 16px', 
-              backgroundColor: 'transparent', 
-              color: theme.text, 
-              border: '1px solid ' + theme.cardBorder, 
-              borderRadius: '10px',
-              fontSize: '14px', 
-              fontWeight: '500',
-              fontFamily: FONTS.body,
-              cursor: 'pointer',
-              flexShrink: 0
-            }}
-          >
-            Login
-          </button>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <section style={{ padding: isSmall ? '48px 20px 56px' : '72px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.cream, borderRadius: '100px', marginBottom: '24px', border: isDark ? 'none' : '1px solid ' + BRAND.blue + '20' }}>
-          <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 18 Free Tools for Filipino VAs & Freelancers</span>
-        </div>
-        
-        <h1 style={{ fontSize: isSmall ? '32px' : '52px', fontWeight: '800', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 16px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
-          Your All-in-One
-          <br />
-          <span style={{ color: BRAND.blue }}>Productivity Hub</span>
-        </h1>
-        
-        <p style={{ fontSize: isSmall ? '16px' : '18px', color: theme.textMuted, margin: '0 0 36px', lineHeight: '1.7', maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
-          Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business, all in one powerful platform.
-        </p>
-        
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button onClick={() => onNavigate('signup')} style={btnPrimary}>
-            Start Free
-            <ChevronRight style={{ width: '18px', height: '18px' }} />
-          </button>
-          <button onClick={() => onNavigate('login')} style={btnOutline}>
-            Sign In
-          </button>
-        </div>
-        
-        {/* Privacy Policy link for Google OAuth compliance - must be easily visible */}
-        <p style={{ fontSize: '13px', color: theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
-          By signing up, you agree to our{' '}
-          <a href="/terms" style={{ color: BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Terms of Service</a>
-          {' '}and{' '}
-          <a href="/privacy" style={{ color: BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Privacy Policy</a>
-        </p>
-      </section>
-
-      {/* What is BrewedOps */}
-      <section style={{ padding: isSmall ? '48px 20px' : '64px 32px', backgroundColor: isDark ? '#0a0a0b' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
-          <h2 style={{ fontSize: isSmall ? '24px' : '36px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 16px', letterSpacing: '-0.02em', fontFamily: FONTS.heading }}>
-            What is BrewedOps?
-          </h2>
-          <p style={{ fontSize: '16px', color: theme.textMuted, margin: '0 0 32px', lineHeight: '1.8', maxWidth: '700px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
-            BrewedOps is a comprehensive productivity platform with <strong style={{ color: isDark ? '#fff' : BRAND.brown }}>18 free tools</strong> built specifically for 
-            Filipino Virtual Assistants and Freelancers. From financial tracking and tax calculations to image editing, 
-            PDF manipulation, and productivity tools — everything you need to run your freelance business professionally.
-          </p>
-          
-          {/* Stats */}
-          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
-            {[
-              { value: '18', label: 'Free Tools' },
-              { value: '5', label: 'Categories' },
-              { value: '100%', label: 'Free' },
-              { value: '24/7', label: 'Available' },
-            ].map((stat, i) => (
-              <div key={i} style={{ padding: '20px 16px', backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
-                <div style={{ fontSize: '28px', fontWeight: '800', color: BRAND.blue, marginBottom: '4px', fontFamily: FONTS.heading }}>{stat.value}</div>
-                <div style={{ fontSize: '13px', color: theme.textMuted, fontWeight: '500', fontFamily: FONTS.body }}>{stat.label}</div>
-              </div>
-            ))}
-          </div>
-          
-          {/* Icon Cloud */}
-          <div style={{ 
-            display: 'flex', 
-            justifyContent: 'center', 
-            alignItems: 'center', 
-            marginBottom: '40px',
-            minHeight: isSmall ? '280px' : '350px'
-          }}>
-            <div style={{ position: 'relative', maxWidth: '500px', width: '100%' }}>
-              <IconCloudDemo />
-            </div>
-          </div>
-          
-          <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : 'repeat(2, 1fr)', gap: '20px', textAlign: 'left' }}>
-            <div style={{ padding: '24px', backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.blue + '15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '22px' }}>💼</span>
-                </div>
-                <h3 style={{ fontSize: '17px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>Productivity Suite</h3>
-              </div>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6', fontFamily: FONTS.body }}>
-                Finance Tracker with multi-currency support, VAKita earnings calculator, Task Manager for organization, 
-                and Brewed Notes with rich text formatting — all synced to your account.
-              </p>
-            </div>
-            
-            <div style={{ padding: '24px', backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '12px' }}>
-                <div style={{ width: '44px', height: '44px', backgroundColor: isDark ? '#8b5cf6' + '20' : '#8b5cf6' + '15', borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <span style={{ fontSize: '22px' }}>🛠️</span>
-                </div>
-                <h3 style={{ fontSize: '17px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>Media & Document Tools</h3>
-              </div>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, lineHeight: '1.6', fontFamily: FONTS.body }}>
-                7 image tools (BG remover, cropper, resizer, compressor, converter, color picker, image to PDF), 
-                2 video tools, 3 PDF tools, plus QR generator and text utilities.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* All 18 Tools */}
-      <section style={{ padding: isSmall ? '48px 16px' : '64px 32px', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#fff' }}>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <h2 style={{ fontSize: isSmall ? '24px' : '36px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, textAlign: 'center', margin: '0 0 12px', letterSpacing: '-0.02em', fontFamily: FONTS.heading }}>
-            All 18 Tools Included
-          </h2>
-          <p style={{ fontSize: '15px', color: theme.textMuted, textAlign: 'center', margin: '0 0 40px', fontFamily: FONTS.body }}>
-            Everything you need to run your freelance business efficiently
-          </p>
-          
-          {/* Tools by Category */}
-          {toolCategories.map((category, catIdx) => (
-            <div key={catIdx} style={{ marginBottom: '32px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: category.color }} />
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: 0, fontFamily: FONTS.heading }}>
-                  {category.name}
-                  <span style={{ fontSize: '13px', fontWeight: '400', color: theme.textMuted, marginLeft: '8px', fontFamily: FONTS.body }}>
-                    ({category.tools.length} tools)
-                  </span>
-                </h3>
-              </div>
-              
-              <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: '12px' }}>
-                {category.tools.map((tool, toolIdx) => (
-                  <div key={toolIdx} style={{ 
-                    backgroundColor: isDark ? theme.cardBg : '#fff', 
-                    borderRadius: '10px', 
-                    border: '1px solid ' + theme.cardBorder, 
-                    padding: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    transition: 'all 0.2s ease'
-                  }}>
-                    <div style={{ 
-                      width: '40px', 
-                      height: '40px', 
-                      backgroundColor: category.color + '15', 
-                      borderRadius: '10px', 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      justifyContent: 'center',
-                      flexShrink: 0
-                    }}>
-                      <span style={{ fontSize: '20px' }}>{tool.icon}</span>
-                    </div>
-                    <div>
-                      <h4 style={{ fontSize: '14px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 2px', fontFamily: FONTS.heading }}>{tool.title}</h4>
-                      <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>{tool.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section style={{ padding: isSmall ? '48px 20px' : '64px 32px', maxWidth: '800px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: isSmall ? '24px' : '36px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, textAlign: 'center', margin: '0 0 40px', letterSpacing: '-0.02em', fontFamily: FONTS.heading }}>
-          How It Works
-        </h2>
-        
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {[
-            { num: '1', title: 'Sign Up for Free', desc: 'Create your account in seconds and get instant access to all 18 tools' },
-            { num: '2', title: 'Choose Your Tools', desc: 'Use Finance Tracker for income/expenses, image tools for editing, PDF tools for documents — mix and match' },
-            { num: '3', title: 'Boost Your Productivity', desc: 'Manage your entire freelance business from one platform — track finances, organize tasks, process files' },
-            { num: '4', title: 'Grow Your Business', desc: 'Send professional invoices, calculate taxes, and watch your freelance business thrive' },
-          ].map((step, i) => (
-            <div key={i} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
-              <div style={{ width: '44px', height: '44px', borderRadius: '10px', backgroundColor: BRAND.blue, color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px', fontWeight: '700', flexShrink: 0, fontFamily: FONTS.heading }}>{step.num}</div>
-              <div>
-                <h3 style={{ fontSize: '16px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 4px', fontFamily: FONTS.heading }}>{step.title}</h3>
-                <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>{step.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section style={{ padding: isSmall ? '0 16px 48px' : '0 32px 64px', maxWidth: '800px', margin: '0 auto' }}>
-        <div style={{ backgroundColor: BRAND.brown, borderRadius: '16px', padding: isSmall ? '40px 24px' : '48px', textAlign: 'center' }}>
-          <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: '#fafafa', margin: '0 0 12px', fontFamily: FONTS.heading }}>
-            Ready to Boost Your Productivity?
-          </h2>
-          <p style={{ fontSize: '15px', color: '#d4d4d8', margin: '0 0 24px', fontFamily: FONTS.body }}>
-            Join Filipino VAs and freelancers using all 18 tools to manage their business smarter
-          </p>
-          <button onClick={() => onNavigate('signup')} style={{ height: '48px', padding: '0 32px', backgroundColor: BRAND.green, color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', cursor: 'pointer', fontFamily: FONTS.body, transition: 'all 0.2s ease' }}>
-            Get Started — It's Free
-          </button>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer style={{ padding: '24px 20px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center', backgroundColor: isDark ? theme.bg : '#fff' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '12px', flexWrap: 'wrap' }}>
-          <a 
-            href="/privacy"
-            style={{ 
-              color: theme.textMuted, 
-              fontSize: '13px', 
-              textDecoration: 'none',
-              padding: '4px 0',
-              fontFamily: FONTS.body,
-            }}
-            onMouseEnter={(e) => e.target.style.color = BRAND.blue}
-            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
-          >
-            Privacy Policy
-          </a>
-          <a 
-            href="/terms"
-            style={{ 
-              color: theme.textMuted, 
-              fontSize: '13px', 
-              textDecoration: 'none',
-              padding: '4px 0',
-              fontFamily: FONTS.body,
-            }}
-            onMouseEnter={(e) => e.target.style.color = '#004AAC'}
-            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
-          >
-            Terms of Service
-          </a>
-          <a 
-            href="/about"
-            style={{ 
-              color: theme.textMuted, 
-              fontSize: '13px', 
-              textDecoration: 'none',
-              padding: '4px 0'
-            }}
-            onMouseEnter={(e) => e.target.style.color = '#004AAC'}
-            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
-          >
-            About Us
-          </a>
-          <a 
-            href="mailto:brewedops@gmail.com"
-            style={{ 
-              color: theme.textMuted, 
-              fontSize: '13px', 
-              textDecoration: 'none',
-              padding: '4px 0'
-            }}
-            onMouseEnter={(e) => e.target.style.color = '#004AAC'}
-            onMouseLeave={(e) => e.target.style.color = theme.textMuted}
-          >
-            Contact
-          </a>
-        </div>
-        <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0 }}>© {new Date().getFullYear()} BrewedOps by Kenneth V.</p>
-      </footer>
-    </div>
-  );
-};
 
 // ============================================
 // LOGIN PAGE
@@ -1134,39 +658,44 @@ function AppContent() {
 />;
   }
 
-  // Public routes
-  return (
-    <Routes>
-      <Route path="/" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
-      <Route path="/login" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
-      <Route path="/signup" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="signup" />} />
-      <Route path="/reset-password" element={<ResetPassword isDark={isDark} setIsDark={setIsDark} />} />
-      <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
-      <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
-      <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
-      {/* Public tool routes - redirect to login */}
-      <Route path="/vakita" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
-      <Route path="/taskmanager" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
-      <Route path="/brewednotes" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
-      <Route path="/pdfeditor" element={<PDFEditor isDark={isDark} />} />
-      <Route path="/bgremover" element={<BackgroundRemover isDark={isDark} />} />
-      <Route path="/imagecropper" element={<ImageCropper isDark={isDark} />} />
-      <Route path="/imageconverter" element={<ImageConverter isDark={isDark} />} />
-      <Route path="/imagecompressor" element={<ImageCompressor isDark={isDark} />} />
-      <Route path="/imageresizer" element={<ImageResizer isDark={isDark} />} />
-      <Route path="/qrgenerator" element={<QRGenerator isDark={isDark} />} />
-      <Route path="/colorpicker" element={<ColorPicker isDark={isDark} />} />
-      <Route path="/pdfmerge" element={<PDFMerge isDark={isDark} />} />
-      <Route path="/pdfsplit" element={<PDFSplit isDark={isDark} />} />
-      <Route path="/imagetopdf" element={<ImageToPDF isDark={isDark} />} />
-      <Route path="/videocompressor" element={<VideoCompressor isDark={isDark} />} />
-      <Route path="/videotrimmer" element={<VideoTrimmer isDark={isDark} />} />
-      <Route path="/findreplace" element={<FindReplace isDark={isDark} />} />
-      <Route path="/caseconverter" element={<CaseConverter isDark={isDark} />} />
-      <Route path="/wordcounter" element={<WordCounter isDark={isDark} />} />
-      <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
-    </Routes>
-  );
+ // Public routes
+return (
+  <Routes>
+    <Route path="/" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
+    <Route path="/login" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
+    <Route path="/signup" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="signup" />} />
+    <Route path="/reset-password" element={<ResetPassword isDark={isDark} setIsDark={setIsDark} />} />
+    <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+    <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+    <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+    
+    {/* Productivity tools - redirect to login (requires account) */}
+    <Route path="/vakita" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
+    <Route path="/taskmanager" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
+    <Route path="/brewednotes" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
+    <Route path="/finance" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
+    
+    {/* Free Tools - wrapped in GuestToolLayout */}
+    <Route path="/bgremover" element={<GuestToolLayout toolName="BG Remover" isDark={isDark} setIsDark={setIsDark}><BackgroundRemover isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/imagecropper" element={<GuestToolLayout toolName="Image Cropper" isDark={isDark} setIsDark={setIsDark}><ImageCropper isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/imageresizer" element={<GuestToolLayout toolName="Image Resizer" isDark={isDark} setIsDark={setIsDark}><ImageResizer isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/imagecompressor" element={<GuestToolLayout toolName="Image Compressor" isDark={isDark} setIsDark={setIsDark}><ImageCompressor isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/imageconverter" element={<GuestToolLayout toolName="Image Converter" isDark={isDark} setIsDark={setIsDark}><ImageConverter isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/colorpicker" element={<GuestToolLayout toolName="Color Picker" isDark={isDark} setIsDark={setIsDark}><ColorPicker isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/imagetopdf" element={<GuestToolLayout toolName="Image to PDF" isDark={isDark} setIsDark={setIsDark}><ImageToPDF isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/videocompressor" element={<GuestToolLayout toolName="Video Compressor" isDark={isDark} setIsDark={setIsDark}><VideoCompressor isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/videotrimmer" element={<GuestToolLayout toolName="Video Trimmer" isDark={isDark} setIsDark={setIsDark}><VideoTrimmer isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/pdfeditor" element={<GuestToolLayout toolName="PDF Editor" isDark={isDark} setIsDark={setIsDark}><PDFEditor isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/pdfmerge" element={<GuestToolLayout toolName="PDF Merge" isDark={isDark} setIsDark={setIsDark}><PDFMerge isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/pdfsplit" element={<GuestToolLayout toolName="PDF Split" isDark={isDark} setIsDark={setIsDark}><PDFSplit isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/qrgenerator" element={<GuestToolLayout toolName="QR Generator" isDark={isDark} setIsDark={setIsDark}><QRGenerator isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/findreplace" element={<GuestToolLayout toolName="Find & Replace" isDark={isDark} setIsDark={setIsDark}><FindReplace isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/caseconverter" element={<GuestToolLayout toolName="Case Converter" isDark={isDark} setIsDark={setIsDark}><CaseConverter isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/wordcounter" element={<GuestToolLayout toolName="Word Counter" isDark={isDark} setIsDark={setIsDark}><WordCounter isDark={isDark} /></GuestToolLayout>} />
+    
+    <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
+  </Routes>
+);
 }
 
 // ============================================
