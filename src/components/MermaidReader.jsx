@@ -1,15 +1,15 @@
 /**
  * MermaidReader Component
+ * - Wide preview layout (code collapsed by default)
+ * - Auto-color feature for flowcharts
  * - Pan & zoom whiteboard preview
- * - Collapsible code panel
  * - Save diagrams (max 10 per user)
- * - Fixed PNG export
  */
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import mermaid from 'mermaid';
 import { supabase } from '../lib/supabase';
-import { Copy, Check, Download, RefreshCw, Code, Eye, Trash2, ChevronDown, GitBranch, ZoomIn, ZoomOut, Move, PanelLeftClose, PanelLeft, RotateCcw, Save, X, FileText, Clock, Loader2, FolderOpen } from 'lucide-react';
+import { Copy, Check, Download, RefreshCw, Code, Eye, Trash2, ChevronDown, GitBranch, ZoomIn, ZoomOut, Move, PanelLeftClose, PanelLeft, RotateCcw, Save, X, FileText, Clock, Loader2, FolderOpen, Wand2 } from 'lucide-react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -33,6 +33,16 @@ const getTheme = (isDark) => ({
 
 const MAX_SAVED_DIAGRAMS = 10;
 
+// Color class definitions for auto-coloring
+const COLOR_CLASSES = `
+    classDef start fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#92400e
+    classDef process fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e40af
+    classDef decision fill:#f3e8ff,stroke:#a855f7,stroke-width:2px,color:#6b21a8
+    classDef success fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#166534
+    classDef error fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#991b1b
+    classDef warning fill:#fef9c3,stroke:#eab308,stroke-width:2px,color:#854d0e
+    classDef endNode fill:#d1fae5,stroke:#10b981,stroke-width:2px,color:#065f46`;
+
 // Sample Templates
 const TEMPLATES = [
   {
@@ -53,20 +63,16 @@ const TEMPLATES = [
     classDef success fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#166534
     classDef error fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#991b1b
     classDef warning fill:#fef9c3,stroke:#eab308,stroke-width:2px,color:#854d0e
-    classDef endNode fill:#d1fae5,stroke:#10b981,stroke-width:2px,color:#065f46
-    
-    linkStyle 2 stroke:#22c55e,stroke-width:2px
-    linkStyle 3 stroke:#ef4444,stroke-width:2px`,
+    classDef endNode fill:#d1fae5,stroke:#10b981,stroke-width:2px,color:#065f46`,
   },
   {
     name: 'Simple Flowchart',
     code: `flowchart TD
-    A[🚀 Start] --> B{Is it working?}
-    B -->|Yes| C[✅ Great!]
-    B -->|No| D[🔧 Debug]
-    D --> B
-    C --> E[🎉 Deploy]
-    E --> F[🏁 End]`,
+    A[Start] --> B{Decision?}
+    B -->|Yes| C[Action 1]
+    B -->|No| D[Action 2]
+    C --> E[End]
+    D --> E`,
   },
   {
     name: 'Sequence Diagram',
@@ -84,21 +90,18 @@ const TEMPLATES = [
     A-->>U: Redirect to Dashboard`,
   },
   {
-    name: 'Decision Flow',
+    name: 'Lead Flow',
     code: `flowchart TD
-    Start([📋 New Lead]):::start --> A[Review]:::process
-    A --> B{Qualified?}:::decision
-    B -->|Yes| C[Call]:::success
-    B -->|No| D[Reject]:::error
-    C --> E([Done]):::endNode
-    D --> E
-
-    classDef start fill:#fef3c7,stroke:#f59e0b,stroke-width:2px,color:#92400e
-    classDef process fill:#dbeafe,stroke:#3b82f6,stroke-width:2px,color:#1e40af
-    classDef decision fill:#f3e8ff,stroke:#a855f7,stroke-width:2px,color:#6b21a8
-    classDef success fill:#dcfce7,stroke:#22c55e,stroke-width:2px,color:#166534
-    classDef error fill:#fee2e2,stroke:#ef4444,stroke-width:2px,color:#991b1b
-    classDef endNode fill:#e0e7ff,stroke:#6366f1,stroke-width:2px,color:#3730a3`,
+    Start([New Lead]) --> A[Review]
+    A --> B{Qualified?}
+    B -->|Yes| C[Schedule Call]
+    B -->|No| D[Send Rejection]
+    C --> E{Call Done?}
+    E -->|Yes| F[Create Proposal]
+    E -->|No| G[Reschedule]
+    G --> C
+    F --> End([Close])
+    D --> End`,
   },
   {
     name: 'Gantt Chart',
@@ -124,6 +127,54 @@ const TEMPLATES = [
     "Other" : 18`,
   },
 ];
+
+// Auto-color function for flowcharts
+const autoColorFlowchart = (code) => {
+  if (!code.trim().toLowerCase().startsWith('flowchart')) {
+    return code;
+  }
+
+  // Remove existing classDef and class assignments
+  let cleanCode = code
+    .replace(/:::\w+/g, '')
+    .replace(/\n\s*classDef\s+.*/g, '')
+    .replace(/\n\s*class\s+.*/g, '')
+    .trim();
+
+  const lines = cleanCode.split('\n');
+  const processedLines = lines.map(line => {
+    if (line.trim().startsWith('%%') || !line.trim()) return line;
+    
+    let processedLine = line;
+    
+    // Stadium/pill shape - usually start/end: ([...])
+    processedLine = processedLine.replace(/(\w+)\(\[([^\]]*)\]\)(?!:::)/g, (match, nodeId, text) => {
+      const lower = text.toLowerCase();
+      if (lower.includes('start') || lower.includes('begin') || lower.includes('🚀') || lower.includes('new')) return `${match}:::start`;
+      if (lower.includes('end') || lower.includes('done') || lower.includes('finish') || lower.includes('🏁') || lower.includes('close') || lower.includes('archive')) return `${match}:::endNode`;
+      return `${match}:::process`;
+    });
+    
+    // Circle shape: ((text))
+    processedLine = processedLine.replace(/(\w+)\(\(([^)]*)\)\)(?!:::)/g, (match) => `${match}:::start`);
+    
+    // Diamond/decision shape: {text} or {text?}
+    processedLine = processedLine.replace(/(\w+)\{([^}]*)\}(?!:::)/g, (match) => `${match}:::decision`);
+    
+    // Rectangle shape: [text]
+    processedLine = processedLine.replace(/(\w+)\[([^\]]*)\](?!:::)/g, (match, nodeId, text) => {
+      const lower = text.toLowerCase();
+      if (lower.includes('✅') || lower.includes('success') || lower.includes('save') || lower.includes('complete') || lower.includes('approve') || lower.includes('accept')) return `${match}:::success`;
+      if (lower.includes('❌') || lower.includes('error') || lower.includes('fail') || lower.includes('reject') || lower.includes('cancel') || lower.includes('delete')) return `${match}:::error`;
+      if (lower.includes('⚠') || lower.includes('warn') || lower.includes('retry') || lower.includes('reschedule') || lower.includes('wait') || lower.includes('log') || lower.includes('pending')) return `${match}:::warning`;
+      return `${match}:::process`;
+    });
+
+    return processedLine;
+  });
+
+  return processedLines.join('\n') + '\n' + COLOR_CLASSES;
+};
 
 // Save Modal Component
 const SaveModal = ({ isOpen, onClose, onSave, isDark, theme, isLoading, currentName }) => {
@@ -181,13 +232,13 @@ const SaveModal = ({ isOpen, onClose, onSave, isDark, theme, isLoading, currentN
 // Main Component
 const MermaidReader = ({ isDark = true, user = null }) => {
   const theme = getTheme(isDark);
-  const [code, setCode] = useState(TEMPLATES[0].code);
+  const [code, setCode] = useState(TEMPLATES[1].code);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [svgContent, setSvgContent] = useState('');
   const [key, setKey] = useState(0);
-  const [isCodeCollapsed, setIsCodeCollapsed] = useState(false);
+  const [isCodeCollapsed, setIsCodeCollapsed] = useState(true); // Collapsed by default
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   
   // Save state
@@ -208,27 +259,17 @@ const MermaidReader = ({ isDark = true, user = null }) => {
   const templateRef = useRef(null);
   const svgRef = useRef(null);
 
-  // Load saved diagrams
-  useEffect(() => {
-    if (user) loadSavedDiagrams();
-  }, [user]);
+  useEffect(() => { if (user) loadSavedDiagrams(); }, [user]);
 
   const loadSavedDiagrams = async () => {
     if (!user) return;
     setIsLoadingDiagrams(true);
     try {
-      const { data, error } = await supabase
-        .from('mermaid_diagrams')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('updated_at', { ascending: false });
+      const { data, error } = await supabase.from('mermaid_diagrams').select('*').eq('user_id', user.id).order('updated_at', { ascending: false });
       if (error) throw error;
       setSavedDiagrams(data || []);
-    } catch (err) {
-      console.error('Failed to load diagrams:', err);
-    } finally {
-      setIsLoadingDiagrams(false);
-    }
+    } catch (err) { console.error('Failed to load:', err); }
+    finally { setIsLoadingDiagrams(false); }
   };
 
   const saveDiagram = async (name) => {
@@ -236,11 +277,10 @@ const MermaidReader = ({ isDark = true, user = null }) => {
     setIsSaving(true);
     try {
       if (!currentDiagramId && savedDiagrams.length >= MAX_SAVED_DIAGRAMS) {
-        alert(`Maximum ${MAX_SAVED_DIAGRAMS} diagrams allowed. Please delete one first.`);
+        alert(`Maximum ${MAX_SAVED_DIAGRAMS} diagrams. Delete one first.`);
         setIsSaving(false);
         return;
       }
-
       if (currentDiagramId) {
         const { error } = await supabase.from('mermaid_diagrams').update({ name, code, updated_at: new Date().toISOString() }).eq('id', currentDiagramId);
         if (error) throw error;
@@ -252,22 +292,11 @@ const MermaidReader = ({ isDark = true, user = null }) => {
       setCurrentDiagramName(name);
       setShowSaveModal(false);
       await loadSavedDiagrams();
-    } catch (err) {
-      console.error('Failed to save:', err);
-      alert('Failed to save diagram.');
-    } finally {
-      setIsSaving(false);
-    }
+    } catch (err) { console.error('Failed to save:', err); alert('Failed to save.'); }
+    finally { setIsSaving(false); }
   };
 
-  const loadDiagram = (diagram) => {
-    setCode(diagram.code);
-    setCurrentDiagramId(diagram.id);
-    setCurrentDiagramName(diagram.name);
-    setKey((k) => k + 1);
-    setIsSidebarOpen(false);
-  };
-
+  const loadDiagram = (d) => { setCode(d.code); setCurrentDiagramId(d.id); setCurrentDiagramName(d.name); setKey((k) => k + 1); setIsSidebarOpen(false); };
   const deleteDiagram = async (id) => {
     if (!confirm('Delete this diagram?')) return;
     try {
@@ -275,20 +304,11 @@ const MermaidReader = ({ isDark = true, user = null }) => {
       if (error) throw error;
       if (currentDiagramId === id) { setCurrentDiagramId(null); setCurrentDiagramName(''); }
       await loadSavedDiagrams();
-    } catch (err) {
-      console.error('Failed to delete:', err);
-    }
+    } catch (err) { console.error('Failed to delete:', err); }
   };
+  const createNewDiagram = () => { setCode(TEMPLATES[1].code); setCurrentDiagramId(null); setCurrentDiagramName(''); setKey((k) => k + 1); setIsSidebarOpen(false); };
+  const handleAutoColor = () => { setCode(autoColorFlowchart(code)); setKey((k) => k + 1); };
 
-  const createNewDiagram = () => {
-    setCode(TEMPLATES[0].code);
-    setCurrentDiagramId(null);
-    setCurrentDiagramName('');
-    setKey((k) => k + 1);
-    setIsSidebarOpen(false);
-  };
-
-  // Mermaid init
   useEffect(() => {
     mermaid.initialize({
       startOnLoad: false,
@@ -312,7 +332,6 @@ const MermaidReader = ({ isDark = true, user = null }) => {
     });
   }, [isDark]);
 
-  // Render
   const renderDiagram = useCallback(async () => {
     if (!code.trim()) { setError(''); setSvgContent(''); return; }
     try {
@@ -323,93 +342,66 @@ const MermaidReader = ({ isDark = true, user = null }) => {
       setError('');
       setScale(1);
       setPosition({ x: 0, y: 0 });
-    } catch (err) {
-      setError(err.message || 'Invalid Mermaid syntax');
-      setSvgContent('');
-    }
+    } catch (err) { setError(err.message || 'Invalid syntax'); setSvgContent(''); }
   }, [code]);
 
-  useEffect(() => {
-    const timer = setTimeout(() => renderDiagram(), 500);
-    return () => clearTimeout(timer);
-  }, [code, renderDiagram, isDark, key]);
+  useEffect(() => { const t = setTimeout(() => renderDiagram(), 500); return () => clearTimeout(t); }, [code, renderDiagram, isDark, key]);
 
-  // Pan handlers
   const handleMouseDown = (e) => { if (e.button !== 0) return; setIsDragging(true); setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y }); };
   const handleMouseMove = (e) => { if (!isDragging) return; setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }); };
   const handleMouseUp = () => setIsDragging(false);
   const handleTouchStart = (e) => { const t = e.touches[0]; setIsDragging(true); setDragStart({ x: t.clientX - position.x, y: t.clientY - position.y }); };
   const handleTouchMove = (e) => { if (!isDragging) return; const t = e.touches[0]; setPosition({ x: t.clientX - dragStart.x, y: t.clientY - dragStart.y }); };
-  const handleWheel = (e) => { e.preventDefault(); const d = e.deltaY > 0 ? -0.1 : 0.1; setScale((p) => Math.min(Math.max(p + d, 0.2), 4)); };
+  const handleWheel = (e) => { e.preventDefault(); setScale((p) => Math.min(Math.max(p + (e.deltaY > 0 ? -0.1 : 0.1), 0.2), 4)); };
 
   const zoomIn = () => setScale((p) => Math.min(p + 0.25, 4));
   const zoomOut = () => setScale((p) => Math.max(p - 0.25, 0.2));
   const resetView = () => { setScale(1); setPosition({ x: 0, y: 0 }); };
-
   const handleCopy = async () => { await navigator.clipboard.writeText(code); setCopied(true); setTimeout(() => setCopied(false), 2000); };
 
-  // Fixed SVG Download
   const handleDownloadSVG = () => {
     if (!svgContent) return;
     const blob = new Blob([svgContent], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `${currentDiagramName || 'diagram'}.svg`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    a.href = url; a.download = `${currentDiagramName || 'diagram'}.svg`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
 
-  // Fixed PNG Download
   const handleDownloadPNG = () => {
     if (!svgContent) return;
-    
     const container = document.createElement('div');
     container.innerHTML = svgContent;
     container.style.position = 'absolute';
     container.style.left = '-9999px';
     document.body.appendChild(container);
-    
-    const svgElement = container.querySelector('svg');
-    if (!svgElement) { document.body.removeChild(container); return; }
-    
-    const bbox = svgElement.getBoundingClientRect();
-    const width = Math.max(bbox.width, parseFloat(svgElement.getAttribute('width')) || 800);
-    const height = Math.max(bbox.height, parseFloat(svgElement.getAttribute('height')) || 600);
-    
-    svgElement.setAttribute('width', width);
-    svgElement.setAttribute('height', height);
-    
-    const serializer = new XMLSerializer();
-    const svgString = serializer.serializeToString(svgElement);
-    const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+    const svgEl = container.querySelector('svg');
+    if (!svgEl) { document.body.removeChild(container); return; }
+    const bbox = svgEl.getBoundingClientRect();
+    const w = Math.max(bbox.width, parseFloat(svgEl.getAttribute('width')) || 800);
+    const h = Math.max(bbox.height, parseFloat(svgEl.getAttribute('height')) || 600);
+    svgEl.setAttribute('width', w);
+    svgEl.setAttribute('height', h);
+    const svgStr = new XMLSerializer().serializeToString(svgEl);
+    const svgBlob = new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' });
     const url = URL.createObjectURL(svgBlob);
-    
     const img = new Image();
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const sc = 2;
-      canvas.width = width * sc;
-      canvas.height = height * sc;
+      canvas.width = w * 2; canvas.height = h * 2;
       const ctx = canvas.getContext('2d');
-      ctx.scale(sc, sc);
+      ctx.scale(2, 2);
       ctx.fillStyle = isDark ? '#18181b' : '#ffffff';
-      ctx.fillRect(0, 0, width, height);
-      ctx.drawImage(img, 0, 0, width, height);
-      
+      ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
       canvas.toBlob((blob) => {
         const pngUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = pngUrl;
-        a.download = `${currentDiagramName || 'diagram'}.png`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        a.href = pngUrl; a.download = `${currentDiagramName || 'diagram'}.png`;
+        document.body.appendChild(a); a.click(); document.body.removeChild(a);
         URL.revokeObjectURL(pngUrl);
       }, 'image/png');
-      
       URL.revokeObjectURL(url);
       document.body.removeChild(container);
     };
@@ -429,7 +421,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
   const formatDate = (d) => new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
   return (
-    <div style={{ maxWidth: '1600px', margin: '0 auto', position: 'relative' }}>
+    <div style={{ maxWidth: '100%', margin: '0 auto', padding: '0', position: 'relative' }}>
       <style>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
 
       {/* Header */}
@@ -444,7 +436,6 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           </div>
           <p style={{ fontSize: '13px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>Create flowcharts, sequence diagrams, and more</p>
         </div>
-
         {user && (
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => setIsSidebarOpen(true)} style={btnStyle}><FolderOpen size={14} /> My Diagrams ({savedDiagrams.length}/{MAX_SAVED_DIAGRAMS})</button>
@@ -455,21 +446,19 @@ const MermaidReader = ({ isDark = true, user = null }) => {
         )}
       </div>
 
-      {/* Main */}
-      <div style={{ display: 'flex', gap: '12px', height: 'calc(100vh - 240px)', minHeight: '450px' }}>
-        {/* Code Panel */}
+      {/* Main Content - Full width */}
+      <div style={{ display: 'flex', gap: '12px', height: 'calc(100vh - 200px)', minHeight: '500px' }}>
+        {/* Code Panel - Collapsible */}
         {!isCodeCollapsed && (
-          <div style={{ width: '380px', minWidth: '300px', backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+          <div style={{ width: '320px', minWidth: '280px', maxWidth: '320px', flexShrink: 0, backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
             <div style={{ padding: '10px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Code size={14} style={{ color: theme.textMuted }} /><span style={{ fontSize: '12px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>Code</span></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <div ref={templateRef} style={{ position: 'relative' }}>
-                  <button onClick={() => setShowTemplates(!showTemplates)} style={btnStyle}>Templates <ChevronDown size={12} style={{ transform: showTemplates ? 'rotate(180deg)' : 'rotate(0deg)' }} /></button>
+                  <button onClick={() => setShowTemplates(!showTemplates)} style={btnStyle}>Templates <ChevronDown size={12} /></button>
                   {showTemplates && (
-                    <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '4px', backgroundColor: theme.cardBg, border: '1px solid ' + theme.cardBorder, borderRadius: '8px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.15)', padding: '6px', zIndex: 100, minWidth: '160px' }}>
-                      {TEMPLATES.map((t, i) => (
-                        <button key={i} onClick={() => loadTemplate(t)} style={{ width: '100%', padding: '8px 10px', backgroundColor: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', textAlign: 'left', fontSize: '12px', color: theme.text, fontFamily: FONTS.body }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#27272a' : '#f4f4f5'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>{t.name}</button>
-                      ))}
+                    <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '4px', backgroundColor: theme.cardBg, border: '1px solid ' + theme.cardBorder, borderRadius: '8px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.15)', padding: '6px', zIndex: 100, minWidth: '180px' }}>
+                      {TEMPLATES.map((t, i) => (<button key={i} onClick={() => loadTemplate(t)} style={{ width: '100%', padding: '8px 10px', backgroundColor: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', textAlign: 'left', fontSize: '12px', color: theme.text, fontFamily: FONTS.body }}>{t.name}</button>))}
                     </div>
                   )}
                 </div>
@@ -477,21 +466,27 @@ const MermaidReader = ({ isDark = true, user = null }) => {
                 <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); }} style={{ ...btnStyle, width: '32px', padding: 0 }} title="Clear"><Trash2 size={14} /></button>
               </div>
             </div>
+            <div style={{ padding: '8px 12px', borderBottom: '1px solid ' + theme.cardBorder }}>
+              <button onClick={handleAutoColor} style={{ ...btnStyle, width: '100%', backgroundColor: isDark ? '#3730a3' : '#eef2ff', borderColor: isDark ? '#4f46e5' : '#c7d2fe', color: isDark ? '#a5b4fc' : '#4338ca' }} title="Auto-color flowchart"><Wand2 size={14} /> Auto Color</button>
+            </div>
             <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter Mermaid code..." spellCheck={false} style={{ flex: 1, padding: '12px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', border: 'none', outline: 'none', resize: 'none', fontSize: '12px', fontFamily: "'Fira Code', 'Consolas', monospace", color: isDark ? '#e4e4e7' : '#27272a', lineHeight: '1.7' }} />
             {error && <div style={{ padding: '10px 12px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', borderTop: '1px solid ' + (isDark ? '#7f1d1d' : '#fecaca'), color: isDark ? '#fca5a5' : '#dc2626', fontSize: '11px', fontFamily: FONTS.body }}>⚠️ {error}</div>}
           </div>
         )}
 
-        {/* Preview */}
-        <div style={{ flex: 1, backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ padding: '10px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        {/* Preview Panel - Takes full width when code collapsed */}
+        <div style={{ flex: 1, backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, overflow: 'hidden', display: 'flex', flexDirection: 'column', minWidth: 0 }}>
+          <div style={{ padding: '10px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button onClick={() => setIsCodeCollapsed(!isCodeCollapsed)} style={{ ...btnStyle, width: '32px', padding: 0, backgroundColor: isCodeCollapsed ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent' }} title={isCodeCollapsed ? 'Show Code' : 'Hide Code'}>{isCodeCollapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}</button>
               <Eye size={14} style={{ color: theme.textMuted }} />
               <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>Preview</span>
               <span style={{ fontSize: '11px', color: theme.textMuted, backgroundColor: isDark ? '#27272a' : '#f4f4f5', padding: '2px 8px', borderRadius: '4px' }}>{Math.round(scale * 100)}%</span>
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+              {isCodeCollapsed && (
+                <button onClick={handleAutoColor} style={{ ...btnStyle, backgroundColor: isDark ? '#3730a3' : '#eef2ff', borderColor: isDark ? '#4f46e5' : '#c7d2fe', color: isDark ? '#a5b4fc' : '#4338ca' }}><Wand2 size={14} /> Auto Color</button>
+              )}
               <button onClick={zoomOut} style={{ ...btnStyle, width: '32px', padding: 0 }} title="Zoom Out"><ZoomOut size={14} /></button>
               <button onClick={zoomIn} style={{ ...btnStyle, width: '32px', padding: 0 }} title="Zoom In"><ZoomIn size={14} /></button>
               <button onClick={resetView} style={{ ...btnStyle, width: '32px', padding: 0 }} title="Reset"><RotateCcw size={14} /></button>
@@ -516,6 +511,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           <div style={{ padding: '8px 12px', borderTop: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '20px', backgroundColor: isDark ? '#0f0f10' : '#fafafa' }}>
             <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'flex', alignItems: 'center', gap: '4px' }}><Move size={12} /> Drag to pan</span>
             <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'flex', alignItems: 'center', gap: '4px' }}><ZoomIn size={12} /> Scroll to zoom</span>
+            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'flex', alignItems: 'center', gap: '4px' }}><PanelLeft size={12} /> {isCodeCollapsed ? 'Show' : 'Hide'} code</span>
           </div>
         </div>
       </div>
@@ -529,22 +525,20 @@ const MermaidReader = ({ isDark = true, user = null }) => {
               <button onClick={() => setIsSidebarOpen(false)} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer' }}><X size={18} /></button>
             </div>
             <div style={{ padding: '12px 16px' }}>
-              <button onClick={createNewDiagram} style={{ width: '100%', height: '40px', backgroundColor: BRAND.blue, border: 'none', borderRadius: '8px', color: '#fff', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>+ New Diagram</button>
+              <button onClick={createNewDiagram} style={{ width: '100%', height: '40px', backgroundColor: BRAND.blue, border: 'none', borderRadius: '8px', color: '#fff', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer' }}>+ New Diagram</button>
             </div>
             <div style={{ flex: 1, overflow: 'auto', padding: '0 16px 16px' }}>
-              {isLoadingDiagrams ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: theme.textMuted }}><Loader2 size={24} style={{ animation: 'spin 1s linear infinite' }} /></div>
-              ) : savedDiagrams.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '40px 0', color: theme.textMuted }}><FileText size={32} style={{ marginBottom: '8px', opacity: 0.3 }} /><p style={{ fontSize: '13px', margin: 0, fontFamily: FONTS.body }}>No saved diagrams</p></div>
+              {isLoadingDiagrams ? (<div style={{ textAlign: 'center', padding: '40px 0', color: theme.textMuted }}><Loader2 size={24} style={{ animation: 'spin 1s linear infinite' }} /></div>
+              ) : savedDiagrams.length === 0 ? (<div style={{ textAlign: 'center', padding: '40px 0', color: theme.textMuted }}><FileText size={32} style={{ marginBottom: '8px', opacity: 0.3 }} /><p style={{ fontSize: '13px', margin: 0 }}>No saved diagrams</p></div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {savedDiagrams.map((d) => (
                     <div key={d.id} style={{ padding: '12px', backgroundColor: currentDiagramId === d.id ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent', border: '1px solid ' + (currentDiagramId === d.id ? BRAND.blue : theme.cardBorder), borderRadius: '8px', cursor: 'pointer' }} onClick={() => loadDiagram(d)}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
-                        <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{d.name}</span>
+                        <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text }}>{d.name}</span>
                         <button onClick={(e) => { e.stopPropagation(); deleteDiagram(d.id); }} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '4px' }}><Trash2 size={14} /></button>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={10} style={{ color: theme.textMuted }} /><span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body }}>{formatDate(d.updated_at)}</span></div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><Clock size={10} style={{ color: theme.textMuted }} /><span style={{ fontSize: '11px', color: theme.textMuted }}>{formatDate(d.updated_at)}</span></div>
                     </div>
                   ))}
                 </div>
