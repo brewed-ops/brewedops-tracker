@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock } from 'lucide-react';
 import { createNoise3D } from "simplex-noise";
 import { motion } from "framer-motion";
+import { PixelatedCanvas } from '@/components/ui/pixelated-canvas';
 
 // ============================================
 // VORTEX BACKGROUND COMPONENT
@@ -21,6 +22,25 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
   const offscreenRef = useRef(null);
   const animationFrameId = useRef();
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+  const backgroundColorRef = useRef(backgroundColor);
+  
+  // Detect if background is light or dark
+  const isLightBg = (color) => {
+    const hex = color.replace('#', '');
+    const r = parseInt(hex.substr(0, 2), 16);
+    const g = parseInt(hex.substr(2, 2), 16);
+    const b = parseInt(hex.substr(4, 2), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 128;
+  };
+  
+  const isLightRef = useRef(isLightBg(backgroundColor));
+  
+  // Update refs when prop changes
+  useEffect(() => {
+    backgroundColorRef.current = backgroundColor;
+    isLightRef.current = isLightBg(backgroundColor);
+  }, [backgroundColor]);
   
   const particlePropCount = 9;
   const particlePropsLength = particleCount * particlePropCount;
@@ -55,7 +75,12 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineWidth = radius;
-    ctx.strokeStyle = `hsla(${hue},100%,60%,${fadeInOut(life, ttl)})`;
+    // For light backgrounds, use much darker/more visible colors
+    if (isLightRef.current) {
+      ctx.strokeStyle = `hsla(${hue}, 100%, 35%, ${fadeInOut(life, ttl) * 0.9})`;
+    } else {
+      ctx.strokeStyle = `hsla(${hue}, 100%, 60%, ${fadeInOut(life, ttl)})`;
+    }
     ctx.beginPath();
     ctx.moveTo(x, y);
     ctx.lineTo(x2, y2);
@@ -87,11 +112,36 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
     if (!offCtx) return;
     offCtx.clearRect(0, 0, width, height);
     for (let i = 0; i < particlePropsLength; i += particlePropCount) updateParticle(i, offCtx, width, height);
-    ctx.fillStyle = backgroundColor;
+    
+    // Fill background
+    ctx.fillStyle = backgroundColorRef.current;
     ctx.fillRect(0, 0, width, height);
-    ctx.save(); ctx.filter = "blur(8px) brightness(200%)"; ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
-    ctx.save(); ctx.filter = "blur(4px) brightness(150%)"; ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
-    ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
+    
+    // Different rendering for light vs dark backgrounds
+    if (isLightRef.current) {
+      // Light mode: draw particles directly with subtle glow
+      ctx.save();
+      ctx.filter = "blur(8px)";
+      ctx.globalAlpha = 0.6;
+      ctx.drawImage(offscreen, 0, 0);
+      ctx.restore();
+      
+      ctx.save();
+      ctx.filter = "blur(3px)";
+      ctx.globalAlpha = 0.8;
+      ctx.drawImage(offscreen, 0, 0);
+      ctx.restore();
+      
+      ctx.save();
+      ctx.drawImage(offscreen, 0, 0);
+      ctx.restore();
+    } else {
+      // Dark mode: use lighter for glowing particles
+      ctx.save(); ctx.filter = "blur(8px) brightness(200%)"; ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
+      ctx.save(); ctx.filter = "blur(4px) brightness(150%)"; ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
+      ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
+    }
+    
     animationFrameId.current = window.requestAnimationFrame(() => draw(canvas, ctx, width, height));
   };
 
@@ -271,45 +321,51 @@ const ThreeDMarquee = ({ isDark, theme }) => {
           if (path) navigate(path);
         }}
         style={{
-          minWidth: '180px',
-          padding: '20px',
+          minWidth: '220px',
+          padding: '28px 24px',
           backgroundColor: isDark ? '#18181b' : '#ffffff',
           border: `1px solid ${isDark ? '#27272a' : '#e4e4e7'}`,
-          borderRadius: '16px',
+          borderRadius: '20px',
           cursor: 'pointer',
           display: 'flex',
           flexDirection: 'column',
-          gap: '12px',
+          gap: '16px',
           transition: 'all 0.3s ease',
           boxShadow: isDark 
-            ? '0 4px 20px rgba(0,0,0,0.3)' 
-            : '0 4px 20px rgba(0,0,0,0.08)',
+            ? '0 4px 24px rgba(0,0,0,0.4)' 
+            : '0 4px 24px rgba(0,0,0,0.1)',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-4px) scale(1.02)';
+          e.currentTarget.style.transform = 'translateY(-6px) scale(1.03)';
           e.currentTarget.style.borderColor = tool.color;
+          e.currentTarget.style.boxShadow = isDark 
+            ? `0 8px 32px rgba(0,0,0,0.5), 0 0 20px ${tool.color}30`
+            : `0 8px 32px rgba(0,0,0,0.15), 0 0 20px ${tool.color}20`;
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'translateY(0) scale(1)';
           e.currentTarget.style.borderColor = isDark ? '#27272a' : '#e4e4e7';
+          e.currentTarget.style.boxShadow = isDark 
+            ? '0 4px 24px rgba(0,0,0,0.4)' 
+            : '0 4px 24px rgba(0,0,0,0.1)';
         }}
       >
         <div
           style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '10px',
-            backgroundColor: tool.color + '15',
+            width: '56px',
+            height: '56px',
+            borderRadius: '14px',
+            backgroundColor: tool.color + '18',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
           }}
         >
-          <IconComponent size={20} style={{ color: tool.color }} />
+          <IconComponent size={28} style={{ color: tool.color }} />
         </div>
         <span
           style={{
-            fontSize: '14px',
+            fontSize: '17px',
             fontWeight: '600',
             color: theme.text,
             fontFamily: FONTS.body,
@@ -325,9 +381,9 @@ const ThreeDMarquee = ({ isDark, theme }) => {
     <div
       style={{
         display: 'flex',
-        gap: '16px',
+        gap: '24px',
         animation: `${reverse ? 'marqueeReverse' : 'marquee'} ${speed}s linear infinite`,
-        paddingLeft: reverse ? '0' : '16px',
+        paddingLeft: reverse ? '0' : '24px',
       }}
     >
       {[...tools, ...tools, ...tools].map((tool, i) => (
@@ -339,44 +395,19 @@ const ThreeDMarquee = ({ isDark, theme }) => {
   return (
     <div
       style={{
-        perspective: '1000px',
         overflow: 'hidden',
-        padding: '60px 0',
+        padding: '80px 0',
         position: 'relative',
       }}
     >
-      {/* Gradient overlays */}
-      <div
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          right: 0,
-          height: '100px',
-          background: `linear-gradient(to bottom, ${isDark ? '#0a0a0b' : BRAND.cream}, transparent)`,
-          zIndex: 10,
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: '100px',
-          background: `linear-gradient(to top, ${isDark ? '#0a0a0b' : BRAND.cream}, transparent)`,
-          zIndex: 10,
-          pointerEvents: 'none',
-        }}
-      />
+      {/* Gradient overlays - Left and Right only */}
       <div
         style={{
           position: 'absolute',
           top: 0,
           left: 0,
           bottom: 0,
-          width: '150px',
+          width: '200px',
           background: `linear-gradient(to right, ${isDark ? '#0a0a0b' : BRAND.cream}, transparent)`,
           zIndex: 10,
           pointerEvents: 'none',
@@ -388,26 +419,24 @@ const ThreeDMarquee = ({ isDark, theme }) => {
           top: 0,
           right: 0,
           bottom: 0,
-          width: '150px',
+          width: '200px',
           background: `linear-gradient(to left, ${isDark ? '#0a0a0b' : BRAND.cream}, transparent)`,
           zIndex: 10,
           pointerEvents: 'none',
         }}
       />
 
-      {/* 3D Rotated Container */}
+      {/* Horizontal Marquee Container */}
       <div
         style={{
-          transform: 'rotateX(25deg) rotateZ(-10deg)',
-          transformStyle: 'preserve-3d',
           display: 'flex',
           flexDirection: 'column',
-          gap: '16px',
+          gap: '24px',
         }}
       >
-        <MarqueeRow tools={row1} reverse={false} speed={35} />
-        <MarqueeRow tools={row2} reverse={true} speed={40} />
-        <MarqueeRow tools={row3} reverse={false} speed={32} />
+        <MarqueeRow tools={row1} reverse={false} speed={45} />
+        <MarqueeRow tools={row2} reverse={true} speed={50} />
+        <MarqueeRow tools={row3} reverse={false} speed={42} />
       </div>
 
       {/* CSS Animations */}
@@ -646,9 +675,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       </nav>
 
       {/* HERO with Vortex Background */}
-      <div style={{ backgroundColor: '#09090b' }}>
+      <div style={{ backgroundColor: isDark ? '#09090b' : '#ffffff' }}>
         <Vortex
-          backgroundColor="#09090b"
+          backgroundColor={isDark ? '#09090b' : '#ffffff'}
           particleCount={600}
           baseHue={220}
           rangeY={200}
@@ -657,23 +686,69 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           baseRadius={1}
           rangeRadius={2}
         >
-          <section style={{ padding: isSmall ? '80px 20px 60px' : '100px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: 'rgba(0, 74, 172, 0.4)', backdropFilter: 'blur(8px)', borderRadius: '100px', marginBottom: '24px', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
-              <span style={{ fontSize: '13px', color: '#93c5fd', fontWeight: '600', fontFamily: FONTS.body }}>☕ 20 Free Tools for Filipino VAs & Freelancers</span>
+          <section style={{ padding: isSmall ? '60px 20px 40px' : '80px 64px 100px', maxWidth: '1400px', margin: '0 auto' }}>
+            <div style={{ 
+              display: 'flex', 
+              flexDirection: isMobile ? 'column' : 'row',
+              alignItems: 'center', 
+              justifyContent: 'space-between',
+              gap: isMobile ? '48px' : '80px',
+            }}>
+              {/* Left Side - Hero Text */}
+              <div style={{ flex: 1, textAlign: isMobile ? 'center' : 'left', maxWidth: isMobile ? '100%' : '650px' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', backgroundColor: isDark ? 'rgba(0, 74, 172, 0.4)' : BRAND.cream, backdropFilter: 'blur(8px)', borderRadius: '100px', marginBottom: '32px', border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid ' + BRAND.blue + '20' }}>
+                  <span style={{ fontSize: '15px', color: isDark ? '#93c5fd' : BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 20 Free Tools for Filipino VAs & Freelancers</span>
+                </div>
+                <h1 style={{ fontSize: isSmall ? '40px' : '64px', fontWeight: '800', color: isDark ? '#ffffff' : BRAND.brown, margin: '0 0 24px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
+                  Your All-in-One<br /><span style={{ color: isDark ? '#60a5fa' : BRAND.blue }}>Productivity Hub</span>
+                </h1>
+                <p style={{ fontSize: isSmall ? '16px' : '20px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 0 40px', lineHeight: '1.7', fontFamily: FONTS.body }}>
+                  Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business.
+                </p>
+                <div style={{ display: 'flex', gap: '16px', justifyContent: isMobile ? 'center' : 'flex-start', flexWrap: 'wrap' }}>
+                  <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, height: '56px', padding: '0 32px', fontSize: '16px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>Start Free <ChevronRight size={20} /></button>
+                  <button onClick={() => onNavigate('login')} style={{ ...btnOutline, height: '56px', padding: '0 32px', fontSize: '16px', color: isDark ? '#fff' : theme.text, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : theme.cardBorder, backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'transparent', backdropFilter: isDark ? 'blur(8px)' : 'none' }}>Sign In</button>
+                </div>
+                <p style={{ fontSize: '13px', color: isDark ? 'rgba(255, 255, 255, 0.5)' : theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
+                  By signing up, you agree to our <a href="/terms" style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Terms</a> and <a href="/privacy" style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Privacy Policy</a>
+                </p>
+              </div>
+
+              {/* Right Side - Pixelated Logo */}
+              {!isSmall && (
+                <div style={{ 
+                  flex: '0 0 auto', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  justifyContent: 'center',
+                }}>
+                  <div style={{
+                    borderRadius: '24px',
+                    overflow: 'hidden',
+                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 80px rgba(99, 102, 241, 0.15)',
+                  }}>
+                    <PixelatedCanvas
+                      src="https://i.imgur.com/R52jwPv.png"
+                      width={400}
+                      height={400}
+                      cellSize={4}
+                      dotScale={0.9}
+                      shape="square"
+                      backgroundColor="#09090b"
+                      interactive={true}
+                      distortionStrength={4}
+                      distortionRadius={100}
+                      distortionMode="swirl"
+                      followSpeed={0.15}
+                      jitterStrength={3}
+                      jitterSpeed={3}
+                      fadeOnLeave={true}
+                      fadeSpeed={0.08}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-            <h1 style={{ fontSize: isSmall ? '36px' : '56px', fontWeight: '800', color: '#ffffff', margin: '0 0 16px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
-              Your All-in-One<br /><span style={{ color: '#60a5fa' }}>Productivity Hub</span>
-            </h1>
-            <p style={{ fontSize: isSmall ? '16px' : '18px', color: 'rgba(255, 255, 255, 0.7)', margin: '0 0 36px', lineHeight: '1.7', maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
-              Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business.
-            </p>
-            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>Start Free <ChevronRight size={18} /></button>
-              <button onClick={() => onNavigate('login')} style={{ ...btnOutline, color: '#fff', borderColor: 'rgba(255, 255, 255, 0.3)', backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(8px)' }}>Sign In</button>
-            </div>
-            <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.5)', marginTop: '24px', fontFamily: FONTS.body }}>
-              By signing up, you agree to our <a href="/terms" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: '500' }}>Terms</a> and <a href="/privacy" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: '500' }}>Privacy Policy</a>
-            </p>
           </section>
         </Vortex>
       </div>
