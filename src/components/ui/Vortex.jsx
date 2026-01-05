@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import React, { useEffect, useRef, useState } from "react";
 import { createNoise3D } from "simplex-noise";
-import { motion } from "motion/react";
+import { motion } from "framer-motion";
 
 export const Vortex = (props) => {
   const canvasRef = useRef(null);
