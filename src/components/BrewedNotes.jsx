@@ -306,6 +306,36 @@ const BrewedNotes = ({ isDark, user }) => {
   const handleEditorKeyDown = useCallback((e) => {
     if (!isEditing) return;
     
+    // Handle Enter key inside checklist items
+    if (e.key === 'Enter') {
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+      
+      const range = selection.getRangeAt(0);
+      const checkItem = range.startContainer.parentElement?.closest('.checklist-item');
+      
+      if (checkItem) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // Create a new paragraph after the checklist item
+        const newParagraph = document.createElement('p');
+        newParagraph.innerHTML = '<br>';
+        
+        // Insert after the checklist item
+        checkItem.parentNode.insertBefore(newParagraph, checkItem.nextSibling);
+        
+        // Move cursor to the new paragraph
+        const newRange = document.createRange();
+        newRange.setStart(newParagraph, 0);
+        newRange.collapse(true);
+        selection.removeAllRanges();
+        selection.addRange(newRange);
+        
+        return;
+      }
+    }
+    
     // Stop propagation for formatting shortcuts so sidebar doesn't capture them
     if (e.ctrlKey || e.metaKey) {
       switch (e.key.toLowerCase()) {
@@ -664,7 +694,7 @@ const BrewedNotes = ({ isDark, user }) => {
 
               {/* Status */}
               <div className="px-4 py-2 border-t text-xs text-muted-foreground flex justify-between" style={{ borderColor: theme.cardBorder, fontFamily: "'Montserrat', sans-serif" }}>
-                <span>{isEditing ? '✏️ Editing - Checked items will be crossed out' : '👁️ View mode - Double-click to edit'}</span>
+                <span>{isEditing ? '✏️ Editing - Press Enter in checklist to add new line' : '👁️ View mode - Double-click to edit'}</span>
                 <span>Saved: {new Date(selectedNote.updated_at).toLocaleString()}</span>
               </div>
             </>

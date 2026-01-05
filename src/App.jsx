@@ -554,47 +554,7 @@ function AppContent() {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-  // Session timeout - auto logout after 30 minutes of inactivity
-useEffect(() => {
-  if (!user) return; // Only run when logged in
-  
-  let timeout;
-  const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 minutes
-  
-  const logout = async () => {
-    localStorage.removeItem('isAdmin');
-    await supabase.auth.signOut();
-    setUser(null);
-    navigate('/');
-  };
-  
-  const resetTimer = () => {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => {
-      // Show alert before logging out
-      alert('Session expired due to inactivity. Please log in again.');
-      logout();
-    }, TIMEOUT_DURATION);
-  };
-  
-  // Events that reset the timer
-  const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-  
-  events.forEach(event => {
-    window.addEventListener(event, resetTimer);
-  });
-  
-  // Start timer
-  resetTimer();
-  
-  // Cleanup
-  return () => {
-    clearTimeout(timeout);
-    events.forEach(event => {
-      window.removeEventListener(event, resetTimer);
-    });
-  };
-}, [user, navigate]);
+
 
 
   // Apply dark class to document root for shadcn/ui compatibility
