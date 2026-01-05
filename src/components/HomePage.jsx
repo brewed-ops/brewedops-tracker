@@ -867,7 +867,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           <a href="/terms" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Terms of Service</a>
           <a href="/about" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>About Us</a>
         </div>
-        <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>© 2025 BrewedOps. Made with ☕ for Filipino VAs & Freelancers.</p>
+        <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>© 2025 BrewedOps. Made by Kenneth V. </p>
       </footer>
     </div>
   );
