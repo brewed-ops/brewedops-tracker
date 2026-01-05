@@ -7,7 +7,8 @@ function easeOutCubic(t) {
 
 export function IconCloud({
   icons,
-  images
+  images,
+  size = 400,
 }) {
   const canvasRef = useRef(null)
   const [iconPositions, setIconPositions] = useState([])
@@ -21,6 +22,11 @@ export function IconCloud({
   const iconCanvasesRef = useRef([])
   const imagesLoadedRef = useRef([])
 
+  // Scale factor based on size (base size is 400)
+  const scaleFactor = size / 400
+  const iconSize = Math.round(40 * scaleFactor)
+  const sphereRadius = 100 * scaleFactor
+
   // Create icon canvases once when icons/images change
   useEffect(() => {
     if (!icons && !images) return
@@ -30,8 +36,8 @@ export function IconCloud({
 
     const newIconCanvases = items.map((item, index) => {
       const offscreen = document.createElement("canvas")
-      offscreen.width = 40
-      offscreen.height = 40
+      offscreen.width = iconSize
+      offscreen.height = iconSize
       const offCtx = offscreen.getContext("2d")
 
       if (offCtx) {
@@ -45,18 +51,18 @@ export function IconCloud({
 
             // Create circular clipping path
             offCtx.beginPath()
-            offCtx.arc(20, 20, 20, 0, Math.PI * 2)
+            offCtx.arc(iconSize / 2, iconSize / 2, iconSize / 2, 0, Math.PI * 2)
             offCtx.closePath()
             offCtx.clip()
 
             // Draw the image
-            offCtx.drawImage(img, 0, 0, 40, 40)
+            offCtx.drawImage(img, 0, 0, iconSize, iconSize)
 
             imagesLoadedRef.current[index] = true
           }
         } else {
           // Handle SVG icons
-          offCtx.scale(0.4, 0.4)
+          offCtx.scale(0.4 * scaleFactor, 0.4 * scaleFactor)
           const svgString = renderToString(item)
           const img = new Image()
           img.src = "data:image/svg+xml;base64," + btoa(svgString)
@@ -71,7 +77,7 @@ export function IconCloud({
     })
 
     iconCanvasesRef.current = newIconCanvases
-  }, [icons, images])
+  }, [icons, images, iconSize, scaleFactor])
 
   // Generate initial icon positions on a sphere
   useEffect(() => {
@@ -92,16 +98,16 @@ export function IconCloud({
       const z = Math.sin(phi) * r
 
       newIcons.push({
-        x: x * 100,
-        y: y * 100,
-        z: z * 100,
+        x: x * sphereRadius,
+        y: y * sphereRadius,
+        z: z * sphereRadius,
         scale: 1,
         opacity: 1,
         id: i,
       })
     }
     setIconPositions(newIcons)
-  }, [icons, images])
+  }, [icons, images, sphereRadius])
 
   // Handle mouse events
   const handleMouseDown = (e) => {
@@ -127,8 +133,8 @@ export function IconCloud({
       const screenX = canvasRef.current.width / 2 + rotatedX
       const screenY = canvasRef.current.height / 2 + rotatedY
 
-      const scale = (rotatedZ + 200) / 300
-      const radius = 20 * scale
+      const scale = (rotatedZ + 200 * scaleFactor) / (300 * scaleFactor)
+      const radius = (iconSize / 2) * scale
       const dx = x - screenX
       const dy = y - screenY
 
@@ -235,8 +241,8 @@ export function IconCloud({
         const rotatedZ = icon.x * sinY + icon.z * cosY
         const rotatedY = icon.y * cosX + rotatedZ * sinX
 
-        const scale = (rotatedZ + 200) / 300
-        const opacity = Math.max(0.2, Math.min(1, (rotatedZ + 150) / 200))
+        const scale = (rotatedZ + 200 * scaleFactor) / (300 * scaleFactor)
+        const opacity = Math.max(0.2, Math.min(1, (rotatedZ + 150 * scaleFactor) / (200 * scaleFactor)))
 
         ctx.save()
         ctx.translate(canvas.width / 2 + rotatedX, canvas.height / 2 + rotatedY)
@@ -249,18 +255,18 @@ export function IconCloud({
             iconCanvasesRef.current[index] &&
             imagesLoadedRef.current[index]
           ) {
-            ctx.drawImage(iconCanvasesRef.current[index], -20, -20, 40, 40)
+            ctx.drawImage(iconCanvasesRef.current[index], -iconSize / 2, -iconSize / 2, iconSize, iconSize)
           }
         } else {
           // Show numbered circles if no icons/images are provided
           ctx.beginPath()
-          ctx.arc(0, 0, 20, 0, Math.PI * 2)
+          ctx.arc(0, 0, iconSize / 2, 0, Math.PI * 2)
           ctx.fillStyle = "#4444ff"
           ctx.fill()
           ctx.fillStyle = "white"
           ctx.textAlign = "center"
           ctx.textBaseline = "middle"
-          ctx.font = "16px Arial"
+          ctx.font = `${16 * scaleFactor}px Arial`
           ctx.fillText(`${icon.id + 1}`, 0, 0)
         }
 
@@ -276,13 +282,13 @@ export function IconCloud({
         cancelAnimationFrame(animationFrameRef.current)
       }
     };
-  }, [icons, images, iconPositions, isDragging, mousePos, targetRotation])
+  }, [icons, images, iconPositions, isDragging, mousePos, targetRotation, iconSize, scaleFactor])
 
   return (
     <canvas
       ref={canvasRef}
-      width={400}
-      height={400}
+      width={size}
+      height={size}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}

@@ -11,8 +11,9 @@ import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock } from 'lucide-react';
 import { createNoise3D } from "simplex-noise";
 import { motion } from "framer-motion";
-import { PixelatedCanvas } from '@/components/ui/pixelated-canvas';
+import { IconCloud } from '@/components/ui/icon-cloud';
 import { LayoutTextFlip } from '@/components/ui/layout-text-flip';
+import { MacbookScroll } from '@/components/ui/macbook-scroll';
 
 // ============================================
 // VORTEX BACKGROUND COMPONENT
@@ -676,9 +677,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       </nav>
 
       {/* HERO with Vortex Background */}
-      <div style={{ backgroundColor: isDark ? '#09090b' : '#ffffff' }}>
+      <div style={{ backgroundColor: isDark ? '#0a0a0b' : BRAND.cream }}>
         <Vortex
-          backgroundColor={isDark ? '#09090b' : '#ffffff'}
+          backgroundColor={isDark ? '#0a0a0b' : BRAND.cream}
           particleCount={600}
           baseHue={220}
           rangeY={200}
@@ -687,7 +688,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           baseRadius={1}
           rangeRadius={2}
         >
-          <section style={{ padding: isSmall ? '60px 20px 40px' : '80px 64px 100px', maxWidth: '1400px', margin: '0 auto' }}>
+          <section style={{ padding: isSmall ? '60px 20px 0px' : '80px 64px 0px', maxWidth: '1400px', margin: '0 auto' }}>
             <div style={{ 
               display: 'flex', 
               flexDirection: isMobile ? 'column' : 'row',
@@ -743,7 +744,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 </p>
               </div>
 
-              {/* Right Side - Pixelated Logo */}
+              {/* Right Side - Icon Cloud */}
               {!isSmall && (
                 <div style={{ 
                   flex: '0 0 auto', 
@@ -751,36 +752,153 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   alignItems: 'center', 
                   justifyContent: 'center',
                 }}>
-                  <div style={{
-                    borderRadius: '24px',
-                    overflow: 'hidden',
-                    boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 0 80px rgba(99, 102, 241, 0.15)',
-                  }}>
-                    <PixelatedCanvas
-                      src="https://i.imgur.com/R52jwPv.png"
-                      width={400}
-                      height={400}
-                      cellSize={4}
-                      dotScale={0.9}
-                      shape="square"
-                      backgroundColor="#09090b"
-                      interactive={true}
-                      distortionStrength={4}
-                      distortionRadius={100}
-                      distortionMode="swirl"
-                      followSpeed={0.15}
-                      jitterStrength={3}
-                      jitterSpeed={3}
-                      fadeOnLeave={true}
-                      fadeSpeed={0.08}
-                    />
-                  </div>
+                  <IconCloud
+                    size={550}
+                    images={[
+                      // Tech Stack
+                      'https://cdn.simpleicons.org/react/61DAFB',
+                      'https://cdn.simpleicons.org/vite/646CFF',
+                      'https://cdn.simpleicons.org/tailwindcss/06B6D4',
+                      'https://cdn.simpleicons.org/supabase/3FCF8E',
+                      'https://cdn.simpleicons.org/javascript/F7DF1E',
+                      'https://cdn.simpleicons.org/typescript/3178C6',
+                      'https://cdn.simpleicons.org/nodedotjs/339933',
+                      'https://cdn.simpleicons.org/github/ffffff',
+                      'https://cdn.simpleicons.org/visualstudiocode/007ACC',
+                      // Productivity Tools
+                      'https://cdn.simpleicons.org/notion/ffffff',
+                      'https://cdn.simpleicons.org/slack/4A154B',
+                      'https://cdn.simpleicons.org/discord/5865F2',
+                      'https://cdn.simpleicons.org/zoom/2D8CFF',
+                      'https://cdn.simpleicons.org/googledrive/4285F4',
+                      'https://cdn.simpleicons.org/trello/0052CC',
+                      'https://cdn.simpleicons.org/asana/F06A6A',
+                      // Design
+                      'https://cdn.simpleicons.org/figma/F24E1E',
+                      'https://cdn.simpleicons.org/canva/00C4CC',
+                      'https://cdn.simpleicons.org/adobephotoshop/31A8FF',
+                      'https://cdn.simpleicons.org/adobeillustrator/FF9A00',
+                      // Social Media
+                      'https://cdn.simpleicons.org/facebook/1877F2',
+                      'https://cdn.simpleicons.org/instagram/E4405F',
+                      'https://cdn.simpleicons.org/linkedin/0A66C2',
+                      'https://cdn.simpleicons.org/x/ffffff',
+                      'https://cdn.simpleicons.org/youtube/FF0000',
+                      'https://cdn.simpleicons.org/tiktok/ffffff',
+                      // Communication
+                      'https://cdn.simpleicons.org/whatsapp/25D366',
+                      'https://cdn.simpleicons.org/telegram/26A5E4',
+                      'https://cdn.simpleicons.org/gmail/EA4335',
+                      'https://cdn.simpleicons.org/googlemeet/00897B',
+                    ]}
+                  />
                 </div>
               )}
             </div>
           </section>
         </Vortex>
       </div>
+
+      {/* MACBOOK SCROLL SHOWCASE - Desktop only */}
+      {!isMobile && (
+        <section 
+          style={{ 
+            backgroundColor: isDark ? '#0a0a0b' : BRAND.cream,
+            overflow: 'hidden',
+            position: 'relative',
+          }}
+        >
+          <MacbookScroll
+            src="https://i.imgur.com/XWCrnOz.png"
+            showGradient={true}
+            title={
+              <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+                <h2 style={{ 
+                  fontSize: '64px', 
+                  fontWeight: '800', 
+                  color: isDark ? '#fff' : BRAND.brown, 
+                  marginBottom: '12px',
+                  fontFamily: FONTS.heading,
+                }}>
+                  BrewedOps
+                </h2>
+                <p style={{ 
+                  fontSize: '14px', 
+                  fontWeight: '600', 
+                  letterSpacing: '4px',
+                  color: isDark ? '#a1a1aa' : '#71717a', 
+                  marginBottom: '28px',
+                  fontFamily: FONTS.body,
+                  textTransform: 'uppercase',
+                }}>
+                  Automations Brewed to Perfection
+                </p>
+                <p style={{ 
+                  fontSize: '20px', 
+                  color: isDark ? '#a1a1aa' : '#71717a', 
+                  lineHeight: '1.8',
+                  fontFamily: FONTS.body,
+                }}>
+                  BrewedOps is a modern automation and virtual assistant brand inspired by the warmth of coffee culture and the precision of technology. It delivers smooth, efficient systems for businesses that value both connection and performance.
+                </p>
+              </div>
+            }
+          />
+        </section>
+      )}
+
+      {/* MOBILE ABOUT SECTION */}
+      {isMobile && (
+        <section 
+          style={{ 
+            backgroundColor: isDark ? '#0a0a0b' : BRAND.cream,
+            padding: '48px 20px',
+          }}
+        >
+          <div style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'center' }}>
+            <h2 style={{ 
+              fontSize: '36px', 
+              fontWeight: '800', 
+              color: isDark ? '#fff' : BRAND.brown, 
+              marginBottom: '8px',
+              fontFamily: FONTS.heading,
+            }}>
+              BrewedOps
+            </h2>
+            <p style={{ 
+              fontSize: '11px', 
+              fontWeight: '600', 
+              letterSpacing: '3px',
+              color: isDark ? '#a1a1aa' : '#71717a', 
+              marginBottom: '20px',
+              fontFamily: FONTS.body,
+              textTransform: 'uppercase',
+            }}>
+              Automations Brewed to Perfection
+            </p>
+            <p style={{ 
+              fontSize: '15px', 
+              color: isDark ? '#a1a1aa' : '#71717a', 
+              lineHeight: '1.7',
+              fontFamily: FONTS.body,
+              marginBottom: '24px',
+            }}>
+              BrewedOps is a modern automation and virtual assistant brand inspired by the warmth of coffee culture and the precision of technology. It delivers smooth, efficient systems for businesses that value both connection and performance.
+            </p>
+            <img 
+              src="https://i.imgur.com/XWCrnOz.png" 
+              alt="BrewedOps Dashboard"
+              style={{
+                width: '100%',
+                borderRadius: '12px',
+                boxShadow: isDark 
+                  ? '0 20px 40px rgba(0,0,0,0.5)' 
+                  : '0 20px 40px rgba(0,0,0,0.15)',
+              }}
+            />
+          </div>
+        </section>
+      )}
 
       {/* TOOLS SHOWCASE */}
       <section style={{ backgroundColor: isDark ? '#0a0a0b' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder, overflow: 'hidden' }}>
