@@ -9,7 +9,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock } from 'lucide-react';
-import { Vortex } from '@/components/ui/vortex';
+import { Vortex } from './ui/vortex.jsx';
 
 // ============================================
 // BRAND CONFIGURATION
