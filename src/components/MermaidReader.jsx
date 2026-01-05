@@ -420,37 +420,113 @@ const MermaidReader = ({ isDark = true, user = null }) => {
     document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
   };
 
-  const handleDownloadPNG = () => {
+  const handleDownloadPNG = async () => {
     if (!svgContent) return;
-    const container = document.createElement('div');
-    container.innerHTML = svgContent;
-    container.style.cssText = 'position:absolute;left:-9999px';
-    document.body.appendChild(container);
-    const svgEl = container.querySelector('svg');
-    if (!svgEl) { document.body.removeChild(container); return; }
-    const bbox = svgEl.getBoundingClientRect();
-    const w = Math.max(bbox.width, parseFloat(svgEl.getAttribute('width')) || 800);
-    const h = Math.max(bbox.height, parseFloat(svgEl.getAttribute('height')) || 600);
-    svgEl.setAttribute('width', w); svgEl.setAttribute('height', h);
-    const svgStr = new XMLSerializer().serializeToString(svgEl);
-    const url = URL.createObjectURL(new Blob([svgStr], { type: 'image/svg+xml;charset=utf-8' }));
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = w * 2; canvas.height = h * 2;
-      const ctx = canvas.getContext('2d');
-      ctx.scale(2, 2);
-      ctx.fillStyle = isDark ? '#18181b' : '#ffffff';
-      ctx.fillRect(0, 0, w, h);
-      ctx.drawImage(img, 0, 0, w, h);
-      canvas.toBlob((blob) => {
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `${currentDiagramName || 'diagram'}.png`;
-        document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      }, 'image/png');
-      URL.revokeObjectURL(url); document.body.removeChild(container);
-    };
-    img.onerror = () => { URL.revokeObjectURL(url); document.body.removeChild(container); };
-    img.src = url;
+    
+    try {
+      // Create container and parse SVG
+      const container = document.createElement('div');
+      container.innerHTML = svgContent;
+      container.style.cssText = 'position:absolute;left:-9999px;top:-9999px';
+      document.body.appendChild(container);
+      
+      const svgEl = container.querySelector('svg');
+      if (!svgEl) { document.body.removeChild(container); return; }
+      
+      // Get dimensions from SVG or use defaults
+      let w = parseFloat(svgEl.getAttribute('width')) || svgEl.viewBox?.baseVal?.width || 800;
+      let h = parseFloat(svgEl.getAttribute('height')) || svgEl.viewBox?.baseVal?.height || 600;
+      
+      // If dimensions are still weird, try getBoundingClientRect
+      if (w < 100 || h < 100) {
+        const bbox = svgEl.getBoundingClientRect();
+        w = Math.max(w, bbox.width, 400);
+        h = Math.max(h, bbox.height, 300);
+      }
+      
+      // Clone SVG and prepare for export
+      const clonedSvg = svgEl.cloneNode(true);
+      clonedSvg.setAttribute('width', w);
+      clonedSvg.setAttribute('height', h);
+      clonedSvg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+      clonedSvg.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink');
+      
+      // Inline all computed styles
+      const allElements = clonedSvg.querySelectorAll('*');
+      allElements.forEach(el => {
+        const computed = window.getComputedStyle(el);
+        const styles = [];
+        for (let i = 0; i < computed.length; i++) {
+          const prop = computed[i];
+          const value = computed.getPropertyValue(prop);
+          if (value && prop !== 'all') {
+            styles.push(`${prop}:${value}`);
+          }
+        }
+        if (styles.length > 0) {
+          el.setAttribute('style', (el.getAttribute('style') || '') + ';' + styles.join(';'));
+        }
+      });
+      
+      // Add background color to SVG
+      const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      bgRect.setAttribute('width', '100%');
+      bgRect.setAttribute('height', '100%');
+      bgRect.setAttribute('fill', isDark ? '#18181b' : '#ffffff');
+      clonedSvg.insertBefore(bgRect, clonedSvg.firstChild);
+      
+      // Serialize SVG
+      const svgStr = new XMLSerializer().serializeToString(clonedSvg);
+      
+      // Convert to base64 data URL (avoids cross-origin issues)
+      const base64 = btoa(unescape(encodeURIComponent(svgStr)));
+      const dataUrl = `data:image/svg+xml;base64,${base64}`;
+      
+      // Create image and draw to canvas
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const scale = 2; // 2x for better quality
+        canvas.width = w * scale;
+        canvas.height = h * scale;
+        const ctx = canvas.getContext('2d');
+        
+        // Fill background
+        ctx.fillStyle = isDark ? '#18181b' : '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw image scaled
+        ctx.scale(scale, scale);
+        ctx.drawImage(img, 0, 0, w, h);
+        
+        // Download
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${currentDiagramName || 'mermaid-diagram'}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(a.href);
+          }
+        }, 'image/png', 1.0);
+        
+        document.body.removeChild(container);
+      };
+      
+      img.onerror = (e) => {
+        console.error('PNG export failed:', e);
+        document.body.removeChild(container);
+        // Fallback: try downloading SVG instead
+        alert('PNG export failed. Try downloading as SVG instead.');
+      };
+      
+      img.src = dataUrl;
+    } catch (err) {
+      console.error('PNG export error:', err);
+      alert('PNG export failed. Try downloading as SVG instead.');
+    }
   };
 
   const loadTemplate = (t) => { setCode(t.code); setCurrentDiagramId(null); setCurrentDiagramName(''); setCodeBeforeColor(null); setShowTemplates(false); setKey((k) => k + 1); };
