@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch } from 'lucide-react';
+import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock } from 'lucide-react';
 
 // ============================================
 // BRAND CONFIGURATION
@@ -66,15 +66,17 @@ const TOOL_CATEGORIES = [
     ]
   },
   {
-  name: 'Other Tools',
-  tools: [
-    { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
-    { icon: Search, title: 'Find & Replace', path: '/findreplace' },
-    { icon: Type, title: 'Case Converter', path: '/caseconverter' },
-    { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
-    { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },  // ADD THIS
-  ]
-},
+    name: 'Other Tools',
+    tools: [
+      { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
+      { icon: Search, title: 'Find & Replace', path: '/findreplace' },
+      { icon: Type, title: 'Case Converter', path: '/caseconverter' },
+      { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
+      { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
+      { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
+      { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
+    ]
+  },
 ];
 
 const PRODUCTIVITY_TOOLS = [
@@ -102,6 +104,9 @@ const ALL_TOOLS = [
   { icon: Search, title: 'Find & Replace', color: '#f59e0b' },
   { icon: Type, title: 'Case Converter', color: '#f59e0b' },
   { icon: Hash, title: 'Word Counter', color: '#f59e0b' },
+  { icon: GitBranch, title: 'Mermaid Reader', color: '#f59e0b' },
+  { icon: Braces, title: 'JSON Formatter', color: '#3b82f6' },
+  { icon: Clock, title: 'Cron Generator', color: '#22c55e' },
   { icon: DollarSign, title: 'Finance Tracker', color: '#004AAC' },
   { icon: Headphones, title: 'VA Kita', color: '#004AAC' },
 ];
@@ -133,9 +138,9 @@ const ThreeDMarquee = ({ isDark, theme }) => {
   const navigate = useNavigate();
   
   // Create rows of tools for marquee effect
-  const row1 = ALL_TOOLS.slice(0, 6);
-  const row2 = ALL_TOOLS.slice(6, 12);
-  const row3 = ALL_TOOLS.slice(12, 18);
+  const row1 = ALL_TOOLS.slice(0, 7);
+  const row2 = ALL_TOOLS.slice(7, 14);
+  const row3 = ALL_TOOLS.slice(14, 21);
 
   const ToolCard = ({ tool, index, reverse }) => {
     const IconComponent = tool.icon;
@@ -523,7 +528,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       {/* HERO */}
       <section style={{ padding: isSmall ? '48px 20px 32px' : '60px 32px 40px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
         <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.cream, borderRadius: '100px', marginBottom: '24px', border: isDark ? 'none' : '1px solid ' + BRAND.blue + '20' }}>
-          <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 18 Free Tools for Filipino VAs & Freelancers</span>
+          <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 20 Free Tools for Filipino VAs & Freelancers</span>
         </div>
         <h1 style={{ fontSize: isSmall ? '32px' : '52px', fontWeight: '800', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 16px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
           Your All-in-One<br /><span style={{ color: BRAND.blue }}>Productivity Hub</span>

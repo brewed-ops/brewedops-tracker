@@ -25,6 +25,8 @@ import FinanceTracker from './components/FinanceTracker';
 import GuestToolLayout from './components/layout/GuestToolLayout';
 import HomePage from './components/HomePage';
 import MermaidReader from './components/MermaidReader';
+import JsonFormatter from './components/JsonFormatter';
+import CronGenerator from './components/CronGenerator';
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -735,8 +737,12 @@ return (
     <Route path="/qrgenerator" element={<GuestToolLayout toolName="QR Generator" isDark={isDark} setIsDark={setIsDark}><QRGenerator isDark={isDark} /></GuestToolLayout>} />
     <Route path="/findreplace" element={<GuestToolLayout toolName="Find & Replace" isDark={isDark} setIsDark={setIsDark}><FindReplace isDark={isDark} /></GuestToolLayout>} />
     <Route path="/caseconverter" element={<GuestToolLayout toolName="Case Converter" isDark={isDark} setIsDark={setIsDark}><CaseConverter isDark={isDark} /></GuestToolLayout>} />
-    <Route path="/mermaid" element={<GuestToolLayout toolName="Mermaid Reader" isDark={isDark} setIsDark={setIsDark}><MermaidReader isDark={isDark} user={null} /></GuestToolLayout>} />
     <Route path="/wordcounter" element={<GuestToolLayout toolName="Word Counter" isDark={isDark} setIsDark={setIsDark}><WordCounter isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/mermaid" element={<GuestToolLayout toolName="Mermaid Reader" isDark={isDark} setIsDark={setIsDark}><MermaidReader isDark={isDark} user={null} /></GuestToolLayout>} />
+    
+    {/* New Automation Tools */}
+    <Route path="/jsonformatter" element={<GuestToolLayout toolName="JSON Formatter" isDark={isDark} setIsDark={setIsDark}><JsonFormatter isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/crongenerator" element={<GuestToolLayout toolName="Cron Generator" isDark={isDark} setIsDark={setIsDark}><CronGenerator isDark={isDark} /></GuestToolLayout>} />
 
     <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
   </Routes>

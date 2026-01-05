@@ -34,6 +34,8 @@ import CaseConverter from './CaseConverter';
 import WordCounter from './WordCounter';
 import VAKita from './VAKita';
 import MermaidReader from './MermaidReader';
+import JsonFormatter from './JsonFormatter';
+import CronGenerator from './CronGenerator';
 
 // Import constants and utilities
 import {
@@ -245,6 +247,8 @@ const FinanceTracker = ({ user, onLogout, isDark, setIsDark }) => {
       case '/caseconverter': return 'caseconverter';
       case '/wordcounter': return 'wordcounter';
       case '/mermaid': return 'mermaid';
+      case '/jsonformatter': return 'jsonformatter';
+      case '/crongenerator': return 'crongenerator';
       default: return 'dashboard';
     }
   };
@@ -274,6 +278,9 @@ const FinanceTracker = ({ user, onLogout, isDark, setIsDark }) => {
       case 'findreplace': navigate('/findreplace'); break;
       case 'caseconverter': navigate('/caseconverter'); break;
       case 'wordcounter': navigate('/wordcounter'); break;
+      case 'mermaid': navigate('/mermaid'); break;
+      case 'jsonformatter': navigate('/jsonformatter'); break;
+      case 'crongenerator': navigate('/crongenerator'); break;
       default: navigate('/'); break;
     }
   };
@@ -2801,6 +2808,10 @@ const getBudgetStatus = () => {
   <WordCounter isDark={isDark} />
 ) : activeSection === 'mermaid' ? (
   <MermaidReader isDark={isDark} user={user} />
+) : activeSection === 'jsonformatter' ? (
+  <JsonFormatter isDark={isDark} />
+) : activeSection === 'crongenerator' ? (
+  <CronGenerator isDark={isDark} />
 ) : (
 
      <>
