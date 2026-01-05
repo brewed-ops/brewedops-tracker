@@ -9,6 +9,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock } from 'lucide-react';
+import { Vortex } from '@/components/ui/vortex';
 
 // ============================================
 // BRAND CONFIGURATION
@@ -525,25 +526,39 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         </div>
       </nav>
 
-      {/* HERO */}
-      <section style={{ padding: isSmall ? '48px 20px 32px' : '60px 32px 40px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.cream, borderRadius: '100px', marginBottom: '24px', border: isDark ? 'none' : '1px solid ' + BRAND.blue + '20' }}>
-          <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 20 Free Tools for Filipino VAs & Freelancers</span>
-        </div>
-        <h1 style={{ fontSize: isSmall ? '32px' : '52px', fontWeight: '800', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 16px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
-          Your All-in-One<br /><span style={{ color: BRAND.blue }}>Productivity Hub</span>
-        </h1>
-        <p style={{ fontSize: isSmall ? '16px' : '18px', color: theme.textMuted, margin: '0 0 36px', lineHeight: '1.7', maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
-          Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business.
-        </p>
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button onClick={() => onNavigate('signup')} style={btnPrimary}>Start Free <ChevronRight size={18} /></button>
-          <button onClick={() => onNavigate('login')} style={btnOutline}>Sign In</button>
-        </div>
-        <p style={{ fontSize: '13px', color: theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
-          By signing up, you agree to our <a href="/terms" style={{ color: BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Terms</a> and <a href="/privacy" style={{ color: BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Privacy Policy</a>
-        </p>
-      </section>
+      {/* HERO with Vortex Background - Always Dark */}
+      <div style={{ backgroundColor: '#09090b' }}>
+        <Vortex
+          backgroundColor="#09090b"
+          particleCount={600}
+          baseHue={220}
+          rangeY={200}
+          baseSpeed={0.0}
+          rangeSpeed={1.5}
+          baseRadius={1}
+          rangeRadius={2}
+          containerClassName="min-h-[500px]"
+        >
+          <section style={{ padding: isSmall ? '80px 20px 60px' : '100px 32px 80px', maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '8px 16px', backgroundColor: 'rgba(0, 74, 172, 0.4)', backdropFilter: 'blur(8px)', borderRadius: '100px', marginBottom: '24px', border: '1px solid rgba(96, 165, 250, 0.3)' }}>
+              <span style={{ fontSize: '13px', color: '#93c5fd', fontWeight: '600', fontFamily: FONTS.body }}>☕ 20 Free Tools for Filipino VAs & Freelancers</span>
+            </div>
+            <h1 style={{ fontSize: isSmall ? '36px' : '56px', fontWeight: '800', color: '#ffffff', margin: '0 0 16px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
+              Your All-in-One<br /><span style={{ color: '#60a5fa' }}>Productivity Hub</span>
+            </h1>
+            <p style={{ fontSize: isSmall ? '16px' : '18px', color: 'rgba(255, 255, 255, 0.7)', margin: '0 0 36px', lineHeight: '1.7', maxWidth: '650px', marginLeft: 'auto', marginRight: 'auto', fontFamily: FONTS.body }}>
+              Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business.
+            </p>
+            <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, backgroundColor: BRAND.blue, boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>Start Free <ChevronRight size={18} /></button>
+              <button onClick={() => onNavigate('login')} style={{ ...btnOutline, color: '#fff', borderColor: 'rgba(255, 255, 255, 0.3)', backgroundColor: 'rgba(255, 255, 255, 0.1)', backdropFilter: 'blur(8px)' }}>Sign In</button>
+            </div>
+            <p style={{ fontSize: '13px', color: 'rgba(255, 255, 255, 0.5)', marginTop: '24px', fontFamily: FONTS.body }}>
+              By signing up, you agree to our <a href="/terms" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: '500' }}>Terms</a> and <a href="/privacy" style={{ color: '#60a5fa', textDecoration: 'none', fontWeight: '500' }}>Privacy Policy</a>
+            </p>
+          </section>
+        </Vortex>
+      </div>
 
       {/* TOOLS SHOWCASE */}
       <section style={{ backgroundColor: isDark ? '#0a0a0b' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder, overflow: 'hidden' }}>
