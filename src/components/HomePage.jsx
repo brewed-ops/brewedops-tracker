@@ -12,6 +12,7 @@ import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, L
 import { createNoise3D } from "simplex-noise";
 import { motion } from "framer-motion";
 import { PixelatedCanvas } from '@/components/ui/pixelated-canvas';
+import { LayoutTextFlip } from '@/components/ui/layout-text-flip';
 
 // ============================================
 // VORTEX BACKGROUND COMPONENT
@@ -699,9 +700,37 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', backgroundColor: isDark ? 'rgba(0, 74, 172, 0.4)' : BRAND.cream, backdropFilter: 'blur(8px)', borderRadius: '100px', marginBottom: '32px', border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid ' + BRAND.blue + '20' }}>
                   <span style={{ fontSize: '15px', color: isDark ? '#93c5fd' : BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 20 Free Tools for Filipino VAs & Freelancers</span>
                 </div>
-                <h1 style={{ fontSize: isSmall ? '40px' : '64px', fontWeight: '800', color: isDark ? '#ffffff' : BRAND.brown, margin: '0 0 24px', lineHeight: '1.1', letterSpacing: '-0.03em', fontFamily: FONTS.heading }}>
-                  Your All-in-One<br /><span style={{ color: isDark ? '#60a5fa' : BRAND.blue }}>Productivity Hub</span>
-                </h1>
+                <div style={{ marginBottom: '24px' }}>
+                  <div style={{ 
+                    fontSize: isSmall ? '40px' : '64px', 
+                    fontWeight: '800', 
+                    color: isDark ? '#ffffff' : BRAND.brown, 
+                    lineHeight: '1.1', 
+                    letterSpacing: '-0.03em', 
+                    fontFamily: FONTS.heading,
+                    marginBottom: '16px',
+                    textAlign: isMobile ? 'center' : 'left',
+                  }}>
+                    Your All-in-One
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
+                    <LayoutTextFlip
+                      text=""
+                      words={["Productivity Hub", "Automation Suite", "VA Toolkit", "Business Hub"]}
+                      duration={3000}
+                      wordStyle={{
+                        fontSize: isSmall ? '36px' : '56px',
+                        fontWeight: '800',
+                        fontFamily: FONTS.heading,
+                        color: isDark ? '#60a5fa' : BRAND.blue,
+                        backgroundColor: isDark ? 'rgba(96, 165, 250, 0.15)' : 'rgba(0, 74, 172, 0.1)',
+                        border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid rgba(0, 74, 172, 0.2)',
+                        padding: '8px 24px',
+                        borderRadius: '16px',
+                      }}
+                    />
+                  </div>
+                </div>
                 <p style={{ fontSize: isSmall ? '16px' : '20px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 0 40px', lineHeight: '1.7', fontFamily: FONTS.body }}>
                   Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business.
                 </p>
