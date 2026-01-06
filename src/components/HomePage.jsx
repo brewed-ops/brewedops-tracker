@@ -650,6 +650,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           </div>
           {isDesktop && (
             <>
+              <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Portfolio
+              </button>
               <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Services <ChevronDown size={14} />
               </button>

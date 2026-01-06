@@ -25,6 +25,7 @@ import FinanceTracker from './components/FinanceTracker';
 import GuestToolLayout from './components/layout/GuestToolLayout';
 import HomePage from './components/HomePage';
 import MermaidReader from './components/MermaidReader';
+import PortfolioPage from './pages/PortfolioPage';
 import JsonFormatter from './components/JsonFormatter';
 import CronGenerator from './components/CronGenerator';
 
@@ -554,7 +555,47 @@ function AppContent() {
     localStorage.setItem('theme', isDark ? 'dark' : 'light');
   }, [isDark]);
 
-
+  // Session timeout - auto logout after 30 minutes of inactivity
+useEffect(() => {
+  if (!user) return; // Only run when logged in
+  
+  let timeout;
+  const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 minutes
+  
+  const logout = async () => {
+    localStorage.removeItem('isAdmin');
+    await supabase.auth.signOut();
+    setUser(null);
+    navigate('/');
+  };
+  
+  const resetTimer = () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      // Show alert before logging out
+      alert('Session expired due to inactivity. Please log in again.');
+      logout();
+    }, TIMEOUT_DURATION);
+  };
+  
+  // Events that reset the timer
+  const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+  
+  events.forEach(event => {
+    window.addEventListener(event, resetTimer);
+  });
+  
+  // Start timer
+  resetTimer();
+  
+  // Cleanup
+  return () => {
+    clearTimeout(timeout);
+    events.forEach(event => {
+      window.removeEventListener(event, resetTimer);
+    });
+  };
+}, [user, navigate]);
 
 
   // Apply dark class to document root for shadcn/ui compatibility
@@ -668,6 +709,7 @@ function AppContent() {
 return (
   <Routes>
     <Route path="/" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
+    <Route path="/portfolio" element={<PortfolioPage isDark={isDark} setIsDark={setIsDark} />} />
     <Route path="/login" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
     <Route path="/signup" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="signup" />} />
     <Route path="/reset-password" element={<ResetPassword isDark={isDark} setIsDark={setIsDark} />} />
@@ -697,13 +739,14 @@ return (
     <Route path="/qrgenerator" element={<GuestToolLayout toolName="QR Generator" isDark={isDark} setIsDark={setIsDark}><QRGenerator isDark={isDark} /></GuestToolLayout>} />
     <Route path="/findreplace" element={<GuestToolLayout toolName="Find & Replace" isDark={isDark} setIsDark={setIsDark}><FindReplace isDark={isDark} /></GuestToolLayout>} />
     <Route path="/caseconverter" element={<GuestToolLayout toolName="Case Converter" isDark={isDark} setIsDark={setIsDark}><CaseConverter isDark={isDark} /></GuestToolLayout>} />
-    <Route path="/wordcounter" element={<GuestToolLayout toolName="Word Counter" isDark={isDark} setIsDark={setIsDark}><WordCounter isDark={isDark} /></GuestToolLayout>} />
     <Route path="/mermaid" element={<GuestToolLayout toolName="Mermaid Reader" isDark={isDark} setIsDark={setIsDark}><MermaidReader isDark={isDark} user={null} /></GuestToolLayout>} />
+    <Route path="/wordcounter" element={<GuestToolLayout toolName="Word Counter" isDark={isDark} setIsDark={setIsDark}><WordCounter isDark={isDark} /></GuestToolLayout>} />
     
-    {/* New Automation Tools */}
+    {/* JSON Formatter and Cron Generator */}
     <Route path="/jsonformatter" element={<GuestToolLayout toolName="JSON Formatter" isDark={isDark} setIsDark={setIsDark}><JsonFormatter isDark={isDark} /></GuestToolLayout>} />
     <Route path="/crongenerator" element={<GuestToolLayout toolName="Cron Generator" isDark={isDark} setIsDark={setIsDark}><CronGenerator isDark={isDark} /></GuestToolLayout>} />
 
+    {/* Catch-all route */}
     <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
   </Routes>
 );
