@@ -121,12 +121,13 @@ function PortfolioPage({ isDark, setIsDark }) {
       { name: 'Zendesk', icon: 'https://cdn.simpleicons.org/zendesk/03363D' },
       { name: 'HubSpot', icon: 'https://cdn.simpleicons.org/hubspot/FF7A59' },
       { name: 'Salesforce', icon: 'https://cdn.simpleicons.org/salesforce/00A1E0' },
+      { name: 'HighLevel', icon: 'https://images.leadconnectorhq.com/image/f_webp/q_90/r_1200/u_https://cdn.filesafe.space/locationPhotos%2F0dGl6twG5Dn3mOsfPjle%2Fghl-icon.png' },
     ]},
     { name: 'Communication', tools: [
-      { name: 'Slack', icon: 'https://cdn.simpleicons.org/slack/4A154B' },
+      { name: 'Slack', icon: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg' },
       { name: 'Zoom', icon: 'https://cdn.simpleicons.org/zoom/0B5CFF' },
       { name: 'Google Meet', icon: 'https://cdn.simpleicons.org/googlemeet/00897B' },
-      { name: 'Skype', icon: 'https://cdn.simpleicons.org/skype/00AFF0' },
+      { name: 'Skype', icon: 'https://upload.wikimedia.org/wikipedia/commons/6/60/Skype_logo_%282019%E2%80%93present%29.svg' },
     ]},
     { name: 'Project Management', tools: [
       { name: 'Trello', icon: 'https://cdn.simpleicons.org/trello/0052CC' },
@@ -137,18 +138,19 @@ function PortfolioPage({ isDark, setIsDark }) {
     { name: 'eCommerce', tools: [
       { name: 'Shopify', icon: 'https://cdn.simpleicons.org/shopify/7AB55C' },
       { name: 'WooCommerce', icon: 'https://cdn.simpleicons.org/woocommerce/96588A' },
-      { name: 'Lightspeed', icon: 'https://cdn.simpleicons.org/lightspeed/E6500E' },
+      { name: 'Lightspeed', icon: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Lightspeed_logo.svg' },
     ]},
     { name: 'Development', tools: [
       { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
       { name: 'Vite', icon: 'https://cdn.simpleicons.org/vite/646CFF' },
       { name: 'Tailwind', icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4' },
       { name: 'Supabase', icon: 'https://cdn.simpleicons.org/supabase/3FCF8E' },
+      { name: 'n8n', icon: 'https://cdn.simpleicons.org/n8n/EA4B71' },
     ]},
     { name: 'Productivity', tools: [
       { name: 'Google Workspace', icon: 'https://cdn.simpleicons.org/google/4285F4' },
       { name: 'Microsoft 365', icon: 'https://cdn.simpleicons.org/microsoft/5E5E5E' },
-      { name: 'ChatGPT', icon: 'https://cdn.simpleicons.org/openai/412991' },
+      { name: 'ChatGPT', icon: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg' },
       { name: 'Claude', icon: 'https://cdn.simpleicons.org/anthropic/191919' },
     ]},
   ];
