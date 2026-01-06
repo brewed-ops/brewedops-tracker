@@ -5,6 +5,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ContainerScroll } from '@/components/ui/container-scroll-animation';
 import { 
   ChevronRight, 
   Code, 
@@ -78,6 +79,108 @@ const LinkedInIcon = ({ size = 18 }) => (
   </svg>
 );
 
+// Featured Project Section with Container Scroll Animation
+function FeaturedProjectSection({ isDark, theme, isMobile, navigate }) {
+  return (
+    <section 
+      style={{ 
+        backgroundColor: isDark ? '#09090b' : BRAND.cream,
+        position: 'relative',
+        overflow: 'hidden',
+      }}
+    >
+      <ContainerScroll
+        titleComponent={
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: `${BRAND.green}15`, borderRadius: '100px', marginBottom: '20px' }}>
+              <Sparkles size={16} style={{ color: BRAND.green }} />
+              <span style={{ fontSize: '12px', color: BRAND.green, fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '1px' }}>FEATURED PROJECT</span>
+            </div>
+            <h2 style={{ 
+              fontSize: isMobile ? '32px' : '56px', 
+              fontWeight: '800', 
+              fontFamily: FONTS.heading, 
+              color: isDark ? '#fff' : BRAND.brown,
+              marginBottom: '16px',
+              lineHeight: '1.1'
+            }}>
+              <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
+              <span style={{ color: BRAND.blue }}>Ops</span>
+              <span style={{ color: isDark ? '#fff' : BRAND.brown }}> Tools</span>
+              <br />
+              <span style={{ 
+                fontSize: isMobile ? '20px' : '32px', 
+                fontWeight: '600', 
+                color: theme.textMuted,
+                display: 'block',
+                marginTop: '8px'
+              }}>
+                (Vibe Coding)
+              </span>
+            </h2>
+            <p style={{ 
+              fontSize: isMobile ? '14px' : '18px', 
+              color: theme.textMuted, 
+              maxWidth: '600px', 
+              margin: '0 auto 24px',
+              lineHeight: '1.7',
+              fontFamily: FONTS.body
+            }}>
+              A productivity hub for Filipino VAs & freelancers with 20+ free tools, finance tracking, task management, and premium features.
+            </p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginBottom: '20px' }}>
+              {['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'].map((tag, j) => (
+                <span key={j} style={{ 
+                  fontSize: isMobile ? '12px' : '14px', 
+                  padding: isMobile ? '8px 14px' : '10px 20px', 
+                  backgroundColor: `${BRAND.blue}15`, 
+                  color: BRAND.blue, 
+                  borderRadius: '100px', 
+                  fontWeight: '600', 
+                  fontFamily: FONTS.body 
+                }}>{tag}</span>
+              ))}
+            </div>
+            <button 
+              onClick={() => navigate('/')} 
+              style={{ 
+                padding: isMobile ? '14px 28px' : '16px 36px', 
+                backgroundColor: BRAND.blue, 
+                color: '#fff', 
+                border: 'none', 
+                borderRadius: '14px', 
+                fontWeight: '600', 
+                fontSize: isMobile ? '15px' : '16px', 
+                cursor: 'pointer', 
+                fontFamily: FONTS.body, 
+                display: 'inline-flex', 
+                alignItems: 'center', 
+                gap: '10px',
+                boxShadow: `0 8px 32px ${BRAND.blue}40`,
+                transition: 'all 0.2s ease'
+              }}
+            >
+              View Project <ExternalLink size={18} />
+            </button>
+          </div>
+        }
+      >
+        <img 
+          src="https://i.imgur.com/NYgLMDT.png" 
+          alt="BrewedOps Tools Screenshot"
+          className="mx-auto rounded-2xl object-cover h-full object-left-top"
+          draggable={false}
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+      </ContainerScroll>
+    </section>
+  );
+}
+
 // Main Component
 function PortfolioPage({ isDark, setIsDark }) {
   console.log('🚀 PortfolioPage is rendering!');
@@ -120,8 +223,7 @@ function PortfolioPage({ isDark, setIsDark }) {
       { name: 'Intercom', icon: 'https://cdn.simpleicons.org/intercom/1F8DED' },
       { name: 'Zendesk', icon: 'https://cdn.simpleicons.org/zendesk/03363D' },
       { name: 'HubSpot', icon: 'https://cdn.simpleicons.org/hubspot/FF7A59' },
-      { name: 'Salesforce', icon: 'https://cdn.simpleicons.org/salesforce/00A1E0' },
-      { name: 'HighLevel', icon: 'https://images.leadconnectorhq.com/image/f_webp/q_90/r_1200/u_https://cdn.filesafe.space/locationPhotos%2F0dGl6twG5Dn3mOsfPjle%2Fghl-icon.png' },
+      { name: 'HighLevel', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Cdefs%3E%3ClinearGradient id="ghl" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" style="stop-color:%23FF5F1F"/%3E%3Cstop offset="50%25" style="stop-color:%23FF8C00"/%3E%3Cstop offset="100%25" style="stop-color:%23FFB347"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect rx="20" fill="url(%23ghl)" width="100" height="100"/%3E%3Ctext x="50" y="68" font-family="Arial Black" font-size="45" fill="white" text-anchor="middle" font-weight="bold"%3EHL%3C/text%3E%3C/svg%3E' },
     ]},
     { name: 'Communication', tools: [
       { name: 'Slack', icon: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg' },
@@ -138,7 +240,7 @@ function PortfolioPage({ isDark, setIsDark }) {
     { name: 'eCommerce', tools: [
       { name: 'Shopify', icon: 'https://cdn.simpleicons.org/shopify/7AB55C' },
       { name: 'WooCommerce', icon: 'https://cdn.simpleicons.org/woocommerce/96588A' },
-      { name: 'Lightspeed', icon: 'https://upload.wikimedia.org/wikipedia/commons/8/8a/Lightspeed_logo.svg' },
+      { name: 'Lightspeed', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect rx="15" fill="%23E6500E" width="100" height="100"/%3E%3Cpath d="M30 20 L30 80 L70 80 L70 68 L44 68 L44 20 Z" fill="white"/%3E%3C/svg%3E' },
     ]},
     { name: 'Development', tools: [
       { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
@@ -496,41 +598,8 @@ function PortfolioPage({ isDark, setIsDark }) {
         `}</style>
       </section>
 
-      {/* FEATURED PROJECT */}
-      <section style={{ padding: isMobile ? '60px 16px' : '100px 32px', backgroundColor: isDark ? '#0f0f10' : BRAND.cream }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '64px' }}>
-            <h2 style={{ fontSize: isMobile ? '28px' : '42px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>Featured Project</h2>
-          </div>
-          <div style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}`, borderRadius: isMobile ? '16px' : '28px', overflow: 'hidden', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1.6fr', minHeight: isMobile ? 'auto' : '550px' }}>
-            <div style={{ padding: isMobile ? '28px 20px' : '56px', display: 'flex', flexDirection: 'column', justifyContent: 'center', order: isMobile ? 2 : 1 }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 14px', backgroundColor: `${BRAND.green}15`, borderRadius: '100px', marginBottom: '20px', width: 'fit-content' }}>
-                <Sparkles size={14} style={{ color: BRAND.green }} />
-                <span style={{ fontSize: '11px', color: BRAND.green, fontWeight: '700', fontFamily: FONTS.body }}>FEATURED PROJECT</span>
-              </div>
-              <h3 style={{ fontSize: isMobile ? '24px' : '36px', fontWeight: '800', fontFamily: FONTS.heading, marginBottom: '12px', color: isDark ? '#fff' : BRAND.brown }}>BrewedOps <span style={{ fontSize: isMobile ? '16px' : '24px', fontWeight: '600', color: theme.textMuted }}>(shadcn UI)</span></h3>
-              <p style={{ fontSize: isMobile ? '14px' : '17px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '20px', fontFamily: FONTS.body }}>A productivity hub for Filipino VAs & freelancers with 20+ free tools, finance tracking, task management, and premium features to help manage their business efficiently.</p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '24px' }}>
-                {['React', 'Supabase', 'Tailwind CSS', 'Vite'].map((tag, j) => (
-                  <span key={j} style={{ fontSize: isMobile ? '11px' : '13px', padding: isMobile ? '8px 12px' : '10px 18px', backgroundColor: `${BRAND.blue}15`, color: BRAND.blue, borderRadius: '100px', fontWeight: '600', fontFamily: FONTS.body }}>{tag}</span>
-                ))}
-              </div>
-              <button onClick={() => navigate('/')} style={{ padding: isMobile ? '12px 24px' : '16px 32px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '12px', fontWeight: '600', fontSize: isMobile ? '14px' : '15px', cursor: 'pointer', fontFamily: FONTS.body, display: 'flex', alignItems: 'center', gap: '10px', width: 'fit-content' }}>
-                View Project <ExternalLink size={16} />
-              </button>
-            </div>
-            <div style={{ 
-              backgroundImage: 'url(https://i.imgur.com/NYgLMDT.png)', 
-              backgroundSize: isMobile ? 'cover' : 'contain', 
-              backgroundPosition: 'center', 
-              backgroundRepeat: 'no-repeat',
-              minHeight: isMobile ? '200px' : '550px',
-              backgroundColor: isDark ? '#0a0a0b' : '#f4f4f5',
-              order: isMobile ? 1 : 2,
-            }} />
-          </div>
-        </div>
-      </section>
+      {/* FEATURED PROJECT - Container Scroll Animation */}
+      <FeaturedProjectSection isDark={isDark} theme={theme} isMobile={isMobile} navigate={navigate} />
 
       {/* TOOLS */}
       <section style={{ padding: isMobile ? '48px 16px' : '80px 32px', backgroundColor: theme.bg }}>
