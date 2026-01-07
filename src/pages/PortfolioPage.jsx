@@ -251,7 +251,7 @@ function PortfolioPage({ isDark, setIsDark }) {
     ]},
     { name: 'Productivity', tools: [
       { name: 'Google Workspace', icon: 'https://cdn.simpleicons.org/google/4285F4' },
-      { name: 'Microsoft 365', icon: 'https://cdn.simpleicons.org/microsoft/5E5E5E' },
+      { name: 'Microsoft 365', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%230078D4" d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/%3E%3C/svg%3E' },
       { name: 'ChatGPT', icon: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg' },
       { name: 'Claude', icon: 'https://cdn.simpleicons.org/anthropic/191919' },
     ]},
@@ -920,25 +920,116 @@ function PortfolioPage({ isDark, setIsDark }) {
       </section>
 
       {/* SKILLS */}
-      <section style={{ padding: isMobile ? '48px 16px' : '100px 32px', backgroundColor: isDark ? '#0f0f10' : BRAND.cream }}>
+      <section style={{ padding: isMobile ? '48px 16px' : '80px 32px', backgroundColor: isDark ? '#0f0f10' : BRAND.cream }}>
         <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '64px' }}>
-            <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#8b5cf6', textTransform: 'uppercase', marginBottom: '12px', display: 'block' }}>Expertise</span>
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
+            <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#8b5cf6', textTransform: 'uppercase', marginBottom: '8px', display: 'block' }}>Expertise</span>
             <h2 style={{ fontSize: isMobile ? '28px' : '42px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>Skills</h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '16px' : '24px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '12px' : '20px', alignItems: 'start' }}>
             {skills.map((skill, i) => (
-              <div key={i} style={{ padding: isMobile ? '20px 16px' : '28px', backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}`, borderRadius: isMobile ? '14px' : '20px' }}>
-                <h3 style={{ fontSize: isMobile ? '15px' : '18px', fontWeight: '700', marginBottom: isMobile ? '14px' : '20px', color: skill.color, fontFamily: FONTS.heading }}>{skill.category}</h3>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
-                  {skill.items.map((item, j) => (
-                    <span key={j} style={{ padding: isMobile ? '8px 12px' : '10px 16px', backgroundColor: isDark ? '#27272a' : '#f4f4f5', borderRadius: '8px', fontSize: isMobile ? '12px' : '14px', color: theme.textMuted }}>{item}</span>
-                  ))}
+              <div 
+                key={i} 
+                className="gradient-card"
+                style={{ 
+                  position: 'relative',
+                  padding: '2px',
+                  borderRadius: isMobile ? '14px' : '20px',
+                  background: isDark 
+                    ? 'linear-gradient(135deg, #27272a, #18181b)' 
+                    : 'linear-gradient(135deg, #e4e4e7, #f4f4f5)',
+                  overflow: 'hidden',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                {/* Animated gradient border */}
+                <div 
+                  className="gradient-border"
+                  style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: isMobile ? '14px' : '20px',
+                    padding: '2px',
+                    background: `linear-gradient(var(--gradient-angle, 0deg), ${BRAND.blue}, ${BRAND.green}, #8b5cf6, ${BRAND.blue})`,
+                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    WebkitMaskComposite: 'xor',
+                    maskComposite: 'exclude',
+                    opacity: 0,
+                    transition: 'opacity 0.3s ease',
+                  }}
+                />
+                
+                {/* Card content */}
+                <div style={{ 
+                  padding: isMobile ? '16px 14px' : '20px 20px', 
+                  backgroundColor: theme.cardBg, 
+                  borderRadius: isMobile ? '12px' : '18px',
+                  position: 'relative',
+                  zIndex: 1,
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}>
+                  <h3 style={{ 
+                    fontSize: isMobile ? '14px' : '16px', 
+                    fontWeight: '700', 
+                    marginBottom: isMobile ? '10px' : '14px', 
+                    color: skill.color, 
+                    fontFamily: FONTS.heading 
+                  }}>
+                    {skill.category}
+                  </h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '8px', alignItems: 'flex-start', alignContent: 'flex-start' }}>
+                    {skill.items.map((item, j) => (
+                      <span key={j} style={{ 
+                        padding: isMobile ? '6px 10px' : '7px 12px', 
+                        backgroundColor: isDark ? 'rgba(39, 39, 42, 0.8)' : 'rgba(244, 244, 245, 0.8)', 
+                        borderRadius: '6px', 
+                        fontSize: isMobile ? '11px' : '12px', 
+                        color: theme.textMuted, 
+                        fontWeight: '500', 
+                        fontFamily: FONTS.body, 
+                        border: `1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}`,
+                        lineHeight: '1.4',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        whiteSpace: 'nowrap',
+                        minHeight: isMobile ? '24px' : '28px',
+                        boxSizing: 'border-box',
+                      }}>{item}</span>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </div>
+        
+        {/* Gradient animation styles */}
+        <style>{`
+          @property --gradient-angle {
+            syntax: '<angle>';
+            initial-value: 0deg;
+            inherits: false;
+          }
+          
+          @keyframes gradientRotate {
+            0% { --gradient-angle: 0deg; }
+            100% { --gradient-angle: 360deg; }
+          }
+          
+          .gradient-card:hover .gradient-border {
+            opacity: 1 !important;
+            animation: gradientRotate 3s linear infinite;
+          }
+          
+          .gradient-card:hover {
+            transform: translateY(-4px);
+            transition: transform 0.3s ease;
+          }
+        `}</style>
       </section>
 
       {/* TESTIMONIALS */}
