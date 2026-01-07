@@ -354,7 +354,7 @@ function PortfolioPage({ isDark, setIsDark }) {
               </h1>
 
               <p style={{ fontSize: isMobile ? '16px' : '20px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '24px' }}>
-                Customer Support Specialist turned GHL Expert & Vibe Coder. I craft powerful automations and custom tools that help businesses run smoother. Creator of <span style={{ fontWeight: '600' }}><span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span><span style={{ color: BRAND.blue }}>Ops</span></span>.
+                Customer Support Specialist turned GHL Automation/CRM Builder & Vibe Coder. I craft powerful automations and custom tools that help businesses run smoother. Creator of <span style={{ fontWeight: '600' }}><span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span><span style={{ color: BRAND.blue }}>Ops</span></span>.
               </p>
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '12px' : '24px', marginBottom: '28px', fontSize: isMobile ? '14px' : '16px', color: theme.textMuted, justifyContent: isMobile ? 'center' : 'flex-start' }}>
