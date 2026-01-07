@@ -482,7 +482,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                   <>
                     <div style={{ position: 'absolute', top: '-10px', right: '-30px', padding: '14px 20px', backgroundColor: theme.cardBg, borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', border: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, animation: 'float 3s ease-in-out infinite' }}>
                       <Zap size={20} style={{ color: BRAND.green }} />
-                      <span style={{ fontSize: '15px', fontWeight: '700' }}>GHL Expert</span>
+                      <span style={{ fontSize: '15px', fontWeight: '700' }}>GHL CRM Builder</span>
                     </div>
                     
                     <div style={{ position: 'absolute', bottom: '60px', left: '-40px', padding: '14px 20px', backgroundColor: theme.cardBg, borderRadius: '16px', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', border: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: '10px', zIndex: 10, animation: 'float 3.5s ease-in-out infinite' }}>
