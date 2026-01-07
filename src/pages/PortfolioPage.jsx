@@ -343,7 +343,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                 </div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: isMobile ? '10px 14px' : '12px 20px', backgroundColor: isDark ? 'rgba(0, 74, 172, 0.1)' : 'rgba(0, 74, 172, 0.08)', border: `1px solid ${BRAND.blue}30`, borderRadius: '100px' }}>
                   <Briefcase size={isMobile ? 16 : 18} style={{ color: BRAND.blue }} />
-                  <span style={{ fontSize: isMobile ? '13px' : '15px', color: BRAND.blue, fontWeight: '600' }}>11+ Years BPO</span>
+                  <span style={{ fontSize: isMobile ? '13px' : '15px', color: BRAND.blue, fontWeight: '600' }}>11+ Years Customer Support</span>
                 </div>
               </div>
 
