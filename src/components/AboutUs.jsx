@@ -3,7 +3,7 @@ import React from 'react';
 import { 
   Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target, 
   Wallet, CheckSquare, FileText, Headset, Image, Film, FileEdit, QrCode,
-  Coffee, Globe, Shield
+  Coffee, Globe, Shield, Smartphone
 } from 'lucide-react';
 
 // BREWEDOPS BRAND
@@ -20,7 +20,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
 
   const stats = [
     { value: '18', label: 'Free Tools' },
-    { value: '5', label: 'Categories' },
+    { value: '1', label: 'Mobile App' },
     { value: '100%', label: 'Free to Use' },
     { value: '24/7', label: 'Available' },
   ];
@@ -252,6 +252,85 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Fuelyx Mobile App Section */}
+          <div style={{
+            padding: '32px',
+            backgroundColor: isDark ? '#0f172a' : '#f0fdfa',
+            borderRadius: '16px',
+            border: '1px solid ' + (isDark ? '#14b8a640' : '#14b8a630'),
+            marginBottom: '32px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
+              <img 
+                src="https://i.imgur.com/RufDQlF.png" 
+                alt="Fuelyx Logo" 
+                style={{ width: '56px', height: '56px', borderRadius: '14px' }}
+              />
+              <div>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: 0 }}>
+                  Fuelyx <span style={{ color: '#14b8a6' }}>Mobile App</span>
+                </h2>
+                <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>
+                  Nutrition & Fitness Tracker for Filipinos
+                </p>
+              </div>
+            </div>
+            
+            <p style={{ 
+              fontSize: '16px', 
+              color: theme.textMuted, 
+              lineHeight: '1.8',
+              margin: '0 0 20px'
+            }}>
+              <strong style={{ color: theme.text }}>Fuelyx</strong> is our standalone Android mobile app designed to help Filipinos 
+              track their nutrition, fitness, and health goals. Built with the same vibe coding approach as BrewedOps, 
+              it features a comprehensive database of <strong style={{ color: theme.text }}>200+ Filipino foods</strong>.
+            </p>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+              {[
+                { icon: '📸', title: 'AI Food Scanner', desc: 'Snap & log food instantly' },
+                { icon: '🍲', title: '200+ Filipino Foods', desc: 'Local dishes database' },
+                { icon: '⏱️', title: 'Fasting Timer', desc: '6 IF protocols supported' },
+                { icon: '💪', title: 'Workout Tracking', desc: 'Log exercises & calories' },
+                { icon: '📊', title: 'Smart Analytics', desc: 'Charts & progress insights' },
+                { icon: '🏆', title: 'Achievements', desc: 'Streaks & badge rewards' },
+              ].map((feature, idx) => (
+                <div key={idx} style={{
+                  padding: '16px',
+                  backgroundColor: theme.cardBg,
+                  borderRadius: '10px',
+                  border: '1px solid ' + theme.cardBorder,
+                }}>
+                  <div style={{ fontSize: '24px', marginBottom: '8px' }}>{feature.icon}</div>
+                  <div style={{ fontSize: '14px', fontWeight: '600', color: theme.text, marginBottom: '4px' }}>{feature.title}</div>
+                  <div style={{ fontSize: '12px', color: theme.textMuted }}>{feature.desc}</div>
+                </div>
+              ))}
+            </div>
+            
+            <div style={{ marginTop: '20px', textAlign: 'center' }}>
+              <a 
+                href="/fuelyx"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '12px 24px',
+                  background: 'linear-gradient(135deg, #14b8a6, #10b981)',
+                  color: '#fff',
+                  borderRadius: '10px',
+                  textDecoration: 'none',
+                  fontSize: '14px',
+                  fontWeight: '600'
+                }}
+              >
+                <Smartphone size={18} />
+                Learn More & Download
+              </a>
             </div>
           </div>
 

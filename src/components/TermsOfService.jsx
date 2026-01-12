@@ -120,7 +120,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             }}>
               <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.6' }}>
                 Welcome to <strong>BrewedOps</strong>! These Terms of Service ("Terms") govern your use of our 
-                productivity platform with 18 tools for freelancers. By using BrewedOps, you agree to these Terms.
+                productivity platform with 18 tools for freelancers, as well as our mobile application <strong>Fuelyx</strong> (nutrition & fitness tracker). By using BrewedOps or Fuelyx, you agree to these Terms.
               </p>
             </div>
           </div>
@@ -161,11 +161,24 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
               <li>QR Generator, Find & Replace, Case Converter, Word Counter</li>
             </ul>
+
+            <p><strong style={{ color: '#14b8a6' }}>Fuelyx Mobile App (Android):</strong></p>
+            <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
+              <li>Calorie & macro tracking with 200+ Filipino foods database</li>
+              <li>AI Food Scanner - camera-based food recognition</li>
+              <li>Intermittent fasting timer with 6 protocols</li>
+              <li>Workout logging and exercise tracking</li>
+              <li>Weight tracking and progress analytics</li>
+              <li>Step counter/pedometer integration</li>
+              <li>Achievements, streaks, and badges</li>
+            </ul>
             
             <p style={{ marginTop: '16px' }}>
               <strong style={{ color: theme.text }}>Important:</strong> BrewedOps provides tools for productivity, financial tracking, and file processing. 
-              We are not financial advisors, accountants, or legal professionals. Tax calculations are estimates only. 
-              Always consult a qualified professional for financial, tax, and legal advice.
+              Fuelyx provides nutrition and fitness tracking tools.
+              We are not financial advisors, accountants, nutritionists, or medical professionals. 
+              Tax calculations are estimates only. Nutritional information is for general guidance.
+              Always consult a qualified professional for financial, tax, health, and medical advice.
             </p>
           </Section>
 
@@ -217,16 +230,22 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
           </Section>
 
           <Section icon={AlertTriangle} title="Disclaimer of Warranties" color="#f59e0b">
-            <p>BrewedOps is provided "AS IS" and "AS AVAILABLE" without warranties of any kind, either express or implied, including but not limited to:</p>
+            <p>BrewedOps and Fuelyx are provided "AS IS" and "AS AVAILABLE" without warranties of any kind, either express or implied, including but not limited to:</p>
             <ul style={{ margin: '12px 0', paddingLeft: '20px' }}>
               <li>Warranties of merchantability or fitness for a particular purpose</li>
               <li>Warranties that the service will be uninterrupted or error-free</li>
               <li>Warranties regarding the accuracy of financial calculations or tax estimates</li>
               <li>Warranties regarding the results of file processing tools</li>
+              <li>Warranties regarding the accuracy of nutritional information or calorie data</li>
+              <li>Warranties regarding the accuracy of AI food recognition</li>
             </ul>
             <p style={{ marginTop: '12px' }}>
               <strong style={{ color: theme.text }}>Financial Disclaimer:</strong> Tax calculations and financial estimates are for informational purposes only. 
               Always verify with a qualified accountant or tax professional before making financial decisions.
+            </p>
+            <p style={{ marginTop: '12px' }}>
+              <strong style={{ color: theme.text }}>Health Disclaimer:</strong> Fuelyx nutritional data, calorie estimates, and fitness tracking are for general informational purposes only. 
+              The app is not a substitute for professional medical advice, diagnosis, or treatment. Always consult a healthcare provider or registered dietitian before starting any diet or exercise program.
             </p>
           </Section>
 

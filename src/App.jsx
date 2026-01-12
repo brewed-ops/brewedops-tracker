@@ -28,6 +28,7 @@ import MermaidReader from './components/MermaidReader';
 import PortfolioPage from './pages/PortfolioPage';
 import JsonFormatter from './components/JsonFormatter';
 import CronGenerator from './components/CronGenerator';
+import FuelyxPage from './components/FuelyxPage';
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -716,7 +717,7 @@ return (
     <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
     <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
     <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
-    
+    <Route path="/fuelyx" element={<FuelyxPage isDark={isDark} setIsDark={setIsDark} />} />
     {/* Productivity tools - redirect to login (requires account) */}
     <Route path="/vakita" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
     <Route path="/taskmanager" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />

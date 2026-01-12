@@ -121,7 +121,8 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.6' }}>
                 <strong>BrewedOps</strong> ("we", "our", or "us") is committed to protecting your privacy. 
                 This Privacy Policy explains how we collect, use, disclose, and safeguard your information 
-                when you use our productivity platform with 18 tools for Filipino virtual assistants and freelancers.
+                when you use our productivity platform with 18 tools for Filipino virtual assistants and freelancers,
+                as well as our mobile application <strong>Fuelyx</strong> (nutrition & fitness tracker for Android).
               </p>
             </div>
           </div>
@@ -167,6 +168,33 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               <li>We <strong>do not</strong> read, access, or store your emails or contacts</li>
               <li>We <strong>only</strong> use the Gmail API to send invoice emails that you explicitly request</li>
             </ul>
+
+            <p><strong style={{ color: '#14b8a6' }}>Fuelyx Mobile App Data (Stored Locally on Your Device):</strong></p>
+            <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
+              <li><strong>Food logs:</strong> What you eat, calorie intake, macronutrients (protein, carbs, fat, fiber)</li>
+              <li><strong>Body metrics:</strong> Weight history, BMI calculations, body measurements</li>
+              <li><strong>Fitness data:</strong> Workout logs, exercises completed, calories burned</li>
+              <li><strong>Fasting records:</strong> Fasting start/end times, protocol history</li>
+              <li><strong>Step data:</strong> Daily step counts from device pedometer</li>
+              <li><strong>Goals & preferences:</strong> Calorie targets, macro goals, unit preferences</li>
+              <li><strong>Achievements:</strong> Badges earned, streak data, milestones</li>
+            </ul>
+
+            <p><strong style={{ color: '#14b8a6' }}>Fuelyx Camera Access (AI Food Scanner):</strong></p>
+            <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
+              <li>The AI Food Scanner requires camera permission to capture food photos</li>
+              <li>Photos are processed <strong>locally on your device</strong> or sent to AI services for recognition</li>
+              <li>We do <strong>NOT</strong> store your food photos on our servers</li>
+              <li>You can revoke camera permission at any time in your device settings</li>
+            </ul>
+
+            <p><strong style={{ color: '#14b8a6' }}>Important - Fuelyx Data Storage:</strong></p>
+            <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
+              <li>All Fuelyx data is stored <strong>locally on your Android device</strong></li>
+              <li>We do <strong>NOT</strong> upload your health, nutrition, or fitness data to external servers</li>
+              <li>Your data stays private on your device unless you choose to export it</li>
+              <li>Uninstalling the app will delete all locally stored data</li>
+            </ul>
             
             <p><strong style={{ color: theme.text }}>Automatically Collected:</strong></p>
             <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
@@ -186,6 +214,14 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               <li>Improve our services based on usage patterns</li>
               <li>Communicate important updates about the service</li>
               <li>Ensure security and prevent fraud</li>
+            </ul>
+            <p style={{ marginTop: '12px' }}><strong style={{ color: '#14b8a6' }}>Fuelyx App:</strong></p>
+            <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+              <li>Calculate daily calorie intake and nutritional totals</li>
+              <li>Track your fasting windows and workout progress</li>
+              <li>Generate analytics charts and progress reports</li>
+              <li>Power the AI Food Scanner feature (camera access)</li>
+              <li>Store achievements and streak data locally</li>
             </ul>
           </Section>
 
@@ -235,22 +271,33 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
           </Section>
 
           <Section icon={Trash2} title="Data Retention & Deletion">
-            <p><strong style={{ color: theme.text }}>Retention:</strong></p>
+            <p><strong style={{ color: theme.text }}>BrewedOps Web Platform:</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
               <li>Account data: Until you delete your account</li>
               <li>Financial records, notes, tasks: As long as your account exists</li>
               <li>OAuth tokens: Until you disconnect the service</li>
               <li>Files processed by tools: Never stored (processed locally)</li>
             </ul>
+
+            <p><strong style={{ color: '#14b8a6' }}>Fuelyx Mobile App:</strong></p>
+            <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
+              <li>All data stored locally on your device only</li>
+              <li>Food logs, weight history, workouts: Until you clear app data or uninstall</li>
+              <li>Camera photos for AI Scanner: Processed immediately, not stored permanently</li>
+              <li>To delete all Fuelyx data: Uninstall the app or clear app data in Android settings</li>
+            </ul>
             
             <p><strong style={{ color: theme.text }}>Deletion:</strong></p>
-            <p>You can request deletion of your account and all associated data by contacting us. Upon request, we will:</p>
+            <p>You can request deletion of your BrewedOps account and all associated data by contacting us. Upon request, we will:</p>
             <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
               <li>Delete all your personal information within 30 days</li>
               <li>Delete all financial data, notes, and tasks</li>
               <li>Revoke and delete any OAuth tokens</li>
               <li>Notify you when deletion is complete</li>
             </ul>
+            <p style={{ marginTop: '12px', fontStyle: 'italic', color: theme.textMuted }}>
+              Note: Fuelyx app data is stored locally on your device and is not accessible by us. You control your own data deletion.
+            </p>
           </Section>
 
           <Section icon={Shield} title="Your Rights">

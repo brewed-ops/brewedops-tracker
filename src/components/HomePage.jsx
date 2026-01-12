@@ -657,6 +657,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 Services <ChevronDown size={14} />
               </button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} onLoginClick={handleLoginClick} />
+              <button onClick={() => navigate('/fuelyx')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: '#14b8a6', border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Fuelyx
+              </button>
             </>
           )}
         </div>
