@@ -338,7 +338,9 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                 gap: '12px',
                 justifyContent: isTablet ? 'center' : 'flex-start',
               }}>
-                <button 
+                <a 
+                  href="https://github.com/brewed-ops/fuelyx/releases/download/v1.0.0/Fuelyxapp.apk"
+                  download
                   style={{
                     height: '56px',
                     padding: '0 32px',
@@ -356,6 +358,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                     gap: '10px',
                     boxShadow: '0 8px 24px rgba(20,184,166,0.35)',
                     transition: 'transform 0.2s, box-shadow 0.2s',
+                    textDecoration: 'none',
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.transform = 'translateY(-2px)';
@@ -368,9 +371,12 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                 >
                   <Download size={20} />
                   Download APK
-                </button>
+                </a>
                 
-                <button 
+                <a 
+                  href="https://www.facebook.com/reel/879934018325124/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     height: '56px',
                     padding: '0 32px',
@@ -387,6 +393,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                     justifyContent: 'center',
                     gap: '10px',
                     transition: 'all 0.2s',
+                    textDecoration: 'none',
                   }}
                   onMouseOver={(e) => {
                     e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.08)';
@@ -397,7 +404,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                 >
                   <Play size={20} />
                   Watch Demo
-                </button>
+                </a>
               </div>
               
               {/* Stats */}
@@ -1034,7 +1041,9 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
               Download Fuelyx for free and take control of your nutrition. No subscriptions, no ads — just results.
             </p>
             
-            <button 
+            <a 
+              href="https://github.com/brewed-ops/fuelyx/releases/download/v1.0.0/Fuelyxapp.apk"
+              download
               style={{
                 height: '56px',
                 padding: '0 40px',
@@ -1052,20 +1061,21 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                 gap: '10px',
                 boxShadow: '0 8px 24px rgba(0,0,0,0.2)',
                 transition: 'transform 0.2s',
+                textDecoration: 'none',
               }}
               onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
               onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
             >
               <Download size={20} />
               Download Free APK
-            </button>
+            </a>
             
             <p style={{ 
               fontSize: '13px', 
               color: 'rgba(255,255,255,0.7)', 
               marginTop: '16px',
             }}>
-              Android 7.0+ required • 15MB download
+              Android 7.0+ required • 5MB download
             </p>
           </div>
         </div>
