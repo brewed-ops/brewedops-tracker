@@ -145,12 +145,18 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
           {/* Nav Links - Desktop */}
           {!isMobile && (
             <>
-              <button onClick={() => navigate('/portfolio')} style={{ ...navLinkStyle, background: 'none', border: 'none' }}>Portfolio</button>
-              <button style={{ ...navLinkStyle, background: 'none', border: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Portfolio
+              </button>
+              <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Services <ChevronDown size={14} />
               </button>
-              <button onClick={() => navigate('/')} style={{ ...navLinkStyle, background: 'none', border: 'none' }}>Tools</button>
-              <button style={{ ...navLinkStyle, background: 'none', border: 'none', color: FUELYX.primary, fontWeight: '600' }}>Fuelyx</button>
+              <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                Tools <ChevronDown size={14} />
+              </button>
+              <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: FUELYX.primary, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Fuelyx
+              </button>
             </>
           )}
         </div>

@@ -3,14 +3,16 @@
  * Path: /portfolio
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ContainerScroll } from '@/components/ui/container-scroll-animation';
-import { 
-  ChevronRight, 
-  Code, 
-  Zap, 
-  Settings, 
+import {
+  ChevronRight,
+  ChevronLeft,
+  ChevronDown,
+  Code,
+  Zap,
+  Settings,
   Sparkles,
   Star,
   ExternalLink,
@@ -26,7 +28,30 @@ import {
   MapPin,
   Calendar,
   Headphones,
-  Wrench
+  Wrench,
+  Image,
+  Scissors,
+  Move,
+  Minimize2,
+  RefreshCw,
+  Palette,
+  FileImage,
+  Film,
+  FileEdit,
+  Merge,
+  Split,
+  BookOpen,
+  QrCode,
+  Search,
+  Type,
+  Hash,
+  GitBranch,
+  Braces,
+  Clock,
+  Lock,
+  DollarSign,
+  StickyNote,
+  CheckSquare
 } from 'lucide-react';
 
 // Brand Config
@@ -59,6 +84,181 @@ const getTheme = (isDark) => ({
   textMuted: isDark ? '#a1a1aa' : '#71717a',
 });
 
+// ============================================
+// TOOLS DATA
+// ============================================
+const TOOL_CATEGORIES = [
+  {
+    name: 'Image Tools',
+    tools: [
+      { icon: Image, title: 'BG Remover', path: '/bgremover' },
+      { icon: Scissors, title: 'Image Cropper', path: '/imagecropper' },
+      { icon: Move, title: 'Image Resizer', path: '/imageresizer' },
+      { icon: Minimize2, title: 'Image Compressor', path: '/imagecompressor' },
+      { icon: RefreshCw, title: 'Image Converter', path: '/imageconverter' },
+      { icon: Palette, title: 'Color Picker', path: '/colorpicker' },
+      { icon: FileImage, title: 'Image to PDF', path: '/imagetopdf' },
+    ]
+  },
+  {
+    name: 'Video Tools',
+    tools: [
+      { icon: Film, title: 'Video Compressor', path: '/videocompressor' },
+      { icon: Scissors, title: 'Video Trimmer', path: '/videotrimmer' },
+    ]
+  },
+  {
+    name: 'Document Tools',
+    tools: [
+      { icon: FileEdit, title: 'PDF Editor', path: '/pdfeditor' },
+      { icon: Merge, title: 'PDF Merge', path: '/pdfmerge' },
+      { icon: Split, title: 'PDF Split', path: '/pdfsplit' },
+      { icon: BookOpen, title: 'Markdown Viewer', path: '/markdownviewer' },
+    ]
+  },
+  {
+    name: 'Other Tools',
+    tools: [
+      { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
+      { icon: Search, title: 'Find & Replace', path: '/findreplace' },
+      { icon: Type, title: 'Case Converter', path: '/caseconverter' },
+      { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
+      { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
+      { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
+      { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
+    ]
+  },
+];
+
+const PRODUCTIVITY_TOOLS = [
+  { icon: DollarSign, title: 'Finance Tracker', path: '/finance' },
+  { icon: Headphones, title: 'VA Kita', path: '/vakita' },
+  { icon: CheckSquare, title: 'Task Manager', path: '/taskmanager' },
+  { icon: StickyNote, title: 'Brewed Notes', path: '/brewednotes' },
+];
+
+// ============================================
+// TOOLS DROPDOWN COMPONENT
+// ============================================
+const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setIsOpen(false), 150);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div
+      ref={dropdownRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{ position: 'relative' }}
+    >
+      <button
+        style={{
+          height: '40px',
+          padding: '0 8px',
+          backgroundColor: 'transparent',
+          color: isOpen ? BRAND.blue : theme.textMuted,
+          border: 'none',
+          fontSize: '14px',
+          fontWeight: '500',
+          fontFamily: FONTS.body,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+        }}
+      >
+        Tools
+        <ChevronDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: '0',
+            marginTop: '4px',
+            backgroundColor: isDark ? '#111113' : '#ffffff',
+            border: `1px solid ${isDark ? '#27272a' : '#e4e4e7'}`,
+            borderRadius: '12px',
+            boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)',
+            padding: '12px',
+            zIndex: 1000,
+          }}
+        >
+          <div style={{ display: 'flex', gap: '20px' }}>
+            {TOOL_CATEGORIES.map((category) => (
+              <div key={category.name} style={{ minWidth: '130px' }}>
+                <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>
+                  {category.name}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  {category.tools.map((tool) => {
+                    const IconComponent = tool.icon;
+                    return (
+                      <button
+                        key={tool.path}
+                        onClick={() => { setIsOpen(false); onToolClick(tool.path); }}
+                        style={{ padding: '5px 8px', backgroundColor: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', textAlign: 'left' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = BRAND.blue; e.currentTarget.querySelector('svg').style.color = '#fff'; e.currentTarget.querySelector('span').style.color = '#fff'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.querySelector('svg').style.color = theme.textMuted; e.currentTarget.querySelector('span').style.color = theme.text; }}
+                      >
+                        <IconComponent size={13} style={{ color: theme.textMuted, flexShrink: 0 }} />
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>{tool.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', fontWeight: '600', color: BRAND.blue, fontFamily: FONTS.body }}>
+                <Lock size={10} />
+                PRODUCTIVITY
+              </div>
+              {PRODUCTIVITY_TOOLS.map((tool) => {
+                const IconComponent = tool.icon;
+                return (
+                  <div key={tool.path} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body }}>
+                    <IconComponent size={11} />
+                    {tool.title}
+                  </div>
+                );
+              })}
+            </div>
+            <button onClick={() => { setIsOpen(false); onLoginClick(); }} style={{ fontSize: '11px', color: BRAND.blue, backgroundColor: 'transparent', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: FONTS.body }}>
+              Sign in →
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Social Icons
 const FacebookIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
@@ -79,104 +279,667 @@ const LinkedInIcon = ({ size = 18 }) => (
   </svg>
 );
 
-// Featured Project Section with Container Scroll Animation
-function FeaturedProjectSection({ isDark, theme, isMobile, navigate }) {
+// Featured Projects Carousel with Arrow Navigation
+function FeaturedProjectsCarousel({ isDark, theme, isMobile, navigate }) {
+  const [currentProject, setCurrentProject] = useState(0);
+  const FUELYX = { primary: '#14b8a6', secondary: '#0d9488' };
+
+  const projects = [
+    {
+      id: 'brewedops',
+      badge: 'FEATURED PROJECT',
+      badgeColor: BRAND.green,
+      title: (
+        <>
+          <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
+          <span style={{ color: BRAND.blue }}>Ops</span>
+          <span style={{ color: isDark ? '#fff' : BRAND.brown }}> Tools</span>
+        </>
+      ),
+      subtitle: '(Vibe Coding)',
+      description: 'A productivity hub for Filipino VAs & freelancers with 20+ free tools, finance tracking, task management, and premium features.',
+      tags: ['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'],
+      accentColor: BRAND.blue,
+      bgColor: isDark ? '#09090b' : BRAND.cream,
+      image: 'https://i.imgur.com/NYgLMDT.png',
+      buttonText: 'View Project',
+      onButtonClick: () => navigate('/'),
+    },
+    {
+      id: 'fuelyx',
+      badge: 'MOBILE APP',
+      badgeColor: FUELYX.primary,
+      titleComponent: (
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', marginBottom: '16px' }}>
+          <div style={{
+            width: isMobile ? '48px' : '64px',
+            height: isMobile ? '48px' : '64px',
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, #134e4a, #14b8a6)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 8px 32px rgba(20, 184, 166, 0.3)'
+          }}>
+            <svg width={isMobile ? 28 : 36} height={isMobile ? 28 : 36} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12" />
+              <path d="M12 2v10l4.5 4.5" />
+              <path d="M2 12h10" />
+            </svg>
+          </div>
+          <h2 style={{
+            fontSize: isMobile ? '36px' : '56px',
+            fontWeight: '800',
+            fontFamily: FONTS.heading,
+            color: FUELYX.primary,
+            lineHeight: '1.1',
+            margin: 0
+          }}>
+            Fuelyx
+          </h2>
+        </div>
+      ),
+      subtitle: (
+        <span>Your Nutrition, <span style={{ color: FUELYX.primary }}>Simplified</span></span>
+      ),
+      description: 'Track calories, log Filipino foods, monitor fasting, and achieve your health goals — all in one beautiful, easy-to-use app built for Filipinos.',
+      tags: ['React Native', 'Expo', 'Supabase', 'AI Scanner', 'Fasting Timer'],
+      accentColor: FUELYX.primary,
+      bgColor: isDark ? '#0a0a0b' : '#f0fdfa',
+      isPhoneMockup: true,
+      buttonText: 'View Project',
+      onButtonClick: () => navigate('/fuelyx'),
+    }
+  ];
+
+  const currentData = projects[currentProject];
+
+  const goToPrev = () => {
+    setCurrentProject((prev) => (prev === 0 ? projects.length - 1 : prev - 1));
+  };
+
+  const goToNext = () => {
+    setCurrentProject((prev) => (prev === projects.length - 1 ? 0 : prev + 1));
+  };
+
   return (
-    <section 
-      style={{ 
-        backgroundColor: isDark ? '#09090b' : BRAND.cream,
+    <section
+      style={{
+        backgroundColor: currentData.bgColor,
         position: 'relative',
         overflow: 'hidden',
       }}
     >
-      <ContainerScroll
-        titleComponent={
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: `${BRAND.green}15`, borderRadius: '100px', marginBottom: '20px' }}>
-              <Sparkles size={16} style={{ color: BRAND.green }} />
-              <span style={{ fontSize: '12px', color: BRAND.green, fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '1px' }}>FEATURED PROJECT</span>
+      {/* Navigation Arrows */}
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        left: isMobile ? '8px' : '24px',
+        transform: 'translateY(-50%)',
+        zIndex: 20,
+      }}>
+        <button
+          onClick={goToPrev}
+          style={{
+            width: isMobile ? '40px' : '56px',
+            height: isMobile ? '40px' : '56px',
+            borderRadius: '50%',
+            backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+            border: `2px solid ${currentData.accentColor}`,
+            color: currentData.accentColor,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s ease',
+            backdropFilter: 'blur(8px)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = currentData.accentColor;
+            e.currentTarget.style.color = '#fff';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+            e.currentTarget.style.color = currentData.accentColor;
+          }}
+        >
+          <ChevronLeft size={isMobile ? 20 : 28} />
+        </button>
+      </div>
+
+      <div style={{
+        position: 'absolute',
+        top: '50%',
+        right: isMobile ? '8px' : '24px',
+        transform: 'translateY(-50%)',
+        zIndex: 20,
+      }}>
+        <button
+          onClick={goToNext}
+          style={{
+            width: isMobile ? '40px' : '56px',
+            height: isMobile ? '40px' : '56px',
+            borderRadius: '50%',
+            backgroundColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+            border: `2px solid ${currentData.accentColor}`,
+            color: currentData.accentColor,
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            transition: 'all 0.2s ease',
+            backdropFilter: 'blur(8px)',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = currentData.accentColor;
+            e.currentTarget.style.color = '#fff';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)';
+            e.currentTarget.style.color = currentData.accentColor;
+          }}
+        >
+          <ChevronRight size={isMobile ? 20 : 28} />
+        </button>
+      </div>
+
+      {/* Dots Indicator */}
+      <div style={{
+        position: 'absolute',
+        bottom: isMobile ? '16px' : '32px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 20,
+        display: 'flex',
+        gap: '12px',
+      }}>
+        {projects.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentProject(idx)}
+            style={{
+              width: currentProject === idx ? '32px' : '12px',
+              height: '12px',
+              borderRadius: '6px',
+              backgroundColor: currentProject === idx ? currentData.accentColor : (isDark ? 'rgba(255,255,255,0.3)' : 'rgba(0,0,0,0.2)'),
+              border: 'none',
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+            }}
+          />
+        ))}
+      </div>
+
+      {currentData.isPhoneMockup ? (
+        /* Phone Mockup for Fuelyx */
+        <div
+          key={currentData.id}
+          className="project-slide"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: isMobile ? '48px 16px 80px' : '80px 32px 120px',
+            animation: 'fadeSlideIn 0.5s ease-out',
+          }}
+        >
+          {/* Title Section */}
+          <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '48px' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: `${currentData.badgeColor}15`, borderRadius: '100px', marginBottom: '20px' }}>
+              <Sparkles size={16} style={{ color: currentData.badgeColor }} />
+              <span style={{ fontSize: '12px', color: currentData.badgeColor, fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '1px' }}>{currentData.badge}</span>
             </div>
-            <h2 style={{ 
-              fontSize: isMobile ? '32px' : '56px', 
-              fontWeight: '800', 
-              fontFamily: FONTS.heading, 
-              color: isDark ? '#fff' : BRAND.brown,
+
+            {currentData.titleComponent}
+
+            <h3 style={{
+              fontSize: isMobile ? '20px' : '32px',
+              fontWeight: '600',
+              color: theme.textMuted,
               marginBottom: '16px',
-              lineHeight: '1.1'
+              fontFamily: FONTS.heading
             }}>
-              <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
-              <span style={{ color: BRAND.blue }}>Ops</span>
-              <span style={{ color: isDark ? '#fff' : BRAND.brown }}> Tools</span>
-              <br />
-              <span style={{ 
-                fontSize: isMobile ? '20px' : '32px', 
-                fontWeight: '600', 
-                color: theme.textMuted,
-                display: 'block',
-                marginTop: '8px'
-              }}>
-                (Vibe Coding)
-              </span>
-            </h2>
-            <p style={{ 
-              fontSize: isMobile ? '14px' : '18px', 
-              color: theme.textMuted, 
-              maxWidth: '600px', 
+              {currentData.subtitle}
+            </h3>
+
+            <p style={{
+              fontSize: isMobile ? '14px' : '18px',
+              color: theme.textMuted,
+              maxWidth: '600px',
               margin: '0 auto 24px',
               lineHeight: '1.7',
               fontFamily: FONTS.body
             }}>
-              A productivity hub for Filipino VAs & freelancers with 20+ free tools, finance tracking, task management, and premium features.
+              {currentData.description}
             </p>
+
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginBottom: '20px' }}>
-              {['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'].map((tag, j) => (
-                <span key={j} style={{ 
-                  fontSize: isMobile ? '12px' : '14px', 
-                  padding: isMobile ? '8px 14px' : '10px 20px', 
-                  backgroundColor: `${BRAND.blue}15`, 
-                  color: BRAND.blue, 
-                  borderRadius: '100px', 
-                  fontWeight: '600', 
-                  fontFamily: FONTS.body 
+              {currentData.tags.map((tag, j) => (
+                <span key={j} style={{
+                  fontSize: isMobile ? '12px' : '14px',
+                  padding: isMobile ? '8px 14px' : '10px 20px',
+                  backgroundColor: `${currentData.accentColor}15`,
+                  color: currentData.accentColor,
+                  borderRadius: '100px',
+                  fontWeight: '600',
+                  fontFamily: FONTS.body
                 }}>{tag}</span>
               ))}
             </div>
-            <button 
-              onClick={() => navigate('/')} 
-              style={{ 
-                padding: isMobile ? '14px 28px' : '16px 36px', 
-                backgroundColor: BRAND.blue, 
-                color: '#fff', 
-                border: 'none', 
-                borderRadius: '14px', 
-                fontWeight: '600', 
-                fontSize: isMobile ? '15px' : '16px', 
-                cursor: 'pointer', 
-                fontFamily: FONTS.body, 
-                display: 'inline-flex', 
-                alignItems: 'center', 
+
+            <button
+              onClick={currentData.onButtonClick}
+              style={{
+                padding: isMobile ? '14px 28px' : '16px 36px',
+                backgroundColor: currentData.accentColor,
+                color: '#fff',
+                border: 'none',
+                borderRadius: '14px',
+                fontWeight: '600',
+                fontSize: isMobile ? '15px' : '16px',
+                cursor: 'pointer',
+                fontFamily: FONTS.body,
+                display: 'inline-flex',
+                alignItems: 'center',
                 gap: '10px',
-                boxShadow: `0 8px 32px ${BRAND.blue}40`,
+                boxShadow: `0 8px 32px ${currentData.accentColor}40`,
                 transition: 'all 0.2s ease'
               }}
             >
-              View Project <ExternalLink size={18} />
+              {currentData.buttonText} <ExternalLink size={18} />
             </button>
           </div>
-        }
-      >
-        <img 
-          src="https://i.imgur.com/NYgLMDT.png" 
-          alt="BrewedOps Tools Screenshot"
-          className="mx-auto rounded-2xl object-cover h-full object-left-top"
-          draggable={false}
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-          }}
-        />
-      </ContainerScroll>
+
+          {/* Phone Mockup - Exact match to screenshot */}
+          <div style={{
+            position: 'relative',
+            width: isMobile ? '260px' : '300px',
+            height: isMobile ? '520px' : '600px',
+          }}>
+            {/* Floating Goal Reached Badge - Outside phone on left */}
+            <div style={{
+              position: 'absolute',
+              left: isMobile ? '-40px' : '-60px',
+              top: isMobile ? '60px' : '80px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 14px',
+              backgroundColor: '#0a1a10',
+              borderRadius: '12px',
+              border: '1px solid rgba(34, 197, 94, 0.5)',
+              zIndex: 30,
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+            }}>
+              <div style={{
+                width: '26px',
+                height: '26px',
+                borderRadius: '50%',
+                backgroundColor: '#22c55e',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <CheckCircle size={14} color="#fff" />
+              </div>
+              <div>
+                <div style={{ color: '#22c55e', fontSize: '12px', fontWeight: '700' }}>Goal Reached!</div>
+                <div style={{ color: '#4ade80', fontSize: '10px' }}>Protein target hit</div>
+              </div>
+            </div>
+
+            {/* Floating 7 Day Streak Badge - Outside phone on right */}
+            <div style={{
+              position: 'absolute',
+              right: isMobile ? '-40px' : '-60px',
+              bottom: isMobile ? '100px' : '120px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 14px',
+              backgroundColor: '#1a1208',
+              borderRadius: '12px',
+              border: '1px solid rgba(251, 146, 60, 0.5)',
+              zIndex: 30,
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.5)',
+            }}>
+              <div style={{
+                width: '30px',
+                height: '30px',
+                borderRadius: '50%',
+                backgroundColor: '#fb923c',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}>
+                <span style={{ fontSize: '15px' }}>🔥</span>
+              </div>
+              <div>
+                <div style={{ color: '#fff', fontSize: '12px', fontWeight: '700' }}>7 Day Streak!</div>
+                <div style={{ color: '#fdba74', fontSize: '10px' }}>Keep it going</div>
+              </div>
+            </div>
+
+            {/* Phone Frame */}
+            <div style={{
+              position: 'absolute',
+              inset: 0,
+              background: 'linear-gradient(145deg, #2a2a2a 0%, #1a1a1a 100%)',
+              borderRadius: '44px',
+              padding: '10px',
+              boxShadow: `
+                0 50px 100px -20px rgba(0, 0, 0, 0.5),
+                0 30px 60px -30px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1)
+              `,
+            }}>
+              {/* Screen */}
+              <div style={{
+                width: '100%',
+                height: '100%',
+                borderRadius: '34px',
+                overflow: 'hidden',
+                position: 'relative',
+                background: '#0c1929',
+              }}>
+                {/* Dynamic Island */}
+                <div style={{
+                  position: 'absolute',
+                  top: '10px',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '90px',
+                  height: '26px',
+                  backgroundColor: '#000',
+                  borderRadius: '16px',
+                  zIndex: 10,
+                }} />
+
+                {/* App Content */}
+                <div style={{
+                  width: '100%',
+                  height: '100%',
+                  background: '#0c1929',
+                  padding: '48px 14px 12px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                }}>
+                  {/* Header */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: '#fff', fontSize: '16px', fontWeight: '700', fontFamily: FONTS.heading }}>Fuelyx</span>
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '4px',
+                      padding: '4px 10px',
+                      backgroundColor: 'rgba(251, 146, 60, 0.15)',
+                      borderRadius: '16px',
+                      border: '1px solid rgba(251, 146, 60, 0.3)',
+                    }}>
+                      <span style={{ fontSize: '12px' }}>🔥</span>
+                      <span style={{ color: '#fb923c', fontSize: '12px', fontWeight: '600' }}>7</span>
+                    </div>
+                  </div>
+
+                  {/* Calories Card */}
+                  <div style={{
+                    backgroundColor: 'rgba(20, 184, 166, 0.12)',
+                    borderRadius: '14px',
+                    padding: '14px',
+                    border: '1px solid rgba(20, 184, 166, 0.25)',
+                    marginTop: '16px',
+                  }}>
+                    <div style={{ color: '#5eead4', fontSize: '9px', fontWeight: '600', letterSpacing: '1px', marginBottom: '2px' }}>DAILY INTAKE</div>
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px' }}>
+                      <span style={{ color: '#fff', fontSize: '32px', fontWeight: '800' }}>1,245</span>
+                      <span style={{ color: '#64748b', fontSize: '14px' }}>/ 2,100</span>
+                    </div>
+                    <div style={{
+                      width: '100%',
+                      height: '5px',
+                      backgroundColor: 'rgba(20, 184, 166, 0.25)',
+                      borderRadius: '3px',
+                      marginTop: '8px',
+                      overflow: 'hidden',
+                    }}>
+                      <div style={{
+                        width: '59%',
+                        height: '100%',
+                        backgroundColor: '#14b8a6',
+                        borderRadius: '3px',
+                      }} />
+                    </div>
+                  </div>
+
+                  {/* Macros */}
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    {[
+                      { label: 'Protein', value: '65g', color: '#22c55e' },
+                      { label: 'Carbs', value: '142g', color: '#f59e0b' },
+                      { label: 'Fat', value: '48g', color: '#ef4444' },
+                    ].map((macro, i) => (
+                      <div key={i} style={{
+                        flex: 1,
+                        backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                        borderRadius: '10px',
+                        padding: '10px 6px',
+                        textAlign: 'center',
+                        border: '1px solid rgba(255, 255, 255, 0.08)',
+                      }}>
+                        <div style={{ color: macro.color, fontSize: '16px', fontWeight: '700' }}>{macro.value}</div>
+                        <div style={{ color: '#64748b', fontSize: '9px', marginTop: '2px' }}>{macro.label}</div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* AI Scanner */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '12px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255, 255, 255, 0.08)',
+                  }}>
+                    <div style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '10px',
+                      background: 'linear-gradient(135deg, #14b8a6, #0d9488)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                      <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="12" cy="12" r="3" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div style={{ color: '#fff', fontSize: '13px', fontWeight: '600' }}>AI Scanner</div>
+                      <div style={{ color: '#64748b', fontSize: '10px' }}>Snap & log food</div>
+                    </div>
+                  </div>
+
+                  {/* Spacer to push nav to bottom */}
+                  <div style={{ flex: 1 }} />
+
+                  {/* Bottom Nav */}
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-around',
+                    alignItems: 'center',
+                    padding: '12px 0 8px',
+                    borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                  }}>
+                    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#14b8a6" strokeWidth="2">
+                      <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+                    </svg>
+                    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                      <path d="M18 20V10M12 20V4M6 20v-6" />
+                    </svg>
+                    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12,6 12,12 16,14" />
+                    </svg>
+                    <svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                      <circle cx="12" cy="12" r="3" />
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Teal Glow Effect on the right */}
+            <div style={{
+              position: 'absolute',
+              top: '50%',
+              right: '-100px',
+              transform: 'translateY(-50%)',
+              width: '300px',
+              height: '400px',
+              background: 'radial-gradient(ellipse, rgba(20, 184, 166, 0.3) 0%, transparent 70%)',
+              pointerEvents: 'none',
+              zIndex: -1,
+              filter: 'blur(40px)',
+            }} />
+          </div>
+
+          {/* Animation Styles */}
+          <style>{`
+            @keyframes fadeSlideIn {
+              from {
+                opacity: 0;
+                transform: translateX(30px);
+              }
+              to {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
+          `}</style>
+        </div>
+      ) : (
+        /* Container Scroll for Web Projects */
+        <div
+          key={currentData.id}
+          className="project-slide"
+          style={{ animation: 'fadeSlideIn 0.5s ease-out' }}
+        >
+          <ContainerScroll
+            titleComponent={
+              <div style={{ textAlign: 'center' }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '10px 18px', backgroundColor: `${currentData.badgeColor}15`, borderRadius: '100px', marginBottom: '20px' }}>
+                  <Sparkles size={16} style={{ color: currentData.badgeColor }} />
+                  <span style={{ fontSize: '12px', color: currentData.badgeColor, fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '1px' }}>{currentData.badge}</span>
+                </div>
+
+                {currentData.titleComponent ? (
+                  currentData.titleComponent
+                ) : (
+                  <h2 style={{
+                    fontSize: isMobile ? '32px' : '56px',
+                    fontWeight: '800',
+                    fontFamily: FONTS.heading,
+                    color: isDark ? '#fff' : BRAND.brown,
+                    marginBottom: '16px',
+                    lineHeight: '1.1'
+                  }}>
+                    {currentData.title}
+                  </h2>
+                )}
+
+                {currentData.subtitle && (
+                  <h3 style={{
+                    fontSize: isMobile ? '20px' : '32px',
+                    fontWeight: '600',
+                    color: theme.textMuted,
+                    marginBottom: '16px',
+                    fontFamily: FONTS.heading
+                  }}>
+                    {currentData.subtitle}
+                  </h3>
+                )}
+
+                <p style={{
+                  fontSize: isMobile ? '14px' : '18px',
+                  color: theme.textMuted,
+                  maxWidth: '600px',
+                  margin: '0 auto 24px',
+                  lineHeight: '1.7',
+                  fontFamily: FONTS.body
+                }}>
+                  {currentData.description}
+                </p>
+
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', justifyContent: 'center', marginBottom: '20px' }}>
+                  {currentData.tags.map((tag, j) => (
+                    <span key={j} style={{
+                      fontSize: isMobile ? '12px' : '14px',
+                      padding: isMobile ? '8px 14px' : '10px 20px',
+                      backgroundColor: `${currentData.accentColor}15`,
+                      color: currentData.accentColor,
+                      borderRadius: '100px',
+                      fontWeight: '600',
+                      fontFamily: FONTS.body
+                    }}>{tag}</span>
+                  ))}
+                </div>
+
+                <button
+                  onClick={currentData.onButtonClick}
+                  style={{
+                    padding: isMobile ? '14px 28px' : '16px 36px',
+                    backgroundColor: currentData.accentColor,
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '14px',
+                    fontWeight: '600',
+                    fontSize: isMobile ? '15px' : '16px',
+                    cursor: 'pointer',
+                    fontFamily: FONTS.body,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    boxShadow: `0 8px 32px ${currentData.accentColor}40`,
+                    transition: 'all 0.2s ease'
+                  }}
+                >
+                  {currentData.buttonText} <ExternalLink size={18} />
+                </button>
+              </div>
+            }
+          >
+            <img
+              src={currentData.image}
+              alt={`${currentData.id} Screenshot`}
+              className="mx-auto rounded-2xl object-cover h-full object-left-top"
+              draggable={false}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+              }}
+            />
+          </ContainerScroll>
+          {/* Animation Styles */}
+          <style>{`
+            @keyframes fadeSlideIn {
+              from {
+                opacity: 0;
+                transform: translateX(-30px);
+              }
+              to {
+                opacity: 1;
+                transform: translateX(0);
+              }
+            }
+          `}</style>
+        </div>
+      )}
     </section>
   );
 }
@@ -298,9 +1061,16 @@ function PortfolioPage({ isDark, setIsDark }) {
           </div>
           {!isMobile && (
             <>
-              <span style={{ ...navLinkStyle, color: BRAND.blue, fontWeight: '600' }}>Portfolio</span>
-              <a href="/#services" style={navLinkStyle}>Services</a>
-              <a href="/#tools" style={navLinkStyle}>Tools</a>
+              <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: BRAND.blue, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Portfolio
+              </button>
+              <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                Services <ChevronDown size={14} />
+              </button>
+              <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} onLoginClick={() => navigate('/login')} />
+              <button onClick={() => navigate('/fuelyx')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: '#14b8a6', border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Fuelyx
+              </button>
             </>
           )}
         </div>
@@ -598,8 +1368,8 @@ function PortfolioPage({ isDark, setIsDark }) {
         `}</style>
       </section>
 
-      {/* FEATURED PROJECT - Container Scroll Animation */}
-      <FeaturedProjectSection isDark={isDark} theme={theme} isMobile={isMobile} navigate={navigate} />
+      {/* FEATURED PROJECTS CAROUSEL */}
+      <FeaturedProjectsCarousel isDark={isDark} theme={theme} isMobile={isMobile} navigate={navigate} />
 
       {/* TOOLS */}
       <section style={{ padding: isMobile ? '48px 16px' : '80px 32px', backgroundColor: theme.bg }}>

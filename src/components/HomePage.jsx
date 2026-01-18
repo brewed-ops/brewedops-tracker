@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock } from 'lucide-react';
+import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen } from 'lucide-react';
 import { createNoise3D } from "simplex-noise";
 import { motion } from "framer-motion";
 import { IconCloud } from '@/components/ui/icon-cloud';
@@ -236,6 +236,7 @@ const TOOL_CATEGORIES = [
       { icon: FileEdit, title: 'PDF Editor', path: '/pdfeditor' },
       { icon: Merge, title: 'PDF Merge', path: '/pdfmerge' },
       { icon: Split, title: 'PDF Split', path: '/pdfsplit' },
+      { icon: BookOpen, title: 'Markdown Viewer', path: '/markdownviewer' },
     ]
   },
   {

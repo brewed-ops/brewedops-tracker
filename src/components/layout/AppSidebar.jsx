@@ -26,6 +26,7 @@ import {
   GitBranch,
   Braces,
   Clock,
+  BookOpen,
 } from "lucide-react"
 
 import {
@@ -79,6 +80,7 @@ const otherTools = [
   { id: "caseconverter", title: "Case Converter", icon: CaseSensitive, path: "/caseconverter" },
   { id: "wordcounter", title: "Word Counter", icon: Hash, path: "/wordcounter" },
   { id: "mermaid", title: "Mermaid Reader", icon: GitBranch, path: "/mermaid" },
+  { id: "markdownviewer", title: "Markdown Viewer", icon: BookOpen, path: "/markdownviewer" },
   { id: "jsonformatter", title: "JSON Formatter", icon: Braces, path: "/jsonformatter" },
   { id: "crongenerator", title: "Cron Generator", icon: Clock, path: "/crongenerator" },
 ]

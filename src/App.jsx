@@ -29,6 +29,7 @@ import PortfolioPage from './pages/PortfolioPage';
 import JsonFormatter from './components/JsonFormatter';
 import CronGenerator from './components/CronGenerator';
 import FuelyxPage from './components/FuelyxPage';
+import MarkdownViewer from './components/MarkdownViewer';
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -742,7 +743,8 @@ return (
     <Route path="/caseconverter" element={<GuestToolLayout toolName="Case Converter" isDark={isDark} setIsDark={setIsDark}><CaseConverter isDark={isDark} /></GuestToolLayout>} />
     <Route path="/mermaid" element={<GuestToolLayout toolName="Mermaid Reader" isDark={isDark} setIsDark={setIsDark}><MermaidReader isDark={isDark} user={null} /></GuestToolLayout>} />
     <Route path="/wordcounter" element={<GuestToolLayout toolName="Word Counter" isDark={isDark} setIsDark={setIsDark}><WordCounter isDark={isDark} /></GuestToolLayout>} />
-    
+    <Route path="/markdownviewer" element={<GuestToolLayout toolName="Markdown Viewer" isDark={isDark} setIsDark={setIsDark}><MarkdownViewer isDark={isDark} /></GuestToolLayout>} />
+
     {/* JSON Formatter and Cron Generator */}
     <Route path="/jsonformatter" element={<GuestToolLayout toolName="JSON Formatter" isDark={isDark} setIsDark={setIsDark}><JsonFormatter isDark={isDark} /></GuestToolLayout>} />
     <Route path="/crongenerator" element={<GuestToolLayout toolName="Cron Generator" isDark={isDark} setIsDark={setIsDark}><CronGenerator isDark={isDark} /></GuestToolLayout>} />
