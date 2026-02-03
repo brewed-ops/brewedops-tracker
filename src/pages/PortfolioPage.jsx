@@ -51,8 +51,11 @@ import {
   Lock,
   DollarSign,
   StickyNote,
-  CheckSquare
+  CheckSquare,
+  Menu
 } from 'lucide-react';
+import SEO from '@/components/SEO';
+import MobileDrawer from '@/components/layout/MobileDrawer';
 
 // Brand Config
 const BRAND = {
@@ -77,11 +80,11 @@ if (typeof document !== 'undefined' && !document.getElementById('portfolio-fonts
 }
 
 const getTheme = (isDark) => ({
-  bg: isDark ? '#09090b' : '#ffffff',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#09090b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
+  bg: isDark ? '#0d0b09' : '#ffffff',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
 });
 
 // ============================================
@@ -199,7 +202,7 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
             left: '0',
             marginTop: '4px',
             backgroundColor: isDark ? '#111113' : '#ffffff',
-            border: `1px solid ${isDark ? '#27272a' : '#e4e4e7'}`,
+            border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`,
             borderRadius: '12px',
             boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)',
             padding: '12px',
@@ -300,7 +303,7 @@ function FeaturedProjectsCarousel({ isDark, theme, isMobile, navigate }) {
       description: 'A productivity hub for Filipino VAs & freelancers with 20+ free tools, finance tracking, task management, and premium features.',
       tags: ['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'],
       accentColor: BRAND.blue,
-      bgColor: isDark ? '#09090b' : BRAND.cream,
+      bgColor: isDark ? '#0d0b09' : BRAND.cream,
       image: 'https://i.imgur.com/NYgLMDT.png',
       buttonText: 'View Project',
       onButtonClick: () => navigate('/'),
@@ -345,7 +348,7 @@ function FeaturedProjectsCarousel({ isDark, theme, isMobile, navigate }) {
       description: 'Track calories, log Filipino foods, monitor fasting, and achieve your health goals — all in one beautiful, easy-to-use app built for Filipinos.',
       tags: ['React Native', 'Expo', 'Supabase', 'AI Scanner', 'Fasting Timer'],
       accentColor: FUELYX.primary,
-      bgColor: isDark ? '#0a0a0b' : '#f0fdfa',
+      bgColor: isDark ? '#0d0b09' : '#f0fdfa',
       isPhoneMockup: true,
       buttonText: 'View Project',
       onButtonClick: () => navigate('/fuelyx'),
@@ -954,6 +957,8 @@ function PortfolioPage({ isDark, setIsDark }) {
   
   const isMobile = windowWidth < 768;
   const isTablet = windowWidth < 1024;
+  const isDesktop = windowWidth >= 1024;
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 50);
@@ -1049,8 +1054,13 @@ function PortfolioPage({ isDark, setIsDark }) {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg, color: theme.text, fontFamily: FONTS.body }}>
+      <SEO
+        title="Portfolio | BrewedOps"
+        description="View Kenneth V's portfolio - GHL CRM setup, automation, vibe coding, and customer support services. 11+ years BPO experience."
+        keywords="BrewedOps portfolio, GHL CRM, automation, web development, Filipino VA services"
+      />
       {/* NAV */}
-      <nav style={{ padding: isMobile ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${theme.cardBorder}`, backgroundColor: isScrolled ? (isDark ? 'rgba(9,9,11,0.95)' : 'rgba(255,255,255,0.95)') : theme.bg, backdropFilter: isScrolled ? 'blur(12px)' : 'none', position: 'sticky', top: 0, zIndex: 100, transition: 'all 0.3s ease' }}>
+      <nav style={{ padding: isMobile ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: `1px solid ${theme.cardBorder}`, backgroundColor: isScrolled ? (isDark ? 'rgba(13,11,9,0.95)' : 'rgba(255,255,255,0.95)') : theme.bg, backdropFilter: isScrolled ? 'blur(12px)' : 'none', position: 'sticky', top: 0, zIndex: 100, transition: 'all 0.3s ease' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: isMobile ? '0' : '20px', cursor: 'pointer' }}>
             <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
@@ -1064,7 +1074,7 @@ function PortfolioPage({ isDark, setIsDark }) {
               <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: BRAND.blue, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Portfolio
               </button>
-              <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <button onClick={() => navigate('/#services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Services <ChevronDown size={14} />
               </button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} onLoginClick={() => navigate('/login')} />
@@ -1081,20 +1091,24 @@ function PortfolioPage({ isDark, setIsDark }) {
               <a href="/privacy" style={navLinkStyle}>Privacy</a>
             </>
           )}
-          <button onClick={() => setIsDark(!isDark)} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
+          <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          {!isMobile && (
+          {!isMobile ? (
             <>
               <button onClick={() => navigate('/login')} style={{ height: '36px', padding: '0 14px', backgroundColor: 'transparent', color: theme.text, border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', fontSize: '13px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', marginLeft: '4px' }}>Login</button>
               <button onClick={() => navigate('/signup')} style={{ height: '36px', padding: '0 14px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer' }}>Sign Up</button>
             </>
+          ) : (
+            <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
+              <Menu size={18} />
+            </button>
           )}
         </div>
       </nav>
 
       {/* HERO */}
-      <section style={{ minHeight: isMobile ? 'auto' : '100vh', display: 'flex', alignItems: 'center', padding: isMobile ? '60px 20px' : '100px 48px', background: isDark ? 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 74, 172, 0.15), transparent), #09090b' : `linear-gradient(180deg, ${BRAND.cream} 0%, #ffffff 60%)`, position: 'relative', overflow: 'hidden' }}>
+      <section id="main-content" style={{ minHeight: isMobile ? 'auto' : '100vh', display: 'flex', alignItems: 'center', padding: isMobile ? '60px 20px' : '100px 48px', background: isDark ? 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(0, 74, 172, 0.15), transparent), #0d0b09' : `linear-gradient(180deg, ${BRAND.cream} 0%, #ffffff 60%)`, position: 'relative', overflow: 'hidden' }}>
         {!isMobile && (
           <>
             <div style={{ position: 'absolute', top: '15%', right: '10%', width: '500px', height: '500px', background: `radial-gradient(circle, ${BRAND.blue}18, transparent 70%)`, borderRadius: '50%', filter: 'blur(80px)' }} />
@@ -1164,7 +1178,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                       position: 'relative',
                       zIndex: 1,
                       padding: isMobile ? '14px 24px' : '16px 32px', 
-                      backgroundColor: isDark ? '#09090b' : '#ffffff',
+                      backgroundColor: isDark ? '#0d0b09' : '#ffffff',
                       borderRadius: '12px',
                       fontWeight: '600', 
                       fontSize: isMobile ? '15px' : '17px', 
@@ -1231,12 +1245,12 @@ function PortfolioPage({ isDark, setIsDark }) {
                 <span style={{ fontSize: '14px', color: theme.textMuted, fontFamily: FONTS.body }}>Connect:</span>
                 {socialLinks.map((social, i) => (
                   social.username ? (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: isMobile ? '10px 14px' : '12px 18px', borderRadius: '12px', backgroundColor: isDark ? '#27272a' : '#f4f4f5', color: theme.textMuted }}>
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: isMobile ? '10px 14px' : '12px 18px', borderRadius: '12px', backgroundColor: isDark ? '#2a2420' : '#faf8f5', color: theme.textMuted }}>
                       <social.icon size={isMobile ? 18 : 22} />
                       <span style={{ fontSize: isMobile ? '13px' : '14px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{social.username}</span>
                     </div>
                   ) : (
-                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" style={{ width: isMobile ? '42px' : '48px', height: isMobile ? '42px' : '48px', borderRadius: '12px', backgroundColor: isDark ? '#27272a' : '#f4f4f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, textDecoration: 'none', transition: 'all 0.2s ease' }} title={social.name}>
+                    <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" style={{ width: isMobile ? '42px' : '48px', height: isMobile ? '42px' : '48px', borderRadius: '12px', backgroundColor: isDark ? '#2a2420' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, textDecoration: 'none', transition: 'all 0.2s ease' }} title={social.name}>
                       <social.icon size={isMobile ? 18 : 22} />
                     </a>
                   )
@@ -1268,7 +1282,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                 )}
 
                 {/* Square profile image */}
-                <div style={{ width: '100%', height: '100%', borderRadius: isMobile ? '16px' : '24px', overflow: 'hidden', border: `${isMobile ? '3px' : '4px'} solid ${BRAND.blue}`, boxShadow: `0 20px 60px ${BRAND.blue}30, 0 0 0 ${isMobile ? '4px' : '8px'} ${isDark ? '#18181b' : '#f4f4f5'}` }}>
+                <div style={{ width: '100%', height: '100%', borderRadius: isMobile ? '16px' : '24px', overflow: 'hidden', border: `${isMobile ? '3px' : '4px'} solid ${BRAND.blue}`, boxShadow: `0 20px 60px ${BRAND.blue}30, 0 0 0 ${isMobile ? '4px' : '8px'} ${isDark ? '#171411' : '#faf8f5'}` }}>
                   <img src="https://i.imgur.com/Z5kBKUU.png" alt="Kenneth Villar" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
                 </div>
               </div>
@@ -1292,7 +1306,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                     position: 'relative',
                     padding: '2px',
                     borderRadius: isMobile ? '14px' : '20px',
-                    background: isDark ? '#18181b' : '#e4e4e7',
+                    background: isDark ? '#171411' : '#e8e0d4',
                     overflow: 'hidden',
                   }}
                 >
@@ -1390,8 +1404,8 @@ function PortfolioPage({ isDark, setIsDark }) {
                   padding: '2px',
                   borderRadius: isMobile ? '14px' : '20px',
                   background: isDark 
-                    ? 'linear-gradient(135deg, #27272a, #18181b)' 
-                    : 'linear-gradient(135deg, #e4e4e7, #f4f4f5)',
+                    ? 'linear-gradient(135deg, #2a2420, #171411)'
+                    : 'linear-gradient(135deg, #e8e0d4, #faf8f5)',
                   overflow: 'hidden',
                 }}
               >
@@ -1440,9 +1454,9 @@ function PortfolioPage({ isDark, setIsDark }) {
                           alignItems: 'center', 
                           gap: isMobile ? '6px' : '10px', 
                           padding: isMobile ? '8px 10px' : '10px 16px', 
-                          backgroundColor: isDark ? 'rgba(39, 39, 42, 0.8)' : 'rgba(244, 244, 245, 0.8)', 
+                          backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)', 
                           borderRadius: isMobile ? '8px' : '12px',
-                          border: `1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}`,
+                          border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
                           transition: 'all 0.2s ease',
                         }}
                       >
@@ -1706,8 +1720,8 @@ function PortfolioPage({ isDark, setIsDark }) {
                   padding: '2px',
                   borderRadius: isMobile ? '14px' : '20px',
                   background: isDark 
-                    ? 'linear-gradient(135deg, #27272a, #18181b)' 
-                    : 'linear-gradient(135deg, #e4e4e7, #f4f4f5)',
+                    ? 'linear-gradient(135deg, #2a2420, #171411)'
+                    : 'linear-gradient(135deg, #e8e0d4, #faf8f5)',
                   overflow: 'hidden',
                   height: '100%',
                   display: 'flex',
@@ -1755,13 +1769,13 @@ function PortfolioPage({ isDark, setIsDark }) {
                     {skill.items.map((item, j) => (
                       <span key={j} style={{ 
                         padding: isMobile ? '6px 10px' : '7px 12px', 
-                        backgroundColor: isDark ? 'rgba(39, 39, 42, 0.8)' : 'rgba(244, 244, 245, 0.8)', 
+                        backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)', 
                         borderRadius: '6px', 
                         fontSize: isMobile ? '11px' : '12px', 
                         color: theme.textMuted, 
                         fontWeight: '500', 
                         fontFamily: FONTS.body, 
-                        border: `1px solid ${isDark ? '#3f3f46' : '#e4e4e7'}`,
+                        border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
                         lineHeight: '1.4',
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -1817,7 +1831,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                 </div>
                 <p style={{ fontSize: isMobile ? '14px' : '17px', color: theme.text, lineHeight: '1.7', marginBottom: isMobile ? '20px' : '28px', fontStyle: 'italic' }}>"{t.content}"</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <div style={{ width: isMobile ? '40px' : '52px', height: isMobile ? '40px' : '52px', borderRadius: '50%', backgroundColor: isDark ? '#27272a' : '#f4f4f5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? '20px' : '26px' }}>{t.avatar}</div>
+                  <div style={{ width: isMobile ? '40px' : '52px', height: isMobile ? '40px' : '52px', borderRadius: '50%', backgroundColor: isDark ? '#2a2420' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? '20px' : '26px' }}>{t.avatar}</div>
                   <div>
                     <div style={{ fontWeight: '600', fontSize: isMobile ? '13px' : '15px' }}>{t.name}</div>
                     <div style={{ fontSize: isMobile ? '12px' : '14px', color: theme.textMuted }}>{t.role}</div>
@@ -1880,6 +1894,14 @@ function PortfolioPage({ isDark, setIsDark }) {
           </div>
         </div>
       </footer>
+
+      <MobileDrawer
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        isDark={isDark}
+        navigate={navigate}
+        onNavigate={() => setMobileMenuOpen(false)}
+      />
 
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

@@ -1,13 +1,14 @@
 // ============================================
 // BREWEDOPS BRAND CONFIGURATION
 // Based on Official Brand Kit
+// Warm coffee-inspired palette
 // ============================================
 
 // Brand Colors
 export const BRAND = {
   // Primary Colors
   brown: '#3F200C',      // Coffee Brown - Primary text, logo
-  blue: '#004AAC',       // Brand Blue - Buttons, links, accents  
+  blue: '#004AAC',       // Brand Blue - Buttons, links, accents
   green: '#51AF43',      // Success Green - Arrow icon, success states
   cream: '#FFF0D4',      // Cream - Light backgrounds
   black: '#000000',      // Pure black
@@ -16,16 +17,16 @@ export const BRAND = {
   blueDark: '#003d8f',   // Darker blue for hover states
   blueLight: '#3373c4',  // Lighter blue for secondary elements
   blueMuted: '#004AAC20', // Blue with transparency for backgrounds
-  
+
   brownLight: '#5a3a1f', // Lighter brown
   brownMuted: '#3F200C15', // Brown with transparency
-  
+
   greenDark: '#3d8a32',  // Darker green for hover
   greenLight: '#6bc45a', // Lighter green
   greenMuted: '#51AF4320', // Green with transparency
-  
+
   creamDark: '#f5e6c8',  // Slightly darker cream
-  
+
   // Semantic Colors
   success: '#51AF43',    // Green
   error: '#dc2626',      // Red
@@ -37,7 +38,7 @@ export const BRAND = {
 export const FONTS = {
   heading: "'Montserrat', sans-serif",
   body: "'Poppins', sans-serif",
-  
+
   // Font weights
   weights: {
     regular: 400,
@@ -51,50 +52,50 @@ export const FONTS = {
 // Google Fonts import URL
 export const GOOGLE_FONTS_URL = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600&display=swap';
 
-// Theme configuration with brand colors
+// Theme configuration with brand colors — warm coffee tones
 export const getBrandTheme = (isDark) => ({
   // Backgrounds
-  bg: isDark ? '#09090b' : '#ffffff',
-  bgAlt: isDark ? '#0a0a0b' : BRAND.cream,
-  bgMuted: isDark ? '#18181b' : '#fafafa',
-  
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  bgAlt: isDark ? '#100e0b' : BRAND.cream,
+  bgMuted: isDark ? '#171411' : '#faf8f5',
+
   // Cards
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  cardHover: isDark ? '#1f1f23' : '#f8f8f8',
-  
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  cardHover: isDark ? '#1e1a16' : '#faf5ee',
+
   // Text
-  text: isDark ? '#fafafa' : BRAND.brown,
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
-  textLight: isDark ? '#71717a' : '#a1a1aa',
-  
+  text: isDark ? '#f5f0eb' : BRAND.brown,
+  textMuted: isDark ? '#a09585' : '#7a6652',
+  textLight: isDark ? '#6b5f52' : '#a09585',
+
   // Brand accent
   accent: BRAND.blue,
   accentHover: BRAND.blueDark,
   accentMuted: isDark ? '#004AAC30' : '#004AAC15',
   accentText: '#ffffff',
-  
+
   // Secondary accent (green)
   secondary: BRAND.green,
   secondaryHover: BRAND.greenDark,
   secondaryMuted: isDark ? '#51AF4330' : '#51AF4315',
-  
+
   // Inputs
-  inputBg: isDark ? '#27272a' : '#ffffff',
-  inputBorder: isDark ? '#3f3f46' : '#e4e4e7',
+  inputBg: isDark ? '#1e1a16' : '#faf8f5',
+  inputBorder: isDark ? '#332d26' : '#e0d6c8',
   inputFocus: BRAND.blue,
-  
+
   // Status colors
   success: BRAND.green,
-  successBg: isDark ? '#052e16' : '#f0fdf4',
+  successBg: isDark ? '#0a2618' : '#ecfdf5',
   successBorder: isDark ? '#166534' : '#86efac',
-  
+
   error: '#ef4444',
-  errorBg: isDark ? '#451a1a' : '#fef2f2',
+  errorBg: isDark ? '#260a0a' : '#fef2f2',
   errorBorder: isDark ? '#7f1d1d' : '#fecaca',
-  
+
   warning: '#f59e0b',
-  warningBg: isDark ? '#451a03' : '#fffbeb',
+  warningBg: isDark ? '#261a08' : '#fff8eb',
   warningBorder: isDark ? '#92400e' : '#fde68a',
 });
 
@@ -116,8 +117,9 @@ export const getButtonStyles = (theme) => ({
     justifyContent: 'center',
     gap: '8px',
     transition: 'all 0.15s ease',
+    boxShadow: '0 2px 8px rgba(0,74,172,0.2)',
   },
-  
+
   secondary: {
     height: '44px',
     padding: '0 24px',
@@ -135,7 +137,7 @@ export const getButtonStyles = (theme) => ({
     gap: '8px',
     transition: 'all 0.15s ease',
   },
-  
+
   outline: {
     height: '44px',
     padding: '0 24px',
@@ -153,7 +155,7 @@ export const getButtonStyles = (theme) => ({
     gap: '8px',
     transition: 'all 0.15s ease',
   },
-  
+
   ghost: {
     height: '40px',
     padding: '0 16px',
@@ -193,8 +195,8 @@ export const getInputStyles = (theme, hasError = false) => ({
 export const getCardStyles = (theme) => ({
   backgroundColor: theme.cardBg,
   border: `1px solid ${theme.cardBorder}`,
-  borderRadius: '12px',
-  padding: '20px',
+  borderRadius: '14px',
+  padding: '24px',
   transition: 'all 0.15s ease',
 });
 
@@ -202,19 +204,19 @@ export const getCardStyles = (theme) => ({
 export const getBadgeStyles = (variant, isDark) => {
   const variants = {
     blue: {
-      bg: isDark ? '#004AAC25' : '#004AAC15',
+      bg: isDark ? '#004AAC25' : '#004AAC12',
       color: isDark ? '#6ba3d6' : BRAND.blue,
       border: isDark ? '#004AAC50' : '#004AAC30',
     },
     green: {
-      bg: isDark ? '#51AF4325' : '#51AF4315',
+      bg: isDark ? '#51AF4325' : '#51AF4312',
       color: isDark ? '#7bc96f' : BRAND.green,
       border: isDark ? '#51AF4350' : '#51AF4330',
     },
     brown: {
-      bg: isDark ? '#3F200C25' : '#3F200C10',
+      bg: isDark ? '#3F200C25' : '#3F200C08',
       color: isDark ? '#b89a7a' : BRAND.brown,
-      border: isDark ? '#3F200C50' : '#3F200C30',
+      border: isDark ? '#3F200C50' : '#3F200C25',
     },
     cream: {
       bg: BRAND.cream,
@@ -222,7 +224,7 @@ export const getBadgeStyles = (variant, isDark) => {
       border: BRAND.creamDark,
     },
   };
-  
+
   return variants[variant] || variants.blue;
 };
 

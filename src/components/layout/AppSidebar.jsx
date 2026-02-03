@@ -43,7 +43,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 
-const BRAND = { brown: '#3F200C', blue: '#004AAC' }
+const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' }
 
 // Navigation items
 const homeItems = [
@@ -124,12 +124,12 @@ export function AppSidebar({ isDark, ...props }) {
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    color: isDark ? '#6b7280' : '#9ca3af',
+    color: isDark ? '#6b5f52' : '#a09585',
     padding: '4px 8px 2px 8px',
   }
 
   // Solid background for sidebar
-  const sidebarBg = isDark ? '#09090b' : '#ffffff'
+  const sidebarBg = isDark ? '#0d0b09' : '#faf8f5'
 
   return (
     <Sidebar 
@@ -187,7 +187,7 @@ export function AppSidebar({ isDark, ...props }) {
 
       <SidebarFooter className="p-1" style={{ backgroundColor: sidebarBg }}>
         <div className="text-[9px] text-muted-foreground text-center py-1">
-          © 2025 BrewedOps
+          © 2026 BrewedOps
         </div>
       </SidebarFooter>
 

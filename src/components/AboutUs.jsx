@@ -1,21 +1,22 @@
 // AboutUs.jsx - About Us page for BrewedOps
 import React from 'react';
-import { 
-  Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target, 
+import {
+  Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target,
   Wallet, CheckSquare, FileText, Headset, Image, Film, FileEdit, QrCode,
   Coffee, Globe, Shield, Smartphone
 } from 'lucide-react';
+import SEO from './SEO';
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
 
 const AboutUs = ({ onBack, onNavigate, isDark }) => {
   const theme = {
-    bg: isDark ? '#09090b' : '#ffffff',
-    text: isDark ? '#fafafa' : '#18181b',
-    textMuted: isDark ? '#a1a1aa' : '#71717a',
-    cardBg: isDark ? '#18181b' : '#ffffff',
-    cardBorder: isDark ? '#27272a' : '#e4e4e7',
+    bg: isDark ? '#0d0b09' : '#faf8f5',
+    text: isDark ? '#f5f0eb' : '#3F200C',
+    textMuted: isDark ? '#a09585' : '#7a6652',
+    cardBg: isDark ? '#171411' : '#ffffff',
+    cardBorder: isDark ? '#2a2420' : '#e8e0d4',
   };
 
   const stats = [
@@ -34,8 +35,14 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
   ];
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
+    <>
+    <SEO
+      title="About Us | BrewedOps"
+      description="Learn about BrewedOps - free productivity tools built for Filipino Virtual Assistants and Freelancers."
+      keywords="BrewedOps about, Filipino VA, freelancer tools, productivity platform"
+    />
+    <div style={{
+      minHeight: '100vh',
       backgroundColor: theme.bg,
       display: 'flex',
       flexDirection: 'column',
@@ -119,7 +126,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              A comprehensive productivity platform with 18 free tools built specifically for Filipino Virtual Assistants and Freelancers
+              A comprehensive productivity platform with 20 free tools built specifically for Filipino Virtual Assistants and Freelancers
             </p>
           </div>
 
@@ -181,7 +188,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               BrewedOps was created by <strong style={{ color: theme.text }}>Kenneth</strong> through the power of 
               vibe coding — a creative approach where ideas flow naturally into functional software. What started 
               as a personal tool to manage freelance finances has evolved into a comprehensive platform with 
-              <strong style={{ color: theme.text }}> 18 free tools</strong> designed specifically for the needs 
+              <strong style={{ color: theme.text }}> 20 free tools</strong> designed specifically for the needs 
               of Filipino VAs and freelancers.
             </p>
             <p style={{ 
@@ -546,6 +553,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
         </p>
       </footer>
     </div>
+    </>
   );
 };
 

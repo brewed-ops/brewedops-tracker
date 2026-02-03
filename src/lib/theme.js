@@ -1,30 +1,41 @@
 // ============================================
-// THEME - Theme configuration and helpers
+// THEME - BrewedOps Brand Theme Configuration
+// Warm coffee-inspired palette
 // ============================================
 
 // Get theme colors based on dark/light mode
 export const getTheme = (isDark) => ({
-  bg: isDark ? '#0a0a0b' : '#f4f4f5',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#18181b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
-  textSubtle: isDark ? '#71717a' : '#a1a1aa',
-  textDim: isDark ? '#52525b' : '#a1a1aa',
-  inputBg: isDark ? '#27272a' : '#f4f4f5',
-  inputBorder: isDark ? '#3f3f46' : '#e4e4e7',
-  statBg: isDark ? '#27272a' : '#f4f4f5',
-  toggleActive: isDark ? '#27272a' : '#ffffff',
-  hoverBg: isDark ? '#3f3f46' : '#e4e4e7',
-  successBg: isDark ? '#14532d' : '#dcfce7',
-  successText: isDark ? '#22c55e' : '#16a34a',
-  warningBg: isDark ? '#7c2d12' : '#fed7aa',
-  warningText: isDark ? '#f97316' : '#ea580c',
-  errorBg: isDark ? '#7f1d1d' : '#fee2e2',
+  // Backgrounds
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  bgAlt: isDark ? '#100e0b' : '#FFF0D4',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+
+  // Text
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
+  textSubtle: isDark ? '#6b5f52' : '#a09585',
+  textDim: isDark ? '#4a4038' : '#b8ad9f',
+
+  // Inputs
+  inputBg: isDark ? '#1e1a16' : '#faf8f5',
+  inputBorder: isDark ? '#332d26' : '#e0d6c8',
+
+  // States
+  statBg: isDark ? '#1e1a16' : '#faf8f5',
+  toggleActive: isDark ? '#1e1a16' : '#ffffff',
+  hoverBg: isDark ? '#2a2420' : '#f0e8dc',
+
+  // Status
+  successBg: isDark ? '#0a2618' : '#ecfdf5',
+  successText: isDark ? '#51AF43' : '#3d8a32',
+  warningBg: isDark ? '#261a08' : '#fff8eb',
+  warningText: isDark ? '#f59e0b' : '#d97706',
+  errorBg: isDark ? '#260a0a' : '#fef2f2',
   errorText: isDark ? '#ef4444' : '#dc2626',
 });
 
-// Get CSS variables from theme (for use with CSS-in-JS)
+// Get CSS variables from theme
 export const getThemeVars = (theme) => ({
   '--bg': theme.bg,
   '--card-bg': theme.cardBg,
@@ -40,95 +51,98 @@ export const getThemeVars = (theme) => ({
 // Common style generators
 export const getCardStyle = (theme, isSmall = false) => ({
   backgroundColor: theme.cardBg,
-  borderRadius: '12px',
+  borderRadius: '14px',
   border: `1px solid ${theme.cardBorder}`,
-  padding: isSmall ? '16px' : '20px'
+  padding: isSmall ? '16px' : '24px',
+  transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
 });
 
 export const getInputStyle = (theme, isSmall = false) => ({
   width: '100%',
-  height: isSmall ? '40px' : '36px',
+  height: isSmall ? '42px' : '40px',
   backgroundColor: theme.inputBg,
   border: `1px solid ${theme.inputBorder}`,
-  borderRadius: '6px',
-  padding: '0 12px',
+  borderRadius: '10px',
+  padding: '0 14px',
   fontSize: isSmall ? '16px' : '14px',
   color: theme.text,
   outline: 'none',
-  boxSizing: 'border-box'
+  boxSizing: 'border-box',
+  transition: 'border-color 0.2s ease',
 });
 
 export const getButtonStyle = (active, theme, isDark, isSmall = false) => ({
-  padding: isSmall ? '8px 12px' : '6px 12px',
+  padding: isSmall ? '8px 14px' : '8px 14px',
   backgroundColor: active ? theme.toggleActive : 'transparent',
   border: active ? `1px solid ${theme.inputBorder}` : '1px solid transparent',
-  borderRadius: '6px',
+  borderRadius: '8px',
   fontSize: '13px',
   color: active ? theme.text : theme.textSubtle,
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
   gap: '6px',
-  boxShadow: active && !isDark ? '0 1px 2px rgba(0,0,0,0.05)' : 'none',
-  flex: isSmall ? 1 : 'none'
+  boxShadow: active && !isDark ? '0 1px 3px rgba(63,32,12,0.06)' : 'none',
+  flex: isSmall ? 1 : 'none',
+  transition: 'all 0.15s ease',
 });
 
 // Button variants
 export const buttonPrimary = (isDark) => ({
-  height: '40px',
-  padding: '0 16px',
-  backgroundColor: isDark ? '#fafafa' : '#18181b',
-  color: isDark ? '#18181b' : '#fafafa',
+  height: '44px',
+  padding: '0 20px',
+  backgroundColor: '#004AAC',
+  color: '#ffffff',
   border: 'none',
-  borderRadius: '6px',
+  borderRadius: '10px',
   fontSize: '14px',
-  fontWeight: '500',
+  fontWeight: '600',
   cursor: 'pointer',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   gap: '8px',
-  transition: 'opacity 0.2s'
+  transition: 'all 0.15s ease',
 });
 
 export const buttonOutline = (theme) => ({
-  height: '40px',
-  width: '40px',
+  height: '44px',
+  width: '44px',
   padding: '0',
   backgroundColor: 'transparent',
   border: `1px solid ${theme.cardBorder}`,
-  borderRadius: '6px',
+  borderRadius: '10px',
   color: theme.textMuted,
   cursor: 'pointer',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  transition: 'background-color 0.2s, border-color 0.2s'
+  transition: 'all 0.15s ease',
 });
 
 export const buttonGhost = (theme) => ({
-  padding: '8px 12px',
+  padding: '8px 14px',
   backgroundColor: 'transparent',
   border: 'none',
-  borderRadius: '6px',
+  borderRadius: '8px',
   color: theme.textMuted,
   cursor: 'pointer',
   display: 'flex',
   alignItems: 'center',
   gap: '6px',
   fontSize: '14px',
-  transition: 'background-color 0.2s'
+  transition: 'all 0.15s ease',
 });
 
 export const buttonDestructive = {
-  height: '40px',
-  padding: '0 16px',
+  height: '44px',
+  padding: '0 20px',
   backgroundColor: '#ef4444',
   color: '#ffffff',
   border: 'none',
-  borderRadius: '6px',
+  borderRadius: '10px',
   fontSize: '14px',
-  fontWeight: '500',
+  fontWeight: '600',
   cursor: 'pointer',
   display: 'inline-flex',
   alignItems: 'center',
@@ -137,14 +151,14 @@ export const buttonDestructive = {
 };
 
 export const buttonSuccess = {
-  height: '40px',
-  padding: '0 16px',
-  backgroundColor: '#22c55e',
+  height: '44px',
+  padding: '0 20px',
+  backgroundColor: '#51AF43',
   color: '#ffffff',
   border: 'none',
-  borderRadius: '6px',
+  borderRadius: '10px',
   fontSize: '14px',
-  fontWeight: '500',
+  fontWeight: '600',
   cursor: 'pointer',
   display: 'inline-flex',
   alignItems: 'center',

@@ -8,10 +8,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen } from 'lucide-react';
+import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen, Menu } from 'lucide-react';
+import SEO from './SEO';
+import MobileDrawer from './layout/MobileDrawer';
 import { createNoise3D } from "simplex-noise";
 import { motion } from "framer-motion";
-import { IconCloud } from '@/components/ui/icon-cloud';
 import { LayoutTextFlip } from '@/components/ui/layout-text-flip';
 import { MacbookScroll } from '@/components/ui/macbook-scroll';
 
@@ -199,11 +200,11 @@ const FONTS = {
 };
 
 const getTheme = (isDark) => ({
-  bg: isDark ? '#09090b' : '#ffffff',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#09090b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
 });
 
 // ============================================
@@ -262,25 +263,25 @@ const PRODUCTIVITY_TOOLS = [
 
 // All tools flat for marquee
 const ALL_TOOLS = [
-  { icon: Image, title: 'BG Remover', color: '#8b5cf6' },
-  { icon: Scissors, title: 'Image Cropper', color: '#8b5cf6' },
-  { icon: Move, title: 'Image Resizer', color: '#8b5cf6' },
-  { icon: Minimize2, title: 'Image Compressor', color: '#8b5cf6' },
-  { icon: RefreshCw, title: 'Image Converter', color: '#8b5cf6' },
-  { icon: Palette, title: 'Color Picker', color: '#8b5cf6' },
-  { icon: FileImage, title: 'Image to PDF', color: '#8b5cf6' },
-  { icon: Film, title: 'Video Compressor', color: '#ef4444' },
-  { icon: Scissors, title: 'Video Trimmer', color: '#ef4444' },
-  { icon: FileEdit, title: 'PDF Editor', color: '#22c55e' },
-  { icon: Merge, title: 'PDF Merge', color: '#22c55e' },
-  { icon: Split, title: 'PDF Split', color: '#22c55e' },
-  { icon: QrCode, title: 'QR Generator', color: '#f59e0b' },
-  { icon: Search, title: 'Find & Replace', color: '#f59e0b' },
-  { icon: Type, title: 'Case Converter', color: '#f59e0b' },
-  { icon: Hash, title: 'Word Counter', color: '#f59e0b' },
-  { icon: GitBranch, title: 'Mermaid Reader', color: '#06b6d4' },
-  { icon: Braces, title: 'JSON Formatter', color: '#3b82f6' },
-  { icon: Clock, title: 'Cron Generator', color: '#22c55e' },
+  { icon: Image, title: 'BG Remover', color: '#004AAC' },
+  { icon: Scissors, title: 'Image Cropper', color: '#004AAC' },
+  { icon: Move, title: 'Image Resizer', color: '#004AAC' },
+  { icon: Minimize2, title: 'Image Compressor', color: '#004AAC' },
+  { icon: RefreshCw, title: 'Image Converter', color: '#004AAC' },
+  { icon: Palette, title: 'Color Picker', color: '#004AAC' },
+  { icon: FileImage, title: 'Image to PDF', color: '#004AAC' },
+  { icon: Film, title: 'Video Compressor', color: '#c05621' },
+  { icon: Scissors, title: 'Video Trimmer', color: '#c05621' },
+  { icon: FileEdit, title: 'PDF Editor', color: '#51AF43' },
+  { icon: Merge, title: 'PDF Merge', color: '#51AF43' },
+  { icon: Split, title: 'PDF Split', color: '#51AF43' },
+  { icon: QrCode, title: 'QR Generator', color: '#b8860b' },
+  { icon: Search, title: 'Find & Replace', color: '#b8860b' },
+  { icon: Type, title: 'Case Converter', color: '#b8860b' },
+  { icon: Hash, title: 'Word Counter', color: '#b8860b' },
+  { icon: GitBranch, title: 'Mermaid Reader', color: '#b8860b' },
+  { icon: Braces, title: 'JSON Formatter', color: '#b8860b' },
+  { icon: Clock, title: 'Cron Generator', color: '#b8860b' },
   { icon: DollarSign, title: 'Finance Tracker', color: '#004AAC' },
 ];
 
@@ -326,30 +327,30 @@ const ThreeDMarquee = ({ isDark, theme }) => {
         style={{
           minWidth: '220px',
           padding: '28px 24px',
-          backgroundColor: isDark ? '#18181b' : '#ffffff',
-          border: `1px solid ${isDark ? '#27272a' : '#e4e4e7'}`,
+          backgroundColor: isDark ? '#171411' : '#ffffff',
+          border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`,
           borderRadius: '20px',
           cursor: 'pointer',
           display: 'flex',
           flexDirection: 'column',
           gap: '16px',
           transition: 'all 0.3s ease',
-          boxShadow: isDark 
-            ? '0 4px 24px rgba(0,0,0,0.4)' 
+          boxShadow: isDark
+            ? '0 4px 24px rgba(13,11,9,0.4)'
             : '0 4px 24px rgba(0,0,0,0.1)',
         }}
         onMouseEnter={(e) => {
           e.currentTarget.style.transform = 'translateY(-6px) scale(1.03)';
           e.currentTarget.style.borderColor = tool.color;
-          e.currentTarget.style.boxShadow = isDark 
-            ? `0 8px 32px rgba(0,0,0,0.5), 0 0 20px ${tool.color}30`
+          e.currentTarget.style.boxShadow = isDark
+            ? `0 8px 32px rgba(13,11,9,0.5), 0 0 20px ${tool.color}30`
             : `0 8px 32px rgba(0,0,0,0.15), 0 0 20px ${tool.color}20`;
         }}
         onMouseLeave={(e) => {
           e.currentTarget.style.transform = 'translateY(0) scale(1)';
-          e.currentTarget.style.borderColor = isDark ? '#27272a' : '#e4e4e7';
-          e.currentTarget.style.boxShadow = isDark 
-            ? '0 4px 24px rgba(0,0,0,0.4)' 
+          e.currentTarget.style.borderColor = isDark ? '#2a2420' : '#e8e0d4';
+          e.currentTarget.style.boxShadow = isDark
+            ? '0 4px 24px rgba(13,11,9,0.4)'
             : '0 4px 24px rgba(0,0,0,0.1)';
         }}
       >
@@ -411,7 +412,7 @@ const ThreeDMarquee = ({ isDark, theme }) => {
           left: 0,
           bottom: 0,
           width: '200px',
-          background: `linear-gradient(to right, ${isDark ? '#0a0a0b' : BRAND.cream}, transparent)`,
+          background: `linear-gradient(to right, ${isDark ? '#0d0b09' : BRAND.cream}, transparent)`,
           zIndex: 10,
           pointerEvents: 'none',
         }}
@@ -423,7 +424,7 @@ const ThreeDMarquee = ({ isDark, theme }) => {
           right: 0,
           bottom: 0,
           width: '200px',
-          background: `linear-gradient(to left, ${isDark ? '#0a0a0b' : BRAND.cream}, transparent)`,
+          background: `linear-gradient(to left, ${isDark ? '#0d0b09' : BRAND.cream}, transparent)`,
           zIndex: 10,
           pointerEvents: 'none',
         }}
@@ -520,8 +521,8 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
             top: '100%',
             left: '0',
             marginTop: '4px',
-            backgroundColor: isDark ? '#111113' : '#ffffff',
-            border: `1px solid ${isDark ? '#27272a' : '#e4e4e7'}`,
+            backgroundColor: isDark ? '#171411' : '#ffffff',
+            border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`,
             borderRadius: '12px',
             boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)',
             padding: '12px',
@@ -592,6 +593,8 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   const isSmall = width < 480;
   const isDesktop = width >= 1024;
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
   const handleToolClick = (path) => navigate(path);
   const handleLoginClick = () => onNavigate('login');
 
@@ -638,9 +641,14 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   };
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#ffffff' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#faf8f5' }}>
+      <SEO
+        title="BrewedOps - Free Tools for Filipino VAs & Freelancers"
+        description="Your all-in-one productivity hub with 20 free tools. Finance tracking, image editing, PDF tools, and more - built for Filipino Virtual Assistants and Freelancers."
+        keywords="BrewedOps, Filipino VA, freelancer tools, free online tools, PDF editor, image editor, QR generator, finance tracker"
+      />
       {/* NAV */}
-      <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#ffffff', position: 'sticky', top: 0, zIndex: 100 }}>
+      <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#faf8f5', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px' }}>
             <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
@@ -654,7 +662,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Portfolio
               </button>
-              <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <button onClick={() => { const el = document.getElementById('services'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Services <ChevronDown size={14} />
               </button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} onLoginClick={handleLoginClick} />
@@ -671,40 +679,49 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               <a href="/privacy" style={navLinkStyle}>Privacy</a>
             </>
           )}
-          <button onClick={() => setIsDark(!isDark)} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
+          <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          <button onClick={() => onNavigate('login')} style={{ height: '36px', padding: '0 14px', backgroundColor: 'transparent', color: theme.text, border: '1px solid ' + theme.cardBorder, borderRadius: '8px', fontSize: '13px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', marginLeft: '4px' }}>
-            Login
-          </button>
-          <button onClick={() => onNavigate('signup')} style={{ height: '36px', padding: '0 14px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer' }}>
-            Sign Up
-          </button>
+          {isDesktop ? (
+            <>
+              <button onClick={() => onNavigate('login')} style={{ height: '36px', padding: '0 14px', backgroundColor: 'transparent', color: theme.text, border: '1px solid ' + theme.cardBorder, borderRadius: '8px', fontSize: '13px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', marginLeft: '4px' }}>
+                Login
+              </button>
+              <button onClick={() => onNavigate('signup')} style={{ height: '36px', padding: '0 14px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer' }}>
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
+              <Menu size={18} />
+            </button>
+          )}
         </div>
       </nav>
 
       {/* HERO with Vortex Background */}
-      <div style={{ backgroundColor: isDark ? '#0a0a0b' : BRAND.cream }}>
+      <div id="main-content" style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream }}>
         <Vortex
-          backgroundColor={isDark ? '#0a0a0b' : BRAND.cream}
-          particleCount={600}
-          baseHue={220}
+          backgroundColor={isDark ? '#0d0b09' : BRAND.cream}
+          particleCount={400}
+          baseHue={25}
+          rangeHue={40}
+          baseSaturation={45}
+          baseLightness={50}
           rangeY={200}
           baseSpeed={0.0}
-          rangeSpeed={1.5}
+          rangeSpeed={1.0}
           baseRadius={1}
-          rangeRadius={2}
+          rangeRadius={1.5}
         >
           <section style={{ padding: isSmall ? '60px 20px 0px' : '80px 64px 0px', maxWidth: '1400px', margin: '0 auto' }}>
-            <div style={{ 
-              display: 'flex', 
-              flexDirection: isMobile ? 'column' : 'row',
-              alignItems: 'center', 
-              justifyContent: 'space-between',
-              gap: isMobile ? '48px' : '80px',
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
             }}>
-              {/* Left Side - Hero Text */}
-              <div style={{ flex: 1, textAlign: isMobile ? 'center' : 'left', maxWidth: isMobile ? '100%' : '650px' }}>
+              <div style={{ textAlign: 'center', maxWidth: '750px' }}>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', backgroundColor: isDark ? 'rgba(0, 74, 172, 0.4)' : BRAND.cream, backdropFilter: 'blur(8px)', borderRadius: '100px', marginBottom: '32px', border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid ' + BRAND.blue + '20' }}>
                   <span style={{ fontSize: '15px', color: isDark ? '#93c5fd' : BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 20 Free Tools for Filipino VAs & Freelancers</span>
                 </div>
@@ -717,11 +734,11 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                     letterSpacing: '-0.03em', 
                     fontFamily: FONTS.heading,
                     marginBottom: '16px',
-                    textAlign: isMobile ? 'center' : 'left',
+                    textAlign: 'center',
                   }}>
                     Your All-in-One
                   </div>
-                  <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <LayoutTextFlip
                       text=""
                       words={["Productivity Hub", "Automation Suite", "VA Toolkit", "Business Hub"]}
@@ -742,7 +759,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 <p style={{ fontSize: isSmall ? '16px' : '20px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 0 40px', lineHeight: '1.7', fontFamily: FONTS.body }}>
                   Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business.
                 </p>
-                <div style={{ display: 'flex', gap: '16px', justifyContent: isMobile ? 'center' : 'flex-start', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, height: '56px', padding: '0 32px', fontSize: '16px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>Start Free <ChevronRight size={20} /></button>
                   <button onClick={() => onNavigate('login')} style={{ ...btnOutline, height: '56px', padding: '0 32px', fontSize: '16px', color: isDark ? '#fff' : theme.text, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : theme.cardBorder, backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'transparent', backdropFilter: isDark ? 'blur(8px)' : 'none' }}>Sign In</button>
                 </div>
@@ -751,56 +768,6 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 </p>
               </div>
 
-              {/* Right Side - Icon Cloud */}
-              {!isSmall && (
-                <div style={{ 
-                  flex: '0 0 auto', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                }}>
-                  <IconCloud
-                    size={550}
-                    images={[
-                      // Tech Stack
-                      'https://cdn.simpleicons.org/react/61DAFB',
-                      'https://cdn.simpleicons.org/vite/646CFF',
-                      'https://cdn.simpleicons.org/tailwindcss/06B6D4',
-                      'https://cdn.simpleicons.org/supabase/3FCF8E',
-                      'https://cdn.simpleicons.org/javascript/F7DF1E',
-                      'https://cdn.simpleicons.org/typescript/3178C6',
-                      'https://cdn.simpleicons.org/nodedotjs/339933',
-                      'https://cdn.simpleicons.org/github/ffffff',
-                      'https://cdn.simpleicons.org/visualstudiocode/007ACC',
-                      // Productivity Tools
-                      'https://cdn.simpleicons.org/notion/ffffff',
-                      'https://cdn.simpleicons.org/slack/4A154B',
-                      'https://cdn.simpleicons.org/discord/5865F2',
-                      'https://cdn.simpleicons.org/zoom/2D8CFF',
-                      'https://cdn.simpleicons.org/googledrive/4285F4',
-                      'https://cdn.simpleicons.org/trello/0052CC',
-                      'https://cdn.simpleicons.org/asana/F06A6A',
-                      // Design
-                      'https://cdn.simpleicons.org/figma/F24E1E',
-                      'https://cdn.simpleicons.org/canva/00C4CC',
-                      'https://cdn.simpleicons.org/adobephotoshop/31A8FF',
-                      'https://cdn.simpleicons.org/adobeillustrator/FF9A00',
-                      // Social Media
-                      'https://cdn.simpleicons.org/facebook/1877F2',
-                      'https://cdn.simpleicons.org/instagram/E4405F',
-                      'https://cdn.simpleicons.org/linkedin/0A66C2',
-                      'https://cdn.simpleicons.org/x/ffffff',
-                      'https://cdn.simpleicons.org/youtube/FF0000',
-                      'https://cdn.simpleicons.org/tiktok/ffffff',
-                      // Communication
-                      'https://cdn.simpleicons.org/whatsapp/25D366',
-                      'https://cdn.simpleicons.org/telegram/26A5E4',
-                      'https://cdn.simpleicons.org/gmail/EA4335',
-                      'https://cdn.simpleicons.org/googlemeet/00897B',
-                    ]}
-                  />
-                </div>
-              )}
             </div>
           </section>
         </Vortex>
@@ -810,7 +777,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       {!isMobile && (
         <section 
           style={{ 
-            backgroundColor: isDark ? '#0a0a0b' : BRAND.cream,
+            backgroundColor: isDark ? '#0d0b09' : BRAND.cream,
             overflow: 'hidden',
             position: 'relative',
           }}
@@ -833,7 +800,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   fontSize: '14px', 
                   fontWeight: '600', 
                   letterSpacing: '4px',
-                  color: isDark ? '#a1a1aa' : '#71717a', 
+                  color: isDark ? '#a09585' : '#7a6652', 
                   marginBottom: '28px',
                   fontFamily: FONTS.body,
                   textTransform: 'uppercase',
@@ -842,7 +809,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 </p>
                 <p style={{ 
                   fontSize: '20px', 
-                  color: isDark ? '#a1a1aa' : '#71717a', 
+                  color: isDark ? '#a09585' : '#7a6652', 
                   lineHeight: '1.8',
                   fontFamily: FONTS.body,
                 }}>
@@ -858,7 +825,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       {isMobile && (
         <section 
           style={{ 
-            backgroundColor: isDark ? '#0a0a0b' : BRAND.cream,
+            backgroundColor: isDark ? '#0d0b09' : BRAND.cream,
             padding: '48px 20px',
           }}
         >
@@ -876,7 +843,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               fontSize: '11px', 
               fontWeight: '600', 
               letterSpacing: '3px',
-              color: isDark ? '#a1a1aa' : '#71717a', 
+              color: isDark ? '#a09585' : '#7a6652', 
               marginBottom: '20px',
               fontFamily: FONTS.body,
               textTransform: 'uppercase',
@@ -885,7 +852,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             </p>
             <p style={{ 
               fontSize: '15px', 
-              color: isDark ? '#a1a1aa' : '#71717a', 
+              color: isDark ? '#a09585' : '#7a6652', 
               lineHeight: '1.7',
               fontFamily: FONTS.body,
               marginBottom: '24px',
@@ -908,7 +875,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       )}
 
       {/* TOOLS SHOWCASE */}
-      <section style={{ backgroundColor: isDark ? '#0a0a0b' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder, overflow: 'hidden' }}>
+      <section style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder, overflow: 'hidden' }}>
         
         {/* Desktop: 3D Marquee */}
         {isDesktop && (
@@ -956,7 +923,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       </section>
 
       {/* Productivity CTA */}
-      <section style={{ padding: isSmall ? '48px 20px' : '64px 32px', backgroundColor: isDark ? theme.bg : '#fff' }}>
+      <section id="services" style={{ padding: isSmall ? '48px 20px' : '64px 32px', backgroundColor: isDark ? theme.bg : '#faf8f5' }}>
         <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
           <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.blue + '10', borderRadius: '100px', marginBottom: '16px' }}>
             <Lock size={12} style={{ color: BRAND.blue }} />
@@ -972,7 +939,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             {PRODUCTIVITY_TOOLS.map((tool) => {
               const IconComponent = tool.icon;
               return (
-                <div key={tool.path} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: isDark ? '#27272a' : '#f4f4f5', borderRadius: '100px' }}>
+                <div key={tool.path} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: isDark ? '#2a2420' : '#faf8f5', borderRadius: '100px' }}>
                   <IconComponent size={16} style={{ color: theme.textMuted }} />
                   <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body }}>{tool.title}</span>
                 </div>
@@ -992,8 +959,16 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           <a href="/terms" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Terms of Service</a>
           <a href="/about" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>About Us</a>
         </div>
-        <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>© 2025 BrewedOps. Made by Kenneth V. </p>
+        <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>© 2026 BrewedOps. Made by Kenneth V.</p>
       </footer>
+
+      <MobileDrawer
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        isDark={isDark}
+        navigate={navigate}
+        onNavigate={onNavigate}
+      />
     </div>
   );
 };

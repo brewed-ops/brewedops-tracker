@@ -1,35 +1,45 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
 import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset, PanelLeft } from 'lucide-react';
 import { supabase } from './lib/supabase';
-import TaskManager from './components/TaskManager';
-import PDFEditor from './components/PDFEditor';
-import BackgroundRemover from './components/BackgroundRemover';
-import ImageCropper from './components/ImageCropper';
-import ImageConverter from './components/ImageConverter';
-import ImageCompressor from './components/ImageCompressor';
-import ImageResizer from './components/ImageResizer';
-import QRGenerator from './components/QRGenerator';
-import ColorPicker from './components/ColorPicker';
-import PDFMerge from './components/PDFMerge';
-import PDFSplit from './components/PDFSplit';
-import ImageToPDF from './components/ImageToPDF';
-import VideoCompressor from './components/VideoCompressor';
-import VideoTrimmer from './components/VideoTrimmer';
-import BrewedNotes from './components/BrewedNotes';
-import FindReplace from './components/FindReplace';
-import CaseConverter from './components/CaseConverter';
-import WordCounter from './components/WordCounter';
-import FinanceTracker from './components/FinanceTracker';
+import SEO from './components/SEO';
 import GuestToolLayout from './components/layout/GuestToolLayout';
-import HomePage from './components/HomePage';
-import MermaidReader from './components/MermaidReader';
-import PortfolioPage from './pages/PortfolioPage';
-import JsonFormatter from './components/JsonFormatter';
-import CronGenerator from './components/CronGenerator';
-import FuelyxPage from './components/FuelyxPage';
-import MarkdownViewer from './components/MarkdownViewer';
+import LoadingFallback from './components/ui/LoadingFallback';
+
+// Lazy-loaded pages
+const HomePage = React.lazy(() => import('./components/HomePage'));
+const PortfolioPage = React.lazy(() => import('./pages/PortfolioPage'));
+const FuelyxPage = React.lazy(() => import('./components/FuelyxPage'));
+const PrivacyPolicy = React.lazy(() => import('./components/PrivacyPolicy'));
+const TermsOfService = React.lazy(() => import('./components/TermsOfService'));
+const AboutUs = React.lazy(() => import('./components/AboutUs'));
+const ResetPassword = React.lazy(() => import('./components/ResetPassword'));
+const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
+
+// Lazy-loaded protected components
+const FinanceTracker = React.lazy(() => import('./components/FinanceTracker'));
+
+// Lazy-loaded free tools
+const BackgroundRemover = React.lazy(() => import('./components/BackgroundRemover'));
+const ImageCropper = React.lazy(() => import('./components/ImageCropper'));
+const ImageConverter = React.lazy(() => import('./components/ImageConverter'));
+const ImageCompressor = React.lazy(() => import('./components/ImageCompressor'));
+const ImageResizer = React.lazy(() => import('./components/ImageResizer'));
+const ImageToPDF = React.lazy(() => import('./components/ImageToPDF'));
+const PDFEditor = React.lazy(() => import('./components/PDFEditor'));
+const PDFMerge = React.lazy(() => import('./components/PDFMerge'));
+const PDFSplit = React.lazy(() => import('./components/PDFSplit'));
+const VideoCompressor = React.lazy(() => import('./components/VideoCompressor'));
+const VideoTrimmer = React.lazy(() => import('./components/VideoTrimmer'));
+const QRGenerator = React.lazy(() => import('./components/QRGenerator'));
+const ColorPicker = React.lazy(() => import('./components/ColorPicker'));
+const FindReplace = React.lazy(() => import('./components/FindReplace'));
+const CaseConverter = React.lazy(() => import('./components/CaseConverter'));
+const WordCounter = React.lazy(() => import('./components/WordCounter'));
+const MermaidReader = React.lazy(() => import('./components/MermaidReader'));
+const JsonFormatter = React.lazy(() => import('./components/JsonFormatter'));
+const CronGenerator = React.lazy(() => import('./components/CronGenerator'));
+const MarkdownViewer = React.lazy(() => import('./components/MarkdownViewer'));
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -88,13 +98,7 @@ if (typeof document !== 'undefined' && !document.getElementById('brewedops-fonts
   document.head.appendChild(style);
 }
 
-// Extracted components and utilities
-import VAKita from './components/VAKita';
-import PrivacyPolicy from './components/PrivacyPolicy';
-import TermsOfService from './components/TermsOfService';
-import AboutUs from './components/AboutUs';
-import ResetPassword from './components/ResetPassword';
-import AdminDashboard from './components/AdminDashboard';
+// Constants and utilities
 import {
   CATEGORIES,
   CURRENCIES,
@@ -123,123 +127,39 @@ import { useWindowSize } from './lib/hooks';
 import { formatAmount, getInitial } from './lib/utils';
 
 
+// Skip-to-content link for accessibility
+const SkipLink = () => (
+  <a
+    href="#main-content"
+    className="sr-only focus:not-sr-only focus:absolute focus:z-[9999] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded"
+  >
+    Skip to content
+  </a>
+);
+
 // Badge colors for light and dark mode (kept here as it's UI-specific styling)
 const getBadgeStyle = (type, isDark) => {
   const darkStyles = {
-    utilities: { bg: '#1e3a5f', color: '#60a5fa', border: '#2563eb' },
+    utilities: { bg: '#1a2e4a', color: '#60a5fa', border: '#2563eb' },
     subscription: { bg: '#001a40', color: '#3373c4', border: '#003d8f' },
-    food: { bg: '#4a2c17', color: '#fb923c', border: '#ea580c' },
-    shopping: { bg: '#4a1d3d', color: '#f472b6', border: '#db2777' },
-    healthcare: { bg: '#134e3a', color: '#34d399', border: '#059669' },
-    entertainment: { bg: '#4a3517', color: '#fbbf24', border: '#d97706' },
-    other: { bg: '#27272a', color: '#a1a1aa', border: '#52525b' },
+    food: { bg: '#2e1f10', color: '#fb923c', border: '#ea580c' },
+    shopping: { bg: '#3a1530', color: '#f472b6', border: '#db2777' },
+    healthcare: { bg: '#0a2618', color: '#34d399', border: '#059669' },
+    entertainment: { bg: '#2e2210', color: '#fbbf24', border: '#d97706' },
+    other: { bg: '#1e1a16', color: '#a09585', border: '#4a4038' },
   };
   const lightStyles = {
     utilities: { bg: '#dbeafe', color: '#1d4ed8', border: '#93c5fd' },
     subscription: { bg: '#ede9fe', color: '#003380', border: '#c4b5fd' },
     food: { bg: '#ffedd5', color: '#c2410c', border: '#fdba74' },
     shopping: { bg: '#fce7f3', color: '#be185d', border: '#f9a8d4' },
-    healthcare: { bg: '#d1fae5', color: '#047857', border: '#6ee7b7' },
-    entertainment: { bg: '#fef3c7', color: '#b45309', border: '#fcd34d' },
-    other: { bg: '#f4f4f5', color: '#52525b', border: '#d4d4d8' },
+    healthcare: { bg: '#ecfdf5', color: '#047857', border: '#6ee7b7' },
+    entertainment: { bg: '#fff8eb', color: '#b45309', border: '#fcd34d' },
+    other: { bg: '#faf8f5', color: '#6b5f52', border: '#e8e0d4' },
   };
   const styles = isDark ? darkStyles : lightStyles;
   return styles[type] || styles.other;
 };
-
-// ============================================
-// ICON CLOUD COMPONENT - Using Magic UI
-// ============================================
-// Note: Make sure you have installed: npx shadcn@latest add "https://magicui.design/r/icon-cloud.json"
-import { IconCloud } from "@/components/ui/icon-cloud";
-
-const IconCloudDemo = () => {
-  // Maximum recognizable brand/tool icons
-  const slugs = [
-    // Design & Creative
-    "adobephotoshop",
-    "adobeillustrator",
-    "adobepremierepro",
-    "adobeaftereffects",
-    "adobelightroom",
-    "adobexd",
-    "figma",
-    "canva",
-    "sketch",
-    // Productivity & Notes
-    "notion",
-    "evernote",
-    "todoist",
-    "trello",
-    "asana",
-    "slack",
-    "discord",
-    "zoom",
-    "microsoftteams",
-    // Development & Code
-    "github",
-    "gitlab",
-    "visualstudiocode",
-    "react",
-    "nodedotjs",
-    "javascript",
-    "typescript",
-    "html5",
-    "css3",
-    // Cloud & Storage
-    "googledrive",
-    "dropbox",
-    "icloud",
-    "amazonaws",
-    "googlecloud",
-    "firebase",
-    // Office & Documents
-    "microsoftword",
-    "microsoftexcel",
-    "microsoftpowerpoint",
-    "adobeacrobatreader",
-    "googledocs",
-    "googlesheets",
-    // Finance & Business
-    "stripe",
-    "paypal",
-    "shopify",
-    "quickbooks",
-    // Social & Communication
-    "gmail",
-    "whatsapp",
-    "telegram",
-    "linkedin",
-    "twitter",
-    "instagram",
-    "facebook",
-    "youtube",
-    "tiktok",
-    // Other Tools
-    "zapier",
-    "wordpress",
-    "wix",
-    "squarespace",
-    "mailchimp",
-    "hubspot",
-    "salesforce",
-    "monday",
-    "clickup",
-    "airtable",
-  ];
-
-  const images = slugs.map(
-    (slug) => `https://cdn.simpleicons.org/${slug}/${slug}`
-  );
-
-  return (
-    <div className="relative flex size-full items-center justify-center overflow-hidden">
-      <IconCloud images={images} />
-    </div>
-  );
-};
-
-
 
 // ============================================
 // LOGIN PAGE
@@ -340,8 +260,8 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
   const inputStyle = (hasError) => ({
     width: '100%',
     height: '48px',
-    backgroundColor: theme.inputBg,
-    border: `1px solid ${hasError ? '#ef4444' : theme.inputBorder}`,
+    backgroundColor: isDark ? '#1e1a16' : '#faf8f5',
+    border: `1px solid ${hasError ? '#ef4444' : (isDark ? '#332d26' : '#e0d6c8')}`,
     borderRadius: '10px',
     padding: '0 14px',
     fontSize: '15px',
@@ -349,7 +269,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     color: theme.text,
     outline: 'none',
     boxSizing: 'border-box',
-    transition: 'border-color 0.2s ease',
+    transition: 'border-color 0.2s ease, box-shadow 0.2s ease',
   });
 
   // Google Icon SVG
@@ -363,65 +283,70 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
   );
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#ffffff', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', backgroundColor: isDark ? '#0d0b09' : '#faf8f5', display: 'flex', flexDirection: 'column' }}>
+      <SEO
+        title={isSignup ? 'Sign Up | BrewedOps' : 'Login | BrewedOps'}
+        description="Sign in or create your free BrewedOps account. Access 20 free tools and the productivity suite for Filipino VAs and Freelancers."
+        keywords="BrewedOps login, BrewedOps sign up, Filipino VA tools"
+      />
       {/* Header */}
       <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {onBack ? (
-          <button onClick={onBack} style={{ height: '40px', padding: '0 14px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', fontFamily: FONTS.body }}>
+          <button onClick={onBack} style={{ height: '40px', padding: '0 14px', backgroundColor: 'transparent', border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'), borderRadius: '10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', fontFamily: FONTS.body }}>
             <ChevronLeft style={{ width: '18px', height: '18px' }} />
             Back
           </button>
         ) : <div />}
-        <button onClick={() => setIsDark(!isDark)} style={{ width: '40px', height: '40px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '10px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button onClick={() => setIsDark(!isDark)} style={{ width: '40px', height: '40px', backgroundColor: 'transparent', border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'), borderRadius: '10px', color: isDark ? '#a09585' : '#7a6652', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
         </button>
       </div>
 
       {/* Form Container */}
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{ width: '100%', maxWidth: '380px' }}>
+        <div style={{ width: '100%', maxWidth: '400px' }}>
           {/* Logo & Title */}
-          <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '64px', height: '64px', borderRadius: '14px', marginBottom: '16px', display: 'block', marginLeft: 'auto', marginRight: 'auto' }} />
-            <h1 style={{ fontSize: '26px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 6px', fontFamily: FONTS.heading }}>
+          <div style={{ textAlign: 'center', marginBottom: '36px' }}>
+            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '72px', height: '72px', borderRadius: '16px', marginBottom: '20px', display: 'block', marginLeft: 'auto', marginRight: 'auto', boxShadow: isDark ? '0 8px 24px rgba(0,0,0,0.3)' : '0 8px 24px rgba(63,32,12,0.1)' }} />
+            <h1 style={{ fontSize: '28px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, margin: '0 0 8px', fontFamily: FONTS.heading }}>
               {isSignup ? 'Create Account' : 'Welcome Back'}
             </h1>
-            <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>
+            <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', margin: 0, fontFamily: FONTS.body }}>
               {isSignup ? 'Start managing your VA business' : 'Sign in to continue'}
             </p>
           </div>
 
           {/* Messages */}
           {errors.general && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', border: '1px solid ' + (isDark ? '#7f1d1d' : '#fecaca'), borderRadius: '10px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#260a0a' : '#fef2f2', border: '1px solid ' + (isDark ? '#7f1d1d' : '#fecaca'), borderRadius: '10px', marginBottom: '16px' }}>
               <AlertCircle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
               <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626', fontFamily: FONTS.body }}>{errors.general}</span>
             </div>
           )}
           {successMessage && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#052e16' : '#f0fdf4', border: '1px solid ' + (isDark ? '#166534' : '#86efac'), borderRadius: '10px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#0a2618' : '#ecfdf5', border: '1px solid ' + (isDark ? '#166534' : '#86efac'), borderRadius: '10px', marginBottom: '16px' }}>
               <Check style={{ width: '16px', height: '16px', color: BRAND.green, flexShrink: 0 }} />
               <span style={{ fontSize: '13px', color: isDark ? '#86efac' : '#166534', fontFamily: FONTS.body }}>{successMessage}</span>
             </div>
           )}
 
           {/* Google Sign In Button */}
-          <button onClick={handleGoogleSignIn} disabled={googleLoading || loading} style={{ width: '100%', height: '48px', backgroundColor: isDark ? theme.cardBg : '#fff', color: theme.text, border: '1px solid ' + theme.cardBorder, borderRadius: '10px', fontSize: '15px', fontWeight: '500', fontFamily: FONTS.body, cursor: (googleLoading || loading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px', opacity: (googleLoading || loading) ? 0.7 : 1, transition: 'all 0.2s ease' }}>
+          <button onClick={handleGoogleSignIn} disabled={googleLoading || loading} style={{ width: '100%', height: '50px', backgroundColor: isDark ? '#171411' : '#fff', color: isDark ? '#f5f0eb' : '#3F200C', border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'), borderRadius: '10px', fontSize: '15px', fontWeight: '500', fontFamily: FONTS.body, cursor: (googleLoading || loading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px', opacity: (googleLoading || loading) ? 0.7 : 1, transition: 'all 0.2s ease' }}>
             {googleLoading ? <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} /> : <GoogleIcon />}
             {googleLoading ? 'Connecting...' : (isSignup ? 'Sign up with Google' : 'Continue with Google')}
           </button>
 
           {/* Divider */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-            <div style={{ flex: 1, height: '1px', backgroundColor: theme.cardBorder }} />
-            <span style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body }}>or</span>
-            <div style={{ flex: 1, height: '1px', backgroundColor: theme.cardBorder }} />
+            <div style={{ flex: 1, height: '1px', backgroundColor: isDark ? '#2a2420' : '#e8e0d4' }} />
+            <span style={{ fontSize: '13px', color: isDark ? '#a09585' : '#7a6652', fontFamily: FONTS.body }}>or</span>
+            <div style={{ flex: 1, height: '1px', backgroundColor: isDark ? '#2a2420' : '#e8e0d4' }} />
           </div>
 
           {/* Form */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px', fontFamily: FONTS.body }}>Email</label>
+              <label style={{ display: 'block', fontSize: '13px', fontWeight: '600', color: isDark ? '#a09585' : '#7a6652', marginBottom: '8px', fontFamily: FONTS.body }}>Email</label>
               <input type="email" value={email} onChange={(e) => { setEmail(e.target.value); setErrors({ ...errors, email: '' }); }} onKeyDown={(e) => e.key === 'Enter' && handleSubmit()} placeholder="you@example.com" style={inputStyle(errors.email)} />
               {errors.email && <p style={{ fontSize: '12px', color: '#ef4444', margin: '6px 0 0', fontFamily: FONTS.body }}>{errors.email}</p>}
             </div>
@@ -448,7 +373,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
               </div>
             )}
 
-            <button onClick={handleSubmit} disabled={loading || googleLoading} style={{ width: '100%', height: '48px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', fontFamily: FONTS.body, cursor: (loading || googleLoading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: (loading || googleLoading) ? 0.7 : 1, marginTop: '6px', transition: 'all 0.2s ease' }}>
+            <button onClick={handleSubmit} disabled={loading || googleLoading} style={{ width: '100%', height: '50px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', fontFamily: FONTS.body, cursor: (loading || googleLoading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: (loading || googleLoading) ? 0.7 : 1, marginTop: '8px', transition: 'all 0.2s ease', boxShadow: '0 4px 16px rgba(0,74,172,0.3)' }}>
               {loading ? <><Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />{isSignup ? 'Creating...' : 'Signing in...'}</> : (isSignup ? 'Create Account' : 'Sign In')}
             </button>
 
@@ -460,7 +385,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
           </div>
 
           {/* Switch Mode */}
-          <p style={{ textAlign: 'center', fontSize: '14px', color: theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
+          <p style={{ textAlign: 'center', fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', marginTop: '28px', fontFamily: FONTS.body }}>
             {isSignup ? 'Already have an account?' : "Don't have an account?"}{' '}
             <button onClick={switchMode} style={{ background: 'none', border: 'none', color: BRAND.blue, fontWeight: '600', cursor: 'pointer', fontFamily: FONTS.body }}>
               {isSignup ? 'Sign in' : 'Sign up'}
@@ -491,33 +416,45 @@ function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Verify admin status from Supabase (never trust localStorage)
+  const checkAdminStatus = async (userId) => {
+    try {
+      const { data } = await supabase
+        .from('admins')
+        .select('id')
+        .eq('id', userId)
+        .single();
+      return !!data;
+    } catch {
+      return false;
+    }
+  };
+
   // Check for existing session on load
   useEffect(() => {
     // Check URL hash for recovery token BEFORE Supabase processes it
     const hash = window.location.hash;
     if (hash && hash.includes('type=recovery')) {
-      console.log('Recovery mode detected in URL');
       setIsPasswordRecovery(true);
       sessionStorage.setItem('passwordRecovery', 'true');
     }
-    
+
     // Also check if we already set recovery mode
     if (sessionStorage.getItem('passwordRecovery') === 'true') {
       setIsPasswordRecovery(true);
     }
-    
-    supabase.auth.getSession().then(({ data: { session } }) => {
+
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       // If in recovery mode, don't set user as logged in for main app
       if (sessionStorage.getItem('passwordRecovery') === 'true') {
         setLoading(false);
         return;
       }
-      
+
       if (session?.user) {
-        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        const isAdmin = await checkAdminStatus(session.user.id);
         setUser(isAdmin ? { ...session.user, isAdmin: true } : session.user);
       } else {
-        localStorage.removeItem('isAdmin');
         setUser(null);
       }
       setLoading(false);
@@ -525,26 +462,23 @@ function AppContent() {
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth event:', event);
-      
       // Handle password recovery event
       if (event === 'PASSWORD_RECOVERY') {
-        console.log('PASSWORD_RECOVERY event fired');
         setIsPasswordRecovery(true);
         sessionStorage.setItem('passwordRecovery', 'true');
         return;
       }
-      
+
       // If in recovery mode, don't update user state
       if (sessionStorage.getItem('passwordRecovery') === 'true') {
         return;
       }
-      
+
       if (session?.user) {
-        const isAdmin = localStorage.getItem('isAdmin') === 'true';
-        setUser(isAdmin ? { ...session.user, isAdmin: true } : session.user);
+        checkAdminStatus(session.user.id).then((isAdmin) => {
+          setUser(isAdmin ? { ...session.user, isAdmin: true } : session.user);
+        });
       } else {
-        localStorage.removeItem('isAdmin');
         setUser(null);
       }
     });
@@ -565,7 +499,6 @@ useEffect(() => {
   const TIMEOUT_DURATION = 30 * 60 * 1000; // 30 minutes
   
   const logout = async () => {
-    localStorage.removeItem('isAdmin');
     await supabase.auth.signOut();
     setUser(null);
     navigate('/');
@@ -611,17 +544,11 @@ useEffect(() => {
   }, [isDark]);
   
   const handleLogin = (userData) => {
-  if (userData.isAdmin) {
-    localStorage.setItem('isAdmin', 'true');
-  } else {
-    localStorage.removeItem('isAdmin');
-  }
   setUser(userData);
   window.location.href = 'https://tools.brewedops.com';
 };
 
   const handleLogout = async () => {
-    localStorage.removeItem('isAdmin');
     if (user?.isAdmin) {
       setUser(null);
       navigate('/');
@@ -660,14 +587,14 @@ useEffect(() => {
   // Show loading screen
   if (loading) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        backgroundColor: isDark ? '#0a0a0b' : '#f4f4f5', 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'center' 
+      <div style={{
+        minHeight: '100vh',
+        backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
       }}>
-        <Loader2 style={{ width: '32px', height: '32px', color: isDark ? '#71717a' : '#a1a1aa', animation: 'spin 1s linear infinite' }} />
+        <Loader2 style={{ width: '32px', height: '32px', color: isDark ? '#6b5f52' : '#a09585', animation: 'spin 1s linear infinite' }} />
         <style>{`
           @keyframes spin {
             from { transform: rotate(0deg); }
@@ -680,35 +607,46 @@ useEffect(() => {
 
   // Password Recovery Mode - show reset page regardless of auth state
   if (isPasswordRecovery) {
-    return <ResetPassword 
-      isDark={isDark} 
-      setIsDark={setIsDark} 
-      onComplete={() => {
-        // Clear recovery mode when password is reset
-        sessionStorage.removeItem('passwordRecovery');
-        setIsPasswordRecovery(false);
-        setUser(null);
-      }}
-    />;
-  }
-  
-  // Admin Dashboard
-  if (user?.isAdmin) {
-    return <AdminDashboard onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />;
+    return (
+      <React.Suspense fallback={<LoadingFallback />}>
+        <SkipLink />
+        <ResetPassword
+          isDark={isDark}
+          setIsDark={setIsDark}
+          onComplete={() => {
+            sessionStorage.removeItem('passwordRecovery');
+            setIsPasswordRecovery(false);
+            setUser(null);
+          }}
+        />
+      </React.Suspense>
+    );
   }
 
-  // User Dashboard  
+  // Admin Dashboard
+  if (user?.isAdmin) {
+    return (
+      <React.Suspense fallback={<LoadingFallback />}>
+        <SkipLink />
+        <AdminDashboard onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />
+      </React.Suspense>
+    );
+  }
+
+  // User Dashboard
   if (user) {
-    return <FinanceTracker 
-  user={user} 
-  onLogout={handleLogout} 
-  isDark={isDark} 
-  setIsDark={setIsDark} 
-/>;
+    return (
+      <React.Suspense fallback={<LoadingFallback />}>
+        <SkipLink />
+        <FinanceTracker user={user} onLogout={handleLogout} isDark={isDark} setIsDark={setIsDark} />
+      </React.Suspense>
+    );
   }
 
  // Public routes
 return (
+  <React.Suspense fallback={<LoadingFallback />}>
+  <SkipLink />
   <Routes>
     <Route path="/" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     <Route path="/portfolio" element={<PortfolioPage isDark={isDark} setIsDark={setIsDark} />} />
@@ -752,6 +690,7 @@ return (
     {/* Catch-all route */}
     <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
   </Routes>
+  </React.Suspense>
 );
 }
 

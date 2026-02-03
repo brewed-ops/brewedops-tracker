@@ -1,17 +1,18 @@
 // TermsOfService.jsx - Terms of Service page for BrewedOps
 import React from 'react';
 import { FileText, CheckCircle, AlertTriangle, Scale, Ban, RefreshCw, Shield, Zap, Globe, Lock } from 'lucide-react';
+import SEO from './SEO';
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
 
 const TermsOfService = ({ onBack, onNavigate, isDark }) => {
   const theme = {
-    bg: isDark ? '#09090b' : '#ffffff',
-    text: isDark ? '#fafafa' : '#18181b',
-    textMuted: isDark ? '#a1a1aa' : '#71717a',
-    cardBg: isDark ? '#18181b' : '#ffffff',
-    cardBorder: isDark ? '#27272a' : '#e4e4e7',
+    bg: isDark ? '#0d0b09' : '#faf8f5',
+    text: isDark ? '#f5f0eb' : '#3F200C',
+    textMuted: isDark ? '#a09585' : '#7a6652',
+    cardBg: isDark ? '#171411' : '#ffffff',
+    cardBorder: isDark ? '#2a2420' : '#e8e0d4',
   };
 
   const lastUpdated = 'January 1, 2026';
@@ -39,8 +40,14 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
   );
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
+    <>
+    <SEO
+      title="Terms of Service | BrewedOps"
+      description="Read the BrewedOps terms of service for our free productivity tools and Fuelyx nutrition app."
+      keywords="BrewedOps terms of service, usage terms, Filipino VA tools"
+    />
+    <div style={{
+      minHeight: '100vh',
       backgroundColor: theme.bg,
       display: 'flex',
       flexDirection: 'column',
@@ -131,7 +138,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
           </Section>
 
           <Section icon={FileText} title="Description of Service">
-            <p>BrewedOps is a comprehensive productivity platform with <strong style={{ color: theme.text }}>18 free tools</strong> designed for Filipino virtual assistants and freelancers:</p>
+            <p>BrewedOps is a comprehensive productivity platform with <strong style={{ color: theme.text }}>20 free tools</strong> designed for Filipino virtual assistants and freelancers:</p>
             
             <p style={{ marginTop: '16px' }}><strong style={{ color: theme.text }}>Productivity Tools (4):</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
@@ -396,6 +403,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
         </p>
       </footer>
     </div>
+    </>
   );
 };
 

@@ -52,7 +52,7 @@ const Header = ({
 }) => {
   return (
     <header style={{
-      backgroundColor: isDark ? '#0a0a0b' : '#ffffff',
+      backgroundColor: isDark ? '#0d0b09' : '#ffffff',
       borderBottom: `1px solid ${theme.cardBorder}`,
       padding: '0 24px',
       position: 'sticky',
@@ -125,7 +125,7 @@ const Header = ({
                 </div>
                 <div style={{
                   height: '4px',
-                  backgroundColor: isDark ? '#3f3f46' : '#e4e4e7',
+                  backgroundColor: isDark ? '#332d26' : '#e8e0d4',
                   borderRadius: '2px',
                   overflow: 'hidden'
                 }}>
@@ -211,6 +211,7 @@ const Header = ({
                 justifyContent: 'center'
               }}
               title={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
+              aria-label={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
             >
               <TreePine style={{ width: '20px', height: '20px' }} />
             </button>
@@ -218,6 +219,7 @@ const Header = ({
             {/* Dark/Light Mode Toggle */}
             <button
               onClick={() => setIsDark(!isDark)}
+              aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
               style={{
                 width: '40px',
                 height: '40px',
@@ -504,6 +506,7 @@ const MobileHeaderActions = ({
     {/* Theme Toggle */}
     <button
       onClick={() => setIsDark(!isDark)}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       style={{
         width: '36px',
         height: '36px',

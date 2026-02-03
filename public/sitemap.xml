@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://brewedops.com/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://brewedops.com/portfolio</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://brewedops.com/fuelyx</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://brewedops.com/about</loc><changefreq>monthly</changefreq><priority>0.5</priority></url>
+  <url><loc>https://brewedops.com/privacy</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://brewedops.com/terms</loc><changefreq>yearly</changefreq><priority>0.3</priority></url>
+  <url><loc>https://brewedops.com/bgremover</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/imagecropper</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/imageresizer</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/imagecompressor</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/imageconverter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/colorpicker</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/imagetopdf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/videocompressor</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/videotrimmer</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/pdfeditor</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/pdfmerge</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/pdfsplit</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/markdownviewer</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/qrgenerator</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/findreplace</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/caseconverter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/wordcounter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/mermaid</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/jsonformatter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://brewedops.com/crongenerator</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
+</urlset>

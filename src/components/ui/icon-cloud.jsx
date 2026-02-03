@@ -9,6 +9,8 @@ export function IconCloud({
   icons,
   images,
   size = 400,
+  iconSizeOverride,
+  radiusMultiplier = 1,
 }) {
   const canvasRef = useRef(null)
   const [iconPositions, setIconPositions] = useState([])
@@ -24,8 +26,8 @@ export function IconCloud({
 
   // Scale factor based on size (base size is 400)
   const scaleFactor = size / 400
-  const iconSize = Math.round(40 * scaleFactor)
-  const sphereRadius = 100 * scaleFactor
+  const iconSize = iconSizeOverride || Math.round(40 * scaleFactor)
+  const sphereRadius = 100 * scaleFactor * radiusMultiplier
 
   // Create icon canvases once when icons/images change
   useEffect(() => {

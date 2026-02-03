@@ -6,14 +6,16 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
+import {
   ChevronRight, ChevronDown, Sun, Moon, ChevronLeft,
   Smartphone, Zap, Target, TrendingUp, Clock, Camera,
   Apple, Dumbbell, BarChart3, Heart, Shield, Star,
   Download, Play, Check, ArrowRight, Sparkles, Trophy,
   Flame, Scale, Utensils, Timer, Activity, Award,
-  AlertTriangle, Info, Settings
+  AlertTriangle, Info, Settings, Menu
 } from 'lucide-react';
+import SEO from './SEO';
+import MobileDrawer from './layout/MobileDrawer';
 
 // ============================================
 // BREWEDOPS BRAND CONFIGURATION
@@ -41,12 +43,12 @@ const FUELYX = {
 };
 
 const getTheme = (isDark) => ({
-  bg: isDark ? '#0a0a0b' : '#ffffff',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#18181b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
-  textFaint: isDark ? '#52525b' : '#a1a1aa',
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
+  textFaint: isDark ? '#6b5f52' : '#a09585',
 });
 
 // ============================================
@@ -61,6 +63,8 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
   const isMobile = windowWidth < 640;
   const isTablet = windowWidth < 1024;
+  const isDesktop = windowWidth >= 1024;
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -114,7 +118,12 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: isDark ? '#0a0a0b' : '#ffffff', fontFamily: FONTS.body }}>
-      
+      <SEO
+        title="Fuelyx - Filipino Food Nutrition Tracker | BrewedOps"
+        description="Track Filipino food nutrition, calories, and macros with Fuelyx. AI-powered food scanner built for Pinoy meals. Free download by BrewedOps."
+        keywords="Fuelyx, Filipino food tracker, nutrition tracker, calorie counter, Filipino meals, BrewedOps"
+      />
+
       {/* ==================== NAVIGATION ==================== */}
       <nav style={{ 
         padding: isMobile ? '12px 16px' : '12px 32px', 
@@ -148,7 +157,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
               <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Portfolio
               </button>
-              <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+              <button onClick={() => navigate('/#services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Services <ChevronDown size={14} />
               </button>
               <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -168,62 +177,71 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
               <a href="/privacy" style={navLinkStyle}>Privacy</a>
             </>
           )}
-          <button 
-            onClick={() => setIsDark(!isDark)} 
-            style={{ 
-              width: '36px', 
-              height: '36px', 
-              backgroundColor: 'transparent', 
-              border: '1px solid ' + theme.cardBorder, 
-              borderRadius: '8px', 
-              color: theme.textMuted, 
-              cursor: 'pointer', 
-              display: 'flex', 
-              alignItems: 'center', 
-              justifyContent: 'center' 
+          <button
+            onClick={() => setIsDark(!isDark)}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            style={{
+              width: '36px',
+              height: '36px',
+              backgroundColor: 'transparent',
+              border: '1px solid ' + theme.cardBorder,
+              borderRadius: '8px',
+              color: theme.textMuted,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
             }}
           >
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
-          <button 
-            onClick={() => navigate('/login')}
-            style={{ 
-              height: '36px', 
-              padding: '0 14px', 
-              backgroundColor: 'transparent', 
-              color: theme.text, 
-              border: '1px solid ' + theme.cardBorder, 
-              borderRadius: '8px', 
-              fontSize: '13px', 
-              fontWeight: '500', 
-              fontFamily: FONTS.body, 
-              cursor: 'pointer' 
-            }}
-          >
-            Login
-          </button>
-          <button 
-            onClick={() => navigate('/signup')}
-            style={{ 
-              height: '36px', 
-              padding: '0 14px', 
-              backgroundColor: BRAND.blue, 
-              color: '#fff', 
-              border: 'none', 
-              borderRadius: '8px', 
-              fontSize: '13px', 
-              fontWeight: '600', 
-              fontFamily: FONTS.body, 
-              cursor: 'pointer' 
-            }}
-          >
-            Sign Up
-          </button>
+          {!isMobile ? (
+            <>
+              <button
+                onClick={() => navigate('/login')}
+                style={{
+                  height: '36px',
+                  padding: '0 14px',
+                  backgroundColor: 'transparent',
+                  color: theme.text,
+                  border: '1px solid ' + theme.cardBorder,
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '500',
+                  fontFamily: FONTS.body,
+                  cursor: 'pointer'
+                }}
+              >
+                Login
+              </button>
+              <button
+                onClick={() => navigate('/signup')}
+                style={{
+                  height: '36px',
+                  padding: '0 14px',
+                  backgroundColor: BRAND.blue,
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '13px',
+                  fontWeight: '600',
+                  fontFamily: FONTS.body,
+                  cursor: 'pointer'
+                }}
+              >
+                Sign Up
+              </button>
+            </>
+          ) : (
+            <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Menu size={18} />
+            </button>
+          )}
         </div>
       </nav>
 
       {/* ==================== HERO SECTION ==================== */}
-      <section style={{
+      <section id="main-content" style={{
         background: isDark 
           ? 'linear-gradient(135deg, #0a0a0b 0%, #0f172a 50%, #134e4a 100%)'
           : 'linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%)',
@@ -1117,6 +1135,14 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
           </div>
         </div>
       </footer>
+
+      <MobileDrawer
+        isOpen={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        isDark={isDark}
+        navigate={navigate}
+        onNavigate={() => setMobileMenuOpen(false)}
+      />
     </div>
   );
 };

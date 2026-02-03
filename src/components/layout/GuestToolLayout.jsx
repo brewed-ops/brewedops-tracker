@@ -11,6 +11,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronLeft, Sun, Moon, LogIn } from 'lucide-react';
+import SEO from '../SEO';
 
 // ============================================
 // BRAND CONFIGURATION
@@ -28,11 +29,11 @@ const FONTS = {
 };
 
 const getTheme = (isDark) => ({
-  bg: isDark ? '#09090b' : '#ffffff',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#09090b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
 });
 
 // ============================================
@@ -65,10 +66,16 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
   const isSmall = width < 480;
 
   return (
+    <>
+    <SEO
+      title={`${toolName} - Free Online Tool | BrewedOps`}
+      description={`Use ${toolName} for free - no login required. Part of BrewedOps' suite of 20 free tools for Filipino VAs and Freelancers.`}
+      keywords={`${toolName}, free online tool, BrewedOps, Filipino VA tools`}
+    />
     <div
       style={{
         minHeight: '100vh',
-        backgroundColor: isDark ? theme.bg : '#f4f4f5',
+        backgroundColor: isDark ? theme.bg : '#faf8f5',
         display: 'flex',
         flexDirection: 'column',
       }}
@@ -106,6 +113,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
               justifyContent: 'center',
             }}
             title="Back to Home"
+            aria-label="Back to Home"
           >
             <ChevronLeft size={18} />
           </button>
@@ -159,6 +167,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
           {/* Theme Toggle */}
           <button
             onClick={() => setIsDark(!isDark)}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
             style={{
               width: '36px',
               height: '36px',
@@ -223,6 +232,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
       {/* MAIN CONTENT */}
       {/* ============================================ */}
       <main
+        id="main-content"
         style={{
           flex: 1,
           padding: isSmall ? '16px' : '24px',
@@ -288,6 +298,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
         </button>
       </div>
     </div>
+    </>
   );
 };
 

@@ -1,17 +1,18 @@
 // PrivacyPolicy.jsx - Privacy Policy page for BrewedOps
 import React from 'react';
 import { Shield, Mail, Database, Lock, Eye, Trash2, Globe, Users, Zap, Bell, MapPin, RefreshCw } from 'lucide-react';
+import SEO from './SEO';
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
 
 const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
   const theme = {
-    bg: isDark ? '#09090b' : '#ffffff',
-    text: isDark ? '#fafafa' : '#18181b',
-    textMuted: isDark ? '#a1a1aa' : '#71717a',
-    cardBg: isDark ? '#18181b' : '#ffffff',
-    cardBorder: isDark ? '#27272a' : '#e4e4e7',
+    bg: isDark ? '#0d0b09' : '#faf8f5',
+    text: isDark ? '#f5f0eb' : '#3F200C',
+    textMuted: isDark ? '#a09585' : '#7a6652',
+    cardBg: isDark ? '#171411' : '#ffffff',
+    cardBorder: isDark ? '#2a2420' : '#e8e0d4',
   };
 
   const lastUpdated = 'January 1, 2026';
@@ -39,8 +40,14 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
   );
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
+    <>
+    <SEO
+      title="Privacy Policy | BrewedOps"
+      description="Read the BrewedOps privacy policy. Learn how we handle your data across our free tools and Fuelyx nutrition app."
+      keywords="BrewedOps privacy policy, data protection, Filipino VA tools privacy"
+    />
+    <div style={{
+      minHeight: '100vh',
       backgroundColor: theme.bg,
       display: 'flex',
       flexDirection: 'column',
@@ -401,6 +408,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
         </p>
       </footer>
     </div>
+    </>
   );
 };
 
