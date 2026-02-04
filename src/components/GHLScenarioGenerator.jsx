@@ -397,7 +397,7 @@ const SectionCard = ({ title, content, isDark, index }) => {
 // MAIN COMPONENT
 // ============================================
 const COOLDOWN_KEY = 'brewedops_ghl_cooldown_end';
-const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+const COOLDOWN_MS = 1 * 60 * 1000; // 1 minute
 
 const GHLScenarioGenerator = ({ isDark }) => {
   const theme = getTheme(isDark);
