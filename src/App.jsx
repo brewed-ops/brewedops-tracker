@@ -44,6 +44,8 @@ const CronGenerator = React.lazy(() => import('./components/CronGenerator'));
 const MarkdownViewer = React.lazy(() => import('./components/MarkdownViewer'));
 const TimezoneConverter = React.lazy(() => import('./components/TimezoneConverter'));
 const PomodoroTimer = React.lazy(() => import('./components/PomodoroTimer'));
+const GHLScenarioGenerator = React.lazy(() => import('./components/GHLScenarioGenerator'));
+const TextExtractor = React.lazy(() => import('./components/TextExtractor'));
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -693,6 +695,10 @@ return (
     <Route path="/crongenerator" element={<GuestToolLayout toolName="Cron Generator" isDark={isDark} setIsDark={setIsDark}><CronGenerator isDark={isDark} /></GuestToolLayout>} />
     <Route path="/timezoneconverter" element={<GuestToolLayout toolName="Timezone Converter" isDark={isDark} setIsDark={setIsDark}><TimezoneConverter isDark={isDark} /></GuestToolLayout>} />
     <Route path="/pomodoro" element={<GuestToolLayout toolName="Focus Timer" isDark={isDark} setIsDark={setIsDark}><PomodoroTimer isDark={isDark} /></GuestToolLayout>} />
+
+    {/* AI Tools */}
+    <Route path="/ghl-scenario" element={<GuestToolLayout toolName="GHL Scenario Generator" isDark={isDark} setIsDark={setIsDark}><GHLScenarioGenerator isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/text-extractor" element={<GuestToolLayout toolName="AI Text Extractor" isDark={isDark} setIsDark={setIsDark}><TextExtractor isDark={isDark} /></GuestToolLayout>} />
 
     {/* Catch-all route */}
     <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />

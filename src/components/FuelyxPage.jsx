@@ -167,6 +167,9 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
               <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Tools <CaretDown size={14} />
               </button>
+              <button onClick={() => navigate('/ghl-scenario')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                AI Tools <CaretDown size={14} />
+              </button>
               <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: FUELYX.primary, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Fuelyx
               </button>

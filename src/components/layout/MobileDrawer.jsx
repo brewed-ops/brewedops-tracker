@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CaretDown, Lock, Image, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, BookOpen, QrCode, MagnifyingGlass, TextT, Hash, GitBranch, BracketsCurly, Clock, Globe, Timer } from '@phosphor-icons/react';
+import { X, CaretDown, Lock, Lightning, FileMagnifyingGlass, Image, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, BookOpen, QrCode, MagnifyingGlass, TextT, Hash, GitBranch, BracketsCurly, Clock, Globe, Timer } from '@phosphor-icons/react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -59,8 +59,14 @@ const TOOL_CATEGORIES = [
   },
 ];
 
+const AI_TOOLS = [
+  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario' },
+  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor' },
+];
+
 const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {
   const [toolsExpanded, setToolsExpanded] = useState(false);
+  const [aiToolsExpanded, setAiToolsExpanded] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -262,6 +268,69 @@ const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {
                       })}
                     </div>
                   ))}
+                </div>
+              )}
+
+              {/* AI Tools (expandable) */}
+              <button
+                onClick={() => setAiToolsExpanded(!aiToolsExpanded)}
+                style={navItemStyle}
+              >
+                <span>AI Tools</span>
+                <CaretDown
+                  size={16}
+                  style={{
+                    transform: aiToolsExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s',
+                    color: theme.textMuted,
+                  }}
+                />
+              </button>
+
+              {aiToolsExpanded && (
+                <div style={{ paddingLeft: '16px', paddingBottom: '8px' }}>
+                  <div style={{ marginBottom: '12px' }}>
+                    <div
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: '600',
+                        color: theme.textMuted,
+                        letterSpacing: '0.5px',
+                        textTransform: 'uppercase',
+                        fontFamily: FONTS.body,
+                        padding: '4px 24px',
+                      }}
+                    >
+                      AI-Powered
+                    </div>
+                    {AI_TOOLS.map((tool) => {
+                      const IconComponent = tool.icon;
+                      return (
+                        <button
+                          key={tool.path}
+                          onClick={() => handleNav(tool.path)}
+                          style={{
+                            width: '100%',
+                            padding: '8px 24px',
+                            backgroundColor: 'transparent',
+                            border: 'none',
+                            color: theme.text,
+                            fontSize: '13px',
+                            fontWeight: '500',
+                            fontFamily: FONTS.body,
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            textAlign: 'left',
+                          }}
+                        >
+                          <IconComponent size={14} style={{ color: theme.textMuted }} />
+                          {tool.title}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
 
