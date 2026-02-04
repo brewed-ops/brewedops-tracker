@@ -49,6 +49,8 @@ import {
   DollarSign,
   StickyNote,
   CheckSquare,
+  Globe,
+  Timer,
 } from 'lucide-react';
 import SEO from '@/components/SEO';
 const MobileDrawer = React.lazy(() => import('@/components/layout/MobileDrawer'));

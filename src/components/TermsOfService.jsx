@@ -137,7 +137,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
           </Section>
 
           <Section icon={FileText} title="Description of Service">
-            <p>BrewedOps is a comprehensive productivity platform with <strong style={{ color: theme.text }}>20 free tools</strong> designed for Filipino virtual assistants and freelancers:</p>
+            <p>BrewedOps is a comprehensive productivity platform with <strong style={{ color: theme.text }}>22+ free tools</strong> designed for Filipino virtual assistants and freelancers:</p>
             
             <p style={{ marginTop: '16px' }}><strong style={{ color: theme.text }}>Productivity Tools (4):</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>

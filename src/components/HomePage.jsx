@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen, Menu, Zap, ClipboardList, Code2 } from 'lucide-react';
+import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen, Menu, Zap, ClipboardList, Code2, Globe, Timer } from 'lucide-react';
 import SEO from './SEO';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 import { createNoise3D } from "simplex-noise";
@@ -267,6 +267,8 @@ const TOOL_CATEGORIES = [
     { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
     { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
     { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
+    { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
+    { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
   ]
 },
 ];
@@ -297,7 +299,7 @@ const TOOL_TIMELINE = [
     name: 'Utility Tools',
     icon: Wrench,
     accent: '#004AAC',
-    description: 'Generate QR codes, format JSON, build cron expressions, count words, convert text case, render Mermaid diagrams, and find & replace across text.',
+    description: 'Generate QR codes, format JSON, build cron expressions, count words, convert timezones, stay focused with Pomodoro, and more.',
     tools: TOOL_CATEGORIES[3].tools,
   },
 ];
@@ -330,6 +332,8 @@ const ALL_TOOLS = [
   { icon: GitBranch, title: 'Mermaid Reader', color: '#b8860b' },
   { icon: Braces, title: 'JSON Formatter', color: '#b8860b' },
   { icon: Clock, title: 'Cron Generator', color: '#b8860b' },
+  { icon: Globe, title: 'Timezone', color: '#b8860b' },
+  { icon: Timer, title: 'Focus Timer', color: '#b8860b' },
   { icon: DollarSign, title: 'Finance Tracker', color: '#004AAC' },
 ];
 
@@ -360,9 +364,9 @@ const ThreeDMarquee = ({ isDark, theme }) => {
   const navigate = useNavigate();
   
   // Create rows of tools for marquee effect
-  const row1 = ALL_TOOLS.slice(0, 7);
-  const row2 = ALL_TOOLS.slice(7, 14);
-  const row3 = ALL_TOOLS.slice(14, 21);
+  const row1 = ALL_TOOLS.slice(0, 8);
+  const row2 = ALL_TOOLS.slice(8, 16);
+  const row3 = ALL_TOOLS.slice(16, 24);
 
   const ToolCard = ({ tool, index, reverse }) => {
     const IconComponent = tool.icon;
@@ -693,7 +697,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       <main>
       <SEO
         title="BrewedOps - Free Tools for Filipino VAs & Freelancers"
-        description="Your all-in-one productivity hub with 20 free tools. Finance tracking, image editing, PDF tools, and more - built for Filipino Virtual Assistants and Freelancers."
+        description="Your all-in-one productivity hub with 22+ free tools. Finance tracking, image editing, PDF tools, and more - built for Filipino Virtual Assistants and Freelancers."
         keywords="BrewedOps, Filipino VA, freelancer tools, free online tools, PDF editor, image editor, QR generator, finance tracker"
       />
       {/* NAV */}
@@ -807,7 +811,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   })}
                 </div>
                 <div style={{ marginBottom: '24px' }}>
-                  <div style={{
+                  <h1 style={{
                     fontSize: isSmall ? '36px' : '60px',
                     fontWeight: '800',
                     color: isDark ? '#ffffff' : BRAND.brown,
@@ -816,9 +820,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                     fontFamily: FONTS.heading,
                     marginBottom: '16px',
                     textAlign: 'center',
+                    margin: '0 0 16px',
                   }}>
                     Free Tools & Services for
-                  </div>
+                  </h1>
                   <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <LayoutTextFlip
                       text=""
@@ -838,7 +843,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   </div>
                 </div>
                 <p style={{ fontSize: isSmall ? '15px' : '18px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 auto 40px', lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: '620px' }}>
-                  20+ free productivity tools, GoHighLevel CRM automation, admin VA support, and custom web builds — from someone who's been in your shoes.
+                  22+ free productivity tools, GoHighLevel CRM automation, admin VA support, and custom web builds — from someone who's been in your shoes.
                 </p>
                 <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, height: '56px', padding: '0 32px', fontSize: '16px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>Start Free <ChevronRight size={20} /></button>
@@ -853,6 +858,218 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           </section>
         </Vortex>
       </div>
+
+      {/* SERVICES OVERVIEW */}
+      <section style={{
+        padding: isMobile ? '60px 20px' : '80px 64px',
+        backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <p style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              letterSpacing: '4px',
+              color: isDark ? '#a09585' : '#7a6652',
+              marginBottom: '12px',
+              fontFamily: FONTS.body,
+              textTransform: 'uppercase',
+            }}>
+              Services
+            </p>
+            <h2 style={{
+              fontSize: isMobile ? '28px' : '40px',
+              fontWeight: '800',
+              color: isDark ? '#fff' : BRAND.brown,
+              fontFamily: FONTS.heading,
+              lineHeight: '1.2',
+              margin: '0 0 12px',
+            }}>
+              More Than Just Tools
+            </h2>
+            <p style={{ fontSize: '16px', color: isDark ? 'rgba(255,255,255,0.6)' : theme.textMuted, fontFamily: FONTS.body, maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
+              11+ years of BPO experience packaged into services that help your business grow.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '20px' }}>
+            {[
+              {
+                icon: Headphones,
+                title: 'Customer Support',
+                color: BRAND.blue,
+                description: 'Professional customer service — email, phone, live chat, and ticket management.',
+                features: ['Tier 1 & Tier 2 Support', 'SLA Management', 'CRM-Based Ticketing', 'Quality Monitoring'],
+              },
+              {
+                icon: ClipboardList,
+                title: 'Admin VA',
+                color: BRAND.green,
+                description: 'Day-to-day operations handled so you can focus on growing your business.',
+                features: ['Inbox & Calendar Management', 'Data Entry & Reports', 'Travel & Scheduling', 'Process Documentation'],
+              },
+              {
+                icon: Zap,
+                title: 'GHL Automation',
+                color: '#f59e0b',
+                description: 'GoHighLevel CRM setup, workflow automation, and pipeline management.',
+                features: ['Full CRM Build & Config', 'Automated Follow-ups', 'Pipeline & Lead Scoring', 'SMS & Email Sequences'],
+              },
+              {
+                icon: Code2,
+                title: 'Web Development',
+                color: '#8b5cf6',
+                description: 'Custom web apps, dashboards, and tools — built with modern tech stacks.',
+                features: ['React & Vite Apps', 'API Integrations', 'Custom Dashboards', 'Responsive Design'],
+              },
+            ].map((service) => {
+              const ServiceIcon = service.icon;
+              return (
+                <div
+                  key={service.title}
+                  style={{
+                    padding: isMobile ? '24px' : '32px',
+                    backgroundColor: isDark ? '#171411' : '#ffffff',
+                    border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
+                    borderRadius: '16px',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = service.color; e.currentTarget.style.boxShadow = `0 0 24px ${service.color}15`; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = isDark ? '#2a2420' : '#e8e0d4'; e.currentTarget.style.boxShadow = 'none'; }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                    <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: service.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ServiceIcon size={22} style={{ color: service.color }} />
+                    </div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: 0 }}>
+                      {service.title}
+                    </h3>
+                  </div>
+                  <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 16px' }}>
+                    {service.description}
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {service.features.map((feature) => (
+                      <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: service.color, flexShrink: 0 }} />
+                        <span style={{ fontSize: '13px', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body }}>{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '32px' }}>
+            <button onClick={() => navigate('/services')} style={{ ...btnOutline, height: '44px', padding: '0 24px', fontSize: '14px', color: isDark ? '#fff' : BRAND.brown, borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.cardBorder }}>
+              View All Services <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* PROJECTS SHOWCASE */}
+      <section style={{
+        padding: isMobile ? '60px 20px' : '80px 64px',
+        backgroundColor: isDark ? '#171411' : '#ffffff',
+        borderTop: '1px solid ' + theme.cardBorder,
+        borderBottom: '1px solid ' + theme.cardBorder,
+      }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+            <p style={{
+              fontSize: '11px',
+              fontWeight: '600',
+              letterSpacing: '4px',
+              color: isDark ? '#a09585' : '#7a6652',
+              marginBottom: '12px',
+              fontFamily: FONTS.body,
+              textTransform: 'uppercase',
+            }}>
+              Projects
+            </p>
+            <h2 style={{
+              fontSize: isMobile ? '28px' : '40px',
+              fontWeight: '800',
+              color: isDark ? '#fff' : BRAND.brown,
+              fontFamily: FONTS.heading,
+              lineHeight: '1.2',
+              margin: 0,
+            }}>
+              Built by a VA, for VAs
+            </h2>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '24px' }}>
+            {/* BrewedOps Tools */}
+            <div style={{
+              flex: 1,
+              padding: isMobile ? '24px' : '32px',
+              backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
+              border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
+              borderRadius: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: BRAND.blue + '15', borderRadius: '100px', marginBottom: '16px', alignSelf: 'flex-start' }}>
+                <Wrench size={12} style={{ color: BRAND.blue }} />
+                <span style={{ fontSize: '11px', fontWeight: '600', color: BRAND.blue, fontFamily: FONTS.body }}>WEB APP</span>
+              </div>
+              <h3 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: '0 0 12px' }}>
+                BrewedOps Tools
+              </h3>
+              <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px', flex: 1 }}>
+                A productivity hub with 22+ free tools for Filipino VAs and freelancers — image editing, PDF tools, finance tracking, task management, and more. All browser-based, no installs needed.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+                {['React', 'Supabase', 'Vite', 'Tailwind CSS'].map((tech) => (
+                  <span key={tech} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '100px', backgroundColor: isDark ? '#1e1a16' : '#e8e0d4', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body, fontWeight: '500' }}>{tech}</span>
+                ))}
+              </div>
+              <button onClick={() => navigate('/portfolio')} style={{ ...btnPrimary, height: '40px', padding: '0 20px', fontSize: '13px', alignSelf: 'flex-start' }}>
+                View Project <ChevronRight size={16} />
+              </button>
+            </div>
+
+            {/* Fuelyx */}
+            <div style={{
+              flex: 1,
+              padding: isMobile ? '24px' : '32px',
+              backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
+              border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
+              borderRadius: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+            }}>
+              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: '#14b8a615', borderRadius: '100px', marginBottom: '16px', alignSelf: 'flex-start' }}>
+                <Globe size={12} style={{ color: '#14b8a6' }} />
+                <span style={{ fontSize: '11px', fontWeight: '600', color: '#14b8a6', fontFamily: FONTS.body }}>MOBILE APP</span>
+              </div>
+              <h3 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: '0 0 12px' }}>
+                Fuelyx
+              </h3>
+              <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px', flex: 1 }}>
+                A calorie tracking and fasting app built for Filipinos. Log local foods, monitor fasting windows, scan meals with AI, and hit your health goals — all in one app.
+              </p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+                {['React Native', 'Expo', 'Supabase', 'AI Scanner'].map((tech) => (
+                  <span key={tech} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '100px', backgroundColor: isDark ? '#1e1a16' : '#e8e0d4', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body, fontWeight: '500' }}>{tech}</span>
+                ))}
+              </div>
+              <button onClick={() => navigate('/fuelyx')} style={{ ...btnPrimary, height: '40px', padding: '0 20px', fontSize: '13px', backgroundColor: '#14b8a6', boxShadow: '0 4px 16px rgba(20,184,166,0.3)', alignSelf: 'flex-start' }}>
+                Learn More <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '32px' }}>
+            <button onClick={() => navigate('/portfolio')} style={{ ...btnOutline, height: '44px', padding: '0 24px', fontSize: '14px', color: isDark ? '#fff' : BRAND.brown, borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.cardBorder }}>
+              View Full Portfolio <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      </section>
 
       {/* ZIGZAG TOOLS TIMELINE */}
       <section style={{
@@ -880,7 +1097,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             fontFamily: FONTS.heading,
             lineHeight: '1.15',
           }}>
-            20 Free Tools,<br />Zero Sign-Up Required
+            22+ Free Tools,<br />Zero Sign-Up Required
           </h2>
         </div>
 
@@ -1091,13 +1308,28 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 
       {/* FOOTER */}
       </main>
-      <footer style={{ padding: '24px 32px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '12px', flexWrap: 'wrap' }}>
-          <a href="/privacy" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Privacy Policy</a>
-          <a href="/terms" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Terms of Service</a>
-          <a href="/about" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>About Us</a>
+      <footer style={{ padding: '32px 32px 24px', borderTop: '1px solid ' + theme.cardBorder }}>
+        <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+          <p style={{ fontSize: '13px', color: theme.textMuted, textAlign: 'center', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px' }}>
+            BrewedOps is a free productivity toolkit built by Kenneth Villar, a Filipino with 11+ years of BPO and customer support experience.
+            Designed for virtual assistants, freelancers, and small businesses — offering image editing, PDF tools, finance tracking, cron scheduling, and more.
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '16px', flexWrap: 'wrap' }}>
+            <a href="/privacy" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Privacy Policy</a>
+            <a href="/terms" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Terms of Service</a>
+            <a href="/about" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>About Us</a>
+            <a href="/portfolio" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Portfolio</a>
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '16px' }}>
+            <a href="https://www.facebook.com/brewed.ops/" target="_blank" rel="noopener noreferrer" style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, textDecoration: 'none', border: '1px solid ' + theme.cardBorder }} title="Facebook">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            </a>
+            <a href="https://x.com/BrewedOps" target="_blank" rel="noopener noreferrer" style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, textDecoration: 'none', border: '1px solid ' + theme.cardBorder }} title="X (Twitter)">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+          </div>
+          <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body, textAlign: 'center' }}>© 2026 BrewedOps. Made by Kenneth V.</p>
         </div>
-        <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>© 2026 BrewedOps. Made by Kenneth V.</p>
       </footer>
 
       {mobileMenuOpen && (

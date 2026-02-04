@@ -48,7 +48,9 @@ import {
   DollarSign,
   StickyNote,
   CheckSquare,
-  Menu
+  Menu,
+  Globe,
+  Timer
 } from 'lucide-react';
 import SEO from '@/components/SEO';
 const MobileDrawer = React.lazy(() => import('@/components/layout/MobileDrawer'));
@@ -119,6 +121,8 @@ const TOOL_CATEGORIES = [
       { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
       { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
       { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
+      { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
+      { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
     ]
   },
 ];
@@ -741,7 +745,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                     <span style={{ color: isDark ? '#fff' : BRAND.brown }}> Tools</span>
                   </h3>
                   <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '16px', fontFamily: FONTS.body }}>
-                    A productivity hub for Filipino VAs & freelancers with 20+ free tools, finance tracking, task management, and premium features.
+                    A productivity hub for Filipino VAs & freelancers with 22+ free tools, finance tracking, task management, and premium features.
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
                     {['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'].map((tag) => (

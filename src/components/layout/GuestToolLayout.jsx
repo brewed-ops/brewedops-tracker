@@ -69,7 +69,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
     <>
     <SEO
       title={`${toolName} - Free Online Tool | BrewedOps`}
-      description={`Use ${toolName} for free - no login required. Part of BrewedOps' suite of 20 free tools for Filipino VAs and Freelancers.`}
+      description={`Use ${toolName} for free - no login required. Part of BrewedOps' suite of 22+ free tools for Filipino VAs and Freelancers.`}
       keywords={`${toolName}, free online tool, BrewedOps, Filipino VA tools`}
     />
     <div

@@ -728,7 +728,7 @@ const PDFEditor = ({ isDark }) => {
       const cb = document.createElement('canvas'); cb.width = pdfCanvasRef.current.width; cb.height = pdfCanvasRef.current.height; 
       const cx = cb.getContext('2d'); cx.drawImage(pdfCanvasRef.current, 0, 0); cx.drawImage(annotationCanvasRef.current, 0, 0); 
       const blob = await new Promise(r => cb.toBlob(r, 'image/png')); 
-      setSavedPdfUrl(URL.createObjectURL(blob)); setExpiryTime(Date.now() + 5 * 60 * 1000); setShowSaveDialog(true); 
+      setSavedPdfUrl(URL.createObjectURL(blob)); setExpiryTime(Date.now() + 15 * 60 * 1000); setShowSaveDialog(true); 
     } catch (e) { console.error(e); } finally { setIsSaving(false); }
   };
   
@@ -769,7 +769,7 @@ const PDFEditor = ({ isDark }) => {
                   <AlertTriangle className="size-5 text-amber-500 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-amber-500">Important Notice</p>
-                    <p className="text-xs text-muted-foreground mt-1">After saving, download will be available for <strong>5 minutes only</strong>.</p>
+                    <p className="text-xs text-muted-foreground mt-1">After saving, download will be available for <strong>15 minutes</strong>.</p>
                   </div>
                 </div>
               </div>
@@ -923,7 +923,7 @@ const PDFEditor = ({ isDark }) => {
           <DialogHeader><DialogTitle className="flex items-center gap-2"><CheckCircle className="size-5" style={{ color: BRAND.green }} />Saved Successfully!</DialogTitle></DialogHeader>
           <div className="py-4">
             <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
-              <div className="flex gap-3"><Clock className="size-5 text-amber-500 flex-shrink-0" /><div><p className="text-sm font-medium">5-Minute Download Window</p><p className="text-xs text-muted-foreground mt-1">Download now before it expires.</p></div></div>
+              <div className="flex gap-3"><Clock className="size-5 text-amber-500 flex-shrink-0" /><div><p className="text-sm font-medium">15-Minute Download Window</p><p className="text-xs text-muted-foreground mt-1">Download now before it expires.</p></div></div>
             </div>
             {expiryTime && <div className="flex items-center justify-center gap-2 mt-4"><span className="text-sm text-muted-foreground">Time remaining:</span><ExpiryTimer expiryTime={expiryTime} onExpired={handleExpired} /></div>}
           </div>

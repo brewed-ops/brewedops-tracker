@@ -41,6 +41,8 @@ const MermaidReader = React.lazy(() => import('./components/MermaidReader'));
 const JsonFormatter = React.lazy(() => import('./components/JsonFormatter'));
 const CronGenerator = React.lazy(() => import('./components/CronGenerator'));
 const MarkdownViewer = React.lazy(() => import('./components/MarkdownViewer'));
+const TimezoneConverter = React.lazy(() => import('./components/TimezoneConverter'));
+const PomodoroTimer = React.lazy(() => import('./components/PomodoroTimer'));
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -287,7 +289,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     <div style={{ minHeight: '100vh', backgroundColor: isDark ? '#0d0b09' : '#faf8f5', display: 'flex', flexDirection: 'column' }}>
       <SEO
         title={isSignup ? 'Sign Up | BrewedOps' : 'Login | BrewedOps'}
-        description="Sign in or create your free BrewedOps account. Access 20 free tools and the productivity suite for Filipino VAs and Freelancers."
+        description="Sign in or create your free BrewedOps account. Access 22+ free tools and the productivity suite for Filipino VAs and Freelancers."
         keywords="BrewedOps login, BrewedOps sign up, Filipino VA tools"
       />
       {/* Header */}
@@ -688,6 +690,8 @@ return (
     {/* JSON Formatter and Cron Generator */}
     <Route path="/jsonformatter" element={<GuestToolLayout toolName="JSON Formatter" isDark={isDark} setIsDark={setIsDark}><JsonFormatter isDark={isDark} /></GuestToolLayout>} />
     <Route path="/crongenerator" element={<GuestToolLayout toolName="Cron Generator" isDark={isDark} setIsDark={setIsDark}><CronGenerator isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/timezoneconverter" element={<GuestToolLayout toolName="Timezone Converter" isDark={isDark} setIsDark={setIsDark}><TimezoneConverter isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/pomodoro" element={<GuestToolLayout toolName="Focus Timer" isDark={isDark} setIsDark={setIsDark}><PomodoroTimer isDark={isDark} /></GuestToolLayout>} />
 
     {/* Catch-all route */}
     <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />

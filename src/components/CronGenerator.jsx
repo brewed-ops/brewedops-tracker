@@ -23,12 +23,12 @@ const FONTS = {
 };
 
 const getTheme = (isDark) => ({
-  bg: isDark ? '#09090b' : '#f8fafc',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#09090b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
-  inputBg: isDark ? '#27272a' : '#f4f4f5',
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
+  inputBg: isDark ? '#1e1a16' : '#faf8f5',
 });
 
 // Preset schedules
@@ -382,7 +382,7 @@ const CronGenerator = ({ isDark = true }) => {
                     flexDirection: 'column',
                     gap: '2px',
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#27272a' : '#f4f4f5'}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = isDark ? '#1e1a16' : '#faf8f5'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   <span style={{ fontSize: '12px', color: theme.text, fontWeight: '500' }}>{preset.name}</span>
@@ -398,7 +398,7 @@ const CronGenerator = ({ isDark = true }) => {
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'auto', minHeight: 0 }}>
         
         {/* Schedule Type Tabs */}
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', gap: '4px', flexWrap: 'wrap', flexShrink: 0, backgroundColor: isDark ? '#0f0f10' : '#fafafa' }}>
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', gap: '4px', flexWrap: 'wrap', flexShrink: 0, backgroundColor: isDark ? '#100e0b' : '#faf8f5' }}>
           <button onClick={() => setScheduleType('minutes')} style={tabStyle(scheduleType === 'minutes')}>Minutes</button>
           <button onClick={() => setScheduleType('hourly')} style={tabStyle(scheduleType === 'hourly')}>Hourly</button>
           <button onClick={() => setScheduleType('daily')} style={tabStyle(scheduleType === 'daily')}>Daily</button>
@@ -429,6 +429,8 @@ const CronGenerator = ({ isDark = true }) => {
                 }}
               >
                 <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
                 <option value="5">5</option>
                 <option value="10">10</option>
                 <option value="15">15</option>
@@ -508,7 +510,7 @@ const CronGenerator = ({ isDark = true }) => {
                   cursor: 'pointer',
                 }}
               >
-                {[0, 15, 30, 45].map(m => (
+                {Array.from({ length: 60 }, (_, m) => (
                   <option key={m} value={m}>{m.toString().padStart(2, '0')}</option>
                 ))}
               </select>
@@ -662,7 +664,7 @@ const CronGenerator = ({ isDark = true }) => {
               </div>
               
               {/* Cron Format Reference */}
-              <div style={{ padding: '12px', backgroundColor: isDark ? '#0f0f10' : '#f9fafb', borderRadius: '8px', border: '1px solid ' + theme.cardBorder }}>
+              <div style={{ padding: '12px', backgroundColor: isDark ? '#100e0b' : '#f5f0eb', borderRadius: '8px', border: '1px solid ' + theme.cardBorder }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px' }}>
                   <Info size={14} style={{ color: theme.textMuted }} />
                   <span style={{ fontSize: '11px', fontWeight: '600', color: theme.textMuted }}>CRON FORMAT</span>
@@ -688,7 +690,7 @@ const CronGenerator = ({ isDark = true }) => {
           )}
 
           {/* Generated Cron Expression */}
-          <div style={{ marginTop: '24px', padding: '20px', backgroundColor: isDark ? '#0f0f10' : '#f9fafb', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
+          <div style={{ marginTop: '24px', padding: '20px', backgroundColor: isDark ? '#100e0b' : '#f5f0eb', borderRadius: '12px', border: '1px solid ' + theme.cardBorder }}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
               <span style={{ fontSize: '12px', fontWeight: '600', color: theme.textMuted }}>CRON EXPRESSION</span>
               <button onClick={handleCopy} style={{ ...btnStyle, height: '28px' }}>
@@ -732,7 +734,7 @@ const CronGenerator = ({ isDark = true }) => {
                     alignItems: 'center', 
                     gap: '12px',
                     padding: '10px 14px',
-                    backgroundColor: isDark ? '#0f0f10' : '#f9fafb',
+                    backgroundColor: isDark ? '#100e0b' : '#f5f0eb',
                     borderRadius: '8px',
                     border: '1px solid ' + theme.cardBorder,
                   }}>
@@ -750,7 +752,7 @@ const CronGenerator = ({ isDark = true }) => {
           )}
 
           {/* Platform Tips */}
-          <div style={{ marginTop: '24px', padding: '16px', backgroundColor: isDark ? '#1a1a1f' : '#fffbeb', borderRadius: '8px', border: '1px solid ' + (isDark ? '#3f3f46' : '#fde68a') }}>
+          <div style={{ marginTop: '24px', padding: '16px', backgroundColor: isDark ? '#1e1a16' : '#fffbeb', borderRadius: '8px', border: '1px solid ' + (isDark ? '#332d26' : '#fde68a') }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
               <Info size={14} style={{ color: '#f59e0b' }} />
               <span style={{ fontSize: '12px', fontWeight: '600', color: '#f59e0b' }}>PLATFORM TIPS</span>

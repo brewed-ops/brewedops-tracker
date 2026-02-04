@@ -24,12 +24,12 @@ const FONTS = {
 };
 
 const getTheme = (isDark) => ({
-  bg: isDark ? '#09090b' : '#f8fafc',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#09090b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
-  inputBg: isDark ? '#27272a' : '#f4f4f5',
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
+  inputBg: isDark ? '#1e1a16' : '#faf8f5',
 });
 
 const MAX_SAVED_DIAGRAMS = 10;
@@ -400,6 +400,24 @@ const MermaidReader = ({ isDark = true, user = null }) => {
 
   useEffect(() => { const t = setTimeout(() => renderDiagram(), 500); return () => clearTimeout(t); }, [code, renderDiagram, isDark, key]);
 
+  // Keyboard shortcuts
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Don't trigger when typing in textarea or input
+      if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') return;
+
+      switch (e.key) {
+        case '+': case '=': e.preventDefault(); zoomIn(); break;
+        case '-': e.preventDefault(); zoomOut(); break;
+        case '0': e.preventDefault(); resetView(); break;
+        case 'e': case 'E': e.preventDefault(); setIsCodeCollapsed(c => !c); break;
+        case 'r': case 'R': if (!e.ctrlKey && !e.metaKey) { e.preventDefault(); setKey(k => k + 1); } break;
+      }
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleMouseDown = (e) => { if (e.button !== 0) return; setIsDragging(true); setDragStart({ x: e.clientX - position.x, y: e.clientY - position.y }); };
   const handleMouseMove = (e) => { if (!isDragging) return; setPosition({ x: e.clientX - dragStart.x, y: e.clientY - dragStart.y }); };
   const handleMouseUp = () => setIsDragging(false);
@@ -472,7 +490,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
       const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
       bgRect.setAttribute('width', '100%');
       bgRect.setAttribute('height', '100%');
-      bgRect.setAttribute('fill', isDark ? '#18181b' : '#ffffff');
+      bgRect.setAttribute('fill', isDark ? '#171411' : '#ffffff');
       clonedSvg.insertBefore(bgRect, clonedSvg.firstChild);
       
       // Serialize SVG
@@ -492,7 +510,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
         const ctx = canvas.getContext('2d');
         
         // Fill background
-        ctx.fillStyle = isDark ? '#18181b' : '#ffffff';
+        ctx.fillStyle = isDark ? '#171411' : '#ffffff';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         // Draw image scaled
@@ -590,20 +608,20 @@ const MermaidReader = ({ isDark = true, user = null }) => {
                 <button onClick={handleRevertColor} style={{ height: '32px', padding: '0 12px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '6px', color: theme.textMuted, fontSize: '12px', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}><Undo2 size={14} /> Revert</button>
               )}
             </div>
-            <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter Mermaid code..." spellCheck={false} style={{ flex: 1, padding: '10px', backgroundColor: isDark ? '#0a0a0b' : '#fafafa', border: 'none', outline: 'none', resize: 'none', fontSize: '11px', fontFamily: "'Fira Code', monospace", color: isDark ? '#e4e4e7' : '#27272a', lineHeight: '1.6', minHeight: 0 }} />
+            <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter Mermaid code..." spellCheck={false} style={{ flex: 1, padding: '10px', backgroundColor: isDark ? '#0d0b09' : '#faf8f5', border: 'none', outline: 'none', resize: 'none', fontSize: '11px', fontFamily: "'Fira Code', monospace", color: isDark ? '#e8e0d4' : '#2a2420', lineHeight: '1.6', minHeight: 0 }} />
             {error && <div style={{ padding: '8px 10px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', color: isDark ? '#fca5a5' : '#dc2626', fontSize: '10px', flexShrink: 0 }}>⚠️ {error}</div>}
           </div>
         )}
 
         {/* Preview Panel */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, backgroundColor: isDark ? '#0a0a0b' : '#f8fafc' }}>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0, backgroundColor: isDark ? '#0d0b09' : '#faf8f5' }}>
           {/* Preview Header */}
           <div style={{ padding: '8px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.cardBg, flexWrap: 'wrap', gap: '8px', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <button onClick={() => setIsCodeCollapsed(!isCodeCollapsed)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0, backgroundColor: isCodeCollapsed ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent' }} title={isCodeCollapsed ? 'Show Code' : 'Hide Code'}>{isCodeCollapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}</button>
+              <button onClick={() => setIsCodeCollapsed(!isCodeCollapsed)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0, backgroundColor: isCodeCollapsed ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent' }} title={isCodeCollapsed ? 'Show Code' : 'Hide Code'}>{isCodeCollapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}</button>
               <Eye size={14} style={{ color: theme.textMuted }} />
               <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>Preview</span>
-              <span style={{ fontSize: '10px', color: theme.textMuted, backgroundColor: isDark ? '#27272a' : '#f4f4f5', padding: '2px 6px', borderRadius: '4px' }}>{Math.round(scale * 100)}%</span>
+              <span style={{ fontSize: '10px', color: theme.textMuted, backgroundColor: isDark ? '#1e1a16' : '#faf8f5', padding: '2px 6px', borderRadius: '4px' }}>{Math.round(scale * 100)}%</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
               {isCodeCollapsed && (
@@ -625,9 +643,9 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           </div>
 
           {/* Canvas */}
-          <div ref={previewRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp} onWheel={handleWheel} style={{ flex: 1, overflow: 'hidden', cursor: isDragging ? 'grabbing' : 'grab', backgroundImage: isDark ? 'radial-gradient(circle, #27272a 1px, transparent 1px)' : 'radial-gradient(circle, #d4d4d8 1px, transparent 1px)', backgroundSize: '20px 20px', position: 'relative', userSelect: 'none', minHeight: 0 }}>
+          <div ref={previewRef} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleMouseUp} onWheel={handleWheel} style={{ flex: 1, overflow: 'hidden', cursor: isDragging ? 'grabbing' : 'grab', backgroundImage: isDark ? 'radial-gradient(circle, #2a2420 1px, transparent 1px)' : 'radial-gradient(circle, #e8e0d4 1px, transparent 1px)', backgroundSize: '20px 20px', position: 'relative', userSelect: 'none', minHeight: 0 }}>
             {svgContent ? (
-              <div ref={svgRef} style={{ position: 'absolute', left: '50%', top: '50%', transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${scale})`, transformOrigin: 'center', transition: isDragging ? 'none' : 'transform 0.1s', padding: '20px', backgroundColor: isDark ? '#18181b' : '#fff', borderRadius: '8px', boxShadow: isDark ? '0 2px 16px rgba(0,0,0,0.4)' : '0 2px 16px rgba(0,0,0,0.08)' }} dangerouslySetInnerHTML={{ __html: svgContent }} />
+              <div ref={svgRef} style={{ position: 'absolute', left: '50%', top: '50%', transform: `translate(calc(-50% + ${position.x}px), calc(-50% + ${position.y}px)) scale(${scale})`, transformOrigin: 'center', transition: isDragging ? 'none' : 'transform 0.1s', padding: '20px', backgroundColor: isDark ? '#171411' : '#fff', borderRadius: '8px', boxShadow: isDark ? '0 2px 16px rgba(0,0,0,0.4)' : '0 2px 16px rgba(0,0,0,0.08)' }} dangerouslySetInnerHTML={{ __html: svgContent }} />
             ) : (
               <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%, -50%)', textAlign: 'center', color: theme.textMuted }}>
                 <GitBranch size={48} style={{ marginBottom: '12px', opacity: 0.2 }} />
@@ -637,9 +655,14 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           </div>
 
           {/* Footer */}
-          <div style={{ padding: '6px 12px', borderTop: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '16px', backgroundColor: theme.cardBg, flexShrink: 0 }}>
+          <div style={{ padding: '6px 12px', borderTop: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', backgroundColor: theme.cardBg, flexShrink: 0, flexWrap: 'wrap' }}>
             <span style={{ fontSize: '10px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><Move size={10} /> Drag to pan</span>
             <span style={{ fontSize: '10px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><ZoomIn size={10} /> Scroll to zoom</span>
+            <span style={{ fontSize: '10px', color: theme.textMuted }}>|</span>
+            <span style={{ fontSize: '10px', color: theme.textMuted }}><kbd style={{ padding: '1px 4px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', border: '1px solid ' + theme.cardBorder, borderRadius: '3px', fontSize: '9px' }}>+/-</kbd> Zoom</span>
+            <span style={{ fontSize: '10px', color: theme.textMuted }}><kbd style={{ padding: '1px 4px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', border: '1px solid ' + theme.cardBorder, borderRadius: '3px', fontSize: '9px' }}>0</kbd> Reset</span>
+            <span style={{ fontSize: '10px', color: theme.textMuted }}><kbd style={{ padding: '1px 4px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', border: '1px solid ' + theme.cardBorder, borderRadius: '3px', fontSize: '9px' }}>E</kbd> Code</span>
+            <span style={{ fontSize: '10px', color: theme.textMuted }}><kbd style={{ padding: '1px 4px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', border: '1px solid ' + theme.cardBorder, borderRadius: '3px', fontSize: '9px' }}>R</kbd> Refresh</span>
           </div>
         </div>
       </div>
@@ -661,7 +684,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   {savedDiagrams.map((d) => (
-                    <div key={d.id} style={{ padding: '10px', backgroundColor: currentDiagramId === d.id ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent', border: '1px solid ' + (currentDiagramId === d.id ? BRAND.blue : theme.cardBorder), borderRadius: '6px', cursor: 'pointer' }} onClick={() => loadDiagram(d)}>
+                    <div key={d.id} style={{ padding: '10px', backgroundColor: currentDiagramId === d.id ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent', border: '1px solid ' + (currentDiagramId === d.id ? BRAND.blue : theme.cardBorder), borderRadius: '6px', cursor: 'pointer' }} onClick={() => loadDiagram(d)}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>{d.name}</span>
                         <button onClick={(e) => { e.stopPropagation(); deleteDiagram(d.id); }} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '2px' }}><Trash2 size={12} /></button>

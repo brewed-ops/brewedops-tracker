@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Copy, Check, Trash2, FileJson, ChevronRight, ChevronDown, AlertCircle, Minimize2, Maximize2, Download, Upload, Braces, List, Eye, Code } from 'lucide-react';
+import { Copy, Check, Trash2, FileJson, ChevronRight, ChevronDown, AlertCircle, Minimize2, Maximize2, Download, Upload, Braces, List, Eye, Code, Search } from 'lucide-react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -23,13 +23,13 @@ const FONTS = {
 };
 
 const getTheme = (isDark) => ({
-  bg: isDark ? '#09090b' : '#f8fafc',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#09090b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
-  inputBg: isDark ? '#27272a' : '#f4f4f5',
-  codeBg: isDark ? '#0a0a0b' : '#fafafa',
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
+  inputBg: isDark ? '#1e1a16' : '#faf8f5',
+  codeBg: isDark ? '#0d0b09' : '#f5f0eb',
 });
 
 // Sample JSON for placeholder
@@ -50,33 +50,61 @@ const SAMPLE_JSON = `{
   ]
 }`;
 
+// Check if a node or its descendants match the search term
+const nodeMatchesSearch = (key, val, term) => {
+  if (!term) return true;
+  const lower = term.toLowerCase();
+  if (key !== null && String(key).toLowerCase().includes(lower)) return true;
+  if (val === null) return 'null'.includes(lower);
+  if (typeof val !== 'object') return String(val).toLowerCase().includes(lower);
+  if (Array.isArray(val)) return val.some((v, i) => nodeMatchesSearch(i, v, lower));
+  return Object.entries(val).some(([k, v]) => nodeMatchesSearch(k, v, lower));
+};
+
+// Highlight matching text in search
+const HighlightText = ({ text, searchTerm, color }) => {
+  const str = String(text);
+  if (!searchTerm) return <span style={{ color }}>{str}</span>;
+  const idx = str.toLowerCase().indexOf(searchTerm.toLowerCase());
+  if (idx === -1) return <span style={{ color }}>{str}</span>;
+  return (
+    <span style={{ color }}>
+      {str.slice(0, idx)}
+      <span style={{ backgroundColor: '#854d0e', color: '#fef08a', padding: '0 1px', borderRadius: '2px' }}>{str.slice(idx, idx + searchTerm.length)}</span>
+      {str.slice(idx + searchTerm.length)}
+    </span>
+  );
+};
+
 // Tree Node Component
-const TreeNode = ({ name, value, level = 0, isDark, theme, defaultExpanded = true }) => {
-  const [isExpanded, setIsExpanded] = useState(defaultExpanded && level < 2);
-  
-  const getValueColor = (val) => {
-    if (val === null) return '#f97316';
-    if (typeof val === 'string') return '#22c55e';
-    if (typeof val === 'number') return '#3b82f6';
-    if (typeof val === 'boolean') return '#a855f7';
-    return theme.text;
-  };
+const TreeNode = ({ name, value, level = 0, isDark, theme, defaultExpanded = true, searchTerm = '' }) => {
+  const [isExpanded, setIsExpanded] = useState(searchTerm ? true : (defaultExpanded && level < 2));
+
+  // Auto-expand when search term changes and matches
+  useEffect(() => {
+    if (searchTerm && nodeMatchesSearch(name, value, searchTerm)) {
+      setIsExpanded(true);
+    }
+  }, [searchTerm]);
 
   const renderValue = (val) => {
-    if (val === null) return <span style={{ color: '#f97316' }}>null</span>;
-    if (typeof val === 'string') return <span style={{ color: '#22c55e' }}>"{val}"</span>;
-    if (typeof val === 'number') return <span style={{ color: '#3b82f6' }}>{val}</span>;
-    if (typeof val === 'boolean') return <span style={{ color: '#a855f7' }}>{val.toString()}</span>;
+    if (val === null) return <HighlightText text="null" searchTerm={searchTerm} color="#f97316" />;
+    if (typeof val === 'string') return <><span style={{ color: '#22c55e' }}>"</span><HighlightText text={val} searchTerm={searchTerm} color="#22c55e" /><span style={{ color: '#22c55e' }}>"</span></>;
+    if (typeof val === 'number') return <HighlightText text={String(val)} searchTerm={searchTerm} color="#3b82f6" />;
+    if (typeof val === 'boolean') return <HighlightText text={val.toString()} searchTerm={searchTerm} color="#a855f7" />;
     return null;
   };
 
   const isExpandable = typeof value === 'object' && value !== null;
   const isArray = Array.isArray(value);
 
+  // Filter out non-matching nodes when searching
+  if (searchTerm && !nodeMatchesSearch(name, value, searchTerm)) return null;
+
   if (!isExpandable) {
     return (
       <div style={{ paddingLeft: level * 16, display: 'flex', alignItems: 'center', gap: '4px', padding: '2px 0 2px ' + (level * 16 + 20) + 'px', fontSize: '12px', fontFamily: "'Fira Code', monospace" }}>
-        {name !== null && <span style={{ color: '#ec4899' }}>"{name}"</span>}
+        {name !== null && <><span style={{ color: '#ec4899' }}>"</span><HighlightText text={name} searchTerm={searchTerm} color="#ec4899" /><span style={{ color: '#ec4899' }}>"</span></>}
         {name !== null && <span style={{ color: theme.textMuted }}>:</span>}
         {renderValue(value)}
       </div>
@@ -89,20 +117,20 @@ const TreeNode = ({ name, value, level = 0, isDark, theme, defaultExpanded = tru
 
   return (
     <div style={{ fontSize: '12px', fontFamily: "'Fira Code', monospace" }}>
-      <div 
-        onClick={() => setIsExpanded(!isExpanded)} 
-        style={{ 
-          paddingLeft: level * 16, 
-          display: 'flex', 
-          alignItems: 'center', 
-          gap: '2px', 
+      <div
+        onClick={() => setIsExpanded(!isExpanded)}
+        style={{
+          paddingLeft: level * 16,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '2px',
           cursor: 'pointer',
           padding: '2px 0 2px ' + (level * 16) + 'px',
           borderRadius: '4px',
         }}
       >
         {isExpanded ? <ChevronDown size={14} style={{ color: theme.textMuted }} /> : <ChevronRight size={14} style={{ color: theme.textMuted }} />}
-        {name !== null && <span style={{ color: '#ec4899' }}>"{name}"</span>}
+        {name !== null && <><span style={{ color: '#ec4899' }}>"</span><HighlightText text={name} searchTerm={searchTerm} color="#ec4899" /><span style={{ color: '#ec4899' }}>"</span></>}
         {name !== null && <span style={{ color: theme.textMuted }}>: </span>}
         <span style={{ color: theme.textMuted }}>{bracketOpen}</span>
         {!isExpanded && (
@@ -117,7 +145,7 @@ const TreeNode = ({ name, value, level = 0, isDark, theme, defaultExpanded = tru
       {isExpanded && (
         <>
           {entries.map(([key, val], idx) => (
-            <TreeNode key={key} name={isArray ? null : key} value={val} level={level + 1} isDark={isDark} theme={theme} defaultExpanded={level < 1} />
+            <TreeNode key={key} name={isArray ? null : key} value={val} level={level + 1} isDark={isDark} theme={theme} defaultExpanded={searchTerm ? true : level < 1} searchTerm={searchTerm} />
           ))}
           <div style={{ paddingLeft: level * 16 + 20, color: theme.textMuted }}>{bracketClose}</div>
         </>
@@ -137,6 +165,9 @@ const JsonFormatter = ({ isDark = true }) => {
   const [indentSize, setIndentSize] = useState(2);
   const [viewMode, setViewMode] = useState('formatted'); // 'formatted', 'tree', 'minified'
   const [stats, setStats] = useState(null);
+  const [treeSearch, setTreeSearch] = useState('');
+  const [treeKey, setTreeKey] = useState(0);
+  const [treeDefaultExpanded, setTreeDefaultExpanded] = useState(true);
   const fileInputRef = useRef(null);
 
   // Parse and format JSON
@@ -304,7 +335,7 @@ const JsonFormatter = ({ isDark = true }) => {
 
       {/* Stats Bar */}
       {stats && (
-        <div style={{ padding: '8px 16px', backgroundColor: isDark ? '#0f0f10' : '#f4f4f5', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', flexShrink: 0 }}>
+        <div style={{ padding: '8px 16px', backgroundColor: isDark ? '#100e0b' : '#faf8f5', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', flexShrink: 0 }}>
           <span style={{ fontSize: '11px', color: BRAND.green, fontFamily: FONTS.body }}>✓ Valid JSON</span>
           <span style={{ fontSize: '11px', color: theme.textMuted }}>|</span>
           <span style={{ fontSize: '11px', color: theme.textMuted }}>{stats.keys} keys</span>
@@ -350,7 +381,7 @@ const JsonFormatter = ({ isDark = true }) => {
               resize: 'none',
               fontSize: '12px',
               fontFamily: "'Fira Code', 'Consolas', monospace",
-              color: isDark ? '#e4e4e7' : '#27272a',
+              color: isDark ? '#e8e0d4' : '#2a2420',
               lineHeight: '1.6',
               minHeight: 0,
             }}
@@ -385,7 +416,7 @@ const JsonFormatter = ({ isDark = true }) => {
 
           {/* Indent Size Selector */}
           {viewMode === 'formatted' && (
-            <div style={{ padding: '6px 12px', backgroundColor: isDark ? '#0f0f10' : '#f9fafb', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+            <div style={{ padding: '6px 12px', backgroundColor: isDark ? '#100e0b' : '#f5f0eb', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
               <span style={{ fontSize: '11px', color: theme.textMuted }}>Indent:</span>
               {[2, 4].map((size) => (
                 <button
@@ -407,11 +438,44 @@ const JsonFormatter = ({ isDark = true }) => {
             </div>
           )}
 
+          {/* Tree Toolbar */}
+          {viewMode === 'tree' && parsedJson && (
+            <div style={{ padding: '6px 12px', backgroundColor: isDark ? '#100e0b' : '#f5f0eb', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
+              <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: theme.inputBg, border: '1px solid ' + theme.cardBorder, borderRadius: '6px', padding: '0 8px', height: '28px' }}>
+                <Search size={12} style={{ color: theme.textMuted, flexShrink: 0 }} />
+                <input
+                  type="text"
+                  value={treeSearch}
+                  onChange={(e) => setTreeSearch(e.target.value)}
+                  placeholder="Search keys & values..."
+                  style={{ flex: 1, border: 'none', outline: 'none', backgroundColor: 'transparent', fontSize: '11px', color: theme.text, fontFamily: FONTS.body }}
+                />
+                {treeSearch && (
+                  <button onClick={() => setTreeSearch('')} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '0', fontSize: '14px', lineHeight: 1 }}>&times;</button>
+                )}
+              </div>
+              <button
+                onClick={() => { setTreeDefaultExpanded(true); setTreeKey(k => k + 1); }}
+                style={{ ...btnStyle, height: '28px', padding: '0 8px', fontSize: '11px' }}
+                title="Expand All"
+              >
+                <Maximize2 size={11} /> Expand
+              </button>
+              <button
+                onClick={() => { setTreeDefaultExpanded(false); setTreeSearch(''); setTreeKey(k => k + 1); }}
+                style={{ ...btnStyle, height: '28px', padding: '0 8px', fontSize: '11px' }}
+                title="Collapse All"
+              >
+                <Minimize2 size={11} /> Collapse
+              </button>
+            </div>
+          )}
+
           {/* Output Content */}
           <div style={{ flex: 1, overflow: 'auto', backgroundColor: theme.codeBg, minHeight: 0 }}>
             {viewMode === 'tree' && parsedJson ? (
               <div style={{ padding: '12px' }}>
-                <TreeNode name={null} value={parsedJson} isDark={isDark} theme={theme} />
+                <TreeNode key={treeKey} name={null} value={parsedJson} isDark={isDark} theme={theme} defaultExpanded={treeDefaultExpanded} searchTerm={treeSearch} />
               </div>
             ) : (
               <pre style={{
@@ -419,7 +483,7 @@ const JsonFormatter = ({ isDark = true }) => {
                 padding: '12px',
                 fontSize: '12px',
                 fontFamily: "'Fira Code', 'Consolas', monospace",
-                color: isDark ? '#e4e4e7' : '#27272a',
+                color: isDark ? '#e8e0d4' : '#2a2420',
                 lineHeight: '1.6',
                 whiteSpace: 'pre-wrap',
                 wordBreak: 'break-word',
@@ -432,7 +496,7 @@ const JsonFormatter = ({ isDark = true }) => {
       </div>
 
       {/* Footer */}
-      <div style={{ padding: '8px 16px', borderTop: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', backgroundColor: isDark ? '#0f0f10' : '#fafafa', flexShrink: 0 }}>
+      <div style={{ padding: '8px 16px', borderTop: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '24px', backgroundColor: isDark ? '#100e0b' : '#faf8f5', flexShrink: 0 }}>
         <span style={{ fontSize: '10px', color: theme.textMuted }}>
           💡 Tip: Use Tree view to explore nested objects
         </span>

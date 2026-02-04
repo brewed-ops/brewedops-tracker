@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, FileText, Copy, Check, Download, Trash2, Eye, Code, X, FileUp, Moon, Sun } from 'lucide-react';
+import { Upload, FileText, Copy, Check, Download, Trash2, Eye, Code, X, FileUp, Moon, Sun, Clock, Type, Hash, AlignLeft } from 'lucide-react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -23,17 +23,17 @@ const FONTS = {
 };
 
 const getTheme = (isDark) => ({
-  bg: isDark ? '#09090b' : '#f8fafc',
-  cardBg: isDark ? '#18181b' : '#ffffff',
-  cardBorder: isDark ? '#27272a' : '#e4e4e7',
-  text: isDark ? '#fafafa' : '#09090b',
-  textMuted: isDark ? '#a1a1aa' : '#71717a',
-  inputBg: isDark ? '#27272a' : '#f4f4f5',
-  codeBg: isDark ? '#0a0a0b' : '#f4f4f5',
-  linkColor: isDark ? '#60a5fa' : '#2563eb',
-  blockquoteBorder: isDark ? '#3b82f6' : '#2563eb',
-  tableBorder: isDark ? '#27272a' : '#e4e4e7',
-  tableHeaderBg: isDark ? '#27272a' : '#f4f4f5',
+  bg: isDark ? '#0d0b09' : '#faf8f5',
+  cardBg: isDark ? '#171411' : '#ffffff',
+  cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  text: isDark ? '#f5f0eb' : '#3F200C',
+  textMuted: isDark ? '#a09585' : '#7a6652',
+  inputBg: isDark ? '#1e1a16' : '#faf8f5',
+  codeBg: isDark ? '#0d0b09' : '#f5f0eb',
+  linkColor: isDark ? '#60a5fa' : BRAND.blue,
+  blockquoteBorder: isDark ? '#3b82f6' : BRAND.blue,
+  tableBorder: isDark ? '#2a2420' : '#e8e0d4',
+  tableHeaderBg: isDark ? '#1e1a16' : '#faf8f5',
 });
 
 // Parse markdown to HTML
@@ -293,6 +293,17 @@ const MarkdownViewer = ({ isDark = true }) => {
 
   const parsedHtml = parseMarkdown(markdown, theme);
 
+  // Reading stats
+  const readingStats = markdown ? (() => {
+    const text = markdown.replace(/```[\s\S]*?```/g, '').replace(/`[^`]+`/g, '').replace(/[#*_~\[\]()>|\\-]/g, '');
+    const words = text.trim().split(/\s+/).filter(w => w.length > 0).length;
+    const chars = markdown.length;
+    const lines = markdown.split('\n').length;
+    const headings = (markdown.match(/^#{1,6}\s+/gm) || []).length;
+    const readingTime = Math.max(1, Math.ceil(words / 200));
+    return { words, chars, lines, headings, readingTime };
+  })() : null;
+
   const btnStyle = {
     height: '32px',
     padding: '0 12px',
@@ -366,7 +377,7 @@ const MarkdownViewer = ({ isDark = true }) => {
               onClick={() => setShowRaw(!showRaw)}
               style={{
                 ...btnStyle,
-                backgroundColor: showRaw ? (isDark ? '#27272a' : '#f4f4f5') : 'transparent',
+                backgroundColor: showRaw ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent',
               }}
             >
               {showRaw ? <Eye size={14} /> : <Code size={14} />}
@@ -410,7 +421,7 @@ const MarkdownViewer = ({ isDark = true }) => {
               gap: '16px',
               border: `2px dashed ${isDragging ? BRAND.blue : theme.cardBorder}`,
               borderRadius: '12px',
-              backgroundColor: isDragging ? (isDark ? '#27272a20' : '#f4f4f520') : 'transparent',
+              backgroundColor: isDragging ? (isDark ? '#1e1a1620' : '#faf8f520') : 'transparent',
               cursor: 'pointer',
               transition: 'all 0.2s ease',
             }}
@@ -426,7 +437,7 @@ const MarkdownViewer = ({ isDark = true }) => {
               width: '64px',
               height: '64px',
               borderRadius: '16px',
-              backgroundColor: isDark ? '#27272a' : '#f4f4f5',
+              backgroundColor: isDark ? '#1e1a16' : '#faf8f5',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
@@ -457,7 +468,7 @@ const MarkdownViewer = ({ isDark = true }) => {
             {/* File name bar */}
             <div style={{
               padding: '8px 16px',
-              backgroundColor: isDark ? '#0a0a0b' : '#fafafa',
+              backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
               borderBottom: '1px solid ' + theme.cardBorder,
               display: 'flex',
               alignItems: 'center',
@@ -493,12 +504,44 @@ const MarkdownViewer = ({ isDark = true }) => {
               />
             </div>
 
+            {/* Reading Stats Bar */}
+            {readingStats && (
+              <div style={{
+                padding: '6px 16px',
+                backgroundColor: isDark ? '#100e0b' : '#f5f0eb',
+                borderBottom: '1px solid ' + theme.cardBorder,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                flexWrap: 'wrap',
+                flexShrink: 0,
+              }}>
+                <span style={{ fontSize: '11px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Clock size={10} /> {readingStats.readingTime} min read
+                </span>
+                <span style={{ fontSize: '11px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Type size={10} /> {readingStats.words.toLocaleString()} words
+                </span>
+                <span style={{ fontSize: '11px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Hash size={10} /> {readingStats.chars.toLocaleString()} chars
+                </span>
+                <span style={{ fontSize: '11px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <AlignLeft size={10} /> {readingStats.lines} lines
+                </span>
+                {readingStats.headings > 0 && (
+                  <span style={{ fontSize: '11px', color: theme.textMuted }}>
+                    {readingStats.headings} headings
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Content area */}
             <div style={{
               flex: 1,
               overflow: 'auto',
               padding: showRaw ? '16px' : '24px 32px',
-              backgroundColor: showRaw ? (isDark ? '#0a0a0b' : '#fafafa') : theme.cardBg,
+              backgroundColor: showRaw ? (isDark ? '#0d0b09' : '#faf8f5') : theme.cardBg,
             }}>
               {showRaw ? (
                 <pre style={{

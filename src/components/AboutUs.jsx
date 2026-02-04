@@ -125,7 +125,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              A comprehensive productivity platform with 20 free tools built specifically for Filipino Virtual Assistants and Freelancers
+              A comprehensive productivity platform with 22+ free tools built specifically for Filipino Virtual Assistants and Freelancers
             </p>
           </div>
 
@@ -187,7 +187,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               BrewedOps was created by <strong style={{ color: theme.text }}>Kenneth</strong> through the power of 
               vibe coding — a creative approach where ideas flow naturally into functional software. What started 
               as a personal tool to manage freelance finances has evolved into a comprehensive platform with 
-              <strong style={{ color: theme.text }}> 20 free tools</strong> designed specifically for the needs 
+              <strong style={{ color: theme.text }}> 22+ free tools</strong> designed specifically for the needs 
               of Filipino VAs and freelancers.
             </p>
             <p style={{ 

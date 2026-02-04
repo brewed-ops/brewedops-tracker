@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronDown, Lock, Image, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, BookOpen, QrCode, Search, Type, Hash, GitBranch, Braces, Clock } from 'lucide-react';
+import { X, ChevronDown, Lock, Image, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, BookOpen, QrCode, Search, Type, Hash, GitBranch, Braces, Clock, Globe, Timer } from 'lucide-react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -53,6 +53,8 @@ const TOOL_CATEGORIES = [
       { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
       { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
       { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
+      { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
+      { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
     ],
   },
 ];
