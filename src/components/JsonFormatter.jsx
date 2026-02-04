@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Copy, Check, Trash2, FileJson, ChevronRight, ChevronDown, AlertCircle, Minimize2, Maximize2, Download, Upload, Braces, List, Eye, Code, Search } from 'lucide-react';
+import { Copy, Check, Trash, BracketsCurly, CaretRight, CaretDown, WarningCircle, ArrowsIn, ArrowsOut, DownloadSimple, UploadSimple, ListBullets, Eye, Code, MagnifyingGlass } from '@phosphor-icons/react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -129,7 +129,7 @@ const TreeNode = ({ name, value, level = 0, isDark, theme, defaultExpanded = tru
           borderRadius: '4px',
         }}
       >
-        {isExpanded ? <ChevronDown size={14} style={{ color: theme.textMuted }} /> : <ChevronRight size={14} style={{ color: theme.textMuted }} />}
+        {isExpanded ? <CaretDown size={14} style={{ color: theme.textMuted }} /> : <CaretRight size={14} style={{ color: theme.textMuted }} />}
         {name !== null && <><span style={{ color: '#ec4899' }}>"</span><HighlightText text={name} searchTerm={searchTerm} color="#ec4899" /><span style={{ color: '#ec4899' }}>"</span></>}
         {name !== null && <span style={{ color: theme.textMuted }}>: </span>}
         <span style={{ color: theme.textMuted }}>{bracketOpen}</span>
@@ -311,7 +311,7 @@ const JsonFormatter = ({ isDark = true }) => {
       <div style={{ padding: '12px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, flexShrink: 0, flexWrap: 'wrap', gap: '12px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: `linear-gradient(135deg, ${BRAND.blue}, #3b82f6)`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <Braces size={16} style={{ color: '#fff' }} />
+            <BracketsCurly size={16} style={{ color: '#fff' }} />
           </div>
           <div>
             <h1 style={{ fontSize: '16px', fontWeight: '700', color: theme.text, margin: 0, fontFamily: FONTS.heading }}>JSON Formatter</h1>
@@ -321,14 +321,14 @@ const JsonFormatter = ({ isDark = true }) => {
         
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
           <button onClick={handleLoadSample} style={btnStyle}>
-            <FileJson size={14} /> Sample
+            <BracketsCurly size={14} /> Sample
           </button>
           <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept=".json" style={{ display: 'none' }} />
           <button onClick={() => fileInputRef.current?.click()} style={btnStyle}>
-            <Upload size={14} /> Upload
+            <UploadSimple size={14} /> Upload
           </button>
           <button onClick={handleDownload} disabled={!output} style={{ ...btnStyle, opacity: output ? 1 : 0.5 }}>
-            <Download size={14} /> Download
+            <DownloadSimple size={14} /> Download
           </button>
         </div>
       </div>
@@ -348,7 +348,7 @@ const JsonFormatter = ({ isDark = true }) => {
       {/* Error Bar */}
       {error && (
         <div style={{ padding: '10px 16px', backgroundColor: isDark ? '#451a1a' : '#fef2f2', borderBottom: '1px solid ' + (isDark ? '#7f1d1d' : '#fecaca'), display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
-          <AlertCircle size={14} style={{ color: '#ef4444' }} />
+          <WarningCircle size={14} style={{ color: '#ef4444' }} />
           <span style={{ fontSize: '12px', color: isDark ? '#fca5a5' : '#dc2626', fontFamily: FONTS.body }}>Invalid JSON: {error}</span>
         </div>
       )}
@@ -364,7 +364,7 @@ const JsonFormatter = ({ isDark = true }) => {
               <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>Input</span>
             </div>
             <button onClick={handleClear} style={{ ...btnStyle, height: '26px', padding: '0 8px' }}>
-              <Trash2 size={12} /> Clear
+              <Trash size={12} /> Clear
             </button>
           </div>
           <textarea
@@ -398,13 +398,13 @@ const JsonFormatter = ({ isDark = true }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
               {/* View Mode Buttons */}
               <button onClick={handleBeautify} style={viewMode === 'formatted' ? activeBtnStyle : { ...btnStyle, height: '26px', padding: '0 8px' }}>
-                <Maximize2 size={12} /> Beautify
+                <ArrowsOut size={12} /> Beautify
               </button>
               <button onClick={() => setViewMode('tree')} style={viewMode === 'tree' ? activeBtnStyle : { ...btnStyle, height: '26px', padding: '0 8px' }}>
-                <List size={12} /> Tree
+                <ListBullets size={12} /> Tree
               </button>
               <button onClick={handleMinify} style={viewMode === 'minified' ? activeBtnStyle : { ...btnStyle, height: '26px', padding: '0 8px' }}>
-                <Minimize2 size={12} /> Minify
+                <ArrowsIn size={12} /> Minify
               </button>
               <div style={{ width: '1px', height: '20px', backgroundColor: theme.cardBorder, margin: '0 4px' }} />
               <button onClick={() => handleCopy()} disabled={!output} style={{ ...btnStyle, height: '26px', padding: '0 8px', opacity: output ? 1 : 0.5 }}>
@@ -442,7 +442,7 @@ const JsonFormatter = ({ isDark = true }) => {
           {viewMode === 'tree' && parsedJson && (
             <div style={{ padding: '6px 12px', backgroundColor: isDark ? '#100e0b' : '#f5f0eb', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
               <div style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: theme.inputBg, border: '1px solid ' + theme.cardBorder, borderRadius: '6px', padding: '0 8px', height: '28px' }}>
-                <Search size={12} style={{ color: theme.textMuted, flexShrink: 0 }} />
+                <MagnifyingGlass size={12} style={{ color: theme.textMuted, flexShrink: 0 }} />
                 <input
                   type="text"
                   value={treeSearch}
@@ -459,14 +459,14 @@ const JsonFormatter = ({ isDark = true }) => {
                 style={{ ...btnStyle, height: '28px', padding: '0 8px', fontSize: '11px' }}
                 title="Expand All"
               >
-                <Maximize2 size={11} /> Expand
+                <ArrowsOut size={11} /> Expand
               </button>
               <button
                 onClick={() => { setTreeDefaultExpanded(false); setTreeSearch(''); setTreeKey(k => k + 1); }}
                 style={{ ...btnStyle, height: '28px', padding: '0 8px', fontSize: '11px' }}
                 title="Collapse All"
               >
-                <Minimize2 size={11} /> Collapse
+                <ArrowsIn size={11} /> Collapse
               </button>
             </div>
           )}

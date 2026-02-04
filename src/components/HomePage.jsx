@@ -8,12 +8,13 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen, Menu, Zap, ClipboardList, Code2, Globe, Timer } from 'lucide-react';
+import { CaretRight, CaretDown, Sun, Moon, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck } from '@phosphor-icons/react';
 import SEO from './SEO';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 import { createNoise3D } from "simplex-noise";
 import { motion } from "framer-motion";
 import { LayoutTextFlip } from '@/components/ui/layout-text-flip';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 // ============================================
 // VORTEX BACKGROUND COMPONENT
 // ============================================
@@ -233,9 +234,9 @@ const TOOL_CATEGORIES = [
     tools: [
       { icon: Image, title: 'BG Remover', path: '/bgremover' },
       { icon: Scissors, title: 'Image Cropper', path: '/imagecropper' },
-      { icon: Move, title: 'Image Resizer', path: '/imageresizer' },
-      { icon: Minimize2, title: 'Image Compressor', path: '/imagecompressor' },
-      { icon: RefreshCw, title: 'Image Converter', path: '/imageconverter' },
+      { icon: ArrowsOut, title: 'Image Resizer', path: '/imageresizer' },
+      { icon: ArrowsIn, title: 'Image Compressor', path: '/imagecompressor' },
+      { icon: ArrowsClockwise, title: 'Image Converter', path: '/imageconverter' },
       { icon: Palette, title: 'Color Picker', path: '/colorpicker' },
       { icon: FileImage, title: 'Image to PDF', path: '/imagetopdf' },
     ]
@@ -243,7 +244,7 @@ const TOOL_CATEGORIES = [
   {
     name: 'Video Tools',
     tools: [
-      { icon: Film, title: 'Video Compressor', path: '/videocompressor' },
+      { icon: FilmStrip, title: 'Video Compressor', path: '/videocompressor' },
       { icon: Scissors, title: 'Video Trimmer', path: '/videotrimmer' },
     ]
   },
@@ -251,9 +252,9 @@ const TOOL_CATEGORIES = [
   {
     name: 'Document Tools',
     tools: [
-      { icon: FileEdit, title: 'PDF Editor', path: '/pdfeditor' },
-      { icon: Merge, title: 'PDF Merge', path: '/pdfmerge' },
-      { icon: Split, title: 'PDF Split', path: '/pdfsplit' },
+      { icon: NotePencil, title: 'PDF Editor', path: '/pdfeditor' },
+      { icon: GitMerge, title: 'PDF Merge', path: '/pdfmerge' },
+      { icon: FileDashed, title: 'PDF Split', path: '/pdfsplit' },
       { icon: BookOpen, title: 'Markdown Viewer', path: '/markdownviewer' },
     ]
   },
@@ -261,11 +262,11 @@ const TOOL_CATEGORIES = [
   name: 'Other Tools',
   tools: [
     { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
-    { icon: Search, title: 'Find & Replace', path: '/findreplace' },
-    { icon: Type, title: 'Case Converter', path: '/caseconverter' },
+    { icon: MagnifyingGlass, title: 'Find & Replace', path: '/findreplace' },
+    { icon: TextT, title: 'Case Converter', path: '/caseconverter' },
     { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
     { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
-    { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
+    { icon: BracketsCurly, title: 'JSON Formatter', path: '/jsonformatter' },
     { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
     { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
     { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
@@ -283,7 +284,7 @@ const TOOL_TIMELINE = [
   },
   {
     name: 'Video Tools',
-    icon: Film,
+    icon: FilmStrip,
     accent: '#51AF43',
     description: 'Compress large video files and trim clips to the exact length you need, right from your browser with no uploads required.',
     tools: TOOL_CATEGORIES[1].tools,
@@ -305,36 +306,36 @@ const TOOL_TIMELINE = [
 ];
 
 const PRODUCTIVITY_TOOLS = [
-  { icon: DollarSign, title: 'Finance Tracker', path: '/finance' },
+  { icon: CurrencyDollar, title: 'Finance Tracker', path: '/finance' },
   { icon: Headphones, title: 'VA Kita', path: '/vakita' },
   { icon: CheckSquare, title: 'Task Manager', path: '/taskmanager' },
-  { icon: StickyNote, title: 'Brewed Notes', path: '/brewednotes' },
+  { icon: Note, title: 'Brewed Notes', path: '/brewednotes' },
 ];
 
 // All tools flat for marquee
 const ALL_TOOLS = [
   { icon: Image, title: 'BG Remover', color: '#004AAC' },
   { icon: Scissors, title: 'Image Cropper', color: '#004AAC' },
-  { icon: Move, title: 'Image Resizer', color: '#004AAC' },
-  { icon: Minimize2, title: 'Image Compressor', color: '#004AAC' },
-  { icon: RefreshCw, title: 'Image Converter', color: '#004AAC' },
+  { icon: ArrowsOut, title: 'Image Resizer', color: '#004AAC' },
+  { icon: ArrowsIn, title: 'Image Compressor', color: '#004AAC' },
+  { icon: ArrowsClockwise, title: 'Image Converter', color: '#004AAC' },
   { icon: Palette, title: 'Color Picker', color: '#004AAC' },
   { icon: FileImage, title: 'Image to PDF', color: '#004AAC' },
-  { icon: Film, title: 'Video Compressor', color: '#c05621' },
+  { icon: FilmStrip, title: 'Video Compressor', color: '#c05621' },
   { icon: Scissors, title: 'Video Trimmer', color: '#c05621' },
-  { icon: FileEdit, title: 'PDF Editor', color: '#51AF43' },
-  { icon: Merge, title: 'PDF Merge', color: '#51AF43' },
-  { icon: Split, title: 'PDF Split', color: '#51AF43' },
+  { icon: NotePencil, title: 'PDF Editor', color: '#51AF43' },
+  { icon: GitMerge, title: 'PDF Merge', color: '#51AF43' },
+  { icon: FileDashed, title: 'PDF Split', color: '#51AF43' },
   { icon: QrCode, title: 'QR Generator', color: '#b8860b' },
-  { icon: Search, title: 'Find & Replace', color: '#b8860b' },
-  { icon: Type, title: 'Case Converter', color: '#b8860b' },
+  { icon: MagnifyingGlass, title: 'Find & Replace', color: '#b8860b' },
+  { icon: TextT, title: 'Case Converter', color: '#b8860b' },
   { icon: Hash, title: 'Word Counter', color: '#b8860b' },
   { icon: GitBranch, title: 'Mermaid Reader', color: '#b8860b' },
-  { icon: Braces, title: 'JSON Formatter', color: '#b8860b' },
+  { icon: BracketsCurly, title: 'JSON Formatter', color: '#b8860b' },
   { icon: Clock, title: 'Cron Generator', color: '#b8860b' },
   { icon: Globe, title: 'Timezone', color: '#b8860b' },
   { icon: Timer, title: 'Focus Timer', color: '#b8860b' },
-  { icon: DollarSign, title: 'Finance Tracker', color: '#004AAC' },
+  { icon: CurrencyDollar, title: 'Finance Tracker', color: '#004AAC' },
 ];
 
 // ============================================
@@ -563,7 +564,7 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
         }}
       >
         Tools
-        <ChevronDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+        <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
       </button>
 
       {isOpen && (
@@ -696,9 +697,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
     <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#faf8f5' }}>
       <main>
       <SEO
-        title="BrewedOps - Free Tools for Filipino VAs & Freelancers"
-        description="Your all-in-one productivity hub with 22+ free tools. Finance tracking, image editing, PDF tools, and more - built for Filipino Virtual Assistants and Freelancers."
-        keywords="BrewedOps, Filipino VA, freelancer tools, free online tools, PDF editor, image editor, QR generator, finance tracker"
+        title="BrewedOps - VA Services, GHL Automation & Free Tools"
+        description="Expert customer support, admin VA, GoHighLevel CRM automation, and web development services — backed by 11+ years of customer support experience. Plus 22+ free productivity tools."
+        keywords="BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free online tools"
       />
       {/* NAV */}
       <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#faf8f5', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -712,7 +713,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           </div>
           {isDesktop && (
             <>
-              <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+              <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: BRAND.blue, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Home
               </button>
               <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
@@ -749,7 +750,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             </>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
-              <Menu size={18} />
+              <List size={18} />
             </button>
           )}
         </div>
@@ -782,9 +783,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 <div style={{ display: 'flex', justifyContent: 'center', gap: isSmall ? '8px' : '10px', marginBottom: '32px', flexWrap: 'wrap' }}>
                   {[
                     { icon: Headphones, label: 'Customer Support', color: BRAND.blue },
-                    { icon: ClipboardList, label: 'Admin VA', color: BRAND.green },
-                    { icon: Zap, label: 'GHL Automation', color: '#f59e0b' },
-                    { icon: Code2, label: 'Web Development', color: '#8b5cf6' },
+                    { icon: ClipboardText, label: 'Admin VA', color: BRAND.green },
+                    { icon: Lightning, label: 'GHL Automation', color: '#f59e0b' },
+                    { icon: Code, label: 'Web Development', color: '#8b5cf6' },
                   ].map((chip, i) => {
                     const ChipIcon = chip.icon;
                     return (
@@ -822,12 +823,12 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                     textAlign: 'center',
                     margin: '0 0 16px',
                   }}>
-                    Free Tools & Services for
+                    Your Dedicated VA for
                   </h1>
                   <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <LayoutTextFlip
                       text=""
-                      words={["Filipino VAs", "Freelancers", "Small Businesses", "Remote Teams"]}
+                      words={["Your Business", "Growing Brands", "Digital Agencies", "Remote Teams"]}
                       duration={3000}
                       wordStyle={{
                         fontSize: isSmall ? '32px' : '52px',
@@ -843,14 +844,14 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   </div>
                 </div>
                 <p style={{ fontSize: isSmall ? '15px' : '18px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 auto 40px', lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: '620px' }}>
-                  22+ free productivity tools, GoHighLevel CRM automation, admin VA support, and custom web builds — from someone who's been in your shoes.
+                  11+ years of customer support experience, dedicated to helping businesses streamline operations, automate workflows, and grow. Plus 22+ free tools to boost your productivity.
                 </p>
                 <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, height: '56px', padding: '0 32px', fontSize: '16px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>Start Free <ChevronRight size={20} /></button>
+                  <button onClick={() => navigate('/services')} style={{ ...btnPrimary, height: '56px', padding: '0 32px', fontSize: '16px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>View Services <CaretRight size={20} /></button>
                   <button onClick={() => onNavigate('login')} style={{ ...btnOutline, height: '56px', padding: '0 32px', fontSize: '16px', color: isDark ? '#fff' : theme.text, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : theme.cardBorder, backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'transparent', backdropFilter: isDark ? 'blur(8px)' : 'none' }}>Sign In</button>
                 </div>
                 <p style={{ fontSize: '13px', color: isDark ? 'rgba(255, 255, 255, 0.5)' : theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
-                  By signing up, you agree to our <a href="/terms" style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Terms</a> and <a href="/privacy" style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>Privacy Policy</a>
+                  Or explore our <a href="#free-tools" onClick={(e) => { e.preventDefault(); document.getElementById('free-tools')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>22+ free productivity tools</a> — no sign-up needed.
                 </p>
               </div>
 
@@ -859,11 +860,124 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         </Vortex>
       </div>
 
+      {/* ABOUT SECTION */}
+      <section style={{
+        padding: isMobile ? '60px 20px' : '100px 64px',
+        backgroundColor: '#080604',
+        position: 'relative',
+        overflow: 'hidden',
+      }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+          {/* Top: ABOUT heading + Description */}
+          <ScrollReveal>
+          <div style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'flex-start' : 'center',
+            gap: isMobile ? '24px' : '60px',
+            marginBottom: isMobile ? '48px' : '72px',
+          }}>
+            <h2 style={{
+              fontSize: isSmall ? '56px' : (isMobile ? '72px' : '120px'),
+              fontWeight: '800',
+              color: '#ffffff',
+              fontFamily: FONTS.heading,
+              lineHeight: 1,
+              margin: 0,
+              letterSpacing: '-0.04em',
+              flexShrink: 0,
+            }}>
+              ABOUT
+            </h2>
+            <p style={{
+              fontSize: isSmall ? '17px' : (isMobile ? '20px' : '26px'),
+              lineHeight: 1.45,
+              fontFamily: FONTS.heading,
+              fontWeight: '500',
+              margin: 0,
+              color: 'rgba(255,255,255,0.85)',
+            }}>
+              <span style={{ color: '#FF6B6B' }}>We help growing brands streamline operations and automate workflows</span>
+              , delivering dedicated VA support, CRM automation, and custom-built digital tools with 11+ years of expertise
+            </p>
+          </div>
+          </ScrollReveal>
+
+          {/* Value Cards */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: isSmall ? '1fr 1fr' : (isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'),
+            gap: isSmall ? '12px' : '16px',
+          }}>
+            {[
+              { Icon: Heart, title: 'Passion', description: 'We love what we do and it shows in every project we deliver.', color: '#ef4444', weight: 'fill' },
+              { Icon: LightbulbFilament, title: 'Innovation', description: 'Always pushing boundaries to find creative solutions.', color: '#3b82f6', weight: 'fill' },
+              { Icon: ChartLineUp, title: 'Growth', description: 'Committed to continuous learning and improvement.', color: '#f59e0b', weight: 'bold' },
+              { Icon: ShieldCheck, title: 'Trust', description: 'Building lasting relationships through transparency and reliability.', color: '#22c55e', weight: 'fill' },
+            ].map((value, idx) => (
+              <ScrollReveal key={value.title} delay={0.1 * idx}>
+              <div style={{
+                padding: isSmall ? '24px 16px' : '36px 28px',
+                backgroundColor: '#0e0c09',
+                borderRadius: '16px',
+                border: '1px solid rgba(255,255,255,0.07)',
+                textAlign: 'center',
+                position: 'relative',
+                overflow: 'hidden',
+              }}>
+                {/* Grid pattern */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: 'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)',
+                  backgroundSize: '28px 28px',
+                  pointerEvents: 'none',
+                }} />
+                <div style={{ position: 'relative', zIndex: 1 }}>
+                  <div style={{
+                    width: '56px',
+                    height: '56px',
+                    borderRadius: '14px',
+                    backgroundColor: `${value.color}15`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    margin: '0 auto 20px',
+                  }}>
+                    <value.Icon size={28} color={value.color} weight={value.weight} />
+                  </div>
+                  <h3 style={{
+                    fontSize: isSmall ? '16px' : '18px',
+                    fontWeight: '700',
+                    color: '#ffffff',
+                    fontFamily: FONTS.heading,
+                    margin: '0 0 8px',
+                  }}>
+                    {value.title}
+                  </h3>
+                  <p style={{
+                    fontSize: isSmall ? '12px' : '14px',
+                    color: 'rgba(255,255,255,0.55)',
+                    lineHeight: 1.6,
+                    fontFamily: FONTS.body,
+                    margin: 0,
+                  }}>
+                    {value.description}
+                  </p>
+                </div>
+              </div>
+              </ScrollReveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* SERVICES OVERVIEW */}
       <section style={{
         padding: isMobile ? '60px 20px' : '80px 64px',
         backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
       }}>
+        <ScrollReveal>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <p style={{
@@ -885,10 +999,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               lineHeight: '1.2',
               margin: '0 0 12px',
             }}>
-              More Than Just Tools
+              How I Can Help
             </h2>
             <p style={{ fontSize: '16px', color: isDark ? 'rgba(255,255,255,0.6)' : theme.textMuted, fontFamily: FONTS.body, maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
-              11+ years of BPO experience packaged into services that help your business grow.
+              11+ years of customer support experience packaged into services that help your business grow.
             </p>
           </div>
 
@@ -902,21 +1016,21 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 features: ['Tier 1 & Tier 2 Support', 'SLA Management', 'CRM-Based Ticketing', 'Quality Monitoring'],
               },
               {
-                icon: ClipboardList,
+                icon: ClipboardText,
                 title: 'Admin VA',
                 color: BRAND.green,
                 description: 'Day-to-day operations handled so you can focus on growing your business.',
                 features: ['Inbox & Calendar Management', 'Data Entry & Reports', 'Travel & Scheduling', 'Process Documentation'],
               },
               {
-                icon: Zap,
+                icon: Lightning,
                 title: 'GHL Automation',
                 color: '#f59e0b',
                 description: 'GoHighLevel CRM setup, workflow automation, and pipeline management.',
                 features: ['Full CRM Build & Config', 'Automated Follow-ups', 'Pipeline & Lead Scoring', 'SMS & Email Sequences'],
               },
               {
-                icon: Code2,
+                icon: Code,
                 title: 'Web Development',
                 color: '#8b5cf6',
                 description: 'Custom web apps, dashboards, and tools — built with modern tech stacks.',
@@ -963,10 +1077,11 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 
           <div style={{ textAlign: 'center', marginTop: '32px' }}>
             <button onClick={() => navigate('/services')} style={{ ...btnOutline, height: '44px', padding: '0 24px', fontSize: '14px', color: isDark ? '#fff' : BRAND.brown, borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.cardBorder }}>
-              View All Services <ChevronRight size={16} />
+              View All Services <CaretRight size={16} />
             </button>
           </div>
         </div>
+        </ScrollReveal>
       </section>
 
       {/* PROJECTS SHOWCASE */}
@@ -976,6 +1091,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         borderTop: '1px solid ' + theme.cardBorder,
         borderBottom: '1px solid ' + theme.cardBorder,
       }}>
+        <ScrollReveal>
         <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '48px' }}>
             <p style={{
@@ -1028,7 +1144,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 ))}
               </div>
               <button onClick={() => navigate('/portfolio')} style={{ ...btnPrimary, height: '40px', padding: '0 20px', fontSize: '13px', alignSelf: 'flex-start' }}>
-                View Project <ChevronRight size={16} />
+                View Project <CaretRight size={16} />
               </button>
             </div>
 
@@ -1058,26 +1174,28 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 ))}
               </div>
               <button onClick={() => navigate('/fuelyx')} style={{ ...btnPrimary, height: '40px', padding: '0 20px', fontSize: '13px', backgroundColor: '#14b8a6', boxShadow: '0 4px 16px rgba(20,184,166,0.3)', alignSelf: 'flex-start' }}>
-                Learn More <ChevronRight size={16} />
+                Learn More <CaretRight size={16} />
               </button>
             </div>
           </div>
 
           <div style={{ textAlign: 'center', marginTop: '32px' }}>
             <button onClick={() => navigate('/portfolio')} style={{ ...btnOutline, height: '44px', padding: '0 24px', fontSize: '14px', color: isDark ? '#fff' : BRAND.brown, borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.cardBorder }}>
-              View Full Portfolio <ChevronRight size={16} />
+              View Full Portfolio <CaretRight size={16} />
             </button>
           </div>
         </div>
+        </ScrollReveal>
       </section>
 
       {/* ZIGZAG TOOLS TIMELINE */}
-      <section style={{
+      <section id="free-tools" style={{
         backgroundColor: isDark ? '#0d0b09' : BRAND.cream,
         padding: isMobile ? '60px 20px' : '80px 64px',
         position: 'relative',
       }}>
         {/* Section Header */}
+        <ScrollReveal>
         <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 60px' }}>
           <p style={{
             fontSize: '11px',
@@ -1088,7 +1206,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             fontFamily: FONTS.body,
             textTransform: 'uppercase',
           }}>
-            What You Can Do
+            Bonus
           </p>
           <h2 style={{
             fontSize: isMobile ? '32px' : '48px',
@@ -1097,9 +1215,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             fontFamily: FONTS.heading,
             lineHeight: '1.15',
           }}>
-            22+ Free Tools,<br />Zero Sign-Up Required
+            22+ Free Productivity Tools
           </h2>
         </div>
+        </ScrollReveal>
 
         {/* Timeline Container */}
         <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative' }}>
@@ -1241,10 +1360,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           <div style={{ padding: isSmall ? '48px 20px' : '64px 32px', maxWidth: '1100px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>
               <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 12px', fontFamily: FONTS.heading }}>
-                Free Tools — No Login Required
+                Free Tools — No Sign-Up Needed
               </h2>
               <p style={{ fontSize: '15px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>
-                Use these tools instantly
+                Bonus tools to help with your daily workflow
               </p>
             </div>
 
@@ -1301,7 +1420,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             })}
           </div>
           <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, height: '44px', padding: '0 24px' }}>
-            Sign Up Free <ChevronRight size={18} />
+            Sign Up Free <CaretRight size={18} />
           </button>
         </div>
       </section>
@@ -1311,8 +1430,8 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       <footer style={{ padding: '32px 32px 24px', borderTop: '1px solid ' + theme.cardBorder }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <p style={{ fontSize: '13px', color: theme.textMuted, textAlign: 'center', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px' }}>
-            BrewedOps is a free productivity toolkit built by Kenneth Villar, a Filipino with 11+ years of BPO and customer support experience.
-            Designed for virtual assistants, freelancers, and small businesses — offering image editing, PDF tools, finance tracking, cron scheduling, and more.
+            BrewedOps is built by Kenneth Villar, a Filipino professional with 11+ years of customer support experience — offering VA services, GHL automation, and custom web development.
+            Also home to 22+ free productivity tools for virtual assistants, freelancers, and small businesses.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '16px', flexWrap: 'wrap' }}>
             <a href="/privacy" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Privacy Policy</a>

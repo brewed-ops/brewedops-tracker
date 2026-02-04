@@ -1,6 +1,6 @@
 // PDFSplit.jsx - PDF Split Tool for BrewedOps
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Download, Trash2, Scissors, Loader2, AlertTriangle, FileText, Check } from 'lucide-react';
+import { UploadSimple, DownloadSimple, Trash, Scissors, SpinnerGap, Warning, FileText, Check } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -189,7 +189,7 @@ const PDFSplit = ({ isDark }) => {
                 </div>
                 <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>Upload PDF to Split</h3>
                 <p className="text-muted-foreground mb-4">Drag & drop or click to select</p>
-                <Button style={{ backgroundColor: BRAND.blue }}><Upload className="size-4 mr-2" />Select PDF</Button>
+                <Button style={{ backgroundColor: BRAND.blue }}><UploadSimple className="size-4 mr-2" />Select PDF</Button>
               </div>
               <input ref={fileInputRef} type="file" accept=".pdf" onChange={(e) => handleFileUpload(e.target.files?.[0])} className="hidden" />
             </CardContent>
@@ -210,7 +210,7 @@ const PDFSplit = ({ isDark }) => {
                     </div>
                   </div>
                   <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)} className="text-destructive">
-                    <Trash2 className="size-4 mr-1" />Clear
+                    <Trash className="size-4 mr-1" />Clear
                   </Button>
                 </div>
               </CardContent>
@@ -291,13 +291,13 @@ const PDFSplit = ({ isDark }) => {
                   {splitFiles.length > 0 ? (
                     <div className="flex gap-2">
                       {splitFiles.length > 1 && (
-                        <Button variant="outline" onClick={downloadAll}><Download className="size-4 mr-2" />Download All</Button>
+                        <Button variant="outline" onClick={downloadAll}><DownloadSimple className="size-4 mr-2" />Download All</Button>
                       )}
                       <Button onClick={() => setSplitFiles([])} variant="outline">Split Again</Button>
                     </div>
                   ) : (
                     <Button onClick={splitPDF} disabled={isSplitting} style={{ backgroundColor: BRAND.blue }}>
-                      {isSplitting ? <><Loader2 className="size-4 mr-2 animate-spin" />Splitting...</> : <><Scissors className="size-4 mr-2" />Split PDF</>}
+                      {isSplitting ? <><SpinnerGap className="size-4 mr-2 animate-spin" />Splitting...</> : <><Scissors className="size-4 mr-2" />Split PDF</>}
                     </Button>
                   )}
                 </div>
@@ -318,7 +318,7 @@ const PDFSplit = ({ isDark }) => {
                           <p className="text-xs text-muted-foreground">{formatFileSize(f.size)}</p>
                         </div>
                         <Button size="sm" variant="outline" onClick={() => downloadFile(f)}>
-                          <Download className="size-4 mr-1" />Download
+                          <DownloadSimple className="size-4 mr-1" />Download
                         </Button>
                       </div>
                     ))}
@@ -332,7 +332,7 @@ const PDFSplit = ({ isDark }) => {
         {error && (
           <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
             <div className="flex gap-3">
-              <AlertTriangle className="size-5 text-destructive shrink-0" />
+              <Warning className="size-5 text-destructive shrink-0" />
               <p className="text-sm text-destructive">{error}</p>
             </div>
           </div>
@@ -342,12 +342,12 @@ const PDFSplit = ({ isDark }) => {
       <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><AlertTriangle className="size-5 text-amber-500" />Clear PDF?</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Warning className="size-5 text-amber-500" />Clear PDF?</DialogTitle>
             <DialogDescription>This will remove the PDF and all split files.</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearConfirm(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={clearAll}><Trash2 className="size-4 mr-2" />Clear All</Button>
+            <Button variant="destructive" onClick={clearAll}><Trash className="size-4 mr-2" />Clear All</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

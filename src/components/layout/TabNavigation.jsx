@@ -1,5 +1,5 @@
 import React from 'react';
-import { Wallet, CreditCard } from 'lucide-react';
+import { Wallet, CreditCard } from '@phosphor-icons/react';
 
 const TabNavigation = ({
   activeTab,

@@ -1,11 +1,11 @@
 // BackgroundRemover.jsx - AI-Powered Background Removal Tool for BrewedOps
 // Uses @imgly/background-removal for accurate client-side processing
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  Upload, Download, Trash2, Image, Loader2, CheckCircle, 
-  Clock, AlertTriangle, RefreshCw, ZoomIn, ZoomOut,
-  Smartphone, Monitor, Sparkles, ImageOff, Eye, EyeOff
-} from 'lucide-react';
+import {
+  UploadSimple, DownloadSimple, Trash, Image, SpinnerGap, CheckCircle,
+  Clock, Warning, ArrowsClockwise, MagnifyingGlassPlus, MagnifyingGlassMinus,
+  DeviceMobile, Monitor, Sparkle, ImageBroken, Eye, EyeSlash
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -292,7 +292,7 @@ const BackgroundRemover = ({ isDark }) => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text }}>
-          <Sparkles className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <Sparkle className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Background Remover
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Remove image backgrounds instantly with AI</p>
@@ -333,7 +333,7 @@ const BackgroundRemover = ({ isDark }) => {
                 Drag & drop or click to select an image
               </p>
               <Button style={{ backgroundColor: BRAND.blue }}>
-                <Upload className="size-4 mr-2" />Select Image
+                <UploadSimple className="size-4 mr-2" />Select Image
               </Button>
               <input 
                 ref={fileInputRef} 
@@ -363,7 +363,7 @@ const BackgroundRemover = ({ isDark }) => {
               
               <div className="p-4 rounded-lg bg-blue-500/10 border border-blue-500/20">
                 <div className="flex gap-3">
-                  <Sparkles className="size-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <Sparkle className="size-5 text-blue-500 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-blue-500">AI-Powered Accuracy</p>
                     <p className="text-xs text-muted-foreground mt-1">
@@ -387,7 +387,7 @@ const BackgroundRemover = ({ isDark }) => {
                   size="sm" 
                   onClick={handleReset}
                 >
-                  <RefreshCw className="size-4 mr-1 md:mr-2" />
+                  <ArrowsClockwise className="size-4 mr-1 md:mr-2" />
                   <span className="hidden sm:inline">New Image</span>
                   <span className="sm:hidden">New</span>
                 </Button>
@@ -398,7 +398,7 @@ const BackgroundRemover = ({ isDark }) => {
                     onClick={processImage}
                     style={{ backgroundColor: BRAND.green }}
                   >
-                    <Sparkles className="size-4 mr-1 md:mr-2" />
+                    <Sparkle className="size-4 mr-1 md:mr-2" />
                     Remove Background
                   </Button>
                 )}
@@ -410,7 +410,7 @@ const BackgroundRemover = ({ isDark }) => {
                       onClick={handleDownload}
                       style={{ backgroundColor: BRAND.blue }}
                     >
-                      <Download className="size-4 mr-1 md:mr-2" />
+                      <DownloadSimple className="size-4 mr-1 md:mr-2" />
                       Download PNG
                     </Button>
                     
@@ -419,7 +419,7 @@ const BackgroundRemover = ({ isDark }) => {
                       size="sm"
                       onClick={() => setShowOriginal(!showOriginal)}
                     >
-                      {showOriginal ? <EyeOff className="size-4 mr-1 md:mr-2" /> : <Eye className="size-4 mr-1 md:mr-2" />}
+                      {showOriginal ? <EyeSlash className="size-4 mr-1 md:mr-2" /> : <Eye className="size-4 mr-1 md:mr-2" />}
                       <span className="hidden sm:inline">{showOriginal ? 'Show Result' : 'Show Original'}</span>
                       <span className="sm:hidden">{showOriginal ? 'Result' : 'Original'}</span>
                     </Button>
@@ -440,7 +440,7 @@ const BackgroundRemover = ({ isDark }) => {
           {error && (
             <div className="mb-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
               <div className="flex gap-3">
-                <AlertTriangle className="size-5 text-destructive flex-shrink-0" />
+                <Warning className="size-5 text-destructive flex-shrink-0" />
                 <div>
                   <p className="text-sm font-medium text-destructive">Error</p>
                   <p className="text-xs text-muted-foreground mt-1">{error}</p>
@@ -454,7 +454,7 @@ const BackgroundRemover = ({ isDark }) => {
             <Card className="mb-4">
               <CardContent className="p-6">
                 <div className="text-center">
-                  <Loader2 className="size-10 animate-spin mx-auto mb-4" style={{ color: BRAND.blue }} />
+                  <SpinnerGap className="size-10 animate-spin mx-auto mb-4" style={{ color: BRAND.blue }} />
                   <p className="font-medium mb-2" style={{ color: theme.text }}>{progressText}</p>
                   <Progress value={progress} className="max-w-md mx-auto mb-2" />
                   <p className="text-sm text-muted-foreground">{Math.round(progress)}%</p>
@@ -498,7 +498,7 @@ const BackgroundRemover = ({ isDark }) => {
 
                 {/* Zoom controls */}
                 <div className="flex items-center gap-4 mt-4">
-                  <ZoomOut className="size-4 text-muted-foreground" />
+                  <MagnifyingGlassMinus className="size-4 text-muted-foreground" />
                   <Slider
                     value={[zoom]}
                     onValueChange={([v]) => setZoom(v)}
@@ -507,7 +507,7 @@ const BackgroundRemover = ({ isDark }) => {
                     step={0.1}
                     className="flex-1"
                   />
-                  <ZoomIn className="size-4 text-muted-foreground" />
+                  <MagnifyingGlassPlus className="size-4 text-muted-foreground" />
                 </div>
               </CardContent>
             </Card>
@@ -575,7 +575,7 @@ const BackgroundRemover = ({ isDark }) => {
                   )}
                   {isProcessing && (
                     <div className="flex items-center gap-2 text-sm">
-                      <Loader2 className="size-4 animate-spin" style={{ color: BRAND.blue }} />
+                      <SpinnerGap className="size-4 animate-spin" style={{ color: BRAND.blue }} />
                       <span>Processing...</span>
                     </div>
                   )}
@@ -647,7 +647,7 @@ const BackgroundRemover = ({ isDark }) => {
               Close
             </Button>
             <Button onClick={() => { handleDownload(); setShowSuccessDialog(false); }} style={{ backgroundColor: BRAND.blue }}>
-              <Download className="size-4 mr-2" />
+              <DownloadSimple className="size-4 mr-2" />
               Download PNG
             </Button>
           </DialogFooter>

@@ -1,12 +1,12 @@
 // ImageCropper.jsx - Professional Image Cropping Tool for BrewedOps
 // Features: Crop, resize, rotate, flip, aspect ratios, zoom, drag
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  Upload, Download, Trash2, Loader2, CheckCircle, 
-  Clock, AlertTriangle, ZoomIn, ZoomOut, RotateCw, RotateCcw,
-  FlipHorizontal, FlipVertical, Crop, Square, RectangleHorizontal,
-  Smartphone, Monitor, Image, RefreshCw, Move, Maximize2, X, Check
-} from 'lucide-react';
+import {
+  UploadSimple, DownloadSimple, Trash, SpinnerGap, CheckCircle,
+  Clock, Warning, MagnifyingGlassPlus, MagnifyingGlassMinus, ArrowClockwise, ArrowCounterClockwise,
+  FlipHorizontal, FlipVertical, Crop, Square, Rectangle,
+  DeviceMobile, Monitor, Image, ArrowsClockwise, ArrowsOutCardinal, ArrowsOut, X, Check
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -35,11 +35,11 @@ const SUPPORTED_FORMATS = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
 const ASPECT_RATIOS = [
   { id: 'free', label: 'Free', icon: Crop, ratio: null },
   { id: '1:1', label: '1:1', icon: Square, ratio: 1 },
-  { id: '4:3', label: '4:3', icon: RectangleHorizontal, ratio: 4/3 },
-  { id: '16:9', label: '16:9', icon: RectangleHorizontal, ratio: 16/9 },
-  { id: '3:2', label: '3:2', icon: RectangleHorizontal, ratio: 3/2 },
-  { id: '2:3', label: '2:3', icon: RectangleHorizontal, ratio: 2/3 },
-  { id: '9:16', label: '9:16', icon: RectangleHorizontal, ratio: 9/16 },
+  { id: '4:3', label: '4:3', icon: Rectangle, ratio: 4/3 },
+  { id: '16:9', label: '16:9', icon: Rectangle, ratio: 16/9 },
+  { id: '3:2', label: '3:2', icon: Rectangle, ratio: 3/2 },
+  { id: '2:3', label: '2:3', icon: Rectangle, ratio: 2/3 },
+  { id: '9:16', label: '9:16', icon: Rectangle, ratio: 9/16 },
 ];
 
 // Simple Slider component
@@ -579,7 +579,7 @@ const ImageCropper = ({ isDark }) => {
               <p className="text-muted-foreground mb-4">Drag & drop or click to select an image</p>
               
               <Button style={{ backgroundColor: BRAND.blue }}>
-                <Upload className="size-4 mr-2" />
+                <UploadSimple className="size-4 mr-2" />
                 Select Image
               </Button>
               
@@ -599,7 +599,7 @@ const ImageCropper = ({ isDark }) => {
             {error && (
               <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
                 <div className="flex gap-3">
-                  <AlertTriangle className="size-5 text-destructive flex-shrink-0" />
+                  <Warning className="size-5 text-destructive flex-shrink-0" />
                   <p className="text-sm text-destructive">{error}</p>
                 </div>
               </div>
@@ -658,10 +658,10 @@ const ImageCropper = ({ isDark }) => {
                 {/* Rotation & Flip */}
                 <div className="flex items-center gap-1">
                   <Button variant="outline" size="icon" className="size-8" onClick={rotateLeft} title="Rotate Left">
-                    <RotateCcw className="size-4" />
+                    <ArrowCounterClockwise className="size-4" />
                   </Button>
                   <Button variant="outline" size="icon" className="size-8" onClick={rotateRight} title="Rotate Right">
-                    <RotateCw className="size-4" />
+                    <ArrowClockwise className="size-4" />
                   </Button>
                   <Button 
                     variant={flipH ? "default" : "outline"} 
@@ -703,7 +703,7 @@ const ImageCropper = ({ isDark }) => {
                     onClick={() => setShowClearConfirm(true)}
                     className="text-destructive hover:text-destructive"
                   >
-                    <Trash2 className="size-4 md:mr-2" />
+                    <Trash className="size-4 md:mr-2" />
                     <span className="hidden md:inline">Clear</span>
                   </Button>
                   
@@ -715,7 +715,7 @@ const ImageCropper = ({ isDark }) => {
                       style={{ backgroundColor: BRAND.blue }}
                     >
                       {isProcessing ? (
-                        <Loader2 className="size-4 animate-spin md:mr-2" />
+                        <SpinnerGap className="size-4 animate-spin md:mr-2" />
                       ) : (
                         <Check className="size-4 md:mr-2" />
                       )}
@@ -727,7 +727,7 @@ const ImageCropper = ({ isDark }) => {
                       onClick={handleDownload}
                       style={{ backgroundColor: BRAND.green }}
                     >
-                      <Download className="size-4 md:mr-2" />
+                      <DownloadSimple className="size-4 md:mr-2" />
                       <span className="hidden md:inline">Download</span>
                     </Button>
                   )}
@@ -883,7 +883,7 @@ const ImageCropper = ({ isDark }) => {
               {error && (
                 <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
                   <div className="flex gap-3">
-                    <AlertTriangle className="size-5 text-destructive flex-shrink-0" />
+                    <Warning className="size-5 text-destructive flex-shrink-0" />
                     <p className="text-sm text-destructive">{error}</p>
                   </div>
                 </div>
@@ -896,15 +896,15 @@ const ImageCropper = ({ isDark }) => {
             <CardContent className="p-4">
               <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                 <div className="flex items-center gap-2">
-                  <Move className="size-4" />
+                  <ArrowsOutCardinal className="size-4" />
                   <span>Drag to move</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Maximize2 className="size-4" />
+                  <ArrowsOut className="size-4" />
                   <span>Drag corners to resize</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <RotateCw className="size-4" />
+                  <ArrowClockwise className="size-4" />
                   <span>Use toolbar to rotate/flip</span>
                 </div>
               </div>
@@ -918,7 +918,7 @@ const ImageCropper = ({ isDark }) => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-amber-500" />
+              <Warning className="size-5 text-amber-500" />
               Clear Image?
             </DialogTitle>
             <DialogDescription>
@@ -930,7 +930,7 @@ const ImageCropper = ({ isDark }) => {
               Cancel
             </Button>
             <Button variant="destructive" onClick={handleClear}>
-              <Trash2 className="size-4 mr-2" />
+              <Trash className="size-4 mr-2" />
               Clear Image
             </Button>
           </DialogFooter>

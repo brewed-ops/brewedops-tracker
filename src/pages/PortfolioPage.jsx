@@ -6,52 +6,53 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 import {
-  ChevronRight,
-  ChevronDown,
+  CaretRight,
+  CaretDown,
   Code,
-  Zap,
-  Settings,
+  Lightning,
+  GearSix,
   Star,
-  ExternalLink,
-  Mail,
+  ArrowSquareOut,
+  Envelope,
   Sun,
   Moon,
-  Award,
-  MessageSquare,
+  Medal,
+  ChatCircle,
   CheckCircle,
   Briefcase,
   MapPin,
-  Calendar,
+  CalendarBlank,
   Headphones,
   Wrench,
   Image,
   Scissors,
-  Move,
-  Minimize2,
-  RefreshCw,
+  ArrowsOut,
+  ArrowsIn,
+  ArrowsClockwise,
   Palette,
   FileImage,
-  Film,
-  FileEdit,
-  Merge,
-  Split,
+  FilmStrip,
+  NotePencil,
+  GitMerge,
+  FileDashed,
   BookOpen,
   QrCode,
-  Search,
-  Type,
+  MagnifyingGlass,
+  TextT,
   Hash,
   GitBranch,
-  Braces,
+  BracketsCurly,
   Clock,
   Lock,
-  DollarSign,
-  StickyNote,
+  CurrencyDollar,
+  Note,
   CheckSquare,
-  Menu,
+  List,
   Globe,
   Timer
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import SEO from '@/components/SEO';
 const MobileDrawer = React.lazy(() => import('@/components/layout/MobileDrawer'));
 
@@ -88,9 +89,9 @@ const TOOL_CATEGORIES = [
     tools: [
       { icon: Image, title: 'BG Remover', path: '/bgremover' },
       { icon: Scissors, title: 'Image Cropper', path: '/imagecropper' },
-      { icon: Move, title: 'Image Resizer', path: '/imageresizer' },
-      { icon: Minimize2, title: 'Image Compressor', path: '/imagecompressor' },
-      { icon: RefreshCw, title: 'Image Converter', path: '/imageconverter' },
+      { icon: ArrowsOut, title: 'Image Resizer', path: '/imageresizer' },
+      { icon: ArrowsIn, title: 'Image Compressor', path: '/imagecompressor' },
+      { icon: ArrowsClockwise, title: 'Image Converter', path: '/imageconverter' },
       { icon: Palette, title: 'Color Picker', path: '/colorpicker' },
       { icon: FileImage, title: 'Image to PDF', path: '/imagetopdf' },
     ]
@@ -98,16 +99,16 @@ const TOOL_CATEGORIES = [
   {
     name: 'Video Tools',
     tools: [
-      { icon: Film, title: 'Video Compressor', path: '/videocompressor' },
+      { icon: FilmStrip, title: 'Video Compressor', path: '/videocompressor' },
       { icon: Scissors, title: 'Video Trimmer', path: '/videotrimmer' },
     ]
   },
   {
     name: 'Document Tools',
     tools: [
-      { icon: FileEdit, title: 'PDF Editor', path: '/pdfeditor' },
-      { icon: Merge, title: 'PDF Merge', path: '/pdfmerge' },
-      { icon: Split, title: 'PDF Split', path: '/pdfsplit' },
+      { icon: NotePencil, title: 'PDF Editor', path: '/pdfeditor' },
+      { icon: GitMerge, title: 'PDF Merge', path: '/pdfmerge' },
+      { icon: FileDashed, title: 'PDF Split', path: '/pdfsplit' },
       { icon: BookOpen, title: 'Markdown Viewer', path: '/markdownviewer' },
     ]
   },
@@ -115,11 +116,11 @@ const TOOL_CATEGORIES = [
     name: 'Other Tools',
     tools: [
       { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
-      { icon: Search, title: 'Find & Replace', path: '/findreplace' },
-      { icon: Type, title: 'Case Converter', path: '/caseconverter' },
+      { icon: MagnifyingGlass, title: 'Find & Replace', path: '/findreplace' },
+      { icon: TextT, title: 'Case Converter', path: '/caseconverter' },
       { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
       { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
-      { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
+      { icon: BracketsCurly, title: 'JSON Formatter', path: '/jsonformatter' },
       { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
       { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
       { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
@@ -128,10 +129,10 @@ const TOOL_CATEGORIES = [
 ];
 
 const PRODUCTIVITY_TOOLS = [
-  { icon: DollarSign, title: 'Finance Tracker', path: '/finance' },
+  { icon: CurrencyDollar, title: 'Finance Tracker', path: '/finance' },
   { icon: Headphones, title: 'VA Kita', path: '/vakita' },
   { icon: CheckSquare, title: 'Task Manager', path: '/taskmanager' },
-  { icon: StickyNote, title: 'Brewed Notes', path: '/brewednotes' },
+  { icon: Note, title: 'Brewed Notes', path: '/brewednotes' },
 ];
 
 // ============================================
@@ -185,7 +186,7 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
         }}
       >
         Tools
-        <ChevronDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+        <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
       </button>
 
       {isOpen && (
@@ -306,14 +307,14 @@ function PortfolioPage({ isDark, setIsDark }) {
 
   const services = [
     {
-      icon: Settings,
+      icon: GearSix,
       title: 'GHL CRM Setup',
       description: 'A CRM that works the way your team actually sells. Pipelines, contact management, and custom fields \u2014 all configured around your workflow.',
       features: ['Pipeline Setup', 'Contact Management', 'Custom Fields', 'Team Access'],
       color: BRAND.blue,
     },
     {
-      icon: Zap,
+      icon: Lightning,
       title: 'GHL Automation',
       description: 'Automated follow-ups, SMS campaigns, and trigger-based workflows that nurture leads while you focus on closing deals.',
       features: ['Email Sequences', 'SMS Campaigns', 'Trigger Actions', 'Lead Scoring'],
@@ -333,13 +334,6 @@ function PortfolioPage({ isDark, setIsDark }) {
       features: ['Tier 2 Escalations', 'Technical Support', 'SLA Management', 'CRM Expert'],
       color: '#f59e0b',
     },
-  ];
-
-  const stats = [
-    { value: '11+', label: 'Years BPO Experience', icon: Briefcase },
-    { value: '20+', label: 'Free Tools Built', icon: Wrench },
-    { value: '20+', label: 'Automations Created', icon: Zap },
-    { value: '100%', label: 'Client Satisfaction', icon: Star },
   ];
 
   const toolCategories = [
@@ -414,7 +408,7 @@ function PortfolioPage({ isDark, setIsDark }) {
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg, color: theme.text, fontFamily: FONTS.body }}>
       <SEO
         title="Portfolio | BrewedOps"
-        description="View Kenneth V's portfolio - GHL CRM setup, automation, vibe coding, and customer support services. 11+ years BPO experience."
+        description="View Kenneth V's portfolio - GHL CRM setup, automation, vibe coding, and customer support services. 11+ years customer support experience."
         keywords="BrewedOps portfolio, GHL CRM, automation, web development, Filipino VA services"
       />
 
@@ -476,7 +470,7 @@ function PortfolioPage({ isDark, setIsDark }) {
             </>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
-              <Menu size={18} />
+              <List size={18} />
             </button>
           )}
         </div>
@@ -492,17 +486,45 @@ function PortfolioPage({ isDark, setIsDark }) {
           alignItems: 'center',
           padding: isMobile ? '48px 20px' : '80px 48px',
           backgroundColor: isDark ? '#0d0b09' : '#ffffff',
+          position: 'relative',
+          overflow: 'hidden',
         }}>
-          <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%' }}>
+          {/* Background Profile Image - Right Side */}
+          {!isMobile && (
+            <div style={{
+              position: 'absolute',
+              right: '-2%',
+              top: '50%',
+              transform: 'translateY(-50%)',
+              width: '650px',
+              height: '820px',
+              pointerEvents: 'none',
+              zIndex: 0,
+              maskImage: 'radial-gradient(ellipse 85% 80% at 60% 50%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 80%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 85% 80% at 60% 50%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 80%)',
+            }}>
+              <img
+                src="https://i.imgur.com/Z5kBKUU.png"
+                alt=""
+                width={650}
+                height={820}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  objectPosition: 'center top',
+                }}
+              />
+            </div>
+          )}
+          <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
             <div style={{
               display: 'flex',
-              gap: isMobile ? '32px' : '80px',
               alignItems: 'center',
-              flexDirection: isMobile ? 'column-reverse' : 'row',
-              justifyContent: 'space-between',
+              flexDirection: isMobile ? 'column' : 'row',
             }}>
               {/* Left: Copy */}
-              <div style={{ flex: '1 1 500px', maxWidth: isMobile ? '100%' : '640px', textAlign: isMobile ? 'center' : 'left' }}>
+              <div style={{ flex: '1 1 auto', maxWidth: isMobile ? '100%' : '620px', textAlign: isMobile ? 'center' : 'left' }}>
                 {/* Badges */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '24px', justifyContent: isMobile ? 'center' : 'flex-start' }}>
                   <div style={{
@@ -512,7 +534,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                     border: `1px solid ${BRAND.green}30`,
                     borderRadius: '100px',
                   }}>
-                    <Award size={16} style={{ color: BRAND.green }} />
+                    <Medal size={16} style={{ color: BRAND.green }} />
                     <span style={{ fontSize: '13px', color: BRAND.green, fontWeight: '600', fontFamily: FONTS.body }}>HL Accelerator Student</span>
                   </div>
                   <div style={{
@@ -550,7 +572,7 @@ function PortfolioPage({ isDark, setIsDark }) {
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '12px' : '24px', marginBottom: '28px', fontSize: isMobile ? '14px' : '15px', color: theme.textMuted, justifyContent: isMobile ? 'center' : 'flex-start' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><MapPin size={16} /><span>Cabuyao, Laguna, PH</span></div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Mail size={16} /><span>kvillarmain@gmail.com</span></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Envelope size={16} /><span>kvillarmain@gmail.com</span></div>
                 </div>
 
                 {/* CTA Buttons */}
@@ -575,7 +597,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                       cursor: 'pointer',
                     }}
                   >
-                    Book a Call <ChevronRight size={18} />
+                    Book a Call <CaretRight size={18} />
                   </a>
                   <a
                     href="https://wa.me/639933074618"
@@ -621,31 +643,12 @@ function PortfolioPage({ isDark, setIsDark }) {
                 </div>
               </div>
 
-              {/* Right: Profile Image */}
-              <div style={{ flex: '0 0 auto', display: isMobile ? 'flex' : 'block', justifyContent: 'center' }}>
-                <div style={{
-                  width: isMobile ? '180px' : '360px',
-                  height: isMobile ? '200px' : '400px',
-                  borderRadius: isMobile ? '14px' : '20px',
-                  overflow: 'hidden',
-                  border: `3px solid ${BRAND.blue}`,
-                }}>
-                  <img
-                    src="https://i.imgur.com/Z5kBKUU.png"
-                    alt="Kenneth Villar"
-                    width={400}
-                    height={400}
-                    loading="lazy"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
-                  />
-                </div>
-              </div>
             </div>
           </div>
         </section>
 
         {/* ============================================ */}
-        {/* STATS */}
+        {/* TECH STACK */}
         {/* ============================================ */}
         <section style={{
           padding: isMobile ? '48px 16px' : '72px 32px',
@@ -653,51 +656,60 @@ function PortfolioPage({ isDark, setIsDark }) {
           borderTop: `1px solid ${theme.cardBorder}`,
           borderBottom: `1px solid ${theme.cardBorder}`,
         }}>
+          <ScrollReveal>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)', gap: isMobile ? '12px' : '24px' }}>
-              {stats.map((stat, i) => {
-                const colors = [BRAND.blue, BRAND.green, '#8b5cf6', '#f59e0b'];
-                const color = colors[i % colors.length];
-                return (
-                  <div
-                    key={i}
-                    style={{
-                      backgroundColor: theme.cardBg,
-                      border: `1px solid ${theme.cardBorder}`,
-                      borderRadius: isMobile ? '12px' : '16px',
-                      padding: isMobile ? '20px 12px' : '32px 24px',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <div style={{
-                      width: isMobile ? '40px' : '48px',
-                      height: isMobile ? '40px' : '48px',
-                      borderRadius: '12px',
-                      backgroundColor: `${color}15`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: '0 auto 12px',
-                    }}>
-                      <stat.icon size={isMobile ? 20 : 24} style={{ color }} />
-                    </div>
-                    <div style={{
-                      fontSize: isMobile ? '28px' : '36px',
-                      fontWeight: '800',
-                      fontFamily: FONTS.heading,
-                      color,
-                      marginBottom: '4px',
-                    }}>
-                      {stat.value}
-                    </div>
-                    <div style={{ fontSize: isMobile ? '11px' : '14px', color: theme.textMuted, fontFamily: FONTS.body, fontWeight: '500' }}>
-                      {stat.label}
-                    </div>
+            <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
+              <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.green, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Tech Stack</span>
+              <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>Tools I Work With</h2>
+              <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, maxWidth: '450px', margin: '0 auto', fontFamily: FONTS.body }}>Platforms and technologies I use daily to deliver exceptional results.</p>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '12px' : '20px' }}>
+              {toolCategories.map((category, i) => (
+                <div
+                  key={i}
+                  style={{
+                    padding: isMobile ? '16px' : '24px 28px',
+                    backgroundColor: theme.cardBg,
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: isMobile ? '12px' : '16px',
+                  }}
+                >
+                  <h3 style={{
+                    fontSize: isMobile ? '11px' : '12px',
+                    fontWeight: '700',
+                    textTransform: 'uppercase',
+                    letterSpacing: '2px',
+                    marginBottom: isMobile ? '12px' : '16px',
+                    color: BRAND.blue,
+                    fontFamily: FONTS.heading,
+                  }}>
+                    {category.name}
+                  </h3>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '10px' }}>
+                    {category.tools.map((tool, j) => (
+                      <div
+                        key={j}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: isMobile ? '6px' : '10px',
+                          padding: isMobile ? '8px 10px' : '10px 16px',
+                          backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)',
+                          borderRadius: isMobile ? '8px' : '10px',
+                          border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
+                        }}
+                      >
+                        <img src={tool.icon} alt={tool.name} style={{ width: isMobile ? '18px' : '22px', height: isMobile ? '18px' : '22px', objectFit: 'contain' }} />
+                        <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{tool.name}</span>
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
+                </div>
+              ))}
             </div>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* ============================================ */}
@@ -707,6 +719,7 @@ function PortfolioPage({ isDark, setIsDark }) {
           padding: isMobile ? '48px 16px' : '80px 32px',
           backgroundColor: theme.bg,
         }}>
+          <ScrollReveal>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.green, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Portfolio</span>
@@ -777,7 +790,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                       gap: '8px',
                     }}
                   >
-                    View Project <ExternalLink size={16} />
+                    View Project <ArrowSquareOut size={16} />
                   </button>
                 </div>
               </div>
@@ -861,12 +874,13 @@ function PortfolioPage({ isDark, setIsDark }) {
                       gap: '8px',
                     }}
                   >
-                    View Project <ExternalLink size={16} />
+                    View Project <ArrowSquareOut size={16} />
                   </button>
                 </div>
               </div>
             </div>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* ============================================ */}
@@ -876,6 +890,7 @@ function PortfolioPage({ isDark, setIsDark }) {
           padding: isMobile ? '48px 16px' : '80px 32px',
           backgroundColor: theme.bgAlt,
         }}>
+          <ScrollReveal>
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.blue, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Services</span>
@@ -923,6 +938,7 @@ function PortfolioPage({ isDark, setIsDark }) {
               ))}
             </div>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* ============================================ */}
@@ -932,6 +948,7 @@ function PortfolioPage({ isDark, setIsDark }) {
           padding: isMobile ? '48px 16px' : '80px 32px',
           backgroundColor: theme.bg,
         }}>
+          <ScrollReveal>
           <div style={{ maxWidth: '800px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#f59e0b', textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Background</span>
@@ -953,7 +970,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                     </div>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '12px' : '20px', marginBottom: '10px', fontSize: isMobile ? '12px' : '14px', color: theme.textMuted, fontFamily: FONTS.body }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={14} />{exp.company}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Calendar size={14} />{exp.period}</div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><CalendarBlank size={14} />{exp.period}</div>
                     </div>
                     <p style={{ fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, lineHeight: '1.65', fontFamily: FONTS.body }}>{exp.description}</p>
                   </div>
@@ -961,68 +978,9 @@ function PortfolioPage({ isDark, setIsDark }) {
               ))}
             </div>
           </div>
+          </ScrollReveal>
         </section>
 
-        {/* ============================================ */}
-        {/* TECH STACK */}
-        {/* ============================================ */}
-        <section style={{
-          padding: isMobile ? '48px 16px' : '80px 32px',
-          backgroundColor: theme.bgAlt,
-        }}>
-          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '48px' }}>
-              <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.green, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Tech Stack</span>
-              <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>Tools I Work With</h2>
-              <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, maxWidth: '450px', margin: '0 auto', fontFamily: FONTS.body }}>Platforms and technologies I use daily to deliver exceptional results.</p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '12px' : '20px' }}>
-              {toolCategories.map((category, i) => (
-                <div
-                  key={i}
-                  style={{
-                    padding: isMobile ? '16px' : '24px 28px',
-                    backgroundColor: theme.cardBg,
-                    border: `1px solid ${theme.cardBorder}`,
-                    borderRadius: isMobile ? '12px' : '16px',
-                  }}
-                >
-                  <h3 style={{
-                    fontSize: isMobile ? '11px' : '12px',
-                    fontWeight: '700',
-                    textTransform: 'uppercase',
-                    letterSpacing: '2px',
-                    marginBottom: isMobile ? '12px' : '16px',
-                    color: BRAND.blue,
-                    fontFamily: FONTS.heading,
-                  }}>
-                    {category.name}
-                  </h3>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '10px' }}>
-                    {category.tools.map((tool, j) => (
-                      <div
-                        key={j}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: isMobile ? '6px' : '10px',
-                          padding: isMobile ? '8px 10px' : '10px 16px',
-                          backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)',
-                          borderRadius: isMobile ? '8px' : '10px',
-                          border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
-                        }}
-                      >
-                        <img src={tool.icon} alt={tool.name} style={{ width: isMobile ? '18px' : '22px', height: isMobile ? '18px' : '22px', objectFit: 'contain' }} />
-                        <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{tool.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* ============================================ */}
         {/* SKILLS */}
@@ -1031,6 +989,7 @@ function PortfolioPage({ isDark, setIsDark }) {
           padding: isMobile ? '48px 16px' : '80px 32px',
           backgroundColor: theme.bg,
         }}>
+          <ScrollReveal>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#8b5cf6', textTransform: 'uppercase', marginBottom: '8px', display: 'block', fontFamily: FONTS.body }}>Expertise</span>
@@ -1078,6 +1037,7 @@ function PortfolioPage({ isDark, setIsDark }) {
               ))}
             </div>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* ============================================ */}
@@ -1087,6 +1047,7 @@ function PortfolioPage({ isDark, setIsDark }) {
           padding: isMobile ? '48px 16px' : '80px 32px',
           backgroundColor: theme.bgAlt,
         }}>
+          <ScrollReveal>
           <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
             <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
               <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.blue, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Testimonials</span>
@@ -1115,6 +1076,7 @@ function PortfolioPage({ isDark, setIsDark }) {
               ))}
             </div>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* ============================================ */}
@@ -1124,6 +1086,7 @@ function PortfolioPage({ isDark, setIsDark }) {
           padding: isMobile ? '60px 20px' : '80px 32px',
           backgroundColor: BRAND.blue,
         }}>
+          <ScrollReveal>
           <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
             <h2 style={{ fontSize: isMobile ? '28px' : '42px', fontWeight: '800', fontFamily: FONTS.heading, color: '#fff', marginBottom: '16px', lineHeight: '1.2' }}>
               Let's Find What's Slowing You Down
@@ -1152,10 +1115,11 @@ function PortfolioPage({ isDark, setIsDark }) {
                   cursor: 'pointer',
                 }}
               >
-                <MessageSquare size={isMobile ? 18 : 20} />Book a Free Call
+                <ChatCircle size={isMobile ? 18 : 20} />Book a Free Call
               </a>
             </div>
           </div>
+          </ScrollReveal>
         </section>
       </main>
 

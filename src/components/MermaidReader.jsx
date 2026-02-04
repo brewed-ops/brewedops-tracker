@@ -9,7 +9,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import mermaid from 'mermaid';
 import { supabase } from '../lib/supabase';
-import { Copy, Check, Download, RefreshCw, Code, Eye, Trash2, ChevronDown, GitBranch, ZoomIn, ZoomOut, Move, PanelLeftClose, PanelLeft, RotateCcw, Save, X, FileText, Clock, Loader2, FolderOpen, Wand2, Undo2 } from 'lucide-react';
+import { Copy, Check, DownloadSimple, ArrowsClockwise, Code, Eye, Trash, CaretDown, GitBranch, MagnifyingGlassPlus, MagnifyingGlassMinus, ArrowsOutCardinal, SidebarSimple, ArrowCounterClockwise, FloppyDisk, X, FileText, Clock, SpinnerGap, FolderOpen, MagicWand } from '@phosphor-icons/react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -261,7 +261,7 @@ const SaveModal = ({ isOpen, onClose, onSave, isDark, theme, isLoading, currentN
           <div style={{ display: 'flex', gap: '10px', marginTop: '20px' }}>
             <button type="button" onClick={onClose} style={{ flex: 1, height: '40px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.text, fontSize: '13px', fontFamily: FONTS.body, cursor: 'pointer' }}>Cancel</button>
             <button type="submit" disabled={!name.trim() || isLoading} style={{ flex: 1, height: '40px', backgroundColor: name.trim() ? BRAND.blue : theme.cardBorder, border: 'none', borderRadius: '8px', color: '#fff', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: name.trim() && !isLoading ? 'pointer' : 'not-allowed', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-              {isLoading ? <Loader2 size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <Save size={14} />}
+              {isLoading ? <SpinnerGap size={14} style={{ animation: 'spin 1s linear infinite' }} /> : <FloppyDisk size={14} />}
               {isLoading ? 'Saving...' : 'Save'}
             </button>
           </div>
@@ -576,7 +576,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           <div style={{ display: 'flex', gap: '8px' }}>
             <button onClick={() => setIsSidebarOpen(true)} style={btnStyle}><FolderOpen size={14} /> My Diagrams ({savedDiagrams.length}/{MAX_SAVED_DIAGRAMS})</button>
             <button onClick={() => setShowSaveModal(true)} disabled={!svgContent} style={{ ...btnStyle, backgroundColor: svgContent ? BRAND.blue : 'transparent', borderColor: svgContent ? BRAND.blue : theme.cardBorder, color: svgContent ? '#fff' : theme.textMuted }}>
-              <Save size={14} /> {currentDiagramId ? 'Update' : 'Save'}
+              <FloppyDisk size={14} /> {currentDiagramId ? 'Update' : 'Save'}
             </button>
           </div>
         )}
@@ -591,7 +591,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Code size={14} style={{ color: theme.textMuted }} /><span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>Code</span></div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <div ref={templateRef} style={{ position: 'relative' }}>
-                  <button onClick={() => setShowTemplates(!showTemplates)} style={{ ...btnStyle, height: '26px', padding: '0 8px', fontSize: '11px' }}>Templates <ChevronDown size={10} /></button>
+                  <button onClick={() => setShowTemplates(!showTemplates)} style={{ ...btnStyle, height: '26px', padding: '0 8px', fontSize: '11px' }}>Templates <CaretDown size={10} /></button>
                   {showTemplates && (
                     <div style={{ position: 'absolute', top: '100%', right: 0, marginTop: '4px', backgroundColor: theme.cardBg, border: '1px solid ' + theme.cardBorder, borderRadius: '8px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)', padding: '4px', zIndex: 100, minWidth: '160px' }}>
                       {TEMPLATES.map((t, i) => (<button key={i} onClick={() => loadTemplate(t)} style={{ width: '100%', padding: '6px 8px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', cursor: 'pointer', textAlign: 'left', fontSize: '11px', color: theme.text }}>{t.name}</button>))}
@@ -599,13 +599,13 @@ const MermaidReader = ({ isDark = true, user = null }) => {
                   )}
                 </div>
                 <button onClick={handleCopy} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Copy">{copied ? <Check size={12} style={{ color: BRAND.green }} /> : <Copy size={12} />}</button>
-                <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); setCodeBeforeColor(null); }} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Clear"><Trash2 size={12} /></button>
+                <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); setCodeBeforeColor(null); }} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Clear"><Trash size={12} /></button>
               </div>
             </div>
             <div style={{ padding: '8px', flexShrink: 0, display: 'flex', gap: '4px' }}>
-              <button onClick={handleAutoColor} style={{ flex: 1, height: '32px', backgroundColor: BRAND.green, border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><Wand2 size={14} /> Auto Color</button>
+              <button onClick={handleAutoColor} style={{ flex: 1, height: '32px', backgroundColor: BRAND.green, border: 'none', borderRadius: '6px', color: '#fff', fontSize: '12px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}><MagicWand size={14} /> Auto Color</button>
               {codeBeforeColor && (
-                <button onClick={handleRevertColor} style={{ height: '32px', padding: '0 12px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '6px', color: theme.textMuted, fontSize: '12px', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}><Undo2 size={14} /> Revert</button>
+                <button onClick={handleRevertColor} style={{ height: '32px', padding: '0 12px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '6px', color: theme.textMuted, fontSize: '12px', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}><ArrowCounterClockwise size={14} /> Revert</button>
               )}
             </div>
             <textarea value={code} onChange={(e) => setCode(e.target.value)} placeholder="Enter Mermaid code..." spellCheck={false} style={{ flex: 1, padding: '10px', backgroundColor: isDark ? '#0d0b09' : '#faf8f5', border: 'none', outline: 'none', resize: 'none', fontSize: '11px', fontFamily: "'Fira Code', monospace", color: isDark ? '#e8e0d4' : '#2a2420', lineHeight: '1.6', minHeight: 0 }} />
@@ -618,7 +618,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           {/* Preview Header */}
           <div style={{ padding: '8px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.cardBg, flexWrap: 'wrap', gap: '8px', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <button onClick={() => setIsCodeCollapsed(!isCodeCollapsed)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0, backgroundColor: isCodeCollapsed ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent' }} title={isCodeCollapsed ? 'Show Code' : 'Hide Code'}>{isCodeCollapsed ? <PanelLeft size={14} /> : <PanelLeftClose size={14} />}</button>
+              <button onClick={() => setIsCodeCollapsed(!isCodeCollapsed)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0, backgroundColor: isCodeCollapsed ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent' }} title={isCodeCollapsed ? 'Show Code' : 'Hide Code'}>{isCodeCollapsed ? <SidebarSimple size={14} /> : <SidebarSimple size={14} />}</button>
               <Eye size={14} style={{ color: theme.textMuted }} />
               <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>Preview</span>
               <span style={{ fontSize: '10px', color: theme.textMuted, backgroundColor: isDark ? '#1e1a16' : '#faf8f5', padding: '2px 6px', borderRadius: '4px' }}>{Math.round(scale * 100)}%</span>
@@ -626,19 +626,19 @@ const MermaidReader = ({ isDark = true, user = null }) => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
               {isCodeCollapsed && (
                 <>
-                  <button onClick={handleAutoColor} style={{ ...btnStyle, height: '28px', backgroundColor: BRAND.green, borderColor: BRAND.green, color: '#fff' }}><Wand2 size={12} /> Auto Color</button>
+                  <button onClick={handleAutoColor} style={{ ...btnStyle, height: '28px', backgroundColor: BRAND.green, borderColor: BRAND.green, color: '#fff' }}><MagicWand size={12} /> Auto Color</button>
                   {codeBeforeColor && (
-                    <button onClick={handleRevertColor} style={{ ...btnStyle, height: '28px' }}><Undo2 size={12} /> Revert</button>
+                    <button onClick={handleRevertColor} style={{ ...btnStyle, height: '28px' }}><ArrowCounterClockwise size={12} /> Revert</button>
                   )}
                 </>
               )}
-              <button onClick={zoomOut} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ZoomOut size={14} /></button>
-              <button onClick={zoomIn} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ZoomIn size={14} /></button>
-              <button onClick={resetView} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><RotateCcw size={14} /></button>
+              <button onClick={zoomOut} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><MagnifyingGlassMinus size={14} /></button>
+              <button onClick={zoomIn} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><MagnifyingGlassPlus size={14} /></button>
+              <button onClick={resetView} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ArrowCounterClockwise size={14} /></button>
               <div style={{ width: '1px', height: '20px', backgroundColor: theme.cardBorder }} />
-              <button onClick={() => setKey((k) => k + 1)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><RefreshCw size={14} /></button>
-              <button onClick={handleDownloadSVG} disabled={!svgContent} style={{ ...btnStyle, height: '28px', opacity: svgContent ? 1 : 0.5 }}><Download size={12} /> SVG</button>
-              <button onClick={handleDownloadPNG} disabled={!svgContent} style={{ ...btnStyle, height: '28px', backgroundColor: svgContent ? '#6366f1' : 'transparent', borderColor: svgContent ? '#6366f1' : theme.cardBorder, color: svgContent ? '#fff' : theme.textMuted }}><Download size={12} /> PNG</button>
+              <button onClick={() => setKey((k) => k + 1)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ArrowsClockwise size={14} /></button>
+              <button onClick={handleDownloadSVG} disabled={!svgContent} style={{ ...btnStyle, height: '28px', opacity: svgContent ? 1 : 0.5 }}><DownloadSimple size={12} /> SVG</button>
+              <button onClick={handleDownloadPNG} disabled={!svgContent} style={{ ...btnStyle, height: '28px', backgroundColor: svgContent ? '#6366f1' : 'transparent', borderColor: svgContent ? '#6366f1' : theme.cardBorder, color: svgContent ? '#fff' : theme.textMuted }}><DownloadSimple size={12} /> PNG</button>
             </div>
           </div>
 
@@ -656,8 +656,8 @@ const MermaidReader = ({ isDark = true, user = null }) => {
 
           {/* Footer */}
           <div style={{ padding: '6px 12px', borderTop: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '12px', backgroundColor: theme.cardBg, flexShrink: 0, flexWrap: 'wrap' }}>
-            <span style={{ fontSize: '10px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><Move size={10} /> Drag to pan</span>
-            <span style={{ fontSize: '10px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><ZoomIn size={10} /> Scroll to zoom</span>
+            <span style={{ fontSize: '10px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><ArrowsOutCardinal size={10} /> Drag to pan</span>
+            <span style={{ fontSize: '10px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}><MagnifyingGlassPlus size={10} /> Scroll to zoom</span>
             <span style={{ fontSize: '10px', color: theme.textMuted }}>|</span>
             <span style={{ fontSize: '10px', color: theme.textMuted }}><kbd style={{ padding: '1px 4px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', border: '1px solid ' + theme.cardBorder, borderRadius: '3px', fontSize: '9px' }}>+/-</kbd> Zoom</span>
             <span style={{ fontSize: '10px', color: theme.textMuted }}><kbd style={{ padding: '1px 4px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', border: '1px solid ' + theme.cardBorder, borderRadius: '3px', fontSize: '9px' }}>0</kbd> Reset</span>
@@ -679,7 +679,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
               <button onClick={createNewDiagram} style={{ width: '100%', height: '36px', backgroundColor: BRAND.blue, border: 'none', borderRadius: '8px', color: '#fff', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>+ New Diagram</button>
             </div>
             <div style={{ flex: 1, overflow: 'auto', padding: '0 12px 12px' }}>
-              {isLoadingDiagrams ? (<div style={{ textAlign: 'center', padding: '40px 0' }}><Loader2 size={20} style={{ animation: 'spin 1s linear infinite', color: theme.textMuted }} /></div>
+              {isLoadingDiagrams ? (<div style={{ textAlign: 'center', padding: '40px 0' }}><SpinnerGap size={20} style={{ animation: 'spin 1s linear infinite', color: theme.textMuted }} /></div>
               ) : savedDiagrams.length === 0 ? (<div style={{ textAlign: 'center', padding: '40px 0', color: theme.textMuted }}><FileText size={28} style={{ marginBottom: '8px', opacity: 0.3 }} /><p style={{ fontSize: '12px', margin: 0 }}>No saved diagrams</p></div>
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -687,7 +687,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
                     <div key={d.id} style={{ padding: '10px', backgroundColor: currentDiagramId === d.id ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent', border: '1px solid ' + (currentDiagramId === d.id ? BRAND.blue : theme.cardBorder), borderRadius: '6px', cursor: 'pointer' }} onClick={() => loadDiagram(d)}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>{d.name}</span>
-                        <button onClick={(e) => { e.stopPropagation(); deleteDiagram(d.id); }} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '2px' }}><Trash2 size={12} /></button>
+                        <button onClick={(e) => { e.stopPropagation(); deleteDiagram(d.id); }} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '2px' }}><Trash size={12} /></button>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}><Clock size={9} style={{ color: theme.textMuted }} /><span style={{ fontSize: '10px', color: theme.textMuted }}>{new Date(d.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span></div>
                     </div>

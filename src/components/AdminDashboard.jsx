@@ -1,12 +1,12 @@
 // AdminDashboard.jsx - Admin Dashboard for BrewedOps
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, MessageSquare, FileText, Trash2, X, Loader2, Search, 
-  AlertTriangle, Plus, LogOut, Moon, Sun, Eye, Edit, Check,
-  ChevronDown, ChevronRight, RefreshCw, Mail, Lock, User,
-  Briefcase, Receipt, Target, DollarSign, Award, Settings,
-  Database, Shield, Download, Upload, BarChart3, Calendar
-} from 'lucide-react';
+import {
+  Users, ChatText, FileText, Trash, X, SpinnerGap, MagnifyingGlass,
+  Warning, Plus, SignOut, Moon, Sun, Eye, PencilSimple, Check,
+  CaretDown, CaretRight, ArrowsClockwise, EnvelopeSimple, Lock, User,
+  Briefcase, Receipt, Target, CurrencyDollar, Medal, GearSix,
+  Database, Shield, DownloadSimple, UploadSimple, ChartBar, Calendar
+} from '@phosphor-icons/react';
 import { supabase } from '../lib/supabase';
 import { getTheme } from '../lib/theme';
 import { useWindowSize } from '../lib/hooks';
@@ -803,7 +803,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               {isDark ? <Sun style={{ width: '16px', height: '16px' }} /> : <Moon style={{ width: '16px', height: '16px' }} />}
             </button>
             <button onClick={onLogout} style={{ ...btnDanger }}>
-              <LogOut style={{ width: '15px', height: '15px' }} />
+              <SignOut style={{ width: '15px', height: '15px' }} />
               {!isSmall && 'Logout'}
             </button>
           </div>
@@ -815,8 +815,8 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '0 24px', display: 'flex', gap: '4px' }}>
           {[
             { id: 'users', label: 'Users', icon: Users, count: stats.totalUsers },
-            { id: 'feedback', label: 'Feedback', icon: MessageSquare, count: unreadCount },
-            { id: 'stats', label: 'Statistics', icon: BarChart3 }
+            { id: 'feedback', label: 'Feedback', icon: ChatText, count: unreadCount },
+            { id: 'stats', label: 'Statistics', icon: ChartBar }
           ].map(tab => (
             <button
               key={tab.id}
@@ -878,7 +878,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                     {!isSmall && 'Create'}
                   </button>
                   <div style={{ position: 'relative' }}>
-                    <Search style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textMuted }} />
+                    <MagnifyingGlass style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textMuted }} />
                     <input
                       type="text"
                       placeholder="Search..."
@@ -893,7 +893,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
                 {loading ? (
                   <div style={{ padding: '60px', textAlign: 'center' }}>
-                    <Loader2 style={{ width: '32px', height: '32px', color: theme.textMuted, animation: 'spin 1s linear infinite' }} />
+                    <SpinnerGap style={{ width: '32px', height: '32px', color: theme.textMuted, animation: 'spin 1s linear infinite' }} />
                   </div>
                 ) : filteredUsers.length === 0 ? (
                   <div style={{ padding: '60px', textAlign: 'center' }}>
@@ -947,7 +947,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                         <p style={{ fontSize: '12px', fontWeight: '600', color: '#8b5cf6', margin: 0 }}>Lv.{user.level}</p>
                         <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>{user.expenses.length} entries</p>
                       </div>
-                      <ChevronRight style={{ width: '16px', height: '16px', color: theme.textMuted, flexShrink: 0 }} />
+                      <CaretRight style={{ width: '16px', height: '16px', color: theme.textMuted, flexShrink: 0 }} />
                     </div>
                   ))
                 )}
@@ -959,7 +959,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               <div style={card}>
                 {loadingUserData ? (
                   <div style={{ padding: '60px', textAlign: 'center' }}>
-                    <Loader2 style={{ width: '32px', height: '32px', color: theme.textMuted, animation: 'spin 1s linear infinite' }} />
+                    <SpinnerGap style={{ width: '32px', height: '32px', color: theme.textMuted, animation: 'spin 1s linear infinite' }} />
                   </div>
                 ) : (
                   <>
@@ -1006,13 +1006,13 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                       {/* Quick Actions */}
                       <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         <button onClick={handleEditUser} style={btnOutline}>
-                          <Edit style={{ width: '14px', height: '14px' }} /> Edit
+                          <PencilSimple style={{ width: '14px', height: '14px' }} /> Edit
                         </button>
                         <button onClick={handleSendPasswordReset} style={btnOutline}>
-                          <Mail style={{ width: '14px', height: '14px' }} /> Reset Password
+                          <EnvelopeSimple style={{ width: '14px', height: '14px' }} /> Reset Password
                         </button>
                         <button onClick={() => setShowDeleteConfirm(selectedUser)} style={{ ...btnOutline, borderColor: '#ef4444', color: '#ef4444' }}>
-                          <Trash2 style={{ width: '14px', height: '14px' }} /> Delete
+                          <Trash style={{ width: '14px', height: '14px' }} /> Delete
                         </button>
                       </div>
                     </div>
@@ -1122,7 +1122,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>{formatAmount(expense.amount)}</span>
                                   <button onClick={() => handleDeleteExpense(expense.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Trash2 style={{ width: '12px', height: '12px' }} />
+                                    <Trash style={{ width: '12px', height: '12px' }} />
                                   </button>
                                 </div>
                               </div>
@@ -1156,7 +1156,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <span style={{ fontSize: '14px', fontWeight: '600', color: (wallet.balance || 0) >= 0 ? '#22c55e' : '#ef4444' }}>{formatAmount(wallet.balance || 0)}</span>
                                   <button onClick={() => handleDeleteWallet(wallet.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Trash2 style={{ width: '12px', height: '12px' }} />
+                                    <Trash style={{ width: '12px', height: '12px' }} />
                                   </button>
                                 </div>
                               </div>
@@ -1188,7 +1188,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                   </div>
                                 </div>
                                 <button onClick={() => handleDeleteClient(client.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <Trash2 style={{ width: '12px', height: '12px' }} />
+                                  <Trash style={{ width: '12px', height: '12px' }} />
                                 </button>
                               </div>
                             ))
@@ -1210,7 +1210,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <span style={{ fontSize: '14px', fontWeight: '600', color: invoice.status === 'paid' ? '#22c55e' : theme.text }}>{invoice.currency} {formatAmount(invoice.total)}</span>
                                   <button onClick={() => handleDeleteInvoice(invoice.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Trash2 style={{ width: '12px', height: '12px' }} />
+                                    <Trash style={{ width: '12px', height: '12px' }} />
                                   </button>
                                 </div>
                               </div>
@@ -1233,7 +1233,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                   <span style={{ fontSize: '14px', fontWeight: '600', color: '#22c55e' }}>{formatAmount(income.amountPHP)}</span>
                                   <button onClick={() => handleDeleteIncome(income.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Trash2 style={{ width: '12px', height: '12px' }} />
+                                    <Trash style={{ width: '12px', height: '12px' }} />
                                   </button>
                                 </div>
                               </div>
@@ -1254,7 +1254,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                                   <p style={{ fontSize: '11px', color: theme.textMuted, margin: '2px 0 0' }}>{prospect.company || 'No company'} • {prospect.status}</p>
                                 </div>
                                 <button onClick={() => handleDeleteProspect(prospect.id)} style={{ width: '28px', height: '28px', borderRadius: '6px', border: 'none', backgroundColor: '#ef444420', color: '#ef4444', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <Trash2 style={{ width: '12px', height: '12px' }} />
+                                  <Trash style={{ width: '12px', height: '12px' }} />
                                 </button>
                               </div>
                             ))
@@ -1271,19 +1271,19 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
                             </p>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                               <button onClick={() => setShowResetConfirm('expenses')} style={{ ...btnOutline, width: '100%', borderColor: '#f59e0b', color: '#f59e0b', justifyContent: 'flex-start' }}>
-                                <Trash2 style={{ width: '14px', height: '14px' }} /> Reset Expenses ({userExpenses.length})
+                                <Trash style={{ width: '14px', height: '14px' }} /> Reset Expenses ({userExpenses.length})
                               </button>
                               <button onClick={() => setShowResetConfirm('wallets')} style={{ ...btnOutline, width: '100%', borderColor: '#f59e0b', color: '#f59e0b', justifyContent: 'flex-start' }}>
-                                <Trash2 style={{ width: '14px', height: '14px' }} /> Reset Wallets ({userWallets.length})
+                                <Trash style={{ width: '14px', height: '14px' }} /> Reset Wallets ({userWallets.length})
                               </button>
                               <button onClick={() => setShowResetConfirm('vakita')} style={{ ...btnOutline, width: '100%', borderColor: '#f59e0b', color: '#f59e0b', justifyContent: 'flex-start' }}>
-                                <Trash2 style={{ width: '14px', height: '14px' }} /> Reset VAKita Data (Clients, Invoices, Income)
+                                <Trash style={{ width: '14px', height: '14px' }} /> Reset VAKita Data (Clients, Invoices, Income)
                               </button>
                               <button onClick={() => setShowResetConfirm('achievements')} style={{ ...btnOutline, width: '100%', borderColor: '#f59e0b', color: '#f59e0b', justifyContent: 'flex-start' }}>
-                                <Trash2 style={{ width: '14px', height: '14px' }} /> Reset Achievements ({userAchievements.length})
+                                <Trash style={{ width: '14px', height: '14px' }} /> Reset Achievements ({userAchievements.length})
                               </button>
                               <button onClick={() => setShowResetConfirm('all')} style={{ ...btnDanger, width: '100%', justifyContent: 'flex-start' }}>
-                                <Trash2 style={{ width: '14px', height: '14px' }} /> Reset ALL User Data
+                                <Trash style={{ width: '14px', height: '14px' }} /> Reset ALL User Data
                               </button>
                             </div>
                           </div>
@@ -1305,7 +1305,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
               {feedbacks.length === 0 ? (
                 <div style={{ padding: '60px', textAlign: 'center' }}>
-                  <MessageSquare style={{ width: '40px', height: '40px', color: theme.textMuted, margin: '0 auto 12px' }} />
+                  <ChatText style={{ width: '40px', height: '40px', color: theme.textMuted, margin: '0 auto 12px' }} />
                   <p style={{ color: theme.textMuted }}>No feedback yet</p>
                 </div>
               ) : (
@@ -1346,7 +1346,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
               { label: 'Total Expenses', value: stats.totalExpenses, icon: Receipt, color: '#f59e0b' },
               { label: 'Total Clients', value: stats.totalClients, icon: Briefcase, color: '#8b5cf6' },
               { label: 'Total Invoices', value: stats.totalInvoices, icon: FileText, color: '#ec4899' },
-              { label: 'Total Income', value: `${formatAmount(stats.totalIncome)}`, icon: DollarSign, color: '#22c55e' },
+              { label: 'Total Income', value: `${formatAmount(stats.totalIncome)}`, icon: CurrencyDollar, color: '#22c55e' },
             ].map((stat, i) => (
               <div key={i} style={{ ...card, padding: '20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
@@ -1390,7 +1390,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, display: 'flex', gap: '12px' }}>
               <button onClick={() => setShowEditUserModal(false)} style={{ ...btnOutline, flex: 1 }}>Cancel</button>
               <button onClick={handleSaveUser} disabled={savingUser} style={{ ...btnPrimary, flex: 1, opacity: savingUser ? 0.6 : 1 }}>
-                {savingUser ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Saving...</> : 'Save Changes'}
+                {savingUser ? <><SpinnerGap style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Saving...</> : 'Save Changes'}
               </button>
             </div>
           </div>
@@ -1422,7 +1422,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, display: 'flex', gap: '12px' }}>
               <button onClick={() => setShowCreateUserModal(false)} style={{ ...btnOutline, flex: 1 }}>Cancel</button>
               <button onClick={handleCreateUser} disabled={creatingUser || !createUserForm.email || !createUserForm.password} style={{ ...btnSuccess, flex: 1, opacity: (creatingUser || !createUserForm.email || !createUserForm.password) ? 0.6 : 1 }}>
-                {creatingUser ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Creating...</> : 'Create User'}
+                {creatingUser ? <><SpinnerGap style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Creating...</> : 'Create User'}
               </button>
             </div>
           </div>
@@ -1434,7 +1434,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50, padding: '20px' }} onClick={() => { setShowDeleteConfirm(null); setConfirmText(''); }}>
           <div style={{ ...card, width: '100%', maxWidth: '400px', padding: '24px', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
             <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+              <Warning style={{ width: '28px', height: '28px', color: '#ef4444' }} />
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete User?</h3>
             <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>
@@ -1459,7 +1459,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 60, padding: '20px' }} onClick={() => { setShowResetConfirm(null); setConfirmText(''); }}>
           <div style={{ ...card, width: '100%', maxWidth: '400px', padding: '24px', textAlign: 'center' }} onClick={e => e.stopPropagation()}>
             <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <AlertTriangle style={{ width: '28px', height: '28px', color: '#f59e0b' }} />
+              <Warning style={{ width: '28px', height: '28px', color: '#f59e0b' }} />
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Reset {showResetConfirm}?</h3>
             <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>
@@ -1501,7 +1501,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             </div>
             <div style={{ padding: '16px 20px', borderTop: `1px solid ${theme.cardBorder}`, display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
               <button onClick={() => deleteFeedback(viewingFeedback.id)} style={{ ...btnOutline, borderColor: '#ef4444', color: '#ef4444' }}>
-                <Trash2 style={{ width: '14px', height: '14px' }} /> Delete
+                <Trash style={{ width: '14px', height: '14px' }} /> Delete
               </button>
             </div>
           </div>

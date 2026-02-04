@@ -1,11 +1,11 @@
 // ImageResizer.jsx - Image Resizing Tool for BrewedOps
 // Features: Custom dimensions, social media presets, maintain aspect ratio, batch resize
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { 
-  Upload, Download, Trash2, Loader2, CheckCircle, 
-  AlertTriangle, Minimize2, Image, X, Plus, Lock, Unlock,
-  ArrowRight, Instagram, Facebook, Twitter, Linkedin, Youtube, Monitor
-} from 'lucide-react';
+import {
+  UploadSimple, DownloadSimple, Trash, SpinnerGap, CheckCircle,
+  Warning, ArrowsIn, Image, X, Plus, Lock, LockOpen,
+  ArrowRight, InstagramLogo, FacebookLogo, TwitterLogo, LinkedinLogo, YoutubeLogo, Monitor
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -33,16 +33,16 @@ const SUPPORTED_FORMATS = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp']
 // Social media presets
 const SIZE_PRESETS = [
   { id: 'custom', label: 'Custom', width: null, height: null, icon: Monitor },
-  { id: 'ig-square', label: 'Instagram Post', width: 1080, height: 1080, icon: Instagram },
-  { id: 'ig-portrait', label: 'Instagram Portrait', width: 1080, height: 1350, icon: Instagram },
-  { id: 'ig-story', label: 'Instagram Story', width: 1080, height: 1920, icon: Instagram },
-  { id: 'fb-post', label: 'Facebook Post', width: 1200, height: 630, icon: Facebook },
-  { id: 'fb-cover', label: 'Facebook Cover', width: 820, height: 312, icon: Facebook },
-  { id: 'twitter-post', label: 'Twitter Post', width: 1200, height: 675, icon: Twitter },
-  { id: 'twitter-header', label: 'Twitter Header', width: 1500, height: 500, icon: Twitter },
-  { id: 'linkedin-post', label: 'LinkedIn Post', width: 1200, height: 627, icon: Linkedin },
-  { id: 'linkedin-cover', label: 'LinkedIn Cover', width: 1584, height: 396, icon: Linkedin },
-  { id: 'youtube-thumb', label: 'YouTube Thumbnail', width: 1280, height: 720, icon: Youtube },
+  { id: 'ig-square', label: 'Instagram Post', width: 1080, height: 1080, icon: InstagramLogo },
+  { id: 'ig-portrait', label: 'Instagram Portrait', width: 1080, height: 1350, icon: InstagramLogo },
+  { id: 'ig-story', label: 'Instagram Story', width: 1080, height: 1920, icon: InstagramLogo },
+  { id: 'fb-post', label: 'Facebook Post', width: 1200, height: 630, icon: FacebookLogo },
+  { id: 'fb-cover', label: 'Facebook Cover', width: 820, height: 312, icon: FacebookLogo },
+  { id: 'twitter-post', label: 'Twitter Post', width: 1200, height: 675, icon: TwitterLogo },
+  { id: 'twitter-header', label: 'Twitter Header', width: 1500, height: 500, icon: TwitterLogo },
+  { id: 'linkedin-post', label: 'LinkedIn Post', width: 1200, height: 627, icon: LinkedinLogo },
+  { id: 'linkedin-cover', label: 'LinkedIn Cover', width: 1584, height: 396, icon: LinkedinLogo },
+  { id: 'youtube-thumb', label: 'YouTube Thumbnail', width: 1280, height: 720, icon: YoutubeLogo },
   { id: 'hd', label: 'HD (1280×720)', width: 1280, height: 720, icon: Monitor },
   { id: 'fullhd', label: 'Full HD (1920×1080)', width: 1920, height: 1080, icon: Monitor },
   { id: '4k', label: '4K (3840×2160)', width: 3840, height: 2160, icon: Monitor },
@@ -280,7 +280,7 @@ const ImageResizer = ({ isDark }) => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
-          <Minimize2 className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <ArrowsIn className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Image Resizer
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Resize images to exact dimensions or social media presets</p>
@@ -297,7 +297,7 @@ const ImageResizer = ({ isDark }) => {
               onDrop={(e) => { e.preventDefault(); handleFileUpload(e.dataTransfer.files); }}
             >
               <div className="size-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: BRAND.blue + '15' }}>
-                <Minimize2 className="size-10" style={{ color: BRAND.blue }} />
+                <ArrowsIn className="size-10" style={{ color: BRAND.blue }} />
               </div>
               
               <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
@@ -306,7 +306,7 @@ const ImageResizer = ({ isDark }) => {
               <p className="text-muted-foreground mb-4">Drag & drop or click to select</p>
               
               <Button style={{ backgroundColor: BRAND.blue }}>
-                <Upload className="size-4 mr-2" />
+                <UploadSimple className="size-4 mr-2" />
                 Select Images
               </Button>
               
@@ -379,7 +379,7 @@ const ImageResizer = ({ isDark }) => {
                         onClick={() => setMaintainAspectRatio(!maintainAspectRatio)}
                         title={maintainAspectRatio ? "Aspect ratio locked" : "Aspect ratio unlocked"}
                       >
-                        {maintainAspectRatio ? <Lock className="size-4" style={{ color: BRAND.blue }} /> : <Unlock className="size-4" />}
+                        {maintainAspectRatio ? <Lock className="size-4" style={{ color: BRAND.blue }} /> : <LockOpen className="size-4" />}
                       </Button>
                     </div>
                   </>
@@ -391,7 +391,7 @@ const ImageResizer = ({ isDark }) => {
                     <Plus className="size-4 md:mr-2" /><span className="hidden md:inline">Add More</span>
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)} className="text-destructive hover:text-destructive">
-                    <Trash2 className="size-4 md:mr-2" /><span className="hidden md:inline">Clear</span>
+                    <Trash className="size-4 md:mr-2" /><span className="hidden md:inline">Clear</span>
                   </Button>
                 </div>
               </div>
@@ -417,10 +417,10 @@ const ImageResizer = ({ isDark }) => {
                     </div>
                     <div className="flex items-center gap-2">
                       {fileObj.status === 'pending' && <Badge variant="outline" className="text-xs">Pending</Badge>}
-                      {fileObj.status === 'resizing' && <Badge variant="outline" className="text-xs gap-1"><Loader2 className="size-3 animate-spin" />Resizing</Badge>}
+                      {fileObj.status === 'resizing' && <Badge variant="outline" className="text-xs gap-1"><SpinnerGap className="size-3 animate-spin" />Resizing</Badge>}
                       {fileObj.status === 'done' && (
                         <Button size="sm" variant="outline" onClick={() => downloadFile(fileObj)} className="h-8">
-                          <Download className="size-4 md:mr-1" /><span className="hidden md:inline">Download</span>
+                          <DownloadSimple className="size-4 md:mr-1" /><span className="hidden md:inline">Download</span>
                         </Button>
                       )}
                       {fileObj.status === 'error' && <Badge variant="destructive" className="text-xs">Error</Badge>}
@@ -441,10 +441,10 @@ const ImageResizer = ({ isDark }) => {
                 <span className="text-sm text-muted-foreground">{stats.total} file{stats.total !== 1 ? 's' : ''} → {targetWidth}×{targetHeight}px</span>
                 <div className="flex gap-2">
                   {allDone ? (
-                    <Button onClick={downloadAll} style={{ backgroundColor: BRAND.green }}><Download className="size-4 mr-2" />Download All</Button>
+                    <Button onClick={downloadAll} style={{ backgroundColor: BRAND.green }}><DownloadSimple className="size-4 mr-2" />Download All</Button>
                   ) : (
                     <Button onClick={resizeAll} disabled={isResizing} style={{ backgroundColor: BRAND.blue }}>
-                      {isResizing ? <><Loader2 className="size-4 mr-2 animate-spin" />Resizing...</> : <><Minimize2 className="size-4 mr-2" />Resize All</>}
+                      {isResizing ? <><SpinnerGap className="size-4 mr-2 animate-spin" />Resizing...</> : <><ArrowsIn className="size-4 mr-2" />Resize All</>}
                     </Button>
                   )}
                 </div>
@@ -486,12 +486,12 @@ const ImageResizer = ({ isDark }) => {
       <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><AlertTriangle className="size-5 text-amber-500" />Clear All?</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Warning className="size-5 text-amber-500" />Clear All?</DialogTitle>
             <DialogDescription>Remove all {files.length} images?</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearConfirm(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={clearAll}><Trash2 className="size-4 mr-2" />Clear All</Button>
+            <Button variant="destructive" onClick={clearAll}><Trash className="size-4 mr-2" />Clear All</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

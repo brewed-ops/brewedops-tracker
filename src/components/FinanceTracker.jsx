@@ -6,7 +6,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend, LineChart, Line, AreaChart, Area } from 'recharts';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset, PanelLeft } from 'lucide-react';
+import { UploadSimple, FileText, Users, ChatText, Warning, Plus, SignOut, Eye, Trash, X, SpinnerGap, DownloadSimple, Check, MagnifyingGlass, CaretDown, WarningCircle, Moon, Sun, Receipt, List, Money, TrendUp, TrendDown, CurrencyDollar, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, PencilSimple, Star, Gift, Camera, Trophy, Medal, Fire, GearSix, EnvelopeSimple, Minus, ChartBar, CaretLeft, CaretRight, SquaresFour, Calculator, Headset, SidebarSimple } from '@phosphor-icons/react';
 import { supabase } from '../lib/supabase';
 
 // shadcn Sidebar imports
@@ -2331,7 +2331,7 @@ const getBudgetStatus = () => {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: theme.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Loader2 style={{ width: '32px', height: '32px', color: theme.textSubtle, animation: 'spin 1s linear infinite' }} />
+        <SpinnerGap style={{ width: '32px', height: '32px', color: theme.textSubtle, animation: 'spin 1s linear infinite' }} />
       </div>
     );
   }
@@ -2552,7 +2552,7 @@ const getBudgetStatus = () => {
                         transition: 'background-color 0.15s'
                       }}
                     >
-                      <Edit style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                      <PencilSimple style={{ width: '18px', height: '18px', color: theme.textMuted }} />
                       Edit Profile
                     </button>
                     <button
@@ -2574,7 +2574,7 @@ const getBudgetStatus = () => {
                         transition: 'background-color 0.15s'
                       }}
                     >
-                      <MessageSquare style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                      <ChatText style={{ width: '18px', height: '18px', color: theme.textMuted }} />
                       Send Feedback
                     </button>
                     <button
@@ -2593,7 +2593,7 @@ const getBudgetStatus = () => {
                         textAlign: 'left'
                       }}
                     >
-                      <LogOut style={{ width: '18px', height: '18px' }} />
+                      <SignOut style={{ width: '18px', height: '18px' }} />
                       Logout
                     </button>
                   </div>
@@ -2715,7 +2715,7 @@ const getBudgetStatus = () => {
                         transition: 'background-color 0.15s'
                       }}
                     >
-                      <Edit style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                      <PencilSimple style={{ width: '18px', height: '18px', color: theme.textMuted }} />
                       Edit Profile
                     </button>
                     <button
@@ -2737,7 +2737,7 @@ const getBudgetStatus = () => {
                         transition: 'background-color 0.15s'
                       }}
                     >
-                      <MessageSquare style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+                      <ChatText style={{ width: '18px', height: '18px', color: theme.textMuted }} />
                       Send Feedback
                     </button>
                     <button
@@ -2756,7 +2756,7 @@ const getBudgetStatus = () => {
                         textAlign: 'left'
                       }}
                     >
-                      <LogOut style={{ width: '18px', height: '18px' }} />
+                      <SignOut style={{ width: '18px', height: '18px' }} />
                       Logout
                     </button>
                   </div>
@@ -3002,7 +3002,7 @@ const getBudgetStatus = () => {
             {/* Mode Toggle */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap' }}>
               <button onClick={() => { setUploadMode('file'); setUploadError(''); }} style={buttonStyle(uploadMode === 'file')}>
-                <Upload style={{ width: '14px', height: '14px' }} />
+                <UploadSimple style={{ width: '14px', height: '14px' }} />
                 {isSmall ? 'Upload' : 'Upload File'}
               </button>
               <button onClick={() => { setUploadMode('manual'); setUploadError(''); }} style={buttonStyle(uploadMode === 'manual')}>
@@ -3044,7 +3044,7 @@ const getBudgetStatus = () => {
                       <span style={{ color: theme.textDim }}>Select a category...</span>
                     )}
                   </span>
-                  <ChevronDown style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                  <CaretDown style={{ width: '16px', height: '16px', color: theme.textMuted }} />
                 </button>
                 
                 {categoryDropdownOpen && (
@@ -3177,7 +3177,7 @@ const getBudgetStatus = () => {
                     <p style={{ fontSize: '12px', color: theme.textSubtle, margin: '0 0 12px' }}>{(uploadedFile.size / 1024).toFixed(1)} KB</p>
                     <div style={{ display: 'flex', gap: '8px', flexDirection: isSmall ? 'column' : 'row' }}>
                       <button onClick={processAttachedFile} disabled={isProcessing} style={{ flex: 1, height: '40px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isProcessing ? 0.7 : 1 }}>
-                        {isProcessing ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Extracting...</> : <><Upload style={{ width: '14px', height: '14px' }} /> Extract Data</>}
+                        {isProcessing ? <><SpinnerGap style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Extracting...</> : <><UploadSimple style={{ width: '14px', height: '14px' }} /> Extract Data</>}
                       </button>
                       <button onClick={clearAttachedFile} disabled={isProcessing} style={{ height: '40px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', padding: '0 12px', fontSize: '13px', color: theme.textMuted, cursor: 'pointer' }}>
                         Remove
@@ -3196,7 +3196,7 @@ const getBudgetStatus = () => {
                     cursor: selectedCategory ? 'pointer' : 'not-allowed',
                     marginTop: 'auto'
                   }}>
-                    <Upload style={{ width: '28px', height: '28px', color: selectedCategory ? theme.textDim : '#ef4444', margin: '0 auto 8px' }} />
+                    <UploadSimple style={{ width: '28px', height: '28px', color: selectedCategory ? theme.textDim : '#ef4444', margin: '0 auto 8px' }} />
                     <p style={{ fontSize: '14px', color: selectedCategory ? theme.textMuted : '#ef4444', fontWeight: '500', margin: '0 0 4px' }}>
                       {selectedCategory ? 'Tap to upload' : 'Select a category first'}
                     </p>
@@ -3304,7 +3304,7 @@ const getBudgetStatus = () => {
                     </button>
                   )}
                   <button onClick={handleManualSubmit} disabled={!selectedCategory || isSaving} style={{ flex: 1, height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '14px', fontWeight: '500', cursor: (!selectedCategory || isSaving) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: (!selectedCategory || isSaving) ? 0.5 : 1 }}>
-                    {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Plus style={{ width: '16px', height: '16px' }} /> Add Entry</>}
+                    {isSaving ? <><SpinnerGap style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Plus style={{ width: '16px', height: '16px' }} /> Add Entry</>}
                   </button>
                 </div>
               </div>
@@ -3317,7 +3317,7 @@ const getBudgetStatus = () => {
               <h2 style={{ fontSize: isSmall ? '15px' : '16px', fontWeight: '600', color: theme.text, margin: 0, display: 'flex', alignItems: 'center' }}>History</h2>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: isMobile ? '1 1 100%' : 'none' }}>
                 <div style={{ position: 'relative', flex: 1 }}>
-                  <Search style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textDim }} />
+                  <MagnifyingGlass style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textDim }} />
                   <input
                     placeholder="Search..."
                     value={historySearch}
@@ -3436,7 +3436,7 @@ const getBudgetStatus = () => {
                               )}
                               {entry.notes && (
                                 <span title={entry.notes} style={{ flexShrink: 0, cursor: 'help' }}>
-                                  <MessageSquare style={{ width: '12px', height: '12px', color: theme.textMuted }} />
+                                  <ChatText style={{ width: '12px', height: '12px', color: theme.textMuted }} />
                                 </span>
                               )}
                             </div>
@@ -3481,15 +3481,15 @@ const getBudgetStatus = () => {
                                     <Eye style={{ width: '13px', height: '13px' }} />
                                   </button>
                                   <button onClick={() => handleDownloadFile(entry)} style={{ width: '24px', height: '24px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }} title="Download file">
-                                    <Download style={{ width: '13px', height: '13px' }} />
+                                    <DownloadSimple style={{ width: '13px', height: '13px' }} />
                                   </button>
                                 </>
                               )}
                               <button onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})} style={{ width: '24px', height: '24px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-                                <Edit style={{ width: '13px', height: '13px' }} />
+                                <PencilSimple style={{ width: '13px', height: '13px' }} />
                               </button>
                               <button onClick={() => setDeletingEntry(entry)} style={{ width: '24px', height: '24px', backgroundColor: 'transparent', border: 'none', borderRadius: '4px', color: theme.textSubtle, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-  <Trash2 style={{ width: '13px', height: '13px' }} />
+  <Trash style={{ width: '13px', height: '13px' }} />
 </button>
                             </div>
                           </td>
@@ -3503,7 +3503,7 @@ const getBudgetStatus = () => {
 
             {filteredEntries.length > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', paddingTop: '12px', marginTop: 'auto', borderTop: `1px solid ${theme.cardBorder}` }}>
-                <ChevronDown style={{ width: '16px', height: '16px', color: theme.textDim }} />
+                <CaretDown style={{ width: '16px', height: '16px', color: theme.textDim }} />
                 <span style={{ fontSize: '12px', color: theme.textDim }}>{filteredEntries.length} items</span>
               </div>
             )}
@@ -3539,7 +3539,7 @@ const getBudgetStatus = () => {
                   }}
                 >
                   View All
-                  <ChevronDown style={{ width: '14px', height: '14px', transform: 'rotate(-90deg)' }} />
+                  <CaretDown style={{ width: '14px', height: '14px', transform: 'rotate(-90deg)' }} />
                 </button>
               )}
             </div>
@@ -3708,13 +3708,13 @@ const getBudgetStatus = () => {
                 {/* Status Alert */}
                 {budgetStatus.status === 'over' && (
                   <div style={{ padding: '10px', backgroundColor: isDark ? 'rgba(239, 68, 68, 0.15)' : '#fee2e2', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <AlertTriangle style={{ width: '14px', height: '14px', color: '#ef4444', flexShrink: 0 }} />
+                    <Warning style={{ width: '14px', height: '14px', color: '#ef4444', flexShrink: 0 }} />
                     <span style={{ fontSize: '12px', color: isDark ? '#fca5a5' : '#dc2626' }}>Budget exceeded!</span>
                   </div>
                 )}
                 {budgetStatus.status === 'warning' && (
                   <div style={{ padding: '10px', backgroundColor: isDark ? 'rgba(245, 158, 11, 0.15)' : '#fef3c7', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <AlertCircle style={{ width: '14px', height: '14px', color: '#f59e0b', flexShrink: 0 }} />
+                    <WarningCircle style={{ width: '14px', height: '14px', color: '#f59e0b', flexShrink: 0 }} />
                     <span style={{ fontSize: '12px', color: isDark ? '#fcd34d' : '#b45309' }}>Approaching limit</span>
                   </div>
                 )}
@@ -3850,7 +3850,7 @@ const getBudgetStatus = () => {
             {/* 6-Month Insights */}
             <div style={{ backgroundColor: theme.statBg, borderRadius: '8px', padding: isSmall ? '12px' : '16px' }}>
               <p style={{ fontSize: '13px', fontWeight: '600', color: theme.text, margin: '0 0 12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <TrendingUp style={{ width: '14px', height: '14px', color: theme.textMuted }} />
+                <TrendUp style={{ width: '14px', height: '14px', color: theme.textMuted }} />
                 6-Month Insights
               </p>
               
@@ -3906,7 +3906,7 @@ const getBudgetStatus = () => {
                           alignItems: 'center',
                           gap: '2px'
                         }}>
-                          {monthChange > 0 ? <TrendingUp style={{ width: '12px', height: '12px' }} /> : monthChange < 0 ? <TrendingDown style={{ width: '12px', height: '12px' }} /> : null}
+                          {monthChange > 0 ? <TrendUp style={{ width: '12px', height: '12px' }} /> : monthChange < 0 ? <TrendDown style={{ width: '12px', height: '12px' }} /> : null}
                           {monthChange > 0 ? '+' : ''}{monthChange.toFixed(1)}%
                         </span>
                       </div>
@@ -4016,9 +4016,9 @@ const getBudgetStatus = () => {
                       gap: '6px'
                     }}
                   >
-                    <Search style={{ width: '14px', height: '14px' }} />
+                    <MagnifyingGlass style={{ width: '14px', height: '14px' }} />
                     Advanced Filter
-                    <ChevronDown style={{ width: '14px', height: '14px', transform: analyticsShowFilter ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                    <CaretDown style={{ width: '14px', height: '14px', transform: analyticsShowFilter ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                   </button>
                 </div>
               </div>
@@ -4116,7 +4116,7 @@ const getBudgetStatus = () => {
                   borderRadius: '8px'
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                    <TrendingUp style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                    <TrendUp style={{ width: '16px', height: '16px', color: theme.textMuted }} />
                     <span style={{ fontSize: '14px', fontWeight: '600', color: theme.text }}>Month Comparison</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(4, 1fr)', gap: '16px' }}>
@@ -4224,7 +4224,7 @@ const getBudgetStatus = () => {
                 </div>
                 <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(analyticsStats.month)}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <TrendingUp style={{ width: '14px', height: '14px', color: 'rgba(255,255,255,0.8)' }} />
+                  <TrendUp style={{ width: '14px', height: '14px', color: 'rgba(255,255,255,0.8)' }} />
                   <span style={{ fontSize: '12px', color: 'rgba(255,255,255,0.8)' }}>{new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}</span>
                 </div>
               </div>
@@ -4240,7 +4240,7 @@ const getBudgetStatus = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Avg. Per Entry</span>
                   <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <DollarSign style={{ width: '18px', height: '18px', color: '#fff' }} />
+                    <CurrencyDollar style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
                 <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(analyticsStats.count > 0 ? analyticsStats.total / analyticsStats.count : 0)}</p>
@@ -4353,7 +4353,7 @@ const getBudgetStatus = () => {
               <div style={cardStyle}>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px' }}>
                   <h3 style={{ fontSize: '15px', fontWeight: '600', color: theme.text, margin: 0 }}>Top Expenses</h3>
-                  <TrendingUp style={{ width: '16px', height: '16px', color: theme.textMuted }} />
+                  <TrendUp style={{ width: '16px', height: '16px', color: theme.textMuted }} />
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                   {[...filteredAnalyticsEntries].sort((a, b) => b.amount - a.amount).slice(0, 5).map((entry, i) => {
@@ -4678,7 +4678,7 @@ const getBudgetStatus = () => {
                                   flexShrink: 0
                                 }}
                               >
-                                <Edit style={{ width: isSmall ? '10px' : '11px', height: isSmall ? '10px' : '11px' }} />
+                                <PencilSimple style={{ width: isSmall ? '10px' : '11px', height: isSmall ? '10px' : '11px' }} />
                               </button>
                             )}
                             {selectedWallet?.type !== 'cash' && (
@@ -4701,7 +4701,7 @@ const getBudgetStatus = () => {
                                   flexShrink: 0
                                 }}
                               >
-                                <Trash2 style={{ width: isSmall ? '10px' : '12px', height: isSmall ? '10px' : '12px' }} />
+                                <Trash style={{ width: isSmall ? '10px' : '12px', height: isSmall ? '10px' : '12px' }} />
                               </button>
                             )}
                           </div>
@@ -4807,7 +4807,7 @@ const getBudgetStatus = () => {
                         gap: isSmall ? '2px' : '3px'
                       }}
                     >
-                      <Trash2 style={{ width: isSmall ? '9px' : '10px', height: isSmall ? '9px' : '10px' }} />
+                      <Trash style={{ width: isSmall ? '9px' : '10px', height: isSmall ? '9px' : '10px' }} />
                       Clear
                     </button>
                   )}
@@ -4827,7 +4827,7 @@ const getBudgetStatus = () => {
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                   {/* Search */}
                   <div style={{ position: 'relative' }}>
-                    <Search style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', width: '12px', height: '12px', color: theme.textDim }} />
+                    <MagnifyingGlass style={{ position: 'absolute', left: '8px', top: '50%', transform: 'translateY(-50%)', width: '12px', height: '12px', color: theme.textDim }} />
                     <input
                       placeholder="Search..."
                       value={walletSearch}
@@ -4865,7 +4865,7 @@ const getBudgetStatus = () => {
                       fontSize: '12px'
                     }}
                   >
-                    <ChevronDown style={{ width: '12px', height: '12px' }} />
+                    <CaretDown style={{ width: '12px', height: '12px' }} />
                     {isSmall ? '' : 'Filter'}
                   </button>
                 </div>
@@ -5033,7 +5033,7 @@ const getBudgetStatus = () => {
                     gap: '8px'
                   }}
                 >
-                  <Upload style={{ width: '14px', height: '14px' }} />
+                  <UploadSimple style={{ width: '14px', height: '14px' }} />
                   Import CSV
                   <input type="file" accept=".csv" onChange={handleCsvFileSelect} style={{ display: 'none' }} />
                 </label>
@@ -5054,7 +5054,7 @@ const getBudgetStatus = () => {
                     gap: '8px'
                   }}
                 >
-                  <Download style={{ width: '14px', height: '14px' }} />
+                  <DownloadSimple style={{ width: '14px', height: '14px' }} />
                   Export CSV
                 </button>
               </div>
@@ -5117,7 +5117,7 @@ const getBudgetStatus = () => {
                         gap: '6px'
                       }}
                     >
-                      <Trash2 style={{ width: '14px', height: '14px' }} />
+                      <Trash style={{ width: '14px', height: '14px' }} />
                       Delete Selected
                     </button>
                   )}
@@ -5139,7 +5139,7 @@ const getBudgetStatus = () => {
                         gap: '6px'
                       }}
                     >
-                      <Trash2 style={{ width: '14px', height: '14px' }} />
+                      <Trash style={{ width: '14px', height: '14px' }} />
                       Clear All
                     </button>
                   )}
@@ -5212,7 +5212,7 @@ const getBudgetStatus = () => {
                     disabled={isSaving}
                     style={{ height: '36px', padding: '0 16px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '500', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
                   >
-                    {isSaving ? <><Loader2 style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Importing...</> : <><Check style={{ width: '14px', height: '14px' }} /> Import All</>}
+                    {isSaving ? <><SpinnerGap style={{ width: '14px', height: '14px', animation: 'spin 1s linear infinite' }} /> Importing...</> : <><Check style={{ width: '14px', height: '14px' }} /> Import All</>}
                   </button>
                 </div>
               </div>
@@ -5221,7 +5221,7 @@ const getBudgetStatus = () => {
             {/* Filters */}
             <div style={{ display: 'flex', gap: '8px', marginBottom: '16px', flexWrap: 'wrap', alignItems: 'center' }}>
               <div style={{ position: 'relative', width: '200px', flexShrink: 0 }}>
-                <Search style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textDim }} />
+                <MagnifyingGlass style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', width: '14px', height: '14px', color: theme.textDim }} />
                 <input
                   placeholder="Search..."
                   value={historySearch}
@@ -5252,7 +5252,7 @@ const getBudgetStatus = () => {
                   gap: '6px'
                 }}
               >
-                <ChevronDown style={{ width: '14px', height: '14px', transform: showAdvancedFilter ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
+                <CaretDown style={{ width: '14px', height: '14px', transform: showAdvancedFilter ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }} />
                 Advanced
               </button>
               {!showAdvancedFilter && (
@@ -5462,7 +5462,7 @@ const getBudgetStatus = () => {
                               )}
                               {entry.notes && (
                                 <span title={entry.notes} style={{ flexShrink: 0, cursor: 'help' }}>
-                                  <MessageSquare style={{ width: '13px', height: '13px', color: theme.textMuted }} />
+                                  <ChatText style={{ width: '13px', height: '13px', color: theme.textMuted }} />
                                 </span>
                               )}
                             </div>
@@ -5478,15 +5478,15 @@ const getBudgetStatus = () => {
                                     <Eye style={{ width: '14px', height: '14px' }} />
                                   </button>
                                   <button onClick={() => handleDownloadFile(entry)} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '4px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <Download style={{ width: '14px', height: '14px' }} />
+                                    <DownloadSimple style={{ width: '14px', height: '14px' }} />
                                   </button>
                                 </>
                               )}
                               <button onClick={() => setEditingEntry({...entry, amount: entry.amount.toString()})} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '4px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Edit style={{ width: '14px', height: '14px' }} />
+                                <PencilSimple style={{ width: '14px', height: '14px' }} />
                               </button>
                               <button onClick={() => setDeletingEntry(entry)} style={{ width: '28px', height: '28px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '4px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-  <Trash2 style={{ width: '14px', height: '14px' }} />
+  <Trash style={{ width: '14px', height: '14px' }} />
 </button>
                             </div>
                           </td>
@@ -5574,7 +5574,7 @@ const getBudgetStatus = () => {
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
                   <span style={{ fontSize: '13px', color: 'rgba(255,255,255,0.8)', fontWeight: '500' }}>Yearly Cost</span>
                   <div style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <TrendingUp style={{ width: '18px', height: '18px', color: '#fff' }} />
+                    <TrendUp style={{ width: '18px', height: '18px', color: '#fff' }} />
                   </div>
                 </div>
                 <p style={{ fontSize: '28px', fontWeight: '700', color: '#fff', margin: '0 0 8px' }}>{currency}{formatAmount(getYearlyRecurringCost())}</p>
@@ -5760,13 +5760,13 @@ const getBudgetStatus = () => {
                               onClick={(e) => { e.stopPropagation(); setEditingEntry({...bill, amount: bill.amount.toString()}); }}
                               style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             >
-                              <Edit style={{ width: '14px', height: '14px' }} />
+                              <PencilSimple style={{ width: '14px', height: '14px' }} />
                             </button>
                             <button 
                               onClick={(e) => { e.stopPropagation(); setDeletingEntry(bill); }}
                               style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                             >
-                              <Trash2 style={{ width: '14px', height: '14px' }} />
+                              <Trash style={{ width: '14px', height: '14px' }} />
                             </button>
                           </div>
                         </div>
@@ -6222,7 +6222,7 @@ const getBudgetStatus = () => {
                 justifyContent: 'center',
                 margin: '0 auto 16px'
               }}>
-                <Trash2 style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+                <Trash style={{ width: '28px', height: '28px', color: '#ef4444' }} />
               </div>
               <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete Wallet?</h3>
               <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
@@ -6277,7 +6277,7 @@ const getBudgetStatus = () => {
                   gap: '6px'
                 }}
               >
-                <Trash2 style={{ width: '16px', height: '16px' }} />
+                <Trash style={{ width: '16px', height: '16px' }} />
                 Delete Wallet
               </button>
             </div>
@@ -6300,7 +6300,7 @@ const getBudgetStatus = () => {
                 justifyContent: 'center',
                 margin: '0 auto 16px'
               }}>
-                <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+                <Warning style={{ width: '28px', height: '28px', color: '#ef4444' }} />
               </div>
               <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Clear All Wallets?</h3>
               <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>
@@ -6368,7 +6368,7 @@ const getBudgetStatus = () => {
                   gap: '6px'
                 }}
               >
-                <Trash2 style={{ width: '16px', height: '16px' }} />
+                <Trash style={{ width: '16px', height: '16px' }} />
                 Clear Everything
               </button>
             </div>
@@ -6482,7 +6482,7 @@ const getBudgetStatus = () => {
                 disabled={!editingEntry.name || !editingEntry.amount || isSaving}
                 style={{ flex: 1, height: '44px', backgroundColor: isDark ? '#fafafa' : '#18181b', color: isDark ? '#18181b' : '#fafafa', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', cursor: (!editingEntry.name || !editingEntry.amount || isSaving) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: (!editingEntry.name || !editingEntry.amount || isSaving) ? 0.5 : 1 }}
               >
-                {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Check style={{ width: '16px', height: '16px' }} /> Save Changes</>}
+                {isSaving ? <><SpinnerGap style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Saving...</> : <><Check style={{ width: '16px', height: '16px' }} /> Save Changes</>}
               </button>
             </div>
           </div>
@@ -6494,7 +6494,7 @@ const getBudgetStatus = () => {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setDeletingEntry(null)}>
           <div style={{ width: '100%', maxWidth: '400px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+              <Warning style={{ width: '28px', height: '28px', color: '#ef4444' }} />
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete Entry?</h3>
             <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 16px' }}>Are you sure you want to delete this entry? This action cannot be undone.</p>
@@ -6519,7 +6519,7 @@ const getBudgetStatus = () => {
                 disabled={isSaving}
                 style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isSaving ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isSaving ? 0.7 : 1 }}
               >
-                {isSaving ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Delete</>}
+                {isSaving ? <><SpinnerGap style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash style={{ width: '16px', height: '16px' }} /> Delete</>}
               </button>
             </div>
           </div>
@@ -6531,7 +6531,7 @@ const getBudgetStatus = () => {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => setShowBulkDeleteConfirm(false)}>
           <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+              <Warning style={{ width: '28px', height: '28px', color: '#ef4444' }} />
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Delete {selectedEntries.length} Entries?</h3>
             <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 20px' }}>
@@ -6546,7 +6546,7 @@ const getBudgetStatus = () => {
               border: `1px solid ${isDark ? '#7f1d1d' : '#fecaca'}`
             }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px', justifyContent: 'center' }}>
-                <AlertTriangle style={{ width: '16px', height: '16px', color: '#ef4444' }} />
+                <Warning style={{ width: '16px', height: '16px', color: '#ef4444' }} />
                 <span style={{ fontSize: '13px', fontWeight: '600', color: '#ef4444' }}>
                   Total: {currency}{formatAmount(entries.filter(e => selectedEntries.includes(e.id)).reduce((sum, e) => sum + e.amount, 0))}
                 </span>
@@ -6565,7 +6565,7 @@ const getBudgetStatus = () => {
                 disabled={isDeleting}
                 style={{ flex: 1, height: '44px', backgroundColor: '#ef4444', border: 'none', borderRadius: '8px', fontSize: '14px', fontWeight: '500', color: '#fff', cursor: isDeleting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', opacity: isDeleting ? 0.7 : 1 }}
               >
-                {isDeleting ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Delete All Selected</>}
+                {isDeleting ? <><SpinnerGap style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Deleting...</> : <><Trash style={{ width: '16px', height: '16px' }} /> Delete All Selected</>}
               </button>
             </div>
           </div>
@@ -6577,7 +6577,7 @@ const getBudgetStatus = () => {
         <div style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px', zIndex: 50 }} onClick={() => { setShowClearAllConfirm(false); setClearEntriesConfirmText(''); }}>
           <div style={{ width: '100%', maxWidth: '450px', backgroundColor: theme.cardBg, borderRadius: '12px', border: `1px solid ${theme.cardBorder}`, padding: '24px', textAlign: 'center' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ width: '56px', height: '56px', borderRadius: '50%', backgroundColor: isDark ? '#450a0a' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
-              <AlertTriangle style={{ width: '28px', height: '28px', color: '#ef4444' }} />
+              <Warning style={{ width: '28px', height: '28px', color: '#ef4444' }} />
             </div>
             <h3 style={{ fontSize: '18px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>Clear All Entries?</h3>
             <p style={{ fontSize: '14px', color: theme.textMuted, margin: '0 0 20px' }}>
@@ -6645,7 +6645,7 @@ const getBudgetStatus = () => {
                   opacity: isDeleting ? 0.7 : 1 
                 }}
               >
-                {isDeleting ? <><Loader2 style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Clearing...</> : <><Trash2 style={{ width: '16px', height: '16px' }} /> Clear Everything</>}
+                {isDeleting ? <><SpinnerGap style={{ width: '16px', height: '16px', animation: 'spin 1s linear infinite' }} /> Clearing...</> : <><Trash style={{ width: '16px', height: '16px' }} /> Clear Everything</>}
               </button>
             </div>
           </div>
@@ -6666,7 +6666,7 @@ const getBudgetStatus = () => {
               <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
                 {!isSmall && (
                   <button onClick={() => handleDownloadFile(previewFile)} style={{ height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', padding: '0 12px', fontSize: '13px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <Download style={{ width: '14px', height: '14px' }} /> Download
+                    <DownloadSimple style={{ width: '14px', height: '14px' }} /> Download
                   </button>
                 )}
                 <button onClick={() => setPreviewFile(null)} style={{ width: '32px', height: '32px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -6676,7 +6676,7 @@ const getBudgetStatus = () => {
             </div>
             {isSmall && (
               <button onClick={() => handleDownloadFile(previewFile)} style={{ width: '100%', height: '40px', backgroundColor: 'transparent', border: `1px solid ${theme.inputBorder}`, borderRadius: '6px', marginBottom: '12px', fontSize: '13px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
-                <Download style={{ width: '14px', height: '14px' }} /> Download File
+                <DownloadSimple style={{ width: '14px', height: '14px' }} /> Download File
               </button>
             )}
             <div style={{ backgroundColor: theme.bg, borderRadius: '8px', padding: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '200px' }}>
@@ -6718,7 +6718,7 @@ const getBudgetStatus = () => {
                       gap: '8px' 
                     }}
                   >
-                    <Download style={{ width: '14px', height: '14px' }} /> Download PDF
+                    <DownloadSimple style={{ width: '14px', height: '14px' }} /> Download PDF
                   </button>
                 </div>
               ) : (
@@ -7352,7 +7352,7 @@ const getBudgetStatus = () => {
                   transition: 'transform 0.2s'
                 }}>
                   {isUploadingPicture ? (
-                    <Loader2 style={{ width: '16px', height: '16px', color: '#fff', animation: 'spin 1s linear infinite' }} />
+                    <SpinnerGap style={{ width: '16px', height: '16px', color: '#fff', animation: 'spin 1s linear infinite' }} />
                   ) : (
                     <Camera style={{ width: '16px', height: '16px', color: '#fff' }} />
                   )}
@@ -7566,7 +7566,7 @@ const getBudgetStatus = () => {
                       {checkedInToday ? (
                         <Check style={{ width: '24px', height: '24px', color: '#fff' }} />
                       ) : (
-                        <Flame style={{ width: '24px', height: '24px', color: '#f97316' }} />
+                        <Fire style={{ width: '24px', height: '24px', color: '#f97316' }} />
                       )}
                     </div>
                     <div>
@@ -7602,7 +7602,7 @@ const getBudgetStatus = () => {
                         whiteSpace: 'nowrap'
                       }}
                     >
-                      <Flame style={{ width: '14px', height: '14px' }} />
+                      <Fire style={{ width: '14px', height: '14px' }} />
                       Check In
                     </button>
                   )}
@@ -7739,7 +7739,7 @@ const getBudgetStatus = () => {
           {toast.type === 'success' ? (
             <Check style={{ width: '18px', height: '18px', flexShrink: 0 }} />
           ) : (
-            <AlertCircle style={{ width: '18px', height: '18px', flexShrink: 0 }} />
+            <WarningCircle style={{ width: '18px', height: '18px', flexShrink: 0 }} />
           )}
           <span style={{ fontSize: '14px', fontWeight: '500' }}>{toast.message}</span>
           <button 

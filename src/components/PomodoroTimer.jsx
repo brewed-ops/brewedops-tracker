@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
-import { Timer, Play, Pause, SkipForward, RotateCcw, Settings, Volume2, VolumeX, ChevronDown, ChevronUp, Flame, Coffee, Zap } from 'lucide-react';
+import { Timer, Play, Pause, SkipForward, ArrowCounterClockwise, GearSix, SpeakerHigh, SpeakerSlash, CaretDown, CaretUp, Fire, Coffee, Lightning } from '@phosphor-icons/react';
 
 // ============================================
 // BRAND CONFIG
@@ -32,9 +32,9 @@ const getTheme = (isDark) => ({
 // PHASE CONFIG
 // ============================================
 const PHASES = {
-  work: { label: 'Focus', icon: Zap, color: BRAND.blue, ringColor: BRAND.blue },
+  work: { label: 'Focus', icon: Lightning, color: BRAND.blue, ringColor: BRAND.blue },
   shortBreak: { label: 'Short Break', icon: Coffee, color: BRAND.green, ringColor: BRAND.green },
-  longBreak: { label: 'Long Break', icon: Flame, color: '#f59e0b', ringColor: '#f59e0b' },
+  longBreak: { label: 'Long Break', icon: Fire, color: '#f59e0b', ringColor: '#f59e0b' },
 };
 
 const DEFAULT_SETTINGS = {
@@ -232,7 +232,7 @@ const SettingsPanel = ({ settings, onChange, theme, isDark }) => {
             fontFamily: FONTS.body,
           }}
         >
-          {settings.soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
+          {settings.soundEnabled ? <SpeakerHigh size={14} /> : <SpeakerSlash size={14} />}
           Sound {settings.soundEnabled ? 'On' : 'Off'}
         </button>
       </div>
@@ -544,7 +544,7 @@ const PomodoroTimer = ({ isDark }) => {
           onMouseLeave={(e) => { e.currentTarget.style.borderColor = theme.cardBorder; }}
           title="Reset"
         >
-          <RotateCcw size={18} />
+          <ArrowCounterClockwise size={18} />
         </button>
 
         <button
@@ -703,9 +703,9 @@ const PomodoroTimer = ({ isDark }) => {
         onMouseEnter={(e) => { e.currentTarget.style.borderColor = BRAND.blue; e.currentTarget.style.color = BRAND.blue; }}
         onMouseLeave={(e) => { e.currentTarget.style.borderColor = theme.cardBorder; e.currentTarget.style.color = theme.textMuted; }}
       >
-        <Settings size={16} />
+        <GearSix size={16} />
         Settings
-        {showSettings ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+        {showSettings ? <CaretUp size={14} /> : <CaretDown size={14} />}
       </button>
 
       {showSettings && (

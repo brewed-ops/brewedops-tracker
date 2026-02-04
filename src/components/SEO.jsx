@@ -1,9 +1,9 @@
 import { Helmet } from 'react-helmet-async';
 
 const SEO = ({
-  title = 'BrewedOps | Free Tools for Filipino VAs & Freelancers',
-  description = '22+ free tools for Filipino VAs and freelancers. Image editing, PDF tools, finance tracking, and more — no sign-up required.',
-  keywords = 'BrewedOps, Filipino VA tools, freelancer tools, finance tracker, productivity, virtual assistant, free tools',
+  title = 'BrewedOps | VA Services, GHL Automation & Free Tools',
+  description = 'Expert VA services, GoHighLevel CRM automation, and web development — backed by 11+ years of customer support experience. Plus 22+ free productivity tools.',
+  keywords = 'BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free tools',
   url,
   image = 'https://i.imgur.com/R52jwPv.png',
 }) => {

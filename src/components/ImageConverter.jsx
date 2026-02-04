@@ -1,11 +1,11 @@
 // ImageConverter.jsx - Image Format Converter for BrewedOps
 // Features: Convert between formats (PNG, JPG, WebP, GIF, BMP), quality control, resize, batch convert
 import React, { useState, useRef, useCallback } from 'react';
-import { 
-  Upload, Download, Trash2, Loader2, CheckCircle, 
-  Clock, AlertTriangle, RefreshCw, Image, FileImage,
-  Settings, ChevronDown, X, Plus, Check, Info
-} from 'lucide-react';
+import {
+  UploadSimple, DownloadSimple, Trash, SpinnerGap, CheckCircle,
+  Clock, Warning, ArrowsClockwise, Image, FileImage,
+  GearSix, CaretDown, X, Plus, Check, Info
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -304,7 +304,7 @@ const ImageConverter = ({ isDark }) => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
-          <RefreshCw className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <ArrowsClockwise className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Image Converter
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Convert images between PNG, JPEG, WebP, GIF, and BMP</p>
@@ -338,7 +338,7 @@ const ImageConverter = ({ isDark }) => {
               <p className="text-muted-foreground mb-4">Drag & drop or click to select images</p>
               
               <Button style={{ backgroundColor: BRAND.blue }}>
-                <Upload className="size-4 mr-2" />
+                <UploadSimple className="size-4 mr-2" />
                 Select Images
               </Button>
               
@@ -359,7 +359,7 @@ const ImageConverter = ({ isDark }) => {
             {error && (
               <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
                 <div className="flex gap-3">
-                  <AlertTriangle className="size-5 text-destructive flex-shrink-0" />
+                  <Warning className="size-5 text-destructive flex-shrink-0" />
                   <p className="text-sm text-destructive">{error}</p>
                 </div>
               </div>
@@ -445,7 +445,7 @@ const ImageConverter = ({ isDark }) => {
                     onClick={() => setShowClearConfirm(true)}
                     className="text-destructive hover:text-destructive"
                   >
-                    <Trash2 className="size-4 md:mr-2" />
+                    <Trash className="size-4 md:mr-2" />
                     <span className="hidden md:inline">Clear All</span>
                   </Button>
                 </div>
@@ -506,7 +506,7 @@ const ImageConverter = ({ isDark }) => {
                       )}
                       {fileObj.status === 'converting' && (
                         <Badge variant="outline" className="text-xs gap-1">
-                          <Loader2 className="size-3 animate-spin" />
+                          <SpinnerGap className="size-3 animate-spin" />
                           Converting
                         </Badge>
                       )}
@@ -517,7 +517,7 @@ const ImageConverter = ({ isDark }) => {
                           onClick={() => downloadFile(fileObj)}
                           className="h-8"
                         >
-                          <Download className="size-4 md:mr-1" />
+                          <DownloadSimple className="size-4 md:mr-1" />
                           <span className="hidden md:inline">Download</span>
                         </Button>
                       )}
@@ -541,7 +541,7 @@ const ImageConverter = ({ isDark }) => {
               {error && (
                 <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
                   <div className="flex gap-3">
-                    <AlertTriangle className="size-5 text-destructive flex-shrink-0" />
+                    <Warning className="size-5 text-destructive flex-shrink-0" />
                     <p className="text-sm text-destructive">{error}</p>
                   </div>
                 </div>
@@ -569,7 +569,7 @@ const ImageConverter = ({ isDark }) => {
                       onClick={downloadAll}
                       style={{ backgroundColor: BRAND.green }}
                     >
-                      <Download className="size-4 mr-2" />
+                      <DownloadSimple className="size-4 mr-2" />
                       Download All ({stats.done})
                     </Button>
                   ) : (
@@ -580,12 +580,12 @@ const ImageConverter = ({ isDark }) => {
                     >
                       {isConverting ? (
                         <>
-                          <Loader2 className="size-4 mr-2 animate-spin" />
+                          <SpinnerGap className="size-4 mr-2 animate-spin" />
                           Converting...
                         </>
                       ) : (
                         <>
-                          <RefreshCw className="size-4 mr-2" />
+                          <ArrowsClockwise className="size-4 mr-2" />
                           Convert {stats.pending > 0 ? `(${stats.pending})` : 'All'}
                         </>
                       )}
@@ -632,7 +632,7 @@ const ImageConverter = ({ isDark }) => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-amber-500" />
+              <Warning className="size-5 text-amber-500" />
               Clear All Images?
             </DialogTitle>
             <DialogDescription>
@@ -644,7 +644,7 @@ const ImageConverter = ({ isDark }) => {
               Cancel
             </Button>
             <Button variant="destructive" onClick={clearAll}>
-              <Trash2 className="size-4 mr-2" />
+              <Trash className="size-4 mr-2" />
               Clear All
             </Button>
           </DialogFooter>

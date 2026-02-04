@@ -1,6 +1,6 @@
 // PrivacyPolicy.jsx - Privacy Policy page for BrewedOps
 import React from 'react';
-import { Shield, Mail, Database, Lock, Eye, Trash2, Globe, Users, Zap, Bell, MapPin, RefreshCw } from 'lucide-react';
+import { Shield, EnvelopeSimple, Database, Lock, Eye, Trash, Globe, Users, Lightning, Bell, MapPin, ArrowsClockwise } from '@phosphor-icons/react';
 import SEO from './SEO';
 
 // BREWEDOPS BRAND
@@ -260,7 +260,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
             </ul>
           </Section>
 
-          <Section icon={Zap} title="Cookies & Local Storage">
+          <Section icon={Lightning} title="Cookies & Local Storage">
             <p>BrewedOps uses minimal browser storage:</p>
             <ul style={{ margin: '12px 0', paddingLeft: '20px' }}>
               <li><strong style={{ color: theme.text }}>Authentication:</strong> Session tokens to keep you logged in</li>
@@ -276,7 +276,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
             <p>BrewedOps is not intended for use by anyone under the age of 18. We do not knowingly collect personal information from children. If you believe a child has provided us with personal information, please contact us immediately and we will delete such information.</p>
           </Section>
 
-          <Section icon={Trash2} title="Data Retention & Deletion">
+          <Section icon={Trash} title="Data Retention & Deletion">
             <p><strong style={{ color: theme.text }}>BrewedOps Web Platform:</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
               <li>Account data: Until you delete your account</li>
@@ -320,7 +320,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
             </p>
           </Section>
 
-          <Section icon={RefreshCw} title="Changes to This Policy">
+          <Section icon={ArrowsClockwise} title="Changes to This Policy">
             <p>We may update this Privacy Policy from time to time. When we make changes:</p>
             <ul style={{ margin: '12px 0', paddingLeft: '20px' }}>
               <li>We will update the "Last updated" date at the top</li>

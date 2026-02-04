@@ -1,6 +1,6 @@
 // WordCounter.jsx - Word & Character Counter Tool for BrewedOps
 import React, { useState, useMemo } from 'react';
-import { FileText, Copy, Check, Trash2, AlertTriangle, Clock, Hash, Type, AlignLeft, BookOpen } from 'lucide-react';
+import { FileText, Copy, Check, Trash, Warning, Clock, Hash, TextT, TextAlignLeft, BookOpen } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -126,7 +126,7 @@ const WordCounter = ({ isDark }) => {
                           {copied ? 'Copied!' : 'Copy'}
                         </Button>
                         <Button variant="outline" size="sm" onClick={() => setShowClearModal(true)} className="text-destructive">
-                          <Trash2 className="size-4 mr-1" />Clear
+                          <Trash className="size-4 mr-1" />Clear
                         </Button>
                       </>
                     )}
@@ -153,13 +153,13 @@ const WordCounter = ({ isDark }) => {
                 value={stats.words.toLocaleString()} 
               />
               <StatCard 
-                icon={Type} 
+                icon={TextT} 
                 label="Characters" 
                 value={stats.characters.toLocaleString()}
                 subvalue={`${stats.charactersNoSpaces.toLocaleString()} without spaces`}
               />
               <StatCard 
-                icon={AlignLeft} 
+                icon={TextAlignLeft} 
                 label="Sentences" 
                 value={stats.sentences.toLocaleString()} 
                 color={BRAND.green}
@@ -242,7 +242,7 @@ const WordCounter = ({ isDark }) => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-amber-500" />
+              <Warning className="size-5 text-amber-500" />
               Clear Text?
             </DialogTitle>
             <DialogDescription>
@@ -252,7 +252,7 @@ const WordCounter = ({ isDark }) => {
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearModal(false)}>Cancel</Button>
             <Button variant="destructive" onClick={clearAll}>
-              <Trash2 className="size-4 mr-2" />Clear
+              <Trash className="size-4 mr-2" />Clear
             </Button>
           </DialogFooter>
         </DialogContent>

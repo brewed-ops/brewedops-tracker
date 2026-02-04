@@ -1,16 +1,16 @@
 import React from 'react';
-import { 
-  Sun, 
-  Moon, 
-  TreePine, 
-  Trophy, 
-  Gift, 
-  Flame, 
-  Edit, 
-  MessageSquare, 
-  LogOut,
-  Menu
-} from 'lucide-react';
+import {
+  Sun,
+  Moon,
+  Tree,
+  Trophy,
+  Gift,
+  Fire,
+  PencilSimple,
+  ChatText,
+  SignOut,
+  List
+} from '@phosphor-icons/react';
 import { getAnimatedFrameStyle, getAvatarInnerStyle, getInitial } from '../../lib/gamification';
 import { ACHIEVEMENTS, CURRENCIES } from '../../lib/constants';
 
@@ -175,7 +175,7 @@ const Header = ({
                   borderRadius: '12px',
                   position: 'relative'
                 }}>
-                  <Flame style={{ width: '14px', height: '14px', color: checkedInToday ? '#22c55e' : '#f97316' }} />
+                  <Fire style={{ width: '14px', height: '14px', color: checkedInToday ? '#22c55e' : '#f97316' }} />
                   {currentStreak > 0 && (
                     <span style={{ fontSize: '12px', fontWeight: '700', color: checkedInToday ? '#22c55e' : '#f97316' }}>{currentStreak}</span>
                   )}
@@ -213,7 +213,7 @@ const Header = ({
               title={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
               aria-label={isChristmasTheme ? 'Disable Christmas Theme' : 'Enable Christmas Theme'}
             >
-              <TreePine style={{ width: '20px', height: '20px' }} />
+              <Tree style={{ width: '20px', height: '20px' }} />
             </button>
             
             {/* Dark/Light Mode Toggle */}
@@ -383,7 +383,7 @@ const ProfileDropdown = ({
         textAlign: 'left'
       }}
     >
-      <Edit style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+      <PencilSimple style={{ width: '18px', height: '18px', color: theme.textMuted }} />
       Edit Profile
     </button>
     <button
@@ -402,7 +402,7 @@ const ProfileDropdown = ({
         textAlign: 'left'
       }}
     >
-      <MessageSquare style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+      <ChatText style={{ width: '18px', height: '18px', color: theme.textMuted }} />
       Send Feedback
     </button>
     <button
@@ -421,7 +421,7 @@ const ProfileDropdown = ({
         textAlign: 'left'
       }}
     >
-      <LogOut style={{ width: '18px', height: '18px' }} />
+      <SignOut style={{ width: '18px', height: '18px' }} />
       Logout
     </button>
   </div>
@@ -496,7 +496,7 @@ const MobileHeaderActions = ({
           cursor: 'pointer'
         }}
       >
-        <Flame style={{ width: '14px', height: '14px', color: checkedInToday ? '#22c55e' : '#f97316' }} />
+        <Fire style={{ width: '14px', height: '14px', color: checkedInToday ? '#22c55e' : '#f97316' }} />
         {currentStreak > 0 && (
           <span style={{ fontSize: '12px', fontWeight: '700', color: checkedInToday ? '#22c55e' : '#f97316' }}>{currentStreak}</span>
         )}
@@ -613,7 +613,7 @@ const MobileHeaderActions = ({
               textAlign: 'left'
             }}
           >
-            <Edit style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+            <PencilSimple style={{ width: '18px', height: '18px', color: theme.textMuted }} />
             Edit Profile
           </button>
           <button
@@ -632,7 +632,7 @@ const MobileHeaderActions = ({
               textAlign: 'left'
             }}
           >
-            <MessageSquare style={{ width: '18px', height: '18px', color: theme.textMuted }} />
+            <ChatText style={{ width: '18px', height: '18px', color: theme.textMuted }} />
             Send Feedback
           </button>
           <button
@@ -651,7 +651,7 @@ const MobileHeaderActions = ({
               textAlign: 'left'
             }}
           >
-            <LogOut style={{ width: '18px', height: '18px' }} />
+            <SignOut style={{ width: '18px', height: '18px' }} />
             Logout
           </button>
         </div>

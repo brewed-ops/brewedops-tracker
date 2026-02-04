@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react';
+import { SpinnerGap } from '@phosphor-icons/react';
 
 const LoadingFallback = () => (
   <div style={{
@@ -7,7 +7,7 @@ const LoadingFallback = () => (
     justifyContent: 'center',
     minHeight: '60vh',
   }}>
-    <Loader2 style={{
+    <SpinnerGap style={{
       width: '32px',
       height: '32px',
       color: '#6b5f52',

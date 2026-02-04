@@ -1,7 +1,7 @@
 // PDFEditor.jsx - Full-featured PDF Editor for BrewedOps
 // Mobile detection, clear all modal, proper dialogs
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Upload, Download, Save, Trash2, Type, Square, Circle, Minus, PenTool, MousePointer, RotateCcw, RotateCw, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, AlertTriangle, Clock, Bold, Italic, Underline, Palette, FileText, Loader2, CheckCircle, ArrowRight, Monitor, Smartphone, X } from 'lucide-react';
+import { UploadSimple, DownloadSimple, FloppyDisk, Trash, TextT, Square, Circle, Minus, PenNib, Cursor, ArrowCounterClockwise, ArrowClockwise, MagnifyingGlassPlus, MagnifyingGlassMinus, CaretLeft, CaretRight, Warning, Clock, TextB, TextItalic, TextUnderline, Palette, FileText, SpinnerGap, CheckCircle, ArrowRight, Monitor, DeviceMobile, X } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -78,7 +78,7 @@ const MobileWarningScreen = ({ isDark }) => {
       <Card className="max-w-md mx-auto mt-8">
         <CardContent className="p-8 text-center">
           <div className="size-20 rounded-full mx-auto mb-6 flex items-center justify-center bg-amber-500/15">
-            <Smartphone className="size-10 text-amber-500" />
+            <DeviceMobile className="size-10 text-amber-500" />
           </div>
           
           <h2 className="text-xl font-bold mb-3" style={{ color: theme.text }}>
@@ -118,7 +118,7 @@ const MobileWarningPopup = ({ isOpen, onClose }) => (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
-          <AlertTriangle className="size-5 text-amber-500" />
+          <Warning className="size-5 text-amber-500" />
           Not Optimized for Mobile
         </DialogTitle>
         <DialogDescription>
@@ -128,7 +128,7 @@ const MobileWarningPopup = ({ isOpen, onClose }) => (
       <div className="py-4">
         <div className="flex items-center gap-4 mb-4">
           <div className="size-12 rounded-full flex items-center justify-center bg-amber-500/15 flex-shrink-0">
-            <Smartphone className="size-6 text-amber-500" />
+            <DeviceMobile className="size-6 text-amber-500" />
           </div>
           <div>
             <p className="text-sm font-medium">Limited Mobile Support</p>
@@ -162,7 +162,7 @@ const ClearAllModal = ({ isOpen, onClose, onConfirm }) => (
     <DialogContent className="sm:max-w-md">
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
-          <Trash2 className="size-5 text-destructive" />
+          <Trash className="size-5 text-destructive" />
           Clear All Annotations
         </DialogTitle>
         <DialogDescription>
@@ -182,7 +182,7 @@ const ClearAllModal = ({ isOpen, onClose, onConfirm }) => (
           Cancel
         </Button>
         <Button variant="destructive" onClick={onConfirm}>
-          <Trash2 className="size-4 mr-2" />
+          <Trash className="size-4 mr-2" />
           Clear All
         </Button>
       </DialogFooter>
@@ -754,11 +754,11 @@ const PDFEditor = ({ isDark }) => {
       <Card className="max-w-2xl mx-auto">
         <CardContent className="p-6 md:p-12">
           {loading ? (
-            <div className="text-center py-12"><Loader2 className="size-12 animate-spin mx-auto mb-4" style={{ color: BRAND.blue }} /><p className="text-muted-foreground">Loading PDF Editor...</p></div>
+            <div className="text-center py-12"><SpinnerGap className="size-12 animate-spin mx-auto mb-4" style={{ color: BRAND.blue }} /><p className="text-muted-foreground">Loading PDF Editor...</p></div>
           ) : (
             <>
               <div className="border-2 border-dashed rounded-xl p-12 text-center cursor-pointer transition-all hover:border-primary hover:bg-primary/5" onClick={() => fileInputRef.current?.click()}>
-                <div className="size-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: BRAND.blue + '15' }}><Upload className="size-10" style={{ color: BRAND.blue }} /></div>
+                <div className="size-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: BRAND.blue + '15' }}><UploadSimple className="size-10" style={{ color: BRAND.blue }} /></div>
                 <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text }}>Upload PDF to Edit</h3>
                 <p className="text-muted-foreground mb-4">Click to select a PDF file</p>
                 <Button style={{ backgroundColor: BRAND.blue }}><FileText className="size-4 mr-2" />Select PDF</Button>
@@ -766,7 +766,7 @@ const PDFEditor = ({ isDark }) => {
               </div>
               <div className="mt-6 p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
                 <div className="flex gap-3">
-                  <AlertTriangle className="size-5 text-amber-500 flex-shrink-0 mt-0.5" />
+                  <Warning className="size-5 text-amber-500 flex-shrink-0 mt-0.5" />
                   <div>
                     <p className="text-sm font-medium text-amber-500">Important Notice</p>
                     <p className="text-xs text-muted-foreground mt-1">After saving, download will be available for <strong>15 minutes</strong>.</p>
@@ -795,15 +795,15 @@ const PDFEditor = ({ isDark }) => {
       {/* Toolbar */}
       <div className="border-b p-2 flex flex-wrap items-center gap-2" style={{ backgroundColor: theme.cardBg, borderColor: theme.cardBorder }}>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="sm" onClick={() => { setPdfFile(null); setPdfDoc(null); }}><Upload className="size-4 mr-1" />New</Button>
-          <Button size="sm" onClick={handleSave} disabled={isSaving} style={{ backgroundColor: BRAND.green }}>{isSaving ? <Loader2 className="size-4 mr-1 animate-spin" /> : <Save className="size-4 mr-1" />}Save</Button>
-          {savedPdfUrl && <Button variant="outline" size="sm" onClick={handleDownload}><Download className="size-4 mr-1" />Download</Button>}
+          <Button variant="ghost" size="sm" onClick={() => { setPdfFile(null); setPdfDoc(null); }}><UploadSimple className="size-4 mr-1" />New</Button>
+          <Button size="sm" onClick={handleSave} disabled={isSaving} style={{ backgroundColor: BRAND.green }}>{isSaving ? <SpinnerGap className="size-4 mr-1 animate-spin" /> : <FloppyDisk className="size-4 mr-1" />}Save</Button>
+          {savedPdfUrl && <Button variant="outline" size="sm" onClick={handleDownload}><DownloadSimple className="size-4 mr-1" />Download</Button>}
         </div>
         <Separator orientation="vertical" className="h-6" />
         <div className="flex items-center gap-1">
-          <ToolButton icon={MousePointer} label="Select / Move / Resize" isActive={activeTool === TOOLS.SELECT} onClick={() => setActiveTool(TOOLS.SELECT)} />
-          <ToolButton icon={Type} label="Text" isActive={activeTool === TOOLS.TEXT} onClick={() => setActiveTool(TOOLS.TEXT)} />
-          <ToolButton icon={PenTool} label="Draw" isActive={activeTool === TOOLS.DRAW} onClick={() => setActiveTool(TOOLS.DRAW)} />
+          <ToolButton icon={Cursor} label="Select / Move / Resize" isActive={activeTool === TOOLS.SELECT} onClick={() => setActiveTool(TOOLS.SELECT)} />
+          <ToolButton icon={TextT} label="Text" isActive={activeTool === TOOLS.TEXT} onClick={() => setActiveTool(TOOLS.TEXT)} />
+          <ToolButton icon={PenNib} label="Draw" isActive={activeTool === TOOLS.DRAW} onClick={() => setActiveTool(TOOLS.DRAW)} />
           <ToolButton icon={Square} label="Rectangle" isActive={activeTool === TOOLS.RECTANGLE} onClick={() => setActiveTool(TOOLS.RECTANGLE)} />
           <ToolButton icon={Circle} label="Circle" isActive={activeTool === TOOLS.CIRCLE} onClick={() => setActiveTool(TOOLS.CIRCLE)} />
           <ToolButton icon={Minus} label="Line" isActive={activeTool === TOOLS.LINE} onClick={() => setActiveTool(TOOLS.LINE)} />
@@ -813,21 +813,21 @@ const PDFEditor = ({ isDark }) => {
         </div>
         <Separator orientation="vertical" className="h-6" />
         <div className="flex items-center gap-1">
-          <ToolButton icon={RotateCcw} label="Undo" onClick={undo} disabled={historyIndex <= 0} />
-          <ToolButton icon={RotateCw} label="Redo" onClick={redo} disabled={historyIndex >= history.length - 1} />
-          <Button variant="ghost" size="sm" onClick={() => setShowClearDialog(true)} disabled={currentAnnotations.length === 0}><Trash2 className="size-4 mr-1" />Clear</Button>
+          <ToolButton icon={ArrowCounterClockwise} label="Undo" onClick={undo} disabled={historyIndex <= 0} />
+          <ToolButton icon={ArrowClockwise} label="Redo" onClick={redo} disabled={historyIndex >= history.length - 1} />
+          <Button variant="ghost" size="sm" onClick={() => setShowClearDialog(true)} disabled={currentAnnotations.length === 0}><Trash className="size-4 mr-1" />Clear</Button>
         </div>
         <Separator orientation="vertical" className="h-6" />
         <div className="flex items-center gap-1">
-          <ToolButton icon={ZoomOut} label="Zoom Out" onClick={() => setZoom(z => Math.max(0.5, z - 0.25))} />
+          <ToolButton icon={MagnifyingGlassMinus} label="Zoom Out" onClick={() => setZoom(z => Math.max(0.5, z - 0.25))} />
           <Badge variant="outline" className="min-w-[50px] justify-center">{Math.round(zoom * 100)}%</Badge>
-          <ToolButton icon={ZoomIn} label="Zoom In" onClick={() => setZoom(z => Math.min(3, z + 0.25))} />
+          <ToolButton icon={MagnifyingGlassPlus} label="Zoom In" onClick={() => setZoom(z => Math.min(3, z + 0.25))} />
         </div>
         <Separator orientation="vertical" className="h-6" />
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" className="size-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage <= 1}><ChevronLeft className="size-4" /></Button>
+          <Button variant="ghost" size="icon" className="size-8" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage <= 1}><CaretLeft className="size-4" /></Button>
           <span className="text-sm min-w-[60px] text-center">{currentPage} / {numPages}</span>
-          <Button variant="ghost" size="icon" className="size-8" onClick={() => setCurrentPage(p => Math.min(numPages, p + 1))} disabled={currentPage >= numPages}><ChevronRight className="size-4" /></Button>
+          <Button variant="ghost" size="icon" className="size-8" onClick={() => setCurrentPage(p => Math.min(numPages, p + 1))} disabled={currentPage >= numPages}><CaretRight className="size-4" /></Button>
         </div>
         {expiryTime && (<><Separator orientation="vertical" className="h-6" /><div className="flex items-center gap-2"><span className="text-xs text-muted-foreground">Expires:</span><ExpiryTimer expiryTime={expiryTime} onExpired={handleExpired} /></div></>)}
       </div>
@@ -851,9 +851,9 @@ const PDFEditor = ({ isDark }) => {
                 <div className="space-y-2">
                   <Label className="text-xs">Style</Label>
                   <div className="flex gap-1">
-                    <Button variant={(selectedAnnotation?.bold ?? textSettings.bold) ? "default" : "outline"} size="icon" className="size-8" onClick={() => updateSelectedTextStyle({ bold: !(selectedAnnotation?.bold ?? textSettings.bold) })}><Bold className="size-3" /></Button>
-                    <Button variant={(selectedAnnotation?.italic ?? textSettings.italic) ? "default" : "outline"} size="icon" className="size-8" onClick={() => updateSelectedTextStyle({ italic: !(selectedAnnotation?.italic ?? textSettings.italic) })}><Italic className="size-3" /></Button>
-                    <Button variant={(selectedAnnotation?.underline ?? textSettings.underline) ? "default" : "outline"} size="icon" className="size-8" onClick={() => updateSelectedTextStyle({ underline: !(selectedAnnotation?.underline ?? textSettings.underline) })}><Underline className="size-3" /></Button>
+                    <Button variant={(selectedAnnotation?.bold ?? textSettings.bold) ? "default" : "outline"} size="icon" className="size-8" onClick={() => updateSelectedTextStyle({ bold: !(selectedAnnotation?.bold ?? textSettings.bold) })}><TextB className="size-3" /></Button>
+                    <Button variant={(selectedAnnotation?.italic ?? textSettings.italic) ? "default" : "outline"} size="icon" className="size-8" onClick={() => updateSelectedTextStyle({ italic: !(selectedAnnotation?.italic ?? textSettings.italic) })}><TextItalic className="size-3" /></Button>
+                    <Button variant={(selectedAnnotation?.underline ?? textSettings.underline) ? "default" : "outline"} size="icon" className="size-8" onClick={() => updateSelectedTextStyle({ underline: !(selectedAnnotation?.underline ?? textSettings.underline) })}><TextUnderline className="size-3" /></Button>
                   </div>
                 </div>
                 <ColorPicker label="Color" value={selectedAnnotation?.fontColor || textSettings.fontColor} onChange={c => updateSelectedTextStyle({ fontColor: c })} />
@@ -880,7 +880,7 @@ const PDFEditor = ({ isDark }) => {
                   <p>• Drag {selectedAnnotation.type === 'text' ? 'right handle' : 'corner handles'} to resize</p>
                   {selectedAnnotation.type === 'text' && <p>• Double-click to edit</p>}
                 </div>
-                <Button variant="destructive" size="sm" className="w-full" onClick={() => deleteAnnotation(selectedId)}><Trash2 className="size-3 mr-1" />Delete</Button>
+                <Button variant="destructive" size="sm" className="w-full" onClick={() => deleteAnnotation(selectedId)}><Trash className="size-3 mr-1" />Delete</Button>
               </div>
             )}
             
@@ -899,10 +899,10 @@ const PDFEditor = ({ isDark }) => {
         {/* Canvas area */}
         <div className="flex-1 overflow-auto p-4 md:p-6 flex justify-center items-start" style={{ backgroundColor: isDark ? '#1a1a1b' : '#e5e5e5' }}>
           {loading ? (
-            <div className="flex items-center justify-center h-full"><Loader2 className="size-8 animate-spin" style={{ color: BRAND.blue }} /></div>
+            <div className="flex items-center justify-center h-full"><SpinnerGap className="size-8 animate-spin" style={{ color: BRAND.blue }} /></div>
           ) : (
             <div className="relative shadow-2xl bg-white" style={{ minWidth: 300, minHeight: 400 }}>
-              {pageRendering && <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10"><Loader2 className="size-8 animate-spin" style={{ color: BRAND.blue }} /></div>}
+              {pageRendering && <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10"><SpinnerGap className="size-8 animate-spin" style={{ color: BRAND.blue }} /></div>}
               <canvas ref={pdfCanvasRef} style={{ display: 'block', maxWidth: '100%', height: 'auto' }} />
               <canvas ref={annotationCanvasRef} className="absolute top-0 left-0" style={{ cursor: activeTool === TOOLS.SELECT ? 'default' : 'crosshair', maxWidth: '100%', height: 'auto' }} onMouseDown={handleMouseDown} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp} onDoubleClick={handleDoubleClick} />
               {editingAnnotation && <input ref={textInputRef} type="text" value={editingAnnotation.text} onChange={handleTextChange} onKeyDown={handleTextKeyDown} onBlur={handleTextBlur} placeholder="Type here..." style={getTextEditorStyle()} />}
@@ -929,7 +929,7 @@ const PDFEditor = ({ isDark }) => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowSaveDialog(false)}>Close</Button>
-            <Button onClick={handleDownload} style={{ backgroundColor: BRAND.blue }}><Download className="size-4 mr-2" />Download</Button>
+            <Button onClick={handleDownload} style={{ backgroundColor: BRAND.blue }}><DownloadSimple className="size-4 mr-2" />Download</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

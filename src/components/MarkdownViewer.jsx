@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, FileText, Copy, Check, Download, Trash2, Eye, Code, X, FileUp, Moon, Sun, Clock, Type, Hash, AlignLeft } from 'lucide-react';
+import { UploadSimple, FileText, Copy, Check, DownloadSimple, Trash, Eye, Code, X, FileArrowUp, Moon, Sun, Clock, TextT, Hash, TextAlignLeft } from '@phosphor-icons/react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -388,14 +388,14 @@ const MarkdownViewer = ({ isDark = true }) => {
               {copied ? 'Copied!' : 'Copy'}
             </button>
             <button onClick={handleDownload} style={btnStyle}>
-              <Download size={14} />
+              <DownloadSimple size={14} />
               Download
             </button>
             <button
               onClick={handleClear}
               style={{ ...btnStyle, color: '#ef4444', borderColor: '#ef444440' }}
             >
-              <Trash2 size={14} />
+              <Trash size={14} />
               Clear
             </button>
           </div>
@@ -442,7 +442,7 @@ const MarkdownViewer = ({ isDark = true }) => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-              <FileUp size={28} style={{ color: isDragging ? BRAND.blue : theme.textMuted }} />
+              <FileArrowUp size={28} style={{ color: isDragging ? BRAND.blue : theme.textMuted }} />
             </div>
             <div style={{ textAlign: 'center' }}>
               <p style={{
@@ -492,7 +492,7 @@ const MarkdownViewer = ({ isDark = true }) => {
                   gap: '4px',
                 }}
               >
-                <Upload size={12} />
+                <UploadSimple size={12} />
                 Change File
               </button>
               <input
@@ -520,13 +520,13 @@ const MarkdownViewer = ({ isDark = true }) => {
                   <Clock size={10} /> {readingStats.readingTime} min read
                 </span>
                 <span style={{ fontSize: '11px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Type size={10} /> {readingStats.words.toLocaleString()} words
+                  <TextT size={10} /> {readingStats.words.toLocaleString()} words
                 </span>
                 <span style={{ fontSize: '11px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <Hash size={10} /> {readingStats.chars.toLocaleString()} chars
                 </span>
                 <span style={{ fontSize: '11px', color: theme.textMuted, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <AlignLeft size={10} /> {readingStats.lines} lines
+                  <TextAlignLeft size={10} /> {readingStats.lines} lines
                 </span>
                 {readingStats.headings > 0 && (
                   <span style={{ fontSize: '11px', color: theme.textMuted }}>

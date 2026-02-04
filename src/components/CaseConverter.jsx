@@ -1,6 +1,6 @@
 // CaseConverter.jsx - Text Case Converter Tool for BrewedOps
 import React, { useState } from 'react';
-import { CaseSensitive, Copy, Check, Trash2, AlertTriangle, Download, ArrowDown, ArrowUp, Type } from 'lucide-react';
+import { TextAa, Copy, Check, Trash, Warning, DownloadSimple, ArrowDown, ArrowUp, TextT } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -91,11 +91,11 @@ const CaseConverter = ({ isDark }) => {
   const caseOptions = [
     { id: 'lower', label: 'lowercase', example: 'hello world', icon: ArrowDown },
     { id: 'upper', label: 'UPPERCASE', example: 'HELLO WORLD', icon: ArrowUp },
-    { id: 'title', label: 'Title Case', example: 'Hello World', icon: Type },
-    { id: 'sentence', label: 'Sentence case', example: 'Hello world. How are you?', icon: CaseSensitive },
-    { id: 'capitalize', label: 'Capitalize first', example: 'Hello world', icon: CaseSensitive },
-    { id: 'toggle', label: 'tOGGLE cASE', example: 'hELLO wORLD', icon: CaseSensitive },
-    { id: 'alternate', label: 'aLtErNaTe', example: 'hElLo WoRlD', icon: CaseSensitive },
+    { id: 'title', label: 'Title Case', example: 'Hello World', icon: TextT },
+    { id: 'sentence', label: 'Sentence case', example: 'Hello world. How are you?', icon: TextAa },
+    { id: 'capitalize', label: 'Capitalize first', example: 'Hello world', icon: TextAa },
+    { id: 'toggle', label: 'tOGGLE cASE', example: 'hELLO wORLD', icon: TextAa },
+    { id: 'alternate', label: 'aLtErNaTe', example: 'hElLo WoRlD', icon: TextAa },
   ];
 
   return (
@@ -103,7 +103,7 @@ const CaseConverter = ({ isDark }) => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
-          <CaseSensitive className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <TextAa className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Case Converter
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Convert text between different letter cases</p>
@@ -117,7 +117,7 @@ const CaseConverter = ({ isDark }) => {
               <Label className="font-medium" style={{ color: theme.text }}>Your Text</Label>
               {inputText && (
                 <Button variant="outline" size="sm" onClick={() => setShowClearModal(true)} className="text-destructive">
-                  <Trash2 className="size-4 mr-1" />Clear
+                  <Trash className="size-4 mr-1" />Clear
                 </Button>
               )}
             </div>
@@ -185,7 +185,7 @@ const CaseConverter = ({ isDark }) => {
                     {copied ? 'Copied!' : 'Copy'}
                   </Button>
                   <Button variant="outline" size="sm" onClick={downloadResult}>
-                    <Download className="size-4 mr-1" />Save
+                    <DownloadSimple className="size-4 mr-1" />Save
                   </Button>
                 </div>
               </div>
@@ -219,7 +219,7 @@ const CaseConverter = ({ isDark }) => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-amber-500" />
+              <Warning className="size-5 text-amber-500" />
               Clear All?
             </DialogTitle>
             <DialogDescription>
@@ -229,7 +229,7 @@ const CaseConverter = ({ isDark }) => {
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearModal(false)}>Cancel</Button>
             <Button variant="destructive" onClick={clearAll}>
-              <Trash2 className="size-4 mr-2" />Clear All
+              <Trash className="size-4 mr-2" />Clear All
             </Button>
           </DialogFooter>
         </DialogContent>

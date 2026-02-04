@@ -2,10 +2,10 @@
 // Uses shadcn/ui components exclusively
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-  Plus, Play, Pause, RotateCcw, Clock, CheckCircle2, Circle, Timer, Trash2, X,
-  Calendar, Coffee, Target, Zap, TrendingUp, ListTodo, Loader2, AlertCircle,
-  CircleDot, AlertTriangle, Flame, FileText
-} from 'lucide-react';
+  Plus, Play, Pause, ArrowCounterClockwise, Clock, CheckCircle, Circle, Timer, Trash, X,
+  Calendar, Coffee, Target, Lightning, TrendUp, ListChecks, SpinnerGap, WarningCircle,
+  RadioButton, Warning, Fire, FileText
+} from '@phosphor-icons/react';
 import { supabase } from '../lib/supabase';
 
 // shadcn/ui components
@@ -27,14 +27,14 @@ const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FF
 // Priority config with icons instead of emojis
 const PRIORITY_CONFIG = {
   low: { color: '#22c55e', label: 'Low', icon: Circle },
-  medium: { color: '#f59e0b', label: 'Medium', icon: CircleDot },
-  high: { color: '#ef4444', label: 'High', icon: Flame },
+  medium: { color: '#f59e0b', label: 'Medium', icon: RadioButton },
+  high: { color: '#ef4444', label: 'High', icon: Fire },
 };
 
 // Status config
 const STATUS_CONFIG = {
-  todo: { label: 'To Do', icon: ListTodo },
-  'in-progress': { label: 'In Progress', icon: TrendingUp },
+  todo: { label: 'To Do', icon: ListChecks },
+  'in-progress': { label: 'In Progress', icon: TrendUp },
 };
 
 // Responsive hook
@@ -113,7 +113,7 @@ const PomodoroTimer = ({ activeTask, onSessionComplete, isMobile }) => {
         <Tabs value={mode} onValueChange={switchMode} className="mb-4">
           <TabsList className="w-full grid grid-cols-3 h-9">
             <TabsTrigger value="focus" className="text-xs gap-1">
-              <Zap className="size-3" />
+              <Lightning className="size-3" />
               Focus
             </TabsTrigger>
             <TabsTrigger value="short" className="text-xs gap-1">
@@ -166,7 +166,7 @@ const PomodoroTimer = ({ activeTask, onSessionComplete, isMobile }) => {
             onClick={reset}
             className={cn("rounded-full self-center", isMobile ? "size-10" : "size-12")}
           >
-            <RotateCcw className="size-4" />
+            <ArrowCounterClockwise className="size-4" />
           </Button>
         </div>
 
@@ -220,7 +220,7 @@ const TaskCard = ({ task, onUpdate, onDelete, onSelect, isSelected, isMobile, is
               onUpdate({ ...task, status: nextStatus });
             }}
           >
-            {task.status === 'done' && <CheckCircle2 className="size-5 text-white" />}
+            {task.status === 'done' && <CheckCircle className="size-5 text-white" />}
             {task.status === 'in-progress' && <div className="size-1.5 rounded-full" style={{ backgroundColor: BRAND.blue }} />}
           </div>
 
@@ -279,7 +279,7 @@ const TaskCard = ({ task, onUpdate, onDelete, onSelect, isSelected, isMobile, is
               onClick={(e) => { e.stopPropagation(); onDelete(task.id); }}
               className="size-7 text-muted-foreground hover:text-destructive"
             >
-              {isUpdating ? <Loader2 className="size-3 animate-spin" /> : <Trash2 className="size-3" />}
+              {isUpdating ? <SpinnerGap className="size-3 animate-spin" /> : <Trash className="size-3" />}
             </Button>
           </div>
         </div>
@@ -349,13 +349,13 @@ const AddTaskDialog = ({ open, onOpenChange, onAdd }) => {
                   </SelectItem>
                   <SelectItem value="medium">
                     <div className="flex items-center gap-2">
-                      <CircleDot className="size-3 text-amber-500" />
+                      <RadioButton className="size-3 text-amber-500" />
                       <span>Medium</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="high">
                     <div className="flex items-center gap-2">
-                      <Flame className="size-3 text-red-500" />
+                      <Fire className="size-3 text-red-500" />
                       <span>High</span>
                     </div>
                   </SelectItem>
@@ -371,13 +371,13 @@ const AddTaskDialog = ({ open, onOpenChange, onAdd }) => {
                 <SelectContent>
                   <SelectItem value="todo">
                     <div className="flex items-center gap-2">
-                      <ListTodo className="size-3 text-muted-foreground" />
+                      <ListChecks className="size-3 text-muted-foreground" />
                       <span>To Do</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="in-progress">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="size-3 text-blue-500" />
+                      <TrendUp className="size-3 text-blue-500" />
                       <span>In Progress</span>
                     </div>
                   </SelectItem>
@@ -417,7 +417,7 @@ const CompletedTasksHistory = ({ tasks, onReopen, onDelete }) => {
     return (
       <Card className="h-full">
         <CardContent className="p-6 text-center">
-          <CheckCircle2 className="size-10 text-muted-foreground/30 mx-auto mb-2" />
+          <CheckCircle className="size-10 text-muted-foreground/30 mx-auto mb-2" />
           <p className="text-sm text-muted-foreground">No completed tasks yet</p>
         </CardContent>
       </Card>
@@ -428,7 +428,7 @@ const CompletedTasksHistory = ({ tasks, onReopen, onDelete }) => {
     <Card className="h-full flex flex-col">
       <CardHeader className="pb-2">
         <CardTitle className="text-sm flex items-center gap-2">
-          <CheckCircle2 className="size-4" style={{ color: BRAND.green }} />
+          <CheckCircle className="size-4" style={{ color: BRAND.green }} />
           Completed Tasks
         </CardTitle>
         <CardDescription className="text-xs">
@@ -445,7 +445,7 @@ const CompletedTasksHistory = ({ tasks, onReopen, onDelete }) => {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-start gap-2 flex-1 min-w-0">
-                    <CheckCircle2 className="size-4 flex-shrink-0 mt-0.5" style={{ color: BRAND.green }} />
+                    <CheckCircle className="size-4 flex-shrink-0 mt-0.5" style={{ color: BRAND.green }} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-muted-foreground line-through truncate">
                         {task.title}
@@ -475,7 +475,7 @@ const CompletedTasksHistory = ({ tasks, onReopen, onDelete }) => {
                       title="Reopen task"
                       onClick={() => onReopen(task)}
                     >
-                      <RotateCcw className="size-3" />
+                      <ArrowCounterClockwise className="size-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -484,7 +484,7 @@ const CompletedTasksHistory = ({ tasks, onReopen, onDelete }) => {
                       title="Delete task"
                       onClick={() => onDelete(task.id)}
                     >
-                      <Trash2 className="size-3" />
+                      <Trash className="size-3" />
                     </Button>
                   </div>
                 </div>
@@ -629,7 +629,7 @@ const TaskManager = ({ user, isDark, clients = [] }) => {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center">
-          <Loader2 className="size-8 animate-spin mx-auto mb-4 text-primary" />
+          <SpinnerGap className="size-8 animate-spin mx-auto mb-4 text-primary" />
           <p className="text-muted-foreground">Loading tasks...</p>
         </div>
       </div>
@@ -646,7 +646,7 @@ const TaskManager = ({ user, isDark, clients = [] }) => {
 
       {error && (
         <div className="mb-4 p-3 bg-destructive/10 text-destructive rounded-lg flex items-center gap-2 text-sm">
-          <AlertCircle className="size-4" />
+          <WarningCircle className="size-4" />
           {error}
         </div>
       )}
@@ -656,8 +656,8 @@ const TaskManager = ({ user, isDark, clients = [] }) => {
         {[
           { label: 'TOTAL', value: stats.total, icon: Target },
           { label: 'TO DO', value: stats.todo, icon: Circle },
-          { label: 'PROGRESS', value: stats.inProgress, icon: TrendingUp, color: BRAND.blue },
-          { label: 'DONE', value: stats.done, icon: CheckCircle2, color: BRAND.green },
+          { label: 'PROGRESS', value: stats.inProgress, icon: TrendUp, color: BRAND.blue },
+          { label: 'DONE', value: stats.done, icon: CheckCircle, color: BRAND.green },
           { label: 'TIME', value: `${Math.floor(stats.totalTime / 60)}h`, icon: Clock },
         ].map((stat, i) => (
           <Card key={i} className={cn("py-4", isMobile && "min-w-[120px] flex-shrink-0")}>
@@ -708,7 +708,7 @@ const TaskManager = ({ user, isDark, clients = [] }) => {
             <CardContent className="p-4">
               {filteredTasks.length === 0 ? (
                 <div className="text-center py-8">
-                  <ListTodo className="size-10 text-muted-foreground/30 mx-auto mb-3" />
+                  <ListChecks className="size-10 text-muted-foreground/30 mx-auto mb-3" />
                   <p className="text-sm text-muted-foreground">
                     {filter === 'todo' ? 'No tasks to do. Add one to get started!' : 
                      filter === 'in-progress' ? 'No tasks in progress.' : 
@@ -745,7 +745,7 @@ const TaskManager = ({ user, isDark, clients = [] }) => {
             <Card className="mt-4" style={{ backgroundColor: BRAND.blue + '08', borderColor: BRAND.blue + '20' }}>
               <CardContent className="p-4">
                 <h3 className="font-semibold text-sm flex items-center gap-2 mb-3" style={{ color: BRAND.blue }}>
-                  <Zap className="size-4" /> Pomodoro Tips
+                  <Lightning className="size-4" /> Pomodoro Tips
                 </h3>
                 <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
                   <li>Select a task before starting</li>

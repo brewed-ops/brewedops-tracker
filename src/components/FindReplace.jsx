@@ -1,6 +1,6 @@
 // FindReplace.jsx - Find and Replace Text Tool for BrewedOps
 import React, { useState, useRef } from 'react';
-import { Search, Replace, Copy, Check, Trash2, AlertTriangle, RefreshCw, Download } from 'lucide-react';
+import { MagnifyingGlass, Swap, Copy, Check, Trash, Warning, ArrowsClockwise, DownloadSimple } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -115,7 +115,7 @@ const FindReplace = ({ isDark }) => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
-          <Replace className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <Swap className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Find & Replace
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Find and replace text in your content instantly</p>
@@ -129,7 +129,7 @@ const FindReplace = ({ isDark }) => {
               <Label className="font-medium" style={{ color: theme.text }}>Your Text</Label>
               {inputText && (
                 <Button variant="outline" size="sm" onClick={() => setShowClearModal(true)} className="text-destructive">
-                  <Trash2 className="size-4 mr-1" />Clear
+                  <Trash className="size-4 mr-1" />Clear
                 </Button>
               )}
             </div>
@@ -160,7 +160,7 @@ const FindReplace = ({ isDark }) => {
                     style={{ borderColor: theme.cardBorder }}
                   />
                   <Button variant="outline" onClick={handleFindCount} title="Count matches">
-                    <Search className="size-4" />
+                    <MagnifyingGlass className="size-4" />
                   </Button>
                 </div>
                 {matchCount > 0 && (
@@ -213,7 +213,7 @@ const FindReplace = ({ isDark }) => {
               style={{ backgroundColor: BRAND.blue }}
               disabled={!inputText || !findText}
             >
-              <RefreshCw className="size-4 mr-2" />
+              <ArrowsClockwise className="size-4 mr-2" />
               Replace All
             </Button>
           </CardContent>
@@ -238,7 +238,7 @@ const FindReplace = ({ isDark }) => {
                     {copied ? 'Copied!' : 'Copy'}
                   </Button>
                   <Button variant="outline" size="sm" onClick={downloadResult}>
-                    <Download className="size-4 mr-1" />Save
+                    <DownloadSimple className="size-4 mr-1" />Save
                   </Button>
                 </div>
               </div>
@@ -258,7 +258,7 @@ const FindReplace = ({ isDark }) => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-amber-500" />
+              <Warning className="size-5 text-amber-500" />
               Clear All?
             </DialogTitle>
             <DialogDescription>
@@ -268,7 +268,7 @@ const FindReplace = ({ isDark }) => {
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearModal(false)}>Cancel</Button>
             <Button variant="destructive" onClick={clearAll}>
-              <Trash2 className="size-4 mr-2" />Clear All
+              <Trash className="size-4 mr-2" />Clear All
             </Button>
           </DialogFooter>
         </DialogContent>

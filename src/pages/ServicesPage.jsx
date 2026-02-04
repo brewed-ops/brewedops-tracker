@@ -8,51 +8,52 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Headphones,
-  Mail,
+  Envelope,
   Phone,
-  MessageCircle,
+  ChatCircle,
   Ticket,
-  ClipboardList,
+  ClipboardText,
   Calendar,
-  Inbox,
+  Tray,
   UserCheck,
-  Zap,
-  Settings,
+  Lightning,
+  GearSix,
   Database,
   Sun,
   Moon,
-  ChevronLeft,
-  ChevronDown,
-  Construction,
-  Menu,
+  CaretLeft,
+  CaretDown,
+  HardHat,
+  List,
   Bell,
   Image,
   Scissors,
-  Move,
-  Minimize2,
-  RefreshCw,
+  ArrowsOutCardinal,
+  ArrowsIn,
+  ArrowsClockwise,
   Palette,
   FileImage,
-  Film,
-  FileEdit,
-  Merge,
-  Split,
+  FilmStrip,
+  PencilLine,
+  GitMerge,
+  GitFork,
   BookOpen,
   QrCode,
-  Search,
-  Type,
+  MagnifyingGlass,
+  TextAa,
   Hash,
   GitBranch,
-  Braces,
+  BracketsCurly,
   Clock,
   Lock,
-  DollarSign,
-  StickyNote,
+  CurrencyDollar,
+  Note,
   CheckSquare,
   Globe,
   Timer,
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import SEO from '@/components/SEO';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 const MobileDrawer = React.lazy(() => import('@/components/layout/MobileDrawer'));
 
 // ============================================
@@ -87,9 +88,9 @@ const TOOL_CATEGORIES = [
     tools: [
       { icon: Image, title: 'BG Remover', path: '/bgremover' },
       { icon: Scissors, title: 'Image Cropper', path: '/imagecropper' },
-      { icon: Move, title: 'Image Resizer', path: '/imageresizer' },
-      { icon: Minimize2, title: 'Image Compressor', path: '/imagecompressor' },
-      { icon: RefreshCw, title: 'Image Converter', path: '/imageconverter' },
+      { icon: ArrowsOutCardinal, title: 'Image Resizer', path: '/imageresizer' },
+      { icon: ArrowsIn, title: 'Image Compressor', path: '/imagecompressor' },
+      { icon: ArrowsClockwise, title: 'Image Converter', path: '/imageconverter' },
       { icon: Palette, title: 'Color Picker', path: '/colorpicker' },
       { icon: FileImage, title: 'Image to PDF', path: '/imagetopdf' },
     ],
@@ -97,16 +98,16 @@ const TOOL_CATEGORIES = [
   {
     name: 'Video Tools',
     tools: [
-      { icon: Film, title: 'Video Compressor', path: '/videocompressor' },
+      { icon: FilmStrip, title: 'Video Compressor', path: '/videocompressor' },
       { icon: Scissors, title: 'Video Trimmer', path: '/videotrimmer' },
     ],
   },
   {
     name: 'Document Tools',
     tools: [
-      { icon: FileEdit, title: 'PDF Editor', path: '/pdfeditor' },
-      { icon: Merge, title: 'PDF Merge', path: '/pdfmerge' },
-      { icon: Split, title: 'PDF Split', path: '/pdfsplit' },
+      { icon: PencilLine, title: 'PDF Editor', path: '/pdfeditor' },
+      { icon: GitMerge, title: 'PDF Merge', path: '/pdfmerge' },
+      { icon: GitFork, title: 'PDF Split', path: '/pdfsplit' },
       { icon: BookOpen, title: 'Markdown Viewer', path: '/markdownviewer' },
     ],
   },
@@ -114,21 +115,21 @@ const TOOL_CATEGORIES = [
     name: 'Other Tools',
     tools: [
       { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
-      { icon: Search, title: 'Find & Replace', path: '/findreplace' },
-      { icon: Type, title: 'Case Converter', path: '/caseconverter' },
+      { icon: MagnifyingGlass, title: 'Find & Replace', path: '/findreplace' },
+      { icon: TextAa, title: 'Case Converter', path: '/caseconverter' },
       { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
       { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
-      { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
+      { icon: BracketsCurly, title: 'JSON Formatter', path: '/jsonformatter' },
       { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
     ],
   },
 ];
 
 const PRODUCTIVITY_TOOLS = [
-  { icon: DollarSign, title: 'Finance Tracker', path: '/finance' },
+  { icon: CurrencyDollar, title: 'Finance Tracker', path: '/finance' },
   { icon: Headphones, title: 'VA Kita', path: '/vakita' },
   { icon: CheckSquare, title: 'Task Manager', path: '/taskmanager' },
-  { icon: StickyNote, title: 'Brewed Notes', path: '/brewednotes' },
+  { icon: Note, title: 'Brewed Notes', path: '/brewednotes' },
 ];
 
 // ============================================
@@ -182,7 +183,7 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
         }}
       >
         Tools
-        <ChevronDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+        <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
       </button>
 
       {isOpen && (
@@ -265,36 +266,36 @@ const SERVICES = [
     colorLight: '#004AAC15',
     colorDark: '#004AAC30',
     items: [
-      { icon: Mail, label: 'Email Support' },
+      { icon: Envelope, label: 'Email Support' },
       { icon: Phone, label: 'Phone Support' },
-      { icon: MessageCircle, label: 'Live Chat' },
+      { icon: ChatCircle, label: 'Live Chat' },
       { icon: Ticket, label: 'Ticket Management' },
     ],
   },
   {
     title: 'Admin VA',
     description: 'Dedicated virtual assistant services to handle your day-to-day operations so you can focus on growth.',
-    icon: ClipboardList,
+    icon: ClipboardText,
     color: BRAND.green,
     colorLight: '#51AF4315',
     colorDark: '#51AF4330',
     items: [
-      { icon: Inbox, label: 'Inbox Management' },
+      { icon: Tray, label: 'Inbox Management' },
       { icon: Calendar, label: 'Calendar Management' },
       { icon: UserCheck, label: 'Admin Tasks' },
-      { icon: ClipboardList, label: 'Data Entry & Reports' },
+      { icon: ClipboardText, label: 'Data Entry & Reports' },
     ],
   },
   {
     title: 'HighLevel (GHL) Automation',
     description: 'End-to-end GoHighLevel CRM setup, automation workflows, and funnel builds tailored to your business.',
-    icon: Zap,
+    icon: Lightning,
     color: '#f59e0b',
     colorLight: '#f59e0b15',
     colorDark: '#f59e0b30',
     items: [
-      { icon: Settings, label: 'CRM Build & Setup' },
-      { icon: Zap, label: 'Workflow Automation' },
+      { icon: GearSix, label: 'CRM Build & Setup' },
+      { icon: Lightning, label: 'Workflow Automation' },
       { icon: Database, label: 'Pipeline Management' },
       { icon: Bell, label: 'Smart Notifications' },
     ],
@@ -393,7 +394,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
             </>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
-              <Menu size={18} />
+              <List size={18} />
             </button>
           )}
         </div>
@@ -417,6 +418,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
             pointerEvents: 'none',
           }} />
 
+          <ScrollReveal>
           <div style={{ position: 'relative', maxWidth: '700px', margin: '0 auto' }}>
             {/* Under Construction Badge */}
             <div style={{
@@ -429,7 +431,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
               borderRadius: '100px',
               marginBottom: '28px',
             }}>
-              <Construction size={14} style={{ color: '#f59e0b' }} />
+              <HardHat size={14} style={{ color: '#f59e0b' }} />
               <span style={{
                 fontSize: '12px',
                 fontWeight: '700',
@@ -464,6 +466,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
               We're putting the finishing touches on our services page. Here's a preview of what we offer to help businesses grow.
             </p>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* SERVICE CARDS */}
@@ -472,6 +475,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
           maxWidth: '1100px',
           margin: '0 auto',
         }}>
+          <ScrollReveal delay={0.15}>
           <div style={{
             display: 'grid',
             gridTemplateColumns: isSmall ? '1fr' : (width < 1024 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)'),
@@ -599,6 +603,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
               );
             })}
           </div>
+          </ScrollReveal>
         </section>
 
         {/* CTA BANNER */}
@@ -608,6 +613,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
           borderTop: '1px solid ' + theme.cardBorder,
           borderBottom: '1px solid ' + theme.cardBorder,
         }}>
+          <ScrollReveal>
           <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center' }}>
             <h3 style={{
               fontSize: isSmall ? '22px' : '28px',
@@ -650,7 +656,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                   transition: 'all 0.15s ease',
                 }}
               >
-                <Mail size={16} />
+                <Envelope size={16} />
                 Get in Touch
               </a>
               <button
@@ -673,11 +679,12 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                   transition: 'all 0.15s ease',
                 }}
               >
-                <ChevronLeft size={16} />
+                <CaretLeft size={16} />
                 Back to Home
               </button>
             </div>
           </div>
+          </ScrollReveal>
         </section>
       </main>
 

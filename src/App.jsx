@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { Upload, FileText, Users, MessageSquare, AlertTriangle, Plus, LogOut, Eye, Trash2, X, Loader2, Download, Check, Search, ChevronDown, AlertCircle, Moon, Sun, Receipt, Menu, Banknote, TrendingUp, TrendingDown, DollarSign, CreditCard, Wallet, PiggyBank, ArrowUpRight, ArrowDownRight, Bell, Edit, Star, Gift, Camera, Trophy, Award, Flame, Settings, Mail, Minus, BarChart3, ChevronLeft, ChevronRight, LayoutDashboard, Calculator, Headset, PanelLeft } from 'lucide-react';
+import { WarningCircle, Check, SpinnerGap, CaretLeft, Moon, Sun } from '@phosphor-icons/react';
 import { supabase } from './lib/supabase';
 import SEO from './components/SEO';
 import GuestToolLayout from './components/layout/GuestToolLayout';
 import LoadingFallback from './components/ui/LoadingFallback';
+import CanvasCursor from './components/ui/CanvasCursor';
 
 // Lazy-loaded pages
 const HomePage = React.lazy(() => import('./components/HomePage'));
@@ -296,7 +297,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
       <div style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         {onBack ? (
           <button onClick={onBack} style={{ height: '40px', padding: '0 14px', backgroundColor: 'transparent', border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'), borderRadius: '10px', color: theme.text, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px', fontFamily: FONTS.body }}>
-            <ChevronLeft style={{ width: '18px', height: '18px' }} />
+            <CaretLeft style={{ width: '18px', height: '18px' }} />
             Back
           </button>
         ) : <div />}
@@ -322,7 +323,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
           {/* Messages */}
           {errors.general && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 14px', backgroundColor: isDark ? '#260a0a' : '#fef2f2', border: '1px solid ' + (isDark ? '#7f1d1d' : '#fecaca'), borderRadius: '10px', marginBottom: '16px' }}>
-              <AlertCircle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
+              <WarningCircle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
               <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626', fontFamily: FONTS.body }}>{errors.general}</span>
             </div>
           )}
@@ -335,7 +336,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
 
           {/* Google Sign In Button */}
           <button onClick={handleGoogleSignIn} disabled={googleLoading || loading} style={{ width: '100%', height: '50px', backgroundColor: isDark ? '#171411' : '#fff', color: isDark ? '#f5f0eb' : '#3F200C', border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'), borderRadius: '10px', fontSize: '15px', fontWeight: '500', fontFamily: FONTS.body, cursor: (googleLoading || loading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px', opacity: (googleLoading || loading) ? 0.7 : 1, transition: 'all 0.2s ease' }}>
-            {googleLoading ? <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} /> : <GoogleIcon />}
+            {googleLoading ? <SpinnerGap style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} /> : <GoogleIcon />}
             {googleLoading ? 'Connecting...' : (isSignup ? 'Sign up with Google' : 'Continue with Google')}
           </button>
 
@@ -377,7 +378,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
             )}
 
             <button onClick={handleSubmit} disabled={loading || googleLoading} style={{ width: '100%', height: '50px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '10px', fontSize: '15px', fontWeight: '600', fontFamily: FONTS.body, cursor: (loading || googleLoading) ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', opacity: (loading || googleLoading) ? 0.7 : 1, marginTop: '8px', transition: 'all 0.2s ease', boxShadow: '0 4px 16px rgba(0,74,172,0.3)' }}>
-              {loading ? <><Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />{isSignup ? 'Creating...' : 'Signing in...'}</> : (isSignup ? 'Create Account' : 'Sign In')}
+              {loading ? <><SpinnerGap style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />{isSignup ? 'Creating...' : 'Signing in...'}</> : (isSignup ? 'Create Account' : 'Sign In')}
             </button>
 
             {!isSignup && (
@@ -597,7 +598,7 @@ useEffect(() => {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <Loader2 style={{ width: '32px', height: '32px', color: isDark ? '#6b5f52' : '#a09585', animation: 'spin 1s linear infinite' }} />
+        <SpinnerGap style={{ width: '32px', height: '32px', color: isDark ? '#6b5f52' : '#a09585', animation: 'spin 1s linear infinite' }} />
         <style>{`
           @keyframes spin {
             from { transform: rotate(0deg); }
@@ -706,6 +707,7 @@ return (
 export default function App() {
   return (
     <BrowserRouter>
+      <CanvasCursor />
       <AppContent />
     </BrowserRouter>
   );

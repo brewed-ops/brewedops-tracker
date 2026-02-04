@@ -1,6 +1,6 @@
 // VideoTrimmer.jsx - Video Trimming Tool for BrewedOps
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { Upload, Download, Trash2, ScissorsLineDashed, Loader2, AlertTriangle, Play, Pause } from 'lucide-react';
+import { UploadSimple, DownloadSimple, Trash, Scissors, SpinnerGap, Warning, Play, Pause } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -219,7 +219,7 @@ const VideoTrimmer = ({ isDark }) => {
     <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: FONTS.body }}>
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
-          <ScissorsLineDashed className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <Scissors className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Video Trimmer
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Cut and trim video clips to the perfect length</p>
@@ -234,11 +234,11 @@ const VideoTrimmer = ({ isDark }) => {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => { e.preventDefault(); handleFileUpload(e.dataTransfer.files?.[0]); }}>
                 <div className="size-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: BRAND.blue + '15' }}>
-                  <ScissorsLineDashed className="size-10" style={{ color: BRAND.blue }} />
+                  <Scissors className="size-10" style={{ color: BRAND.blue }} />
                 </div>
                 <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>Upload Video</h3>
                 <p className="text-muted-foreground mb-4">Drag & drop or click to select</p>
-                <Button style={{ backgroundColor: BRAND.blue }}><Upload className="size-4 mr-2" />Select Video</Button>
+                <Button style={{ backgroundColor: BRAND.blue }}><UploadSimple className="size-4 mr-2" />Select Video</Button>
                 <p className="text-xs text-muted-foreground mt-4">MP4, WebM, MOV • Max 500MB</p>
               </div>
               <input ref={fileInputRef} type="file" accept="video/*" onChange={(e) => handleFileUpload(e.target.files?.[0])} className="hidden" />
@@ -252,7 +252,7 @@ const VideoTrimmer = ({ isDark }) => {
                 <div className="flex items-center justify-between mb-4">
                   <Label className="font-medium" style={{ color: theme.text }}>Video</Label>
                   <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)} className="text-destructive">
-                    <Trash2 className="size-4 mr-1" />Clear
+                    <Trash className="size-4 mr-1" />Clear
                   </Button>
                 </div>
                 
@@ -400,14 +400,14 @@ const VideoTrimmer = ({ isDark }) => {
                         Trim Again
                       </Button>
                       <Button onClick={downloadVideo} className="flex-1" style={{ backgroundColor: BRAND.green }}>
-                        <Download className="size-4 mr-2" />Download
+                        <DownloadSimple className="size-4 mr-2" />Download
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <div className="space-y-4">
                     <Button onClick={trimVideo} disabled={isTrimming || trimDuration <= 0} className="w-full" style={{ backgroundColor: BRAND.blue }}>
-                      {isTrimming ? <><Loader2 className="size-4 mr-2 animate-spin" />Trimming... {progress}%</> : <><ScissorsLineDashed className="size-4 mr-2" />Trim Video</>}
+                      {isTrimming ? <><SpinnerGap className="size-4 mr-2 animate-spin" />Trimming... {progress}%</> : <><Scissors className="size-4 mr-2" />Trim Video</>}
                     </Button>
                     
                     {isTrimming && (
@@ -425,7 +425,7 @@ const VideoTrimmer = ({ isDark }) => {
         {error && (
           <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
             <div className="flex gap-3">
-              <AlertTriangle className="size-5 text-destructive shrink-0" />
+              <Warning className="size-5 text-destructive shrink-0" />
               <p className="text-sm text-destructive">{error}</p>
             </div>
           </div>
@@ -435,12 +435,12 @@ const VideoTrimmer = ({ isDark }) => {
       <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><AlertTriangle className="size-5 text-amber-500" />Clear Video?</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Warning className="size-5 text-amber-500" />Clear Video?</DialogTitle>
             <DialogDescription>Remove the video and any trimmed output.</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearConfirm(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={clearAll}><Trash2 className="size-4 mr-2" />Clear</Button>
+            <Button variant="destructive" onClick={clearAll}><Trash className="size-4 mr-2" />Clear</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

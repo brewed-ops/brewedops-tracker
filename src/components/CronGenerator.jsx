@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Copy, Check, Clock, Calendar, Play, Info, ChevronDown, Zap, RefreshCw } from 'lucide-react';
+import { Copy, Check, Clock, Calendar, Play, Info, CaretDown, Lightning, ArrowsClockwise } from '@phosphor-icons/react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -348,7 +348,7 @@ const CronGenerator = ({ isDark = true }) => {
         {/* Presets Dropdown */}
         <div style={{ position: 'relative' }}>
           <button onClick={() => setShowPresets(!showPresets)} style={btnStyle}>
-            <Zap size={14} /> Presets <ChevronDown size={12} />
+            <Lightning size={14} /> Presets <CaretDown size={12} />
           </button>
           {showPresets && (
             <div style={{ 
@@ -715,7 +715,7 @@ const CronGenerator = ({ isDark = true }) => {
 
             {/* Human-readable description */}
             <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <RefreshCw size={14} style={{ color: BRAND.green }} />
+              <ArrowsClockwise size={14} style={{ color: BRAND.green }} />
               <span style={{ fontSize: '13px', color: theme.text }}>{description}</span>
             </div>
           </div>

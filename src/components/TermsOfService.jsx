@@ -1,6 +1,6 @@
 // TermsOfService.jsx - Terms of Service page for BrewedOps
 import React from 'react';
-import { FileText, CheckCircle, AlertTriangle, Scale, Ban, RefreshCw, Shield, Zap, Globe, Lock } from 'lucide-react';
+import { FileText, CheckCircle, Warning, Scales, Prohibit, ArrowsClockwise, Shield, Lightning, Globe, Lock } from '@phosphor-icons/react';
 import SEO from './SEO';
 
 // BREWEDOPS BRAND
@@ -110,7 +110,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
                 alignItems: 'center', 
                 justifyContent: 'center' 
               }}>
-                <Scale style={{ width: '28px', height: '28px', color: '#004AAC' }} />
+                <Scales style={{ width: '28px', height: '28px', color: '#004AAC' }} />
               </div>
               <div>
                 <h1 style={{ fontSize: '32px', fontWeight: '700', color: theme.text, margin: 0 }}>Terms of Service</h1>
@@ -205,7 +205,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             </ul>
           </Section>
 
-          <Section icon={Zap} title="Acceptable Use">
+          <Section icon={Lightning} title="Acceptable Use">
             <p><strong style={{ color: theme.text }}>You agree to:</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
               <li>Use BrewedOps only for lawful purposes</li>
@@ -235,7 +235,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             </ul>
           </Section>
 
-          <Section icon={AlertTriangle} title="Disclaimer of Warranties" color="#f59e0b">
+          <Section icon={Warning} title="Disclaimer of Warranties" color="#f59e0b">
             <p>BrewedOps and Fuelyx are provided "AS IS" and "AS AVAILABLE" without warranties of any kind, either express or implied, including but not limited to:</p>
             <ul style={{ margin: '12px 0', paddingLeft: '20px' }}>
               <li>Warranties of merchantability or fitness for a particular purpose</li>
@@ -280,7 +280,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             <p>If you provide feedback, suggestions, or ideas about BrewedOps, you grant us the right to use them without any obligation to you.</p>
           </Section>
 
-          <Section icon={Ban} title="Termination" color="#ef4444">
+          <Section icon={Prohibit} title="Termination" color="#ef4444">
             <p><strong style={{ color: theme.text }}>By You:</strong></p>
             <p>You may stop using BrewedOps at any time. You can request deletion of your account and data by contacting us. Upon deletion, your data will be removed within 30 days.</p>
             
@@ -291,7 +291,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             <p>Upon termination, your right to use BrewedOps ceases immediately. We may delete your data after termination.</p>
           </Section>
 
-          <Section icon={RefreshCw} title="Changes to Terms">
+          <Section icon={ArrowsClockwise} title="Changes to Terms">
             <p>We may update these Terms from time to time. When we make changes:</p>
             <ul style={{ margin: '12px 0', paddingLeft: '20px' }}>
               <li>We will update the "Last updated" date at the top of this page</li>
@@ -301,7 +301,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             </ul>
           </Section>
 
-          <Section icon={Scale} title="Governing Law & Disputes">
+          <Section icon={Scales} title="Governing Law & Disputes">
             <p><strong style={{ color: theme.text }}>Governing Law:</strong></p>
             <p>These Terms shall be governed by and construed in accordance with the laws of the Philippines, without regard to its conflict of law provisions.</p>
             

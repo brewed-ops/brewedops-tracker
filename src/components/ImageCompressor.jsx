@@ -1,11 +1,11 @@
 // ImageCompressor.jsx - Image Compression Tool for BrewedOps
 // Features: Compress images, quality control, batch support, before/after comparison
 import React, { useState, useRef, useCallback } from 'react';
-import { 
-  Upload, Download, Trash2, Loader2, CheckCircle, 
-  AlertTriangle, ImageDown, Image, X, Plus, Info,
+import {
+  UploadSimple, DownloadSimple, Trash, SpinnerGap, CheckCircle,
+  Warning, FileImage, Image, X, Plus, Info,
   ArrowRight, Percent
-} from 'lucide-react';
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -260,7 +260,7 @@ const ImageCompressor = ({ isDark }) => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
-          <ImageDown className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <FileImage className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Image Compressor
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Reduce image file size without losing quality</p>
@@ -281,7 +281,7 @@ const ImageCompressor = ({ isDark }) => {
               }}
             >
               <div className="size-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: BRAND.blue + '15' }}>
-                <ImageDown className="size-10" style={{ color: BRAND.blue }} />
+                <FileImage className="size-10" style={{ color: BRAND.blue }} />
               </div>
               
               <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
@@ -290,7 +290,7 @@ const ImageCompressor = ({ isDark }) => {
               <p className="text-muted-foreground mb-4">Drag & drop or click to select</p>
               
               <Button style={{ backgroundColor: BRAND.blue }}>
-                <Upload className="size-4 mr-2" />
+                <UploadSimple className="size-4 mr-2" />
                 Select Images
               </Button>
               
@@ -311,7 +311,7 @@ const ImageCompressor = ({ isDark }) => {
             {error && (
               <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
                 <div className="flex gap-3">
-                  <AlertTriangle className="size-5 text-destructive flex-shrink-0" />
+                  <Warning className="size-5 text-destructive flex-shrink-0" />
                   <p className="text-sm text-destructive">{error}</p>
                 </div>
               </div>
@@ -373,7 +373,7 @@ const ImageCompressor = ({ isDark }) => {
                     <span className="hidden md:inline">Add More</span>
                   </Button>
                   <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)} className="text-destructive hover:text-destructive">
-                    <Trash2 className="size-4 md:mr-2" />
+                    <Trash className="size-4 md:mr-2" />
                     <span className="hidden md:inline">Clear All</span>
                   </Button>
                 </div>
@@ -434,13 +434,13 @@ const ImageCompressor = ({ isDark }) => {
                       {fileObj.status === 'pending' && <Badge variant="outline" className="text-xs">Pending</Badge>}
                       {fileObj.status === 'compressing' && (
                         <Badge variant="outline" className="text-xs gap-1">
-                          <Loader2 className="size-3 animate-spin" />
+                          <SpinnerGap className="size-3 animate-spin" />
                           Compressing
                         </Badge>
                       )}
                       {fileObj.status === 'done' && (
                         <Button size="sm" variant="outline" onClick={() => downloadFile(fileObj)} className="h-8">
-                          <Download className="size-4 md:mr-1" />
+                          <DownloadSimple className="size-4 md:mr-1" />
                           <span className="hidden md:inline">Download</span>
                         </Button>
                       )}
@@ -470,12 +470,12 @@ const ImageCompressor = ({ isDark }) => {
                 <div className="flex items-center gap-2">
                   {allDone ? (
                     <Button onClick={downloadAll} style={{ backgroundColor: BRAND.green }}>
-                      <Download className="size-4 mr-2" />
+                      <DownloadSimple className="size-4 mr-2" />
                       Download All ({stats.done})
                     </Button>
                   ) : (
                     <Button onClick={compressAll} disabled={isCompressing} style={{ backgroundColor: BRAND.blue }}>
-                      {isCompressing ? <><Loader2 className="size-4 mr-2 animate-spin" />Compressing...</> : <><ImageDown className="size-4 mr-2" />Compress All</>}
+                      {isCompressing ? <><SpinnerGap className="size-4 mr-2 animate-spin" />Compressing...</> : <><FileImage className="size-4 mr-2" />Compress All</>}
                     </Button>
                   )}
                 </div>
@@ -492,14 +492,14 @@ const ImageCompressor = ({ isDark }) => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <AlertTriangle className="size-5 text-amber-500" />
+              <Warning className="size-5 text-amber-500" />
               Clear All Images?
             </DialogTitle>
             <DialogDescription>This will remove all {files.length} image{files.length !== 1 ? 's' : ''}.</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearConfirm(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={clearAll}><Trash2 className="size-4 mr-2" />Clear All</Button>
+            <Button variant="destructive" onClick={clearAll}><Trash className="size-4 mr-2" />Clear All</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

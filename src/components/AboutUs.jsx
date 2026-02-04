@@ -1,11 +1,12 @@
 // AboutUs.jsx - About Us page for BrewedOps
 import React from 'react';
 import {
-  Code, Heart, Mail, Phone, Sparkles, Zap, Users, Target,
-  Wallet, CheckSquare, FileText, Headset, Image, Film, FileEdit, QrCode,
-  Coffee, Globe, Shield, Smartphone
-} from 'lucide-react';
+  Code, Heart, Envelope, Phone, Sparkle, Lightning, Users, Target,
+  Wallet, CheckSquare, FileText, Headset, Image, FilmStrip, NotePencil, QrCode,
+  Coffee, Globe, Shield, DeviceMobile
+} from '@phosphor-icons/react';
 import SEO from './SEO';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
@@ -29,8 +30,8 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
   const toolCategories = [
     { name: 'Productivity', count: 4, icon: Wallet, color: '#004AAC', tools: 'Finance Tracker, VAKita, Task Manager, Brewed Notes' },
     { name: 'Image Tools', count: 7, icon: Image, color: '#8b5cf6', tools: 'BG Remover, Cropper, Resizer, Compressor, Converter, Color Picker, Image to PDF' },
-    { name: 'Video Tools', count: 2, icon: Film, color: '#ef4444', tools: 'Video Compressor, Video Trimmer' },
-    { name: 'Document Tools', count: 3, icon: FileEdit, color: '#22c55e', tools: 'PDF Editor, PDF Merge, PDF Split' },
+    { name: 'Video Tools', count: 2, icon: FilmStrip, color: '#ef4444', tools: 'Video Compressor, Video Trimmer' },
+    { name: 'Document Tools', count: 3, icon: NotePencil, color: '#22c55e', tools: 'PDF Editor, PDF Merge, PDF Split' },
     { name: 'Other Tools', count: 4, icon: QrCode, color: '#f59e0b', tools: 'QR Generator, Find & Replace, Case Converter, Word Counter' },
   ];
 
@@ -94,6 +95,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
       <main style={{ flex: 1, padding: '40px 24px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           {/* Hero Section */}
+          <ScrollReveal>
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
             <div style={{
               width: '80px',
@@ -128,8 +130,10 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               A comprehensive productivity platform with 22+ free tools built specifically for Filipino Virtual Assistants and Freelancers
             </p>
           </div>
+          </ScrollReveal>
 
           {/* Stats */}
+          <ScrollReveal delay={0.1}>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(4, 1fr)',
@@ -153,8 +157,10 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               </div>
             ))}
           </div>
+          </ScrollReveal>
 
           {/* Story Section */}
+          <ScrollReveal>
           <div style={{
             padding: '32px',
             backgroundColor: theme.cardBg,
@@ -201,8 +207,10 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               working remotely for clients around the world.
             </p>
           </div>
+          </ScrollReveal>
 
           {/* Tools Overview */}
+          <ScrollReveal>
           <div style={{
             padding: '32px',
             backgroundColor: isDark ? '#18181b' : '#f9fafb',
@@ -260,8 +268,10 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               ))}
             </div>
           </div>
+          </ScrollReveal>
 
           {/* Fuelyx Mobile App Section */}
+          <ScrollReveal>
           <div style={{
             padding: '32px',
             backgroundColor: isDark ? '#0f172a' : '#f0fdfa',
@@ -334,13 +344,15 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
                   fontWeight: '600'
                 }}
               >
-                <Smartphone size={18} />
+                <DeviceMobile size={18} />
                 Learn More & Download
               </a>
             </div>
           </div>
+          </ScrollReveal>
 
           {/* Features Highlights */}
+          <ScrollReveal>
           <div style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -354,7 +366,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               border: '1px solid ' + theme.cardBorder,
               textAlign: 'center'
             }}>
-              <Zap style={{ width: '32px', height: '32px', color: '#f59e0b', margin: '0 auto 12px' }} />
+              <Lightning style={{ width: '32px', height: '32px', color: '#f59e0b', margin: '0 auto 12px' }} />
               <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
                 Fast & Intuitive
               </h3>
@@ -408,8 +420,10 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               </p>
             </div>
           </div>
+          </ScrollReveal>
 
           {/* Contact Section */}
+          <ScrollReveal>
           <div style={{
             padding: '32px',
             backgroundColor: isDark ? '#004AAC15' : '#004AAC10',
@@ -465,7 +479,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
                   fontWeight: '500'
                 }}
               >
-                <Mail style={{ width: '20px', height: '20px', color: '#004AAC' }} />
+                <Envelope style={{ width: '20px', height: '20px', color: '#004AAC' }} />
                 brewedops@gmail.com
               </a>
               <a 
@@ -490,6 +504,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               </a>
             </div>
           </div>
+          </ScrollReveal>
         </div>
       </main>
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { Globe, Clock, Plus, X, ArrowRightLeft, Search, Pin, ChevronDown } from 'lucide-react';
+import { Globe, Clock, Plus, X, ArrowsLeftRight, MagnifyingGlass, PushPin, CaretDown } from '@phosphor-icons/react';
 
 // ============================================
 // BRAND CONFIG
@@ -353,7 +353,7 @@ const AddTimezonePanel = ({ theme, isDark, pinnedIds, onAdd, onClose }) => {
 
       {/* Search */}
       <div style={{ position: 'relative', marginBottom: '14px' }}>
-        <Search size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: theme.textSubtle }} />
+        <MagnifyingGlass size={14} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: theme.textSubtle }} />
         <input
           type="text"
           value={search}
@@ -643,7 +643,7 @@ const TimezoneConverter = ({ isDark }) => {
         borderRadius: '14px', padding: isSmall ? '20px' : '24px',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '18px' }}>
-          <ArrowRightLeft size={16} style={{ color: BRAND.blue }} />
+          <ArrowsLeftRight size={16} style={{ color: BRAND.blue }} />
           <span style={{ fontSize: '15px', fontWeight: '700', color: theme.text, fontFamily: FONTS.heading }}>
             Quick Convert
           </span>
@@ -711,7 +711,7 @@ const TimezoneConverter = ({ isDark }) => {
             onMouseLeave={(e) => { e.currentTarget.style.borderColor = theme.cardBorder; e.currentTarget.style.color = theme.textMuted; }}
             title="Swap timezones"
           >
-            <ArrowRightLeft size={16} />
+            <ArrowsLeftRight size={16} />
           </button>
 
           {/* To */}

@@ -1,11 +1,11 @@
 // QRGenerator.jsx - QR Code Generator for BrewedOps
 // Features: Generate QR codes for URLs, text, WiFi, customize colors, download PNG/SVG
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { 
-  Download, Trash2, QrCode, Link, Type, Wifi, 
-  Palette, RefreshCw, Copy, Check, AlertTriangle,
-  Eye, Settings, Image
-} from 'lucide-react';
+import {
+  DownloadSimple, Trash, QrCode, Link, TextT, WifiHigh,
+  Palette, ArrowsClockwise, Copy, Check, Warning,
+  Eye, GearSix, Image
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
@@ -30,8 +30,8 @@ const FONTS = {
 // QR Code types
 const QR_TYPES = [
   { id: 'url', label: 'URL / Link', icon: Link, placeholder: 'https://example.com' },
-  { id: 'text', label: 'Text', icon: Type, placeholder: 'Enter your text here...' },
-  { id: 'wifi', label: 'WiFi', icon: Wifi, placeholder: '' },
+  { id: 'text', label: 'Text', icon: TextT, placeholder: 'Enter your text here...' },
+  { id: 'wifi', label: 'WiFi', icon: WifiHigh, placeholder: '' },
 ];
 
 // Preset colors
@@ -387,7 +387,7 @@ const QRGenerator = ({ isDark }) => {
               {error && (
                 <div className="mt-4 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
                   <div className="flex gap-2 items-center">
-                    <AlertTriangle className="size-4 text-destructive" />
+                    <Warning className="size-4 text-destructive" />
                     <p className="text-sm text-destructive">{error}</p>
                   </div>
                 </div>
@@ -406,7 +406,7 @@ const QRGenerator = ({ isDark }) => {
               >
                 {isGenerating ? (
                   <div className="text-center">
-                    <RefreshCw className="size-8 animate-spin mx-auto mb-2 text-muted-foreground" />
+                    <ArrowsClockwise className="size-8 animate-spin mx-auto mb-2 text-muted-foreground" />
                     <p className="text-sm text-muted-foreground">Generating...</p>
                   </div>
                 ) : qrDataUrl ? (
@@ -424,7 +424,7 @@ const QRGenerator = ({ isDark }) => {
                 <div className="mt-6 space-y-3">
                   <div className="flex gap-2">
                     <Button onClick={() => downloadQR('png')} className="flex-1" style={{ backgroundColor: BRAND.blue }}>
-                      <Download className="size-4 mr-2" />
+                      <DownloadSimple className="size-4 mr-2" />
                       Download PNG
                     </Button>
                     <Button variant="outline" onClick={copyToClipboard} className="flex-1">
@@ -433,7 +433,7 @@ const QRGenerator = ({ isDark }) => {
                     </Button>
                   </div>
                   <Button variant="outline" onClick={resetForm} className="w-full">
-                    <Trash2 className="size-4 mr-2" />
+                    <Trash className="size-4 mr-2" />
                     Clear & Start Over
                   </Button>
                 </div>

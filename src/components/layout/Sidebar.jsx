@@ -1,15 +1,15 @@
 import React from 'react';
-import { 
-  Wallet, 
-  Headset, 
-  CheckSquare, 
-  ChevronLeft, 
-  ChevronRight,
-  MoreHorizontal,
-  FileEdit,
+import {
+  Wallet,
+  Headset,
+  CheckSquare,
+  CaretLeft,
+  CaretRight,
+  DotsThree,
+  NotePencil,
   Image,
-  Video,
-} from 'lucide-react';
+  VideoCamera,
+} from '@phosphor-icons/react';
 
 // ============================================
 // BREWEDOPS BRAND CONFIGURATION
@@ -36,9 +36,9 @@ const Sidebar = ({ collapsed, setCollapsed, activeSection, setActiveSection, isD
   ];
 
   const moreTools = [
-    { id: 'pdf-editor', label: 'PDF Editor', icon: FileEdit, color: '#ef4444', comingSoon: true },
+    { id: 'pdf-editor', label: 'PDF Editor', icon: NotePencil, color: '#ef4444', comingSoon: true },
     { id: 'image-tools', label: 'Image Tools', icon: Image, color: '#8b5cf6', comingSoon: true },
-    { id: 'video-compress', label: 'Video Compressor', icon: Video, color: '#ec4899', comingSoon: true },
+    { id: 'video-compress', label: 'Video Compressor', icon: VideoCamera, color: '#ec4899', comingSoon: true },
   ];
 
   const sidebarBg = isDark ? '#0a0a0b' : '#ffffff';
@@ -128,7 +128,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeSection, setActiveSection, isD
               e.currentTarget.style.backgroundColor = 'transparent';
             }}
           >
-            <ChevronLeft style={{ width: '16px', height: '16px' }} />
+            <CaretLeft style={{ width: '16px', height: '16px' }} />
           </button>
         )}
       </div>
@@ -150,7 +150,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeSection, setActiveSection, isD
             justifyContent: 'center',
           }}
         >
-          <ChevronRight style={{ width: '18px', height: '18px' }} />
+          <CaretRight style={{ width: '18px', height: '18px' }} />
         </button>
       )}
 
@@ -276,7 +276,7 @@ const Sidebar = ({ collapsed, setCollapsed, activeSection, setActiveSection, isD
                 gap: '6px',
               }}
             >
-              <MoreHorizontal style={{ width: '12px', height: '12px' }} />
+              <DotsThree style={{ width: '12px', height: '12px' }} />
               More Tools
             </p>
           )}

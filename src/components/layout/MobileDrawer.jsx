@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronDown, Lock, Image, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, BookOpen, QrCode, Search, Type, Hash, GitBranch, Braces, Clock, Globe, Timer } from 'lucide-react';
+import { X, CaretDown, Lock, Image, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, BookOpen, QrCode, MagnifyingGlass, TextT, Hash, GitBranch, BracketsCurly, Clock, Globe, Timer } from '@phosphor-icons/react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -20,9 +20,9 @@ const TOOL_CATEGORIES = [
     tools: [
       { icon: Image, title: 'BG Remover', path: '/bgremover' },
       { icon: Scissors, title: 'Image Cropper', path: '/imagecropper' },
-      { icon: Move, title: 'Image Resizer', path: '/imageresizer' },
-      { icon: Minimize2, title: 'Image Compressor', path: '/imagecompressor' },
-      { icon: RefreshCw, title: 'Image Converter', path: '/imageconverter' },
+      { icon: ArrowsOut, title: 'Image Resizer', path: '/imageresizer' },
+      { icon: ArrowsIn, title: 'Image Compressor', path: '/imagecompressor' },
+      { icon: ArrowsClockwise, title: 'Image Converter', path: '/imageconverter' },
       { icon: Palette, title: 'Color Picker', path: '/colorpicker' },
       { icon: FileImage, title: 'Image to PDF', path: '/imagetopdf' },
     ],
@@ -30,16 +30,16 @@ const TOOL_CATEGORIES = [
   {
     name: 'Video Tools',
     tools: [
-      { icon: Film, title: 'Video Compressor', path: '/videocompressor' },
+      { icon: FilmStrip, title: 'Video Compressor', path: '/videocompressor' },
       { icon: Scissors, title: 'Video Trimmer', path: '/videotrimmer' },
     ],
   },
   {
     name: 'Document Tools',
     tools: [
-      { icon: FileEdit, title: 'PDF Editor', path: '/pdfeditor' },
-      { icon: Merge, title: 'PDF Merge', path: '/pdfmerge' },
-      { icon: Split, title: 'PDF Split', path: '/pdfsplit' },
+      { icon: NotePencil, title: 'PDF Editor', path: '/pdfeditor' },
+      { icon: GitMerge, title: 'PDF Merge', path: '/pdfmerge' },
+      { icon: FileDashed, title: 'PDF Split', path: '/pdfsplit' },
       { icon: BookOpen, title: 'Markdown Viewer', path: '/markdownviewer' },
     ],
   },
@@ -47,11 +47,11 @@ const TOOL_CATEGORIES = [
     name: 'Other Tools',
     tools: [
       { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
-      { icon: Search, title: 'Find & Replace', path: '/findreplace' },
-      { icon: Type, title: 'Case Converter', path: '/caseconverter' },
+      { icon: MagnifyingGlass, title: 'Find & Replace', path: '/findreplace' },
+      { icon: TextT, title: 'Case Converter', path: '/caseconverter' },
       { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
       { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
-      { icon: Braces, title: 'JSON Formatter', path: '/jsonformatter' },
+      { icon: BracketsCurly, title: 'JSON Formatter', path: '/jsonformatter' },
       { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
       { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
       { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
@@ -206,7 +206,7 @@ const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {
                 style={navItemStyle}
               >
                 <span>Tools</span>
-                <ChevronDown
+                <CaretDown
                   size={16}
                   style={{
                     transform: toolsExpanded ? 'rotate(180deg)' : 'rotate(0deg)',

@@ -1,6 +1,6 @@
 // ColorPicker.jsx - Color Picker & Palette Generator for BrewedOps
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Copy, Check, Palette, Pipette, Plus, Trash2, Download, RefreshCw } from 'lucide-react';
+import { UploadSimple, Copy, Check, Palette, Eyedropper, Plus, Trash, DownloadSimple, ArrowsClockwise } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -149,14 +149,14 @@ const ColorPicker = ({ isDark }) => {
               <Label className="font-medium" style={{ color: theme.text }}>Color Picker</Label>
               <Button variant={isPickerActive ? "default" : "outline"} size="sm" onClick={() => setIsPickerActive(!isPickerActive)}
                 style={isPickerActive ? { backgroundColor: BRAND.blue } : {}}>
-                <Pipette className="size-4 mr-2" />{isPickerActive ? 'Active' : 'Pick Color'}
+                <Eyedropper className="size-4 mr-2" />{isPickerActive ? 'Active' : 'Pick Color'}
               </Button>
             </div>
 
             {!imageUrl ? (
               <div className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:border-primary hover:bg-primary/5"
                 onClick={() => fileInputRef.current?.click()}>
-                <Upload className="size-10 mx-auto mb-3 text-muted-foreground" />
+                <UploadSimple className="size-10 mx-auto mb-3 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">Upload image to pick colors</p>
               </div>
             ) : (
@@ -165,7 +165,7 @@ const ColorPicker = ({ isDark }) => {
                   className={cn("w-full rounded-lg", isPickerActive && "cursor-crosshair")} style={{ maxHeight: '300px', objectFit: 'contain' }} />
                 <canvas ref={canvasRef} className="hidden" />
                 <Button variant="outline" size="sm" className="absolute top-2 right-2" onClick={() => { setImageUrl(null); setPickedColors([]); }}>
-                  <Trash2 className="size-4" />
+                  <Trash className="size-4" />
                 </Button>
               </div>
             )}

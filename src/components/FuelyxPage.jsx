@@ -7,14 +7,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ChevronRight, ChevronDown, Sun, Moon, ChevronLeft,
-  Smartphone, Zap, Target, TrendingUp, Clock, Camera,
-  Apple, Dumbbell, BarChart3, Heart, Shield, Star,
-  Download, Play, Check, ArrowRight, Sparkles, Trophy,
-  Flame, Scale, Utensils, Timer, Activity, Award,
-  AlertTriangle, Info, Settings, Menu
-} from 'lucide-react';
+  CaretRight, CaretDown, Sun, Moon, CaretLeft,
+  DeviceMobile, Lightning, Target, TrendUp, Clock, Camera,
+  AppleLogo, Barbell, ChartBar, Heart, Shield, Star,
+  Download, Play, Check, ArrowRight, Sparkle, Trophy,
+  Fire, Scales, ForkKnife, Timer, Pulse, Medal,
+  Warning, Info, GearSix, List
+} from '@phosphor-icons/react';
 import SEO from './SEO';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 
 // ============================================
@@ -81,21 +82,21 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
   // Features data
   const features = [
     { icon: Camera, title: 'AI Food Scanner', description: 'Snap a photo and instantly get nutritional info with AI-powered recognition', color: '#8b5cf6' },
-    { icon: Utensils, title: '200+ Filipino Foods', description: 'Comprehensive database including local dishes, street food, and regional cuisines', color: '#f97316' },
+    { icon: ForkKnife, title: '200+ Filipino Foods', description: 'Comprehensive database including local dishes, street food, and regional cuisines', color: '#f97316' },
     { icon: Timer, title: 'Fasting Timer', description: 'Built-in intermittent fasting tracker with multiple protocols (16:8, 18:6, 20:4)', color: '#0ea5e9' },
-    { icon: Dumbbell, title: 'Workout Tracking', description: 'Log exercises, track calories burned, and monitor your fitness progress', color: '#ec4899' },
-    { icon: BarChart3, title: 'Smart Analytics', description: 'Visualize your progress with beautiful charts and detailed insights', color: '#10b981' },
+    { icon: Barbell, title: 'Workout Tracking', description: 'Log exercises, track calories burned, and monitor your fitness progress', color: '#ec4899' },
+    { icon: ChartBar, title: 'Smart Analytics', description: 'Visualize your progress with beautiful charts and detailed insights', color: '#10b981' },
     { icon: Trophy, title: 'Achievements & Streaks', description: 'Stay motivated with badges, streaks, and milestone celebrations', color: '#f59e0b' },
   ];
 
   // Benefits data
   const benefits = [
     { icon: Target, text: 'Set personalized calorie & macro goals' },
-    { icon: Scale, text: 'Track weight with visual progress charts' },
-    { icon: Activity, text: 'Monitor daily steps with pedometer' },
-    { icon: Flame, text: 'Build healthy habits with streak tracking' },
+    { icon: Scales, text: 'Track weight with visual progress charts' },
+    { icon: Pulse, text: 'Monitor daily steps with pedometer' },
+    { icon: Fire, text: 'Build healthy habits with streak tracking' },
     { icon: Shield, text: 'Your data stays private and secure' },
-    { icon: Zap, text: 'Works offline - no internet required' },
+    { icon: Lightning, text: 'Works offline - no internet required' },
   ];
 
   // Testimonials
@@ -164,7 +165,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                 Services
               </button>
               <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                Tools <ChevronDown size={14} />
+                Tools <CaretDown size={14} />
               </button>
               <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: FUELYX.primary, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Fuelyx
@@ -237,7 +238,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
             </>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Menu size={18} />
+              <List size={18} />
             </button>
           )}
         </div>
@@ -295,7 +296,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                 marginBottom: '24px',
                 border: `1px solid ${FUELYX.primary}30`,
               }}>
-                <Sparkles size={16} style={{ color: FUELYX.primary }} />
+                <Sparkle size={16} style={{ color: FUELYX.primary }} />
                 <span style={{ fontSize: '13px', fontWeight: '600', color: FUELYX.primary, fontFamily: FONTS.body }}>
                   Built with Vibe Coding
                 </span>
@@ -521,7 +522,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                             alignItems: 'center',
                             gap: '4px',
                           }}>
-                            <Flame size={12} style={{ color: '#f97316' }} />
+                            <Fire size={12} style={{ color: '#f97316' }} />
                             <span style={{ fontSize: '10px', color: '#fb923c', fontWeight: '600' }}>7</span>
                           </div>
                         </div>
@@ -606,7 +607,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                       alignItems: 'center',
                       paddingBottom: '8px',
                     }}>
-                      {[Utensils, BarChart3, Timer, Dumbbell].map((Icon, i) => (
+                      {[ForkKnife, ChartBar, Timer, Barbell].map((Icon, i) => (
                         <div key={i} style={{ 
                           padding: '8px',
                           color: i === 0 ? FUELYX.primary : '#64748b',
@@ -669,7 +670,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                     alignItems: 'center',
                     justifyContent: 'center',
                   }}>
-                    <Flame size={18} style={{ color: '#fff' }} />
+                    <Fire size={18} style={{ color: '#fff' }} />
                   </div>
                   <div>
                     <div style={{ fontSize: '11px', fontWeight: '600', color: theme.text }}>7 Day Streak!</div>
@@ -687,6 +688,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
         padding: isMobile ? '60px 20px' : '100px 64px',
         backgroundColor: isDark ? '#0a0a0b' : '#fafafa',
       }}>
+        <ScrollReveal>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           {/* Section header */}
           <div style={{ textAlign: 'center', marginBottom: '60px' }}>
@@ -699,7 +701,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
               borderRadius: '100px',
               marginBottom: '16px',
             }}>
-              <Zap size={14} style={{ color: FUELYX.primary }} />
+              <Lightning size={14} style={{ color: FUELYX.primary }} />
               <span style={{ fontSize: '12px', fontWeight: '600', color: FUELYX.primary }}>FEATURES</span>
             </div>
             <h2 style={{ 
@@ -784,6 +786,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
             ))}
           </div>
         </div>
+        </ScrollReveal>
       </section>
 
       {/* ==================== INSTALLATION NOTICE ==================== */}
@@ -791,6 +794,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
         padding: isMobile ? '40px 20px' : '60px 64px',
         backgroundColor: isDark ? '#0a0a0b' : '#fff',
       }}>
+        <ScrollReveal>
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
           <div style={{
             backgroundColor: isDark ? '#1e293b' : '#fffbeb',
@@ -809,7 +813,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                 justifyContent: 'center',
                 flexShrink: 0,
               }}>
-                <AlertTriangle size={24} style={{ color: '#f59e0b' }} />
+                <Warning size={24} style={{ color: '#f59e0b' }} />
               </div>
               <div style={{ flex: 1 }}>
                 <h3 style={{ 
@@ -844,7 +848,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
                     alignItems: 'center',
                     gap: '8px',
                   }}>
-                    <Settings size={16} style={{ color: FUELYX.primary }} />
+                    <GearSix size={16} style={{ color: FUELYX.primary }} />
                     How to Install:
                   </p>
                   <ol style={{ 
@@ -884,6 +888,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
             </div>
           </div>
         </div>
+        </ScrollReveal>
       </section>
 
       {/* ==================== BENEFITS SECTION ==================== */}
@@ -891,6 +896,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
         padding: isMobile ? '60px 20px' : '100px 64px',
         backgroundColor: isDark ? '#0f172a' : '#f0fdfa',
       }}>
+        <ScrollReveal>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ 
             display: 'flex',
@@ -1015,6 +1021,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
             </div>
           </div>
         </div>
+        </ScrollReveal>
       </section>
 
       {/* ==================== CTA SECTION ==================== */}
@@ -1022,6 +1029,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
         padding: isMobile ? '60px 20px' : '100px 64px',
         backgroundColor: isDark ? '#0a0a0b' : '#fff',
       }}>
+        <ScrollReveal>
         <div style={{ 
           maxWidth: '900px', 
           margin: '0 auto',
@@ -1110,6 +1118,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
             </p>
           </div>
         </div>
+        </ScrollReveal>
       </section>
 
       </main>

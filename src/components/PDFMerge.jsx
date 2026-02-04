@@ -1,6 +1,6 @@
 // PDFMerge.jsx - PDF Merge Tool for BrewedOps
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Download, Trash2, FileStack, Plus, GripVertical, X, Loader2, AlertTriangle, ArrowUp, ArrowDown } from 'lucide-react';
+import { UploadSimple, DownloadSimple, Trash, Files, Plus, DotsSixVertical, X, SpinnerGap, Warning, ArrowUp, ArrowDown } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -117,7 +117,7 @@ const PDFMerge = ({ isDark }) => {
     <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: FONTS.body }}>
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
-          <FileStack className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <Files className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           PDF Merge
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Combine multiple PDF files into one document</p>
@@ -131,7 +131,7 @@ const PDFMerge = ({ isDark }) => {
               onClick={() => fileInputRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => { e.preventDefault(); handleFileUpload(e.dataTransfer.files); }}>
-              <FileStack className="size-12 mx-auto mb-4 text-muted-foreground" />
+              <Files className="size-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="font-semibold mb-2" style={{ color: theme.text }}>Add PDF Files</h3>
               <p className="text-sm text-muted-foreground mb-4">Drag & drop or click to select</p>
               <Button style={{ backgroundColor: BRAND.blue }}><Plus className="size-4 mr-2" />Add PDFs</Button>
@@ -147,7 +147,7 @@ const PDFMerge = ({ isDark }) => {
               <div className="flex items-center justify-between mb-4">
                 <Label className="font-medium" style={{ color: theme.text }}>{files.length} PDF{files.length !== 1 ? 's' : ''} • {formatFileSize(totalSize)}</Label>
                 <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)} className="text-destructive">
-                  <Trash2 className="size-4 mr-1" />Clear All
+                  <Trash className="size-4 mr-1" />Clear All
                 </Button>
               </div>
               
@@ -163,7 +163,7 @@ const PDFMerge = ({ isDark }) => {
                       </Button>
                     </div>
                     <div className="size-10 rounded bg-red-500/10 flex items-center justify-center shrink-0">
-                      <FileStack className="size-5 text-red-500" />
+                      <Files className="size-5 text-red-500" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate" style={{ color: theme.text }}>{fileObj.name}</p>
@@ -192,11 +192,11 @@ const PDFMerge = ({ isDark }) => {
                 </div>
                 {mergedUrl ? (
                   <Button onClick={downloadMerged} style={{ backgroundColor: BRAND.green }}>
-                    <Download className="size-4 mr-2" />Download Merged PDF
+                    <DownloadSimple className="size-4 mr-2" />Download Merged PDF
                   </Button>
                 ) : (
                   <Button onClick={mergePDFs} disabled={isMerging || files.length < 2} style={{ backgroundColor: BRAND.blue }}>
-                    {isMerging ? <><Loader2 className="size-4 mr-2 animate-spin" />Merging...</> : <><FileStack className="size-4 mr-2" />Merge PDFs</>}
+                    {isMerging ? <><SpinnerGap className="size-4 mr-2 animate-spin" />Merging...</> : <><Files className="size-4 mr-2" />Merge PDFs</>}
                   </Button>
                 )}
               </div>
@@ -207,7 +207,7 @@ const PDFMerge = ({ isDark }) => {
         {error && (
           <div className="p-4 rounded-lg bg-destructive/10 border border-destructive/20">
             <div className="flex gap-3">
-              <AlertTriangle className="size-5 text-destructive shrink-0" />
+              <Warning className="size-5 text-destructive shrink-0" />
               <p className="text-sm text-destructive">{error}</p>
             </div>
           </div>
@@ -217,12 +217,12 @@ const PDFMerge = ({ isDark }) => {
       <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><AlertTriangle className="size-5 text-amber-500" />Clear All?</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Warning className="size-5 text-amber-500" />Clear All?</DialogTitle>
             <DialogDescription>This will remove all {files.length} PDF files.</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearConfirm(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={clearAll}><Trash2 className="size-4 mr-2" />Clear All</Button>
+            <Button variant="destructive" onClick={clearAll}><Trash className="size-4 mr-2" />Clear All</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

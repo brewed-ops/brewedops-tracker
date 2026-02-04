@@ -1,7 +1,7 @@
 // ImageToText.jsx - OCR Text Extraction Tool for BrewedOps
 // Uses multiple OCR approaches for reliability
 import React, { useState, useRef, useCallback } from 'react';
-import { Upload, Copy, Check, ScanText, Loader2, Download, Trash2, AlertTriangle, Languages, Info, RefreshCw } from 'lucide-react';
+import { UploadSimple, Copy, Check, Scan, SpinnerGap, DownloadSimple, Trash, Warning, Translate, Info, ArrowsClockwise } from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Label } from '@/components/ui/label';
@@ -267,7 +267,7 @@ const ImageToText = ({ isDark }) => {
     <div className="p-4 md:p-6 w-full min-h-screen" style={{ backgroundColor: theme.bg, fontFamily: FONTS.body }}>
       <div className="mb-6">
         <h1 className="text-xl md:text-3xl font-bold mb-1 flex items-center gap-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>
-          <ScanText className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
+          <Scan className="size-5 md:size-8 shrink-0" style={{ color: BRAND.blue }} />
           Image to Text (OCR)
         </h1>
         <p className="text-xs md:text-sm text-muted-foreground">Extract text from images, screenshots, and documents</p>
@@ -282,18 +282,18 @@ const ImageToText = ({ isDark }) => {
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => { e.preventDefault(); handleFileUpload(e.dataTransfer.files?.[0]); }}>
                 <div className="size-20 rounded-full mx-auto mb-6 flex items-center justify-center" style={{ backgroundColor: BRAND.blue + '15' }}>
-                  <ScanText className="size-10" style={{ color: BRAND.blue }} />
+                  <Scan className="size-10" style={{ color: BRAND.blue }} />
                 </div>
                 <h3 className="text-xl font-semibold mb-2" style={{ color: theme.text, fontFamily: FONTS.heading }}>Upload Image</h3>
                 <p className="text-muted-foreground mb-4">Drag & drop or click to select</p>
-                <Button style={{ backgroundColor: BRAND.blue }}><Upload className="size-4 mr-2" />Select Image</Button>
+                <Button style={{ backgroundColor: BRAND.blue }}><UploadSimple className="size-4 mr-2" />Select Image</Button>
                 <p className="text-xs text-muted-foreground mt-4">PNG, JPG, WebP • Max 10MB (auto-compressed)</p>
               </div>
               <input ref={fileInputRef} type="file" accept="image/*" onChange={(e) => handleFileUpload(e.target.files?.[0])} className="hidden" />
               
               <div className="mt-6 p-4 rounded-lg border" style={{ backgroundColor: BRAND.blue + '08', borderColor: BRAND.blue + '20' }}>
                 <div className="flex gap-3">
-                  <Languages className="size-5 shrink-0 mt-0.5" style={{ color: BRAND.blue }} />
+                  <Translate className="size-5 shrink-0 mt-0.5" style={{ color: BRAND.blue }} />
                   <div>
                     <p className="text-sm font-medium" style={{ color: BRAND.blue }}>12 Languages Supported</p>
                     <p className="text-xs text-muted-foreground mt-1">English, Spanish, Chinese, Japanese, Korean, Tagalog, and more</p>
@@ -309,7 +309,7 @@ const ImageToText = ({ isDark }) => {
                 <div className="flex items-center justify-between mb-4">
                   <Label className="font-medium" style={{ color: theme.text }}>Source Image</Label>
                   <Button variant="outline" size="sm" onClick={() => setShowClearConfirm(true)} className="text-destructive">
-                    <Trash2 className="size-4 mr-1" />Clear
+                    <Trash className="size-4 mr-1" />Clear
                   </Button>
                 </div>
                 
@@ -329,7 +329,7 @@ const ImageToText = ({ isDark }) => {
                   {isProcessing ? (
                     <div className="space-y-3">
                       <Button onClick={cancelExtraction} variant="outline" className="w-full">
-                        <Loader2 className="size-4 mr-2 animate-spin" />Cancel Extraction
+                        <SpinnerGap className="size-4 mr-2 animate-spin" />Cancel Extraction
                       </Button>
                       <div className="space-y-1">
                         <div className="w-full bg-muted rounded-full h-2">
@@ -345,7 +345,7 @@ const ImageToText = ({ isDark }) => {
                     </div>
                   ) : (
                     <Button onClick={extractText} className="w-full" style={{ backgroundColor: BRAND.blue }}>
-                      <ScanText className="size-4 mr-2" />Extract Text
+                      <Scan className="size-4 mr-2" />Extract Text
                     </Button>
                   )}
                   
@@ -368,7 +368,7 @@ const ImageToText = ({ isDark }) => {
                         {copied ? 'Copied!' : 'Copy'}
                       </Button>
                       <Button variant="outline" size="sm" onClick={downloadText}>
-                        <Download className="size-4 mr-1" />Save
+                        <DownloadSimple className="size-4 mr-1" />Save
                       </Button>
                     </div>
                   )}
@@ -393,11 +393,11 @@ const ImageToText = ({ isDark }) => {
           <div className="mt-4 p-4 rounded-lg bg-destructive/10 border border-destructive/20">
             <div className="flex items-start justify-between gap-3">
               <div className="flex gap-3">
-                <AlertTriangle className="size-5 text-destructive shrink-0 mt-0.5" />
+                <Warning className="size-5 text-destructive shrink-0 mt-0.5" />
                 <p className="text-sm text-destructive">{error}</p>
               </div>
               <Button variant="outline" size="sm" onClick={retryExtraction} className="shrink-0">
-                <RefreshCw className="size-4 mr-1" />Retry
+                <ArrowsClockwise className="size-4 mr-1" />Retry
               </Button>
             </div>
           </div>
@@ -407,12 +407,12 @@ const ImageToText = ({ isDark }) => {
       <Dialog open={showClearConfirm} onOpenChange={setShowClearConfirm}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><AlertTriangle className="size-5 text-amber-500" />Clear All?</DialogTitle>
+            <DialogTitle className="flex items-center gap-2"><Warning className="size-5 text-amber-500" />Clear All?</DialogTitle>
             <DialogDescription>Remove the image and extracted text.</DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2 sm:gap-0">
             <Button variant="outline" onClick={() => setShowClearConfirm(false)}>Cancel</Button>
-            <Button variant="destructive" onClick={clearAll}><Trash2 className="size-4 mr-2" />Clear</Button>
+            <Button variant="destructive" onClick={clearAll}><Trash className="size-4 mr-2" />Clear</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

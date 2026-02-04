@@ -6,28 +6,27 @@ import {
   Wallet,
   Headset,
   CheckSquare,
-  FileEdit,
-  Sparkles,
+  NotePencil,
+  Sparkle,
   Crop,
-  RefreshCw,
-  Minimize2,
+  ArrowsClockwise,
+  ArrowsIn,
   QrCode,
-  ImageDown,
+  FileImage,
   Palette,
-  FileStack,
+  Files,
   Scissors,
-  ImagePlus,
-  Film,
-  ScissorsLineDashed,
+  ImageSquare,
+  FilmStrip,
   FileText,
-  Replace,
-  CaseSensitive,
+  Swap,
+  TextAa,
   Hash,
   GitBranch,
-  Braces,
+  BracketsCurly,
   Clock,
   BookOpen,
-} from "lucide-react"
+} from "@phosphor-icons/react"
 
 import {
   Sidebar,
@@ -54,34 +53,34 @@ const homeItems = [
 ]
 
 const imageTools = [
-  { id: "bgremover", title: "BG Remover", icon: Sparkles, path: "/bgremover" },
+  { id: "bgremover", title: "BG Remover", icon: Sparkle, path: "/bgremover" },
   { id: "imagecropper", title: "Image Cropper", icon: Crop, path: "/imagecropper" },
-  { id: "imageresizer", title: "Image Resizer", icon: Minimize2, path: "/imageresizer" },
-  { id: "imagecompressor", title: "Image Compressor", icon: ImageDown, path: "/imagecompressor" },
-  { id: "imageconverter", title: "Image Converter", icon: RefreshCw, path: "/imageconverter" },
+  { id: "imageresizer", title: "Image Resizer", icon: ArrowsIn, path: "/imageresizer" },
+  { id: "imagecompressor", title: "Image Compressor", icon: FileImage, path: "/imagecompressor" },
+  { id: "imageconverter", title: "Image Converter", icon: ArrowsClockwise, path: "/imageconverter" },
   { id: "colorpicker", title: "Color Picker", icon: Palette, path: "/colorpicker" },
-  { id: "imagetopdf", title: "Image to PDF", icon: ImagePlus, path: "/imagetopdf" },
+  { id: "imagetopdf", title: "Image to PDF", icon: ImageSquare, path: "/imagetopdf" },
 ]
 
 const videoTools = [
-  { id: "videocompressor", title: "Video Compressor", icon: Film, path: "/videocompressor" },
-  { id: "videotrimmer", title: "Video Trimmer", icon: ScissorsLineDashed, path: "/videotrimmer" },
+  { id: "videocompressor", title: "Video Compressor", icon: FilmStrip, path: "/videocompressor" },
+  { id: "videotrimmer", title: "Video Trimmer", icon: Scissors, path: "/videotrimmer" },
 ]
 
 const documentTools = [
-  { id: "pdfeditor", title: "PDF Editor", icon: FileEdit, path: "/pdfeditor" },
-  { id: "pdfmerge", title: "PDF Merge", icon: FileStack, path: "/pdfmerge" },
+  { id: "pdfeditor", title: "PDF Editor", icon: NotePencil, path: "/pdfeditor" },
+  { id: "pdfmerge", title: "PDF Merge", icon: Files, path: "/pdfmerge" },
   { id: "pdfsplit", title: "PDF Split", icon: Scissors, path: "/pdfsplit" },
 ]
 
 const otherTools = [
   { id: "qrgenerator", title: "QR Generator", icon: QrCode, path: "/qrgenerator" },
-  { id: "findreplace", title: "Find & Replace", icon: Replace, path: "/findreplace" },
-  { id: "caseconverter", title: "Case Converter", icon: CaseSensitive, path: "/caseconverter" },
+  { id: "findreplace", title: "Find & Replace", icon: Swap, path: "/findreplace" },
+  { id: "caseconverter", title: "Case Converter", icon: TextAa, path: "/caseconverter" },
   { id: "wordcounter", title: "Word Counter", icon: Hash, path: "/wordcounter" },
   { id: "mermaid", title: "Mermaid Reader", icon: GitBranch, path: "/mermaid" },
   { id: "markdownviewer", title: "Markdown Viewer", icon: BookOpen, path: "/markdownviewer" },
-  { id: "jsonformatter", title: "JSON Formatter", icon: Braces, path: "/jsonformatter" },
+  { id: "jsonformatter", title: "JSON Formatter", icon: BracketsCurly, path: "/jsonformatter" },
   { id: "crongenerator", title: "Cron Generator", icon: Clock, path: "/crongenerator" },
 ]
 

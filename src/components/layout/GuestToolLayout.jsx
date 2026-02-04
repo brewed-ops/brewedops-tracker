@@ -10,7 +10,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronLeft, Sun, Moon, LogIn } from 'lucide-react';
+import { CaretLeft, Sun, Moon, SignIn } from '@phosphor-icons/react';
 import SEO from '../SEO';
 
 // ============================================
@@ -115,7 +115,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
             title="Back to Home"
             aria-label="Back to Home"
           >
-            <ChevronLeft size={18} />
+            <CaretLeft size={18} />
           </button>
 
           <div
@@ -205,7 +205,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
               gap: '6px',
             }}
           >
-            <LogIn size={14} />
+            <SignIn size={14} />
             {!isSmall && 'Login'}
           </button>
 

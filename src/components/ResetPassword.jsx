@@ -1,7 +1,7 @@
 // ResetPassword.jsx - Password Reset page for BrewedOps
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Lock, CheckCircle, AlertCircle, Loader2, Sun, Moon, ArrowLeft } from 'lucide-react';
+import { Eye, EyeSlash, Lock, CheckCircle, WarningCircle, SpinnerGap, Sun, Moon, ArrowLeft } from '@phosphor-icons/react';
 import { supabase } from '../lib/supabase';
 
 // ============================================
@@ -217,7 +217,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
         justifyContent: 'center',
       }}>
         <div style={{ textAlign: 'center' }}>
-          <Loader2 style={{ width: '40px', height: '40px', color: '#004AAC', animation: 'spin 1s linear infinite' }} />
+          <SpinnerGap style={{ width: '40px', height: '40px', color: '#004AAC', animation: 'spin 1s linear infinite' }} />
           <p style={{ marginTop: '16px', color: theme.textMuted }}>Verifying reset link...</p>
         </div>
         <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -352,7 +352,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
                 alignItems: 'center',
                 justifyContent: 'center',
               }}>
-                <AlertCircle style={{ width: '32px', height: '32px', color: '#ef4444' }} />
+                <WarningCircle style={{ width: '32px', height: '32px', color: '#ef4444' }} />
               </div>
               <p style={{ fontSize: '14px', color: theme.textMuted, textAlign: 'center' }}>
                 {error || 'This reset link is invalid or has expired.'}
@@ -385,7 +385,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
                   borderRadius: '10px',
                   marginBottom: '20px',
                 }}>
-                  <AlertCircle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
+                  <WarningCircle style={{ width: '16px', height: '16px', color: '#ef4444', flexShrink: 0 }} />
                   <span style={{ fontSize: '13px', color: isDark ? '#fca5a5' : '#dc2626' }}>{error}</span>
                 </div>
               )}
@@ -425,7 +425,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
                       padding: '4px',
                     }}
                   >
-                    {showPassword ? <EyeOff style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
+                    {showPassword ? <EyeSlash style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
                   </button>
                 </div>
                 
@@ -495,7 +495,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
                       padding: '4px',
                     }}
                   >
-                    {showConfirmPassword ? <EyeOff style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
+                    {showConfirmPassword ? <EyeSlash style={{ width: '18px', height: '18px' }} /> : <Eye style={{ width: '18px', height: '18px' }} />}
                   </button>
                 </div>
                 {confirmPassword && password !== confirmPassword && (
@@ -522,7 +522,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
               >
                 {loading ? (
                   <>
-                    <Loader2 style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
+                    <SpinnerGap style={{ width: '18px', height: '18px', animation: 'spin 1s linear infinite' }} />
                     Updating...
                   </>
                 ) : (

@@ -1,11 +1,11 @@
 // BrewedNotes.jsx - Rich Text Notes App for BrewedOps
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Plus, Trash2, Edit3, Save, FileText, AlertTriangle,
-  Bold, Italic, Underline, Strikethrough, List, ListOrdered, CheckSquare,
-  AlignLeft, AlignCenter, AlignRight, Type, Heading1, Heading2, Heading3,
-  X, Loader2, Highlighter, Undo, Redo
-} from 'lucide-react';
+import {
+  Plus, Trash, PencilSimple, FloppyDisk, FileText, Warning,
+  TextB, TextItalic, TextUnderline, TextStrikethrough, ListBullets, ListNumbers, CheckSquare,
+  TextAlignLeft, TextAlignCenter, TextAlignRight, TextT, TextHOne, TextHTwo, TextHThree,
+  X, SpinnerGap, HighlighterCircle, ArrowCounterClockwise, ArrowClockwise
+} from '@phosphor-icons/react';
 import { Button } from '@/components/ui/Button';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
@@ -426,7 +426,7 @@ const BrewedNotes = ({ isDark, user }) => {
   if (loading) {
     return (
       <div className="p-4 md:p-6 w-full min-h-screen flex items-center justify-center" style={{ backgroundColor: theme.bg }}>
-        <Loader2 className="size-8 animate-spin" style={{ color: BRAND.blue }} />
+        <SpinnerGap className="size-8 animate-spin" style={{ color: BRAND.blue }} />
       </div>
     );
   }
@@ -562,8 +562,8 @@ const BrewedNotes = ({ isDark, user }) => {
                 <div className="flex items-center justify-between">
                   <span className="font-medium text-sm truncate pr-2" style={{ color: theme.text, fontFamily: "'Montserrat', sans-serif" }}>{note.name}</span>
                   <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={(e) => { e.stopPropagation(); setNoteToEdit(note); setNewNoteName(note.name); setNewNoteColor(note.color); setShowEditNameModal(true); }} className="p-1 rounded hover:bg-black/10"><Edit3 className="size-3" style={{ color: theme.text }} /></button>
-                    <button onClick={(e) => { e.stopPropagation(); setNoteToDelete(note); setShowDeleteModal(true); }} className="p-1 rounded hover:bg-black/10"><Trash2 className="size-3 text-red-500" /></button>
+                    <button onClick={(e) => { e.stopPropagation(); setNoteToEdit(note); setNewNoteName(note.name); setNewNoteColor(note.color); setShowEditNameModal(true); }} className="p-1 rounded hover:bg-black/10"><PencilSimple className="size-3" style={{ color: theme.text }} /></button>
+                    <button onClick={(e) => { e.stopPropagation(); setNoteToDelete(note); setShowDeleteModal(true); }} className="p-1 rounded hover:bg-black/10"><Trash className="size-3 text-red-500" /></button>
                   </div>
                 </div>
                 <p className="text-[10px] text-muted-foreground mt-0.5" style={{ fontFamily: "'Montserrat', sans-serif" }}>{new Date(note.updated_at).toLocaleDateString()}</p>
@@ -605,23 +605,23 @@ const BrewedNotes = ({ isDark, user }) => {
                 <div className="w-px h-5 bg-border mx-1" />
 
                 {/* Undo/Redo */}
-                <ToolbarBtn onClick={() => execCmd('undo')} disabled={!isEditing} title="Undo"><Undo className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => execCmd('redo')} disabled={!isEditing} title="Redo"><Redo className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('undo')} disabled={!isEditing} title="Undo"><ArrowCounterClockwise className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('redo')} disabled={!isEditing} title="Redo"><ArrowClockwise className="size-3.5" /></ToolbarBtn>
                 
                 <div className="w-px h-5 bg-border mx-1" />
 
                 {/* Basic formatting */}
-                <ToolbarBtn onClick={() => execCmd('bold')} disabled={!isEditing} title="Bold (Ctrl+B)"><Bold className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => execCmd('italic')} disabled={!isEditing} title="Italic (Ctrl+I)"><Italic className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => execCmd('underline')} disabled={!isEditing} title="Underline (Ctrl+U)"><Underline className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => execCmd('strikeThrough')} disabled={!isEditing} title="Strikethrough"><Strikethrough className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('bold')} disabled={!isEditing} title="Bold (Ctrl+B)"><TextB className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('italic')} disabled={!isEditing} title="Italic (Ctrl+I)"><TextItalic className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('underline')} disabled={!isEditing} title="Underline (Ctrl+U)"><TextUnderline className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('strikeThrough')} disabled={!isEditing} title="Strikethrough"><TextStrikethrough className="size-3.5" /></ToolbarBtn>
 
                 <div className="w-px h-5 bg-border mx-1" />
 
                 {/* Text Color */}
                 <div className="relative">
                   <ToolbarBtn onClick={() => setShowTextColorPicker(!showTextColorPicker)} disabled={!isEditing} title="Text Color">
-                    <div className="flex flex-col items-center"><Type className="size-3.5" /><div className="w-3 h-0.5 rounded" style={{ backgroundColor: '#ef4444' }} /></div>
+                    <div className="flex flex-col items-center"><TextT className="size-3.5" /><div className="w-3 h-0.5 rounded" style={{ backgroundColor: '#ef4444' }} /></div>
                   </ToolbarBtn>
                   {showTextColorPicker && isEditing && (
                     <div className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-6 gap-1" style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}>
@@ -634,7 +634,7 @@ const BrewedNotes = ({ isDark, user }) => {
 
                 {/* Highlight */}
                 <div className="relative">
-                  <ToolbarBtn onClick={() => setShowHighlightPicker(!showHighlightPicker)} disabled={!isEditing} title="Highlight"><Highlighter className="size-3.5" /></ToolbarBtn>
+                  <ToolbarBtn onClick={() => setShowHighlightPicker(!showHighlightPicker)} disabled={!isEditing} title="Highlight"><HighlighterCircle className="size-3.5" /></ToolbarBtn>
                   {showHighlightPicker && isEditing && (
                     <div className="absolute top-full left-0 mt-1 p-2 rounded-lg shadow-lg z-50 grid grid-cols-5 gap-1" style={{ backgroundColor: theme.cardBg, border: `1px solid ${theme.cardBorder}` }}>
                       {HIGHLIGHT_COLORS.map(color => (
@@ -647,23 +647,23 @@ const BrewedNotes = ({ isDark, user }) => {
                 <div className="w-px h-5 bg-border mx-1" />
 
                 {/* Alignment */}
-                <ToolbarBtn onClick={() => execCmd('justifyLeft')} disabled={!isEditing} title="Align Left"><AlignLeft className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => execCmd('justifyCenter')} disabled={!isEditing} title="Center"><AlignCenter className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => execCmd('justifyRight')} disabled={!isEditing} title="Align Right"><AlignRight className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('justifyLeft')} disabled={!isEditing} title="Align Left"><TextAlignLeft className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('justifyCenter')} disabled={!isEditing} title="Center"><TextAlignCenter className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => execCmd('justifyRight')} disabled={!isEditing} title="Align Right"><TextAlignRight className="size-3.5" /></ToolbarBtn>
 
                 <div className="w-px h-5 bg-border mx-1" />
 
                 {/* Lists */}
-                <ToolbarBtn onClick={formatAsBulletList} disabled={!isEditing} title="Bullet List"><List className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={formatAsNumberedList} disabled={!isEditing} title="Numbered List"><ListOrdered className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={formatAsBulletList} disabled={!isEditing} title="Bullet List"><ListBullets className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={formatAsNumberedList} disabled={!isEditing} title="Numbered List"><ListNumbers className="size-3.5" /></ToolbarBtn>
                 <ToolbarBtn onClick={formatAsChecklist} disabled={!isEditing} title="Checklist (checks will strikethrough)"><CheckSquare className="size-3.5" /></ToolbarBtn>
 
                 <div className="w-px h-5 bg-border mx-1" />
 
                 {/* Headings */}
-                <ToolbarBtn onClick={() => formatAsHeading('h1')} disabled={!isEditing} title="Heading 1 (click again to remove)"><Heading1 className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => formatAsHeading('h2')} disabled={!isEditing} title="Heading 2 (click again to remove)"><Heading2 className="size-3.5" /></ToolbarBtn>
-                <ToolbarBtn onClick={() => formatAsHeading('h3')} disabled={!isEditing} title="Heading 3 (click again to remove)"><Heading3 className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => formatAsHeading('h1')} disabled={!isEditing} title="Heading 1 (click again to remove)"><TextHOne className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => formatAsHeading('h2')} disabled={!isEditing} title="Heading 2 (click again to remove)"><TextHTwo className="size-3.5" /></ToolbarBtn>
+                <ToolbarBtn onClick={() => formatAsHeading('h3')} disabled={!isEditing} title="Heading 3 (click again to remove)"><TextHThree className="size-3.5" /></ToolbarBtn>
 
                 {/* Clear Formatting */}
                 <ToolbarBtn onClick={removeFormatting} disabled={!isEditing} title="Clear Formatting"><X className="size-3.5" /></ToolbarBtn>
@@ -672,7 +672,7 @@ const BrewedNotes = ({ isDark, user }) => {
                 <div className="ml-auto">
                   {isEditing && (
                     <Button onClick={saveNote} disabled={saving} size="sm" className="h-7 text-xs" style={{ backgroundColor: BRAND.green, fontFamily: "'Montserrat', sans-serif" }}>
-                      {saving ? <Loader2 className="size-3 mr-1 animate-spin" /> : <Save className="size-3 mr-1" />}Save
+                      {saving ? <SpinnerGap className="size-3 mr-1 animate-spin" /> : <FloppyDisk className="size-3 mr-1" />}Save
                     </Button>
                   )}
                 </div>
@@ -714,25 +714,25 @@ const BrewedNotes = ({ isDark, user }) => {
             <div><Label className="text-sm mb-2 block" style={{ fontFamily: "'Montserrat', sans-serif" }}>Note Name</Label><input type="text" value={newNoteName} onChange={(e) => setNewNoteName(e.target.value)} placeholder="Enter note name..." className="w-full h-10 px-3 border rounded-lg bg-background" style={{ borderColor: theme.cardBorder, fontFamily: "'Montserrat', sans-serif" }} autoFocus /></div>
             <div><Label className="text-sm mb-2 block" style={{ fontFamily: "'Montserrat', sans-serif" }}>Color</Label><div className="grid grid-cols-5 gap-2">{NOTE_COLORS.map(color => (<button key={color.value} onClick={() => setNewNoteColor(color.value)} className={`h-8 rounded-lg transition-all ${newNoteColor === color.value ? 'ring-2 ring-offset-2 scale-105' : 'hover:scale-105'}`} style={{ background: getNoteGradient(color.value), borderLeft: `4px solid ${color.value}`, ringColor: color.value }} title={color.name} />))}</div></div>
           </div>
-          <DialogFooter><Button variant="outline" onClick={() => setShowAddModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button onClick={createNote} disabled={!newNoteName.trim() || saving} style={{ backgroundColor: BRAND.blue, fontFamily: "'Montserrat', sans-serif" }}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Plus className="size-4 mr-2" />}Create</Button></DialogFooter>
+          <DialogFooter><Button variant="outline" onClick={() => setShowAddModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button onClick={createNote} disabled={!newNoteName.trim() || saving} style={{ backgroundColor: BRAND.blue, fontFamily: "'Montserrat', sans-serif" }}>{saving ? <SpinnerGap className="size-4 mr-2 animate-spin" /> : <Plus className="size-4 mr-2" />}Create</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showEditNameModal} onOpenChange={setShowEditNameModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle className="flex items-center gap-2" style={{ fontFamily: "'Montserrat', sans-serif" }}><Edit3 className="size-5" style={{ color: BRAND.blue }} />Edit Note</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle className="flex items-center gap-2" style={{ fontFamily: "'Montserrat', sans-serif" }}><PencilSimple className="size-5" style={{ color: BRAND.blue }} />Edit Note</DialogTitle></DialogHeader>
           <div className="space-y-4 py-4">
             <div><Label className="text-sm mb-2 block" style={{ fontFamily: "'Montserrat', sans-serif" }}>Note Name</Label><input type="text" value={newNoteName} onChange={(e) => setNewNoteName(e.target.value)} className="w-full h-10 px-3 border rounded-lg bg-background" style={{ borderColor: theme.cardBorder, fontFamily: "'Montserrat', sans-serif" }} autoFocus /></div>
             <div><Label className="text-sm mb-2 block" style={{ fontFamily: "'Montserrat', sans-serif" }}>Color</Label><div className="grid grid-cols-5 gap-2">{NOTE_COLORS.map(color => (<button key={color.value} onClick={() => setNewNoteColor(color.value)} className={`h-8 rounded-lg transition-all ${newNoteColor === color.value ? 'ring-2 ring-offset-2 scale-105' : 'hover:scale-105'}`} style={{ background: getNoteGradient(color.value), borderLeft: `4px solid ${color.value}`, ringColor: color.value }} />))}</div></div>
           </div>
-          <DialogFooter><Button variant="outline" onClick={() => setShowEditNameModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button onClick={updateNoteName} disabled={!newNoteName.trim() || saving} style={{ backgroundColor: BRAND.blue, fontFamily: "'Montserrat', sans-serif" }}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Save className="size-4 mr-2" />}Save</Button></DialogFooter>
+          <DialogFooter><Button variant="outline" onClick={() => setShowEditNameModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button onClick={updateNoteName} disabled={!newNoteName.trim() || saving} style={{ backgroundColor: BRAND.blue, fontFamily: "'Montserrat', sans-serif" }}>{saving ? <SpinnerGap className="size-4 mr-2 animate-spin" /> : <FloppyDisk className="size-4 mr-2" />}Save</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
       <Dialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle className="flex items-center gap-2" style={{ fontFamily: "'Montserrat', sans-serif" }}><AlertTriangle className="size-5 text-red-500" />Delete Note?</DialogTitle><DialogDescription style={{ fontFamily: "'Montserrat', sans-serif" }}>Are you sure you want to delete "<strong>{noteToDelete?.name}</strong>"?</DialogDescription></DialogHeader>
-          <DialogFooter className="gap-2 sm:gap-0"><Button variant="outline" onClick={() => setShowDeleteModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button variant="destructive" onClick={deleteNote} disabled={saving} style={{ fontFamily: "'Montserrat', sans-serif" }}>{saving ? <Loader2 className="size-4 mr-2 animate-spin" /> : <Trash2 className="size-4 mr-2" />}Delete</Button></DialogFooter>
+          <DialogHeader><DialogTitle className="flex items-center gap-2" style={{ fontFamily: "'Montserrat', sans-serif" }}><Warning className="size-5 text-red-500" />Delete Note?</DialogTitle><DialogDescription style={{ fontFamily: "'Montserrat', sans-serif" }}>Are you sure you want to delete "<strong>{noteToDelete?.name}</strong>"?</DialogDescription></DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0"><Button variant="outline" onClick={() => setShowDeleteModal(false)} style={{ fontFamily: "'Montserrat', sans-serif" }}>Cancel</Button><Button variant="destructive" onClick={deleteNote} disabled={saving} style={{ fontFamily: "'Montserrat', sans-serif" }}>{saving ? <SpinnerGap className="size-4 mr-2 animate-spin" /> : <Trash className="size-4 mr-2" />}Delete</Button></DialogFooter>
         </DialogContent>
       </Dialog>
 
