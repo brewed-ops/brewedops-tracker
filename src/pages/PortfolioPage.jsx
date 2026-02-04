@@ -596,7 +596,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                 {/* CTA Buttons */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '28px', justifyContent: isMobile ? 'center' : 'flex-start' }}>
                   <a
-                    href="https://ghl.brewedops.com/widget/booking/ZSkJj8URVNZLxTy5nCgc"
+                    href="https://connect.brewedops.com/widget/booking/etoVHFeyWv1bqRkpxZee"
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{
@@ -1114,7 +1114,7 @@ function PortfolioPage({ isDark, setIsDark }) {
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
               <a
-                href="https://ghl.brewedops.com/widget/booking/ZSkJj8URVNZLxTy5nCgc"
+                href="https://connect.brewedops.com/widget/booking/etoVHFeyWv1bqRkpxZee"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
