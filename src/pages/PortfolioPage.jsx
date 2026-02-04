@@ -493,21 +493,20 @@ function PortfolioPage({ isDark, setIsDark }) {
           {!isMobile && (
             <div style={{
               position: 'absolute',
-              right: '-2%',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              width: '650px',
-              height: '820px',
+              right: '4%',
+              bottom: 0,
+              width: '750px',
+              height: '95%',
               pointerEvents: 'none',
               zIndex: 0,
-              maskImage: 'radial-gradient(ellipse 85% 80% at 60% 50%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 80%)',
-              WebkitMaskImage: 'radial-gradient(ellipse 85% 80% at 60% 50%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 80%)',
+              maskImage: 'radial-gradient(ellipse 85% 80% at 60% 55%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 80%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 85% 80% at 60% 55%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 80%)',
             }}>
               <img
                 src="https://i.imgur.com/Z5kBKUU.png"
                 alt=""
-                width={650}
-                height={820}
+                width={750}
+                height={900}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -517,6 +516,25 @@ function PortfolioPage({ isDark, setIsDark }) {
               />
             </div>
           )}
+          {/* Wave divider at bottom */}
+          <svg
+            viewBox="0 0 1440 120"
+            preserveAspectRatio="none"
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              width: '100%',
+              height: '80px',
+              zIndex: 2,
+              display: 'block',
+            }}
+          >
+            <path
+              d="M0,60 C240,120 480,0 720,60 C960,120 1200,0 1440,60 L1440,120 L0,120 Z"
+              fill={isDark ? '#0f0d0a' : BRAND.cream}
+            />
+          </svg>
           <div style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', position: 'relative', zIndex: 1 }}>
             <div style={{
               display: 'flex',

@@ -2,9 +2,11 @@
 import React from 'react';
 import { FileText, CheckCircle, Warning, Scales, Prohibit, ArrowsClockwise, Shield, Lightning, Globe, Lock } from '@phosphor-icons/react';
 import SEO from './SEO';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
+const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
 
 const TermsOfService = ({ onBack, onNavigate, isDark }) => {
   const theme = {
@@ -51,7 +53,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
       backgroundColor: theme.bg,
       display: 'flex',
       flexDirection: 'column',
-      fontFamily: "'Montserrat', sans-serif"
+      fontFamily: FONTS.heading
     }}>
       {/* Header */}
       <header style={{
@@ -99,16 +101,17 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
       <main style={{ flex: 1, padding: '24px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           {/* Page Header */}
+          <ScrollReveal>
           <div style={{ marginBottom: '40px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
-              <div style={{ 
-                width: '56px', 
-                height: '56px', 
-                backgroundColor: isDark ? '#004AAC20' : '#004AAC15', 
-                borderRadius: '14px', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center' 
+              <div style={{
+                width: '56px',
+                height: '56px',
+                backgroundColor: isDark ? '#004AAC20' : '#004AAC15',
+                borderRadius: '14px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
               }}>
                 <Scales style={{ width: '28px', height: '28px', color: '#004AAC' }} />
               </div>
@@ -117,19 +120,20 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
                 <p style={{ fontSize: '14px', color: theme.textMuted, margin: '4px 0 0' }}>Last updated: {lastUpdated}</p>
               </div>
             </div>
-            
-            <div style={{ 
-              padding: '16px 20px', 
-              backgroundColor: isDark ? '#3b82f615' : '#3b82f610', 
+
+            <div style={{
+              padding: '16px 20px',
+              backgroundColor: isDark ? '#3b82f615' : '#3b82f610',
               borderRadius: '12px',
               border: '1px solid #3b82f640'
             }}>
               <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.6' }}>
-                Welcome to <strong>BrewedOps</strong>! These Terms of Service ("Terms") govern your use of our 
-                productivity platform with 18 tools for freelancers, as well as our mobile application <strong>Fuelyx</strong> (nutrition & fitness tracker). By using BrewedOps or Fuelyx, you agree to these Terms.
+                Welcome to <strong>BrewedOps</strong>! These Terms of Service ("Terms") govern your use of our
+                productivity platform with 22+ tools for freelancers, as well as our mobile application <strong>Fuelyx</strong> (nutrition & fitness tracker). By using BrewedOps or Fuelyx, you agree to these Terms.
               </p>
             </div>
           </div>
+          </ScrollReveal>
 
           <Section icon={CheckCircle} title="Acceptance of Terms" color="#22c55e">
             <p>By accessing or using BrewedOps, you agree to be bound by these Terms of Service and our Privacy Policy. If you do not agree to these Terms, please do not use our service.</p>
@@ -158,14 +162,14 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
               <li>Video Compressor, Video Trimmer</li>
             </ul>
 
-            <p><strong style={{ color: theme.text }}>Document Tools (3):</strong></p>
+            <p><strong style={{ color: theme.text }}>Document Tools (4):</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
-              <li>PDF Editor, PDF Merge, PDF Split</li>
+              <li>PDF Editor, PDF Merge, PDF Split, Markdown Viewer</li>
             </ul>
 
-            <p><strong style={{ color: theme.text }}>Other Tools (4):</strong></p>
+            <p><strong style={{ color: theme.text }}>Other Tools (9):</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
-              <li>QR Generator, Find & Replace, Case Converter, Word Counter</li>
+              <li>QR Generator, Find & Replace, Case Converter, Word Counter, Mermaid Reader, JSON Formatter, Cron Generator, Timezone Converter, Focus Timer</li>
             </ul>
 
             <p><strong style={{ color: '#14b8a6' }}>Fuelyx Mobile App (Android):</strong></p>
@@ -310,9 +314,10 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
           </Section>
 
           {/* Contact */}
-          <div style={{ 
-            padding: '24px', 
-            backgroundColor: theme.cardBg, 
+          <ScrollReveal>
+          <div style={{
+            padding: '24px',
+            backgroundColor: theme.cardBg,
             borderRadius: '12px',
             border: '1px solid ' + theme.cardBorder,
             marginTop: '40px'
@@ -325,11 +330,13 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
               brewedops@gmail.com
             </p>
           </div>
+          </ScrollReveal>
 
           {/* Agreement Box */}
-          <div style={{ 
-            padding: '20px', 
-            backgroundColor: isDark ? '#22c55e15' : '#22c55e10', 
+          <ScrollReveal>
+          <div style={{
+            padding: '20px',
+            backgroundColor: isDark ? '#22c55e15' : '#22c55e10',
             borderRadius: '12px',
             border: '1px solid #22c55e40',
             marginTop: '24px',
@@ -340,6 +347,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
               By using BrewedOps, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.
             </p>
           </div>
+          </ScrollReveal>
         </div>
       </main>
 
@@ -364,7 +372,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               cursor: 'pointer',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             Privacy Policy
@@ -378,7 +386,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
               fontSize: '13px', 
               cursor: 'pointer',
               fontWeight: '600',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             Terms of Service
@@ -391,7 +399,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               cursor: 'pointer',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             About Us

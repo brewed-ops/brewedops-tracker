@@ -915,7 +915,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               { Icon: ChartLineUp, title: 'Growth', description: 'Committed to continuous learning and improvement.', color: '#f59e0b', weight: 'bold' },
               { Icon: ShieldCheck, title: 'Trust', description: 'Building lasting relationships through transparency and reliability.', color: '#22c55e', weight: 'fill' },
             ].map((value, idx) => (
-              <ScrollReveal key={value.title} delay={0.1 * idx}>
+              <ScrollReveal key={value.title} delay={0.1 * idx} style={{ height: '100%' }}>
               <div style={{
                 padding: isSmall ? '24px 16px' : '36px 28px',
                 backgroundColor: '#0e0c09',
@@ -924,6 +924,8 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 textAlign: 'center',
                 position: 'relative',
                 overflow: 'hidden',
+                height: '100%',
+                boxSizing: 'border-box',
               }}>
                 {/* Grid pattern */}
                 <div style={{

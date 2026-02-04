@@ -2,9 +2,11 @@
 import React from 'react';
 import { Shield, EnvelopeSimple, Database, Lock, Eye, Trash, Globe, Users, Lightning, Bell, MapPin, ArrowsClockwise } from '@phosphor-icons/react';
 import SEO from './SEO';
+import ScrollReveal from '@/components/ui/ScrollReveal';
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
+const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
 
 const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
   const theme = {
@@ -51,7 +53,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
       backgroundColor: theme.bg,
       display: 'flex',
       flexDirection: 'column',
-      fontFamily: "'Montserrat', sans-serif"
+      fontFamily: FONTS.heading
     }}>
       {/* Header */}
       <header style={{
@@ -99,6 +101,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
       <main style={{ flex: 1, padding: '24px' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           {/* Page Header */}
+          <ScrollReveal>
           <div style={{ marginBottom: '40px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '16px' }}>
               <div style={{ 
@@ -127,11 +130,12 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.6' }}>
                 <strong>BrewedOps</strong> ("we", "our", or "us") is committed to protecting your privacy. 
                 This Privacy Policy explains how we collect, use, disclose, and safeguard your information 
-                when you use our productivity platform with 18 tools for Filipino virtual assistants and freelancers,
+                when you use our productivity platform with 22+ tools for Filipino virtual assistants and freelancers,
                 as well as our mobile application <strong>Fuelyx</strong> (nutrition & fitness tracker for Android).
               </p>
             </div>
           </div>
+          </ScrollReveal>
 
           <Section icon={Database} title="Information We Collect">
             <p><strong style={{ color: theme.text }}>Account Information:</strong></p>
@@ -213,7 +217,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
           <Section icon={Eye} title="How We Use Your Information">
             <p>We use your information to:</p>
             <ul style={{ margin: '12px 0', paddingLeft: '20px' }}>
-              <li>Provide and maintain our 18 productivity tools</li>
+              <li>Provide and maintain our 22+ productivity tools</li>
               <li>Process your financial data and generate reports</li>
               <li>Store your notes, tasks, and organizational data</li>
               <li>Send invoice emails through Gmail integration (when authorized)</li>
@@ -330,9 +334,10 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
           </Section>
 
           {/* Contact */}
-          <div style={{ 
-            padding: '24px', 
-            backgroundColor: theme.cardBg, 
+          <ScrollReveal>
+          <div style={{
+            padding: '24px',
+            backgroundColor: theme.cardBg,
             borderRadius: '12px',
             border: '1px solid ' + theme.cardBorder,
             marginTop: '40px'
@@ -345,6 +350,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               brewedops@gmail.com
             </p>
           </div>
+          </ScrollReveal>
         </div>
       </main>
 
@@ -370,7 +376,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               fontSize: '13px', 
               cursor: 'pointer',
               fontWeight: '600',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             Privacy Policy
@@ -383,7 +389,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               cursor: 'pointer',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             Terms of Service
@@ -396,7 +402,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               cursor: 'pointer',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             About Us

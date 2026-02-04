@@ -3,13 +3,15 @@ import React from 'react';
 import {
   Code, Heart, Envelope, Phone, Sparkle, Lightning, Users, Target,
   Wallet, CheckSquare, FileText, Headset, Image, FilmStrip, NotePencil, QrCode,
-  Coffee, Globe, Shield, DeviceMobile
+  Coffee, Globe, Shield, DeviceMobile,
+  Camera, ForkKnife, Timer, Barbell, ChartBar, Trophy
 } from '@phosphor-icons/react';
 import SEO from './SEO';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
+const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
 
 const AboutUs = ({ onBack, onNavigate, isDark }) => {
   const theme = {
@@ -21,18 +23,18 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
   };
 
   const stats = [
-    { value: '18', label: 'Free Tools' },
+    { value: '22+', label: 'Free Tools' },
     { value: '1', label: 'Mobile App' },
     { value: '100%', label: 'Free to Use' },
     { value: '24/7', label: 'Available' },
   ];
 
   const toolCategories = [
-    { name: 'Productivity', count: 4, icon: Wallet, color: '#004AAC', tools: 'Finance Tracker, VAKita, Task Manager, Brewed Notes' },
+    { name: 'Productivity', count: 4, icon: Wallet, color: '#004AAC', tools: 'Finance Tracker, VA Kita, Task Manager, Brewed Notes' },
     { name: 'Image Tools', count: 7, icon: Image, color: '#8b5cf6', tools: 'BG Remover, Cropper, Resizer, Compressor, Converter, Color Picker, Image to PDF' },
     { name: 'Video Tools', count: 2, icon: FilmStrip, color: '#ef4444', tools: 'Video Compressor, Video Trimmer' },
-    { name: 'Document Tools', count: 3, icon: NotePencil, color: '#22c55e', tools: 'PDF Editor, PDF Merge, PDF Split' },
-    { name: 'Other Tools', count: 4, icon: QrCode, color: '#f59e0b', tools: 'QR Generator, Find & Replace, Case Converter, Word Counter' },
+    { name: 'Document Tools', count: 4, icon: NotePencil, color: '#22c55e', tools: 'PDF Editor, PDF Merge, PDF Split, Markdown Viewer' },
+    { name: 'Other Tools', count: 9, icon: QrCode, color: '#f59e0b', tools: 'QR Generator, Find & Replace, Case Converter, Word Counter, Mermaid Reader, JSON Formatter, Cron Generator, Timezone, Focus Timer' },
   ];
 
   return (
@@ -47,7 +49,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
       backgroundColor: theme.bg,
       display: 'flex',
       flexDirection: 'column',
-      fontFamily: "'Montserrat', sans-serif"
+      fontFamily: FONTS.heading
     }}>
       {/* Header */}
       <header style={{
@@ -219,7 +221,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
             marginBottom: '32px'
           }}>
             <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: '0 0 24px', textAlign: 'center' }}>
-              18 Tools Across 5 Categories
+              22+ Tools Across 5 Categories
             </h2>
             <div style={{ display: 'grid', gap: '16px' }}>
               {toolCategories.map((cat, idx) => (
@@ -308,12 +310,12 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
               {[
-                { icon: '📸', title: 'AI Food Scanner', desc: 'Snap & log food instantly' },
-                { icon: '🍲', title: '200+ Filipino Foods', desc: 'Local dishes database' },
-                { icon: '⏱️', title: 'Fasting Timer', desc: '6 IF protocols supported' },
-                { icon: '💪', title: 'Workout Tracking', desc: 'Log exercises & calories' },
-                { icon: '📊', title: 'Smart Analytics', desc: 'Charts & progress insights' },
-                { icon: '🏆', title: 'Achievements', desc: 'Streaks & badge rewards' },
+                { icon: Camera, title: 'AI Food Scanner', desc: 'Snap & log food instantly', color: '#8b5cf6' },
+                { icon: ForkKnife, title: '200+ Filipino Foods', desc: 'Local dishes database', color: '#f97316' },
+                { icon: Timer, title: 'Fasting Timer', desc: '6 IF protocols supported', color: '#0ea5e9' },
+                { icon: Barbell, title: 'Workout Tracking', desc: 'Log exercises & calories', color: '#ec4899' },
+                { icon: ChartBar, title: 'Smart Analytics', desc: 'Charts & progress insights', color: '#10b981' },
+                { icon: Trophy, title: 'Achievements', desc: 'Streaks & badge rewards', color: '#f59e0b' },
               ].map((feature, idx) => (
                 <div key={idx} style={{
                   padding: '16px',
@@ -321,7 +323,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
                   borderRadius: '10px',
                   border: '1px solid ' + theme.cardBorder,
                 }}>
-                  <div style={{ fontSize: '24px', marginBottom: '8px' }}>{feature.icon}</div>
+                  <feature.icon size={24} style={{ color: feature.color, marginBottom: '8px' }} />
                   <div style={{ fontSize: '14px', fontWeight: '600', color: theme.text, marginBottom: '4px' }}>{feature.title}</div>
                   <div style={{ fontSize: '12px', color: theme.textMuted }}>{feature.desc}</div>
                 </div>
@@ -529,7 +531,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               cursor: 'pointer',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             Privacy Policy
@@ -542,7 +544,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               color: theme.textMuted, 
               fontSize: '13px', 
               cursor: 'pointer',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             Terms of Service
@@ -556,7 +558,7 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
               fontSize: '13px', 
               cursor: 'pointer',
               fontWeight: '600',
-              fontFamily: "'Montserrat', sans-serif"
+              fontFamily: FONTS.body
             }}
           >
             About Us
