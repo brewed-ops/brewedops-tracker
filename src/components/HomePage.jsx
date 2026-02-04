@@ -313,8 +313,8 @@ const PRODUCTIVITY_TOOLS = [
 ];
 
 const AI_TOOLS = [
-  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'Generate GHL practice scenarios with AI' },
-  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'Extract text from images and PDFs using AI' },
+  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'AI-generated GHL CRM practice scenarios with workflow diagrams' },
+  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'OCR-powered text extraction from images and scanned PDFs' },
 ];
 
 // All tools flat for marquee
@@ -803,9 +803,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
     <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#faf8f5' }}>
       <main>
       <SEO
-        title="BrewedOps - VA Services, GHL Automation & Free Tools"
-        description="Expert customer support, admin VA, GoHighLevel CRM automation, and web development services — backed by 11+ years of customer support experience. Plus 22+ free productivity tools."
-        keywords="BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free online tools"
+        title="BrewedOps - VA Services, GHL Automation, AI Tools & 22+ Free Productivity Tools"
+        description="Expert customer support, admin VA, GoHighLevel CRM automation, and web development services — backed by 11+ years experience. Plus 22+ free tools and AI-powered utilities including GHL Scenario Generator and AI Text Extractor."
+        keywords="BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free online tools, AI text extractor, OCR, GHL scenario generator"
       />
       {/* NAV */}
       <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#faf8f5', position: 'sticky', top: 0, zIndex: 100 }}>
@@ -951,14 +951,14 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   </div>
                 </div>
                 <p style={{ fontSize: isSmall ? '15px' : '18px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 auto 40px', lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: '620px' }}>
-                  11+ years of customer support experience, dedicated to helping businesses streamline operations, automate workflows, and grow. Plus 22+ free tools to boost your productivity.
+                  11+ years of customer support experience, dedicated to helping businesses streamline operations, automate workflows, and grow. Plus 22+ free tools and AI-powered utilities to boost your productivity.
                 </p>
                 <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button onClick={() => navigate('/services')} style={{ ...btnPrimary, height: '56px', padding: '0 32px', fontSize: '16px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>View Services <CaretRight size={20} /></button>
                   <button onClick={() => onNavigate('login')} style={{ ...btnOutline, height: '56px', padding: '0 32px', fontSize: '16px', color: isDark ? '#fff' : theme.text, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : theme.cardBorder, backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'transparent', backdropFilter: isDark ? 'blur(8px)' : 'none' }}>Sign In</button>
                 </div>
                 <p style={{ fontSize: '13px', color: isDark ? 'rgba(255, 255, 255, 0.5)' : theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
-                  Or explore our <a href="#free-tools" onClick={(e) => { e.preventDefault(); document.getElementById('free-tools')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>22+ free productivity tools</a> — no sign-up needed.
+                  Or explore our <a href="#free-tools" onClick={(e) => { e.preventDefault(); document.getElementById('free-tools')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>22+ free productivity tools & AI tools</a> — no sign-up needed.
                 </p>
               </div>
 
@@ -1540,7 +1540,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
           <p style={{ fontSize: '13px', color: theme.textMuted, textAlign: 'center', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px' }}>
             BrewedOps is built by Kenneth Villar, a Filipino professional with 11+ years of customer support experience — offering VA services, GHL automation, and custom web development.
-            Also home to 22+ free productivity tools for virtual assistants, freelancers, and small businesses.
+            Also home to 22+ free productivity tools and AI-powered utilities for virtual assistants, freelancers, and small businesses.
           </p>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '16px', flexWrap: 'wrap' }}>
             <a href="/privacy" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Privacy Policy</a>

@@ -10,6 +10,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { FileMagnifyingGlass, UploadSimple, SpinnerGap, Copy, Check, DownloadSimple, ArrowClockwise, WarningCircle, FileText, FilePdf, Trash, Eye } from '@phosphor-icons/react';
+import SEO from './SEO';
 
 // ============================================
 // BRAND CONFIGURATION
@@ -78,7 +79,10 @@ const extractTextFromImage = async (base64DataUrl) => {
     // Production: call Supabase Edge Function
     const res = await fetch(OPENAI_CONFIG.edgeFunctionUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+      },
       body: JSON.stringify({ type: 'vision', image_url: base64DataUrl, prompt: EXTRACTION_PROMPT }),
     });
     if (!res.ok) {
@@ -211,6 +215,9 @@ const CopyButton = ({ text, isDark, label = true }) => {
 // ============================================
 // MAIN COMPONENT
 // ============================================
+const COOLDOWN_KEY = 'brewedops_text_extractor_cooldown_end';
+const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+
 const TextExtractor = ({ isDark }) => {
   const theme = getTheme(isDark);
   const fileInputRef = useRef(null);
@@ -225,6 +232,22 @@ const TextExtractor = ({ isDark }) => {
   const [progressLabel, setProgressLabel] = useState('');
   const [extractedText, setExtractedText] = useState('');
   const [error, setError] = useState('');
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
+
+  // Cooldown timer
+  useEffect(() => {
+    const checkCooldown = () => {
+      const endTime = parseInt(localStorage.getItem(COOLDOWN_KEY) || '0', 10);
+      const remaining = Math.max(0, endTime - Date.now());
+      setCooldownRemaining(remaining);
+      return remaining;
+    };
+    checkCooldown();
+    const interval = setInterval(() => {
+      if (checkCooldown() <= 0) clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [status]);
 
   // Cleanup preview URL on unmount or file change
   useEffect(() => {
@@ -319,6 +342,8 @@ const TextExtractor = ({ isDark }) => {
         const text = await extractTextFromImage(base64);
         setExtractedText(text);
         setStatus('done');
+        localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MS));
+        setCooldownRemaining(COOLDOWN_MS);
       } else if (fileType === 'pdf') {
         setProgressLabel('Loading PDF processor...');
         const pdfJs = await loadPdfJs();
@@ -364,6 +389,8 @@ const TextExtractor = ({ isDark }) => {
 
         setExtractedText(allText.trim());
         setStatus('done');
+        localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MS));
+        setCooldownRemaining(COOLDOWN_MS);
       }
     } catch (err) {
       if (err.message === 'API_NOT_CONFIGURED') {
@@ -395,6 +422,11 @@ const TextExtractor = ({ isDark }) => {
 
   return (
     <div style={{ fontFamily: FONTS.body }}>
+      <SEO
+        title="AI Text Extractor - OCR from Images & PDFs | BrewedOps"
+        description="Extract text from images and PDFs using AI-powered OCR. Supports JPEG, PNG, WebP, GIF, BMP, TIFF, and scanned PDFs. Free online tool by BrewedOps."
+        keywords="AI text extractor, OCR online, extract text from image, extract text from PDF, image to text, scanned PDF OCR, BrewedOps AI tools"
+      />
       {/* Animation keyframes */}
       <style>{`
         @keyframes fadeInUp {
@@ -554,6 +586,17 @@ const TextExtractor = ({ isDark }) => {
           }}>
             Max file size: 20MB
           </p>
+          {cooldownRemaining > 0 && (
+            <p style={{
+              margin: '10px 0 0',
+              fontSize: '13px',
+              color: '#f59e0b',
+              fontWeight: '600',
+              fontFamily: FONTS.body,
+            }}>
+              Cooldown active — available in {Math.floor(cooldownRemaining / 60000)}:{String(Math.floor((cooldownRemaining % 60000) / 1000)).padStart(2, '0')}
+            </p>
+          )}
         </div>
       )}
 
@@ -675,24 +718,25 @@ const TextExtractor = ({ isDark }) => {
         <div style={{ marginBottom: '24px' }}>
           <button
             onClick={handleExtract}
-            disabled={status === 'processing'}
+            disabled={status === 'processing' || cooldownRemaining > 0}
             style={{
               width: '100%',
               height: '52px',
               backgroundColor: status === 'processing'
                 ? (isDark ? '#1a2e4a' : '#dbeafe')
-                : BRAND.blue,
-              color: status === 'processing' ? BRAND.blue : '#fff',
+                : cooldownRemaining > 0 ? (isDark ? '#2a2420' : '#e8e0d4') : BRAND.blue,
+              color: status === 'processing' ? BRAND.blue : cooldownRemaining > 0 ? (isDark ? '#a09585' : '#7a6652') : '#fff',
               border: 'none',
               borderRadius: '12px',
               fontSize: '15px',
               fontWeight: '600',
               fontFamily: FONTS.body,
-              cursor: status === 'processing' ? 'not-allowed' : 'pointer',
+              cursor: status === 'processing' || cooldownRemaining > 0 ? 'not-allowed' : 'pointer',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '10px',
+              opacity: cooldownRemaining > 0 ? 0.7 : 1,
               transition: 'all 0.2s',
             }}
           >
@@ -700,6 +744,11 @@ const TextExtractor = ({ isDark }) => {
               <>
                 <SpinnerGap size={18} style={{ animation: 'spin 1s linear infinite' }} />
                 {progressLabel || 'Processing...'}
+              </>
+            ) : cooldownRemaining > 0 ? (
+              <>
+                <FileMagnifyingGlass size={18} weight="bold" />
+                {`Available in ${Math.floor(cooldownRemaining / 60000)}:${String(Math.floor((cooldownRemaining % 60000) / 1000)).padStart(2, '0')}`}
               </>
             ) : (
               <>

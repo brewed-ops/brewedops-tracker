@@ -15,6 +15,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Lightning, ArrowRight, SpinnerGap, Copy, Check, ArrowClockwise, Buildings, ChartLineUp, UsersThree, Gear, FlowArrow, Eye, CaretDown, WarningCircle } from '@phosphor-icons/react';
 import mermaid from 'mermaid';
+import SEO from './SEO';
 
 // ============================================
 // BRAND CONFIGURATION
@@ -395,6 +396,9 @@ const SectionCard = ({ title, content, isDark, index }) => {
 // ============================================
 // MAIN COMPONENT
 // ============================================
+const COOLDOWN_KEY = 'brewedops_ghl_cooldown_end';
+const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutes
+
 const GHLScenarioGenerator = ({ isDark }) => {
   const theme = getTheme(isDark);
   const [input, setInput] = useState('');
@@ -402,15 +406,31 @@ const GHLScenarioGenerator = ({ isDark }) => {
   const [sections, setSections] = useState([]);
   const [error, setError] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [cooldownRemaining, setCooldownRemaining] = useState(0);
   const resultsRef = useRef(null);
   const inputRef = useRef(null);
   const suggestionsRef = useRef(null);
+
+  // Cooldown timer
+  useEffect(() => {
+    const checkCooldown = () => {
+      const endTime = parseInt(localStorage.getItem(COOLDOWN_KEY) || '0', 10);
+      const remaining = Math.max(0, endTime - Date.now());
+      setCooldownRemaining(remaining);
+      return remaining;
+    };
+    checkCooldown();
+    const interval = setInterval(() => {
+      if (checkCooldown() <= 0) clearInterval(interval);
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [sections]);
 
   // Close suggestions on outside click
   useEffect(() => {
     const handleClick = (e) => {
       if (suggestionsRef.current && !suggestionsRef.current.contains(e.target) &&
-          inputRef.current && !inputRef.current.contains(e.target)) {
+        inputRef.current && !inputRef.current.contains(e.target)) {
         setShowSuggestions(false);
       }
     };
@@ -443,7 +463,10 @@ const GHLScenarioGenerator = ({ isDark }) => {
         // Production: call Supabase Edge Function
         const res = await fetch(OPENAI_CONFIG.edgeFunctionUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
           body: JSON.stringify({ type: 'chat', messages: chatMessages, temperature: 0.8, max_tokens: 2000 }),
         });
         if (!res.ok) {
@@ -483,6 +506,9 @@ const GHLScenarioGenerator = ({ isDark }) => {
 
       const parsed = parseResponse(responseText);
       setSections(parsed);
+      // Set 5-minute cooldown
+      localStorage.setItem(COOLDOWN_KEY, String(Date.now() + COOLDOWN_MS));
+      setCooldownRemaining(COOLDOWN_MS);
     } catch (err) {
       if (err.message === 'API_NOT_CONFIGURED') {
         setError('API key not configured. Add VITE_OPENAI_API_KEY to your .env file or set VITE_GHL_SCENARIO_API_URL for the Supabase Edge Function endpoint.');
@@ -533,6 +559,11 @@ const GHLScenarioGenerator = ({ isDark }) => {
 
   return (
     <div style={{ fontFamily: FONTS.body }}>
+      <SEO
+        title="GHL Scenario Generator - AI-Powered GoHighLevel Practice Tool | BrewedOps"
+        description="Generate realistic GoHighLevel CRM practice scenarios with AI. Get business scenarios, client requests, KPIs, automation workflows, and Mermaid diagrams — free online tool by BrewedOps."
+        keywords="GHL scenario generator, GoHighLevel practice, CRM automation, GHL workflows, AI business scenarios, BrewedOps AI tools"
+      />
       {/* Animation keyframes */}
       <style>{`
         @keyframes fadeInUp {
@@ -691,22 +722,22 @@ const GHLScenarioGenerator = ({ isDark }) => {
             </div>
             <button
               onClick={handleGenerate}
-              disabled={loading || !input.trim()}
+              disabled={loading || !input.trim() || cooldownRemaining > 0}
               style={{
                 height: '52px',
                 padding: '0 28px',
-                backgroundColor: loading ? (isDark ? '#1a2e4a' : '#dbeafe') : BRAND.blue,
-                color: loading ? BRAND.blue : '#fff',
+                backgroundColor: loading ? (isDark ? '#1a2e4a' : '#dbeafe') : cooldownRemaining > 0 ? (isDark ? '#2a2420' : '#e8e0d4') : BRAND.blue,
+                color: loading ? BRAND.blue : cooldownRemaining > 0 ? (isDark ? '#a09585' : '#7a6652') : '#fff',
                 border: 'none',
                 borderRadius: '12px',
                 fontSize: '15px',
                 fontWeight: '600',
                 fontFamily: FONTS.body,
-                cursor: loading || !input.trim() ? 'not-allowed' : 'pointer',
+                cursor: loading || !input.trim() || cooldownRemaining > 0 ? 'not-allowed' : 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
-                opacity: !input.trim() && !loading ? 0.5 : 1,
+                opacity: (!input.trim() && !loading) || cooldownRemaining > 0 ? 0.7 : 1,
                 transition: 'all 0.2s',
                 whiteSpace: 'nowrap',
               }}
@@ -715,6 +746,11 @@ const GHLScenarioGenerator = ({ isDark }) => {
                 <>
                   <SpinnerGap size={16} style={{ animation: 'spin 1s linear infinite' }} />
                   Generating...
+                </>
+              ) : cooldownRemaining > 0 ? (
+                <>
+                  <Lightning size={16} weight="fill" />
+                  {`${Math.floor(cooldownRemaining / 60000)}:${String(Math.floor((cooldownRemaining % 60000) / 1000)).padStart(2, '0')}`}
                 </>
               ) : (
                 <>

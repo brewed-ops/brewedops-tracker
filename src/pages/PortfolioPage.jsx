@@ -262,8 +262,8 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
 // AI TOOLS DATA & DROPDOWN
 // ============================================
 const AI_TOOLS = [
-  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'Generate GHL practice scenarios with AI' },
-  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'Extract text from images and PDFs using AI' },
+  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'AI-generated GHL CRM practice scenarios with workflow diagrams' },
+  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'OCR-powered text extraction from images and scanned PDFs' },
 ];
 
 const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {
@@ -474,9 +474,9 @@ function PortfolioPage({ isDark, setIsDark }) {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg, color: theme.text, fontFamily: FONTS.body }}>
       <SEO
-        title="Portfolio | BrewedOps"
-        description="View Kenneth V's portfolio - GHL CRM setup, automation, vibe coding, and customer support services. 11+ years customer support experience."
-        keywords="BrewedOps portfolio, GHL CRM, automation, web development, Filipino VA services"
+        title="Portfolio | BrewedOps - VA Services, GHL Automation & AI Tools"
+        description="Kenneth V's portfolio — GHL CRM setup, automation, vibe coding, AI-powered tools, and 11+ years of customer support experience. 22+ free tools and AI utilities."
+        keywords="BrewedOps portfolio, GHL CRM, automation, web development, Filipino VA services, AI text extractor, GHL scenario generator"
       />
 
       {/* ============================================ */}
@@ -844,7 +844,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                     <span style={{ color: isDark ? '#fff' : BRAND.brown }}> Tools</span>
                   </h3>
                   <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '16px', fontFamily: FONTS.body }}>
-                    A productivity hub for Filipino VAs & freelancers with 22+ free tools, finance tracking, task management, and premium features.
+                    A productivity hub for Filipino VAs & freelancers with 22+ free tools, AI-powered utilities, finance tracking, task management, and premium features.
                   </p>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
                     {['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'].map((tag) => (

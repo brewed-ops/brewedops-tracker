@@ -259,8 +259,8 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
 // AI TOOLS DATA & DROPDOWN
 // ============================================
 const AI_TOOLS = [
-  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'Generate GHL practice scenarios with AI' },
-  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'Extract text from images and PDFs using AI' },
+  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'AI-generated GHL CRM practice scenarios with workflow diagrams' },
+  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'OCR-powered text extraction from images and scanned PDFs' },
 ];
 
 const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {
