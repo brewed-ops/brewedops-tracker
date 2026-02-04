@@ -10,12 +10,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen, Menu } from 'lucide-react';
 import SEO from './SEO';
-import MobileDrawer from './layout/MobileDrawer';
+const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 import { createNoise3D } from "simplex-noise";
 import { motion } from "framer-motion";
 import { LayoutTextFlip } from '@/components/ui/layout-text-flip';
-import { MacbookScroll } from '@/components/ui/macbook-scroll';
-
 // ============================================
 // VORTEX BACKGROUND COMPONENT
 // ============================================
@@ -26,7 +24,8 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
   const animationFrameId = useRef();
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const backgroundColorRef = useRef(backgroundColor);
-  
+  const startedRef = useRef(false);
+
   // Detect if background is light or dark
   const isLightBg = (color) => {
     const hex = color.replace('#', '');
@@ -36,24 +35,27 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
     return brightness > 128;
   };
-  
+
   const isLightRef = useRef(isLightBg(backgroundColor));
-  
+
   // Update refs when prop changes
   useEffect(() => {
     backgroundColorRef.current = backgroundColor;
     isLightRef.current = isLightBg(backgroundColor);
   }, [backgroundColor]);
-  
+
+  // Cap particles at 150 for performance (3 filter passes per frame)
+  const effectiveParticleCount = Math.min(particleCount, 150);
   const particlePropCount = 9;
-  const particlePropsLength = particleCount * particlePropCount;
+  const particlePropsLength = effectiveParticleCount * particlePropCount;
   const baseTTL = 50, rangeTTL = 150, rangeHue = 100, noiseSteps = 3;
   const xOff = 0.00125, yOff = 0.00125, zOff = 0.0005;
-  
+
   const tickRef = useRef(0);
   const noise3DRef = useRef(null);
   const particlePropsRef = useRef(new Float32Array(particlePropsLength));
   const centerRef = useRef([0, 0]);
+  const lastFrameTimeRef = useRef(0);
 
   const TAU = 2 * Math.PI;
   const rand = (n) => n * Math.random();
@@ -78,7 +80,6 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
     ctx.save();
     ctx.lineCap = "round";
     ctx.lineWidth = radius;
-    // For light backgrounds, use much darker/more visible colors
     if (isLightRef.current) {
       ctx.strokeStyle = `hsla(${hue}, 100%, 35%, ${fadeInOut(life, ttl) * 0.9})`;
     } else {
@@ -108,44 +109,42 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
     if (x2 > width || x2 < 0 || y2 > height || y2 < 0 || life > ttl) initParticle(i, width, height);
   };
 
-  const draw = (canvas, ctx, width, height) => {
+  const draw = (canvas, ctx, width, height, timestamp) => {
+    // Throttle to ~30fps (33ms between frames) to halve CPU usage
+    if (timestamp - lastFrameTimeRef.current < 33) {
+      animationFrameId.current = window.requestAnimationFrame((ts) => draw(canvas, ctx, width, height, ts));
+      return;
+    }
+    lastFrameTimeRef.current = timestamp;
+
     tickRef.current++;
     const offscreen = offscreenRef.current;
     const offCtx = offscreen?.getContext("2d");
     if (!offCtx) return;
     offCtx.clearRect(0, 0, width, height);
     for (let i = 0; i < particlePropsLength; i += particlePropCount) updateParticle(i, offCtx, width, height);
-    
+
     // Fill background
     ctx.fillStyle = backgroundColorRef.current;
     ctx.fillRect(0, 0, width, height);
-    
-    // Different rendering for light vs dark backgrounds
+
+    // Reduced to 2 passes (was 3) — drop the heaviest blur pass
     if (isLightRef.current) {
-      // Light mode: draw particles directly with subtle glow
       ctx.save();
-      ctx.filter = "blur(8px)";
-      ctx.globalAlpha = 0.6;
+      ctx.filter = "blur(4px)";
+      ctx.globalAlpha = 0.7;
       ctx.drawImage(offscreen, 0, 0);
       ctx.restore();
-      
-      ctx.save();
-      ctx.filter = "blur(3px)";
-      ctx.globalAlpha = 0.8;
-      ctx.drawImage(offscreen, 0, 0);
-      ctx.restore();
-      
+
       ctx.save();
       ctx.drawImage(offscreen, 0, 0);
       ctx.restore();
     } else {
-      // Dark mode: use lighter for glowing particles
-      ctx.save(); ctx.filter = "blur(8px) brightness(200%)"; ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
-      ctx.save(); ctx.filter = "blur(4px) brightness(150%)"; ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
+      ctx.save(); ctx.filter = "blur(4px) brightness(200%)"; ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
       ctx.save(); ctx.globalCompositeOperation = "lighter"; ctx.drawImage(offscreen, 0, 0); ctx.restore();
     }
-    
-    animationFrameId.current = window.requestAnimationFrame(() => draw(canvas, ctx, width, height));
+
+    animationFrameId.current = window.requestAnimationFrame((ts) => draw(canvas, ctx, width, height, ts));
   };
 
   useEffect(() => {
@@ -170,7 +169,25 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
     centerRef.current = [dimensions.width / 2, dimensions.height / 2];
     noise3DRef.current = createNoise3D();
     initParticles(dimensions.width, dimensions.height);
-    draw(canvas, ctx, dimensions.width, dimensions.height);
+
+    // Defer animation start so it doesn't block initial paint
+    if (!startedRef.current) {
+      startedRef.current = true;
+      // Fill background immediately so canvas isn't blank
+      ctx.fillStyle = backgroundColorRef.current;
+      ctx.fillRect(0, 0, dimensions.width, dimensions.height);
+      const startAnimation = () => {
+        animationFrameId.current = window.requestAnimationFrame((ts) => draw(canvas, ctx, dimensions.width, dimensions.height, ts));
+      };
+      if (typeof requestIdleCallback !== 'undefined') {
+        requestIdleCallback(startAnimation, { timeout: 200 });
+      } else {
+        setTimeout(startAnimation, 100);
+      }
+    } else {
+      animationFrameId.current = window.requestAnimationFrame((ts) => draw(canvas, ctx, dimensions.width, dimensions.height, ts));
+    }
+
     return () => { if (animationFrameId.current) cancelAnimationFrame(animationFrameId.current); };
   }, [dimensions]);
 
@@ -252,6 +269,37 @@ const TOOL_CATEGORIES = [
     { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
   ]
 },
+];
+
+const TOOL_TIMELINE = [
+  {
+    name: 'Image Tools',
+    icon: Image,
+    accent: '#004AAC',
+    description: 'Crop, resize, compress, convert, and remove backgrounds from images. Pick colors and export to PDF — all processed locally in your browser.',
+    tools: TOOL_CATEGORIES[0].tools,
+  },
+  {
+    name: 'Video Tools',
+    icon: Film,
+    accent: '#51AF43',
+    description: 'Compress large video files and trim clips to the exact length you need, right from your browser with no uploads required.',
+    tools: TOOL_CATEGORIES[1].tools,
+  },
+  {
+    name: 'Document Tools',
+    icon: FileText,
+    accent: '#3F200C',
+    description: 'Edit, merge, and split PDFs without leaving your browser. Preview Markdown files instantly.',
+    tools: TOOL_CATEGORIES[2].tools,
+  },
+  {
+    name: 'Utility Tools',
+    icon: Wrench,
+    accent: '#004AAC',
+    description: 'Generate QR codes, format JSON, build cron expressions, count words, convert text case, render Mermaid diagrams, and find & replace across text.',
+    tools: TOOL_CATEGORIES[3].tools,
+  },
 ];
 
 const PRODUCTIVITY_TOOLS = [
@@ -651,7 +699,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#faf8f5', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px' }}>
-            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+            <img src="https://i.imgur.com/R52jwPvt.png" alt="Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
             <span style={{ fontSize: '18px', fontWeight: '700', fontFamily: FONTS.heading }}>
               <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
               <span style={{ color: BRAND.blue }}>Ops</span>
@@ -773,106 +821,162 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         </Vortex>
       </div>
 
-      {/* MACBOOK SCROLL SHOWCASE - Desktop only */}
-      {!isMobile && (
-        <section 
-          style={{ 
-            backgroundColor: isDark ? '#0d0b09' : BRAND.cream,
-            overflow: 'hidden',
-            position: 'relative',
-          }}
-        >
-          <MacbookScroll
-            src="https://i.imgur.com/XWCrnOz.png"
-            showGradient={true}
-            title={
-              <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
-                <h2 style={{ 
-                  fontSize: '64px', 
-                  fontWeight: '800', 
-                  color: isDark ? '#fff' : BRAND.brown, 
-                  marginBottom: '12px',
-                  fontFamily: FONTS.heading,
-                }}>
-                  BrewedOps
-                </h2>
-                <p style={{ 
-                  fontSize: '14px', 
-                  fontWeight: '600', 
-                  letterSpacing: '4px',
-                  color: isDark ? '#a09585' : '#7a6652', 
-                  marginBottom: '28px',
-                  fontFamily: FONTS.body,
-                  textTransform: 'uppercase',
-                }}>
-                  Automations Brewed to Perfection
-                </p>
-                <p style={{ 
-                  fontSize: '20px', 
-                  color: isDark ? '#a09585' : '#7a6652', 
-                  lineHeight: '1.8',
-                  fontFamily: FONTS.body,
-                }}>
-                  BrewedOps is a modern automation and virtual assistant brand inspired by the warmth of coffee culture and the precision of technology. It delivers smooth, efficient systems for businesses that value both connection and performance.
-                </p>
-              </div>
-            }
-          />
-        </section>
-      )}
+      {/* ZIGZAG TOOLS TIMELINE */}
+      <section style={{
+        backgroundColor: isDark ? '#0d0b09' : BRAND.cream,
+        padding: isMobile ? '60px 20px' : '80px 64px',
+        position: 'relative',
+      }}>
+        {/* Section Header */}
+        <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 60px' }}>
+          <p style={{
+            fontSize: '11px',
+            fontWeight: '600',
+            letterSpacing: '4px',
+            color: isDark ? '#a09585' : '#7a6652',
+            marginBottom: '12px',
+            fontFamily: FONTS.body,
+            textTransform: 'uppercase',
+          }}>
+            What You Can Do
+          </p>
+          <h2 style={{
+            fontSize: isMobile ? '32px' : '48px',
+            fontWeight: '800',
+            color: isDark ? '#fff' : BRAND.brown,
+            fontFamily: FONTS.heading,
+            lineHeight: '1.15',
+          }}>
+            20 Free Tools,<br />Zero Sign-Up Required
+          </h2>
+        </div>
 
-      {/* MOBILE ABOUT SECTION */}
-      {isMobile && (
-        <section 
-          style={{ 
-            backgroundColor: isDark ? '#0d0b09' : BRAND.cream,
-            padding: '48px 20px',
-          }}
-        >
-          <div style={{ maxWidth: '500px', margin: '0 auto', textAlign: 'center' }}>
-            <h2 style={{ 
-              fontSize: '36px', 
-              fontWeight: '800', 
-              color: isDark ? '#fff' : BRAND.brown, 
-              marginBottom: '8px',
-              fontFamily: FONTS.heading,
-            }}>
-              BrewedOps
-            </h2>
-            <p style={{ 
-              fontSize: '11px', 
-              fontWeight: '600', 
-              letterSpacing: '3px',
-              color: isDark ? '#a09585' : '#7a6652', 
-              marginBottom: '20px',
-              fontFamily: FONTS.body,
-              textTransform: 'uppercase',
-            }}>
-              Automations Brewed to Perfection
-            </p>
-            <p style={{ 
-              fontSize: '15px', 
-              color: isDark ? '#a09585' : '#7a6652', 
-              lineHeight: '1.7',
-              fontFamily: FONTS.body,
-              marginBottom: '24px',
-            }}>
-              BrewedOps is a modern automation and virtual assistant brand inspired by the warmth of coffee culture and the precision of technology. It delivers smooth, efficient systems for businesses that value both connection and performance.
-            </p>
-            <img 
-              src="https://i.imgur.com/XWCrnOz.png" 
-              alt="BrewedOps Dashboard"
-              style={{
-                width: '100%',
-                borderRadius: '12px',
-                boxShadow: isDark 
-                  ? '0 20px 40px rgba(0,0,0,0.5)' 
-                  : '0 20px 40px rgba(0,0,0,0.15)',
-              }}
-            />
-          </div>
-        </section>
-      )}
+        {/* Timeline Container */}
+        <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative' }}>
+          {/* Vertical center line (desktop only) */}
+          {!isMobile && (
+            <div style={{
+              position: 'absolute',
+              left: '50%',
+              top: '40px',
+              bottom: '40px',
+              width: '2px',
+              background: isDark
+                ? 'linear-gradient(to bottom, transparent, #2a2420 10%, #2a2420 90%, transparent)'
+                : 'linear-gradient(to bottom, transparent, #d4c8b8 10%, #d4c8b8 90%, transparent)',
+            }} />
+          )}
+
+          {TOOL_TIMELINE.map((category, index) => {
+            const isEven = index % 2 === 0;
+            const IconComp = category.icon;
+            const accentColor = category.accent;
+            const accentBg = isDark
+              ? `${accentColor}25`
+              : `${accentColor}15`;
+
+            return (
+              <div
+                key={category.name}
+                style={{
+                  display: 'flex',
+                  flexDirection: isMobile ? 'column' : (isEven ? 'row' : 'row-reverse'),
+                  alignItems: isMobile ? 'flex-start' : 'center',
+                  gap: isMobile ? '0' : '60px',
+                  marginBottom: index < TOOL_TIMELINE.length - 1 ? (isMobile ? '48px' : '64px') : 0,
+                  position: 'relative',
+                }}
+              >
+                {/* Text Content */}
+                <div style={{
+                  flex: 1,
+                  textAlign: isMobile ? 'left' : (isEven ? 'right' : 'left'),
+                  paddingLeft: isMobile ? '60px' : 0,
+                }}>
+                  <h3 style={{
+                    fontSize: isMobile ? '22px' : '28px',
+                    fontWeight: '700',
+                    color: isDark ? '#f5f0eb' : BRAND.brown,
+                    fontFamily: FONTS.heading,
+                    marginBottom: '8px',
+                  }}>
+                    {category.name}
+                  </h3>
+                  <p style={{
+                    fontSize: isMobile ? '14px' : '16px',
+                    color: isDark ? '#a09585' : '#7a6652',
+                    lineHeight: '1.7',
+                    fontFamily: FONTS.body,
+                    marginBottom: '16px',
+                  }}>
+                    {category.description}
+                  </p>
+                  <div style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '8px',
+                    justifyContent: isMobile ? 'flex-start' : (isEven ? 'flex-end' : 'flex-start'),
+                  }}>
+                    {category.tools.map((tool) => (
+                      <button
+                        key={tool.path}
+                        onClick={() => navigate(tool.path)}
+                        style={{
+                          padding: '6px 14px',
+                          fontSize: '12px',
+                          fontWeight: '500',
+                          fontFamily: FONTS.body,
+                          color: isDark ? '#d4c8b8' : '#5a4a3a',
+                          backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(63,32,12,0.06)',
+                          border: `1px solid ${isDark ? '#2a2420' : '#e0d4c4'}`,
+                          borderRadius: '100px',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s',
+                        }}
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(63,32,12,0.12)';
+                          e.currentTarget.style.borderColor = accentColor;
+                          e.currentTarget.style.color = isDark ? '#fff' : accentColor;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(63,32,12,0.06)';
+                          e.currentTarget.style.borderColor = isDark ? '#2a2420' : '#e0d4c4';
+                          e.currentTarget.style.color = isDark ? '#d4c8b8' : '#5a4a3a';
+                        }}
+                      >
+                        {tool.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Icon Circle */}
+                <div style={{
+                  width: isMobile ? '40px' : '72px',
+                  height: isMobile ? '40px' : '72px',
+                  borderRadius: '50%',
+                  backgroundColor: accentBg,
+                  border: `2px solid ${accentColor}`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flexShrink: 0,
+                  position: isMobile ? 'absolute' : 'relative',
+                  left: isMobile ? '0' : 'auto',
+                  top: isMobile ? '0' : 'auto',
+                  zIndex: 2,
+                  boxShadow: `0 0 20px ${accentColor}20`,
+                }}>
+                  <IconComp size={isMobile ? 18 : 28} style={{ color: accentColor }} />
+                </div>
+
+                {/* Empty flex spacer for desktop zigzag */}
+                {!isMobile && <div style={{ flex: 1 }} />}
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       {/* TOOLS SHOWCASE */}
       <section style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder, overflow: 'hidden' }}>
@@ -962,13 +1066,17 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
         <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>© 2026 BrewedOps. Made by Kenneth V.</p>
       </footer>
 
-      <MobileDrawer
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        isDark={isDark}
-        navigate={navigate}
-        onNavigate={onNavigate}
-      />
+      {mobileMenuOpen && (
+        <React.Suspense fallback={null}>
+          <MobileDrawer
+            isOpen={mobileMenuOpen}
+            onClose={() => setMobileMenuOpen(false)}
+            isDark={isDark}
+            navigate={navigate}
+            onNavigate={onNavigate}
+          />
+        </React.Suspense>
+      )}
     </div>
   );
 };

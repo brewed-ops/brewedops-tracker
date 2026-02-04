@@ -15,7 +15,7 @@ import {
   AlertTriangle, Info, Settings, Menu
 } from 'lucide-react';
 import SEO from './SEO';
-import MobileDrawer from './layout/MobileDrawer';
+const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 
 // ============================================
 // BREWEDOPS BRAND CONFIGURATION
@@ -1136,13 +1136,17 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
         </div>
       </footer>
 
-      <MobileDrawer
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        isDark={isDark}
-        navigate={navigate}
-        onNavigate={() => setMobileMenuOpen(false)}
-      />
+      {mobileMenuOpen && (
+        <React.Suspense fallback={null}>
+          <MobileDrawer
+            isOpen={mobileMenuOpen}
+            onClose={() => setMobileMenuOpen(false)}
+            isDark={isDark}
+            navigate={navigate}
+            onNavigate={() => setMobileMenuOpen(false)}
+          />
+        </React.Suspense>
+      )}
     </div>
   );
 };

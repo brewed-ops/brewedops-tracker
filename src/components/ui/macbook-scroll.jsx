@@ -145,7 +145,10 @@ export const Lid = ({
         <div className="absolute inset-0 rounded-lg bg-[#272729]" />
         <img
           src={src}
-          alt="aceternity logo"
+          alt="BrewedOps dashboard preview"
+          loading="lazy"
+          width={669}
+          height={384}
           className="absolute inset-0 h-full w-full rounded-lg object-cover object-left-top" />
       </motion.div>
     </div>

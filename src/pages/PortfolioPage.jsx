@@ -55,7 +55,7 @@ import {
   Menu
 } from 'lucide-react';
 import SEO from '@/components/SEO';
-import MobileDrawer from '@/components/layout/MobileDrawer';
+const MobileDrawer = React.lazy(() => import('@/components/layout/MobileDrawer'));
 
 // Brand Config
 const BRAND = {
@@ -1895,13 +1895,17 @@ function PortfolioPage({ isDark, setIsDark }) {
         </div>
       </footer>
 
-      <MobileDrawer
-        isOpen={mobileMenuOpen}
-        onClose={() => setMobileMenuOpen(false)}
-        isDark={isDark}
-        navigate={navigate}
-        onNavigate={() => setMobileMenuOpen(false)}
-      />
+      {mobileMenuOpen && (
+        <React.Suspense fallback={null}>
+          <MobileDrawer
+            isOpen={mobileMenuOpen}
+            onClose={() => setMobileMenuOpen(false)}
+            isDark={isDark}
+            navigate={navigate}
+            onNavigate={() => setMobileMenuOpen(false)}
+          />
+        </React.Suspense>
+      )}
 
       <style>{`
         @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
