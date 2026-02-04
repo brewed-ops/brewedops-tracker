@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen, Menu } from 'lucide-react';
+import { ChevronRight, ChevronDown, Sun, Moon, Image, Video, FileText, Wrench, Lock, Scissors, Move, Minimize2, RefreshCw, Palette, FileImage, Film, FileEdit, Merge, Split, QrCode, Search, Type, Hash, DollarSign, Headphones, CheckSquare, StickyNote, GitBranch, Braces, Clock, BookOpen, Menu, Zap, ClipboardList, Code2 } from 'lucide-react';
 import SEO from './SEO';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 import { createNoise3D } from "simplex-noise";
@@ -690,6 +690,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 
   return (
     <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#faf8f5' }}>
+      <main>
       <SEO
         title="BrewedOps - Free Tools for Filipino VAs & Freelancers"
         description="Your all-in-one productivity hub with 20 free tools. Finance tracking, image editing, PDF tools, and more - built for Filipino Virtual Assistants and Freelancers."
@@ -707,11 +708,14 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           </div>
           {isDesktop && (
             <>
+              <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Home
+              </button>
               <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Portfolio
               </button>
-              <button onClick={() => { const el = document.getElementById('services'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                Services <ChevronDown size={14} />
+              <button onClick={() => navigate('/services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Services
               </button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} onLoginClick={handleLoginClick} />
               <button onClick={() => navigate('/fuelyx')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: '#14b8a6', border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
@@ -769,30 +773,59 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               alignItems: 'center',
               justifyContent: 'center',
             }}>
-              <div style={{ textAlign: 'center', maxWidth: '750px' }}>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '10px 20px', backgroundColor: isDark ? 'rgba(0, 74, 172, 0.4)' : BRAND.cream, backdropFilter: 'blur(8px)', borderRadius: '100px', marginBottom: '32px', border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid ' + BRAND.blue + '20' }}>
-                  <span style={{ fontSize: '15px', color: isDark ? '#93c5fd' : BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>☕ 20 Free Tools for Filipino VAs & Freelancers</span>
+              <div style={{ textAlign: 'center', maxWidth: '800px' }}>
+                {/* Service indicator chips */}
+                <div style={{ display: 'flex', justifyContent: 'center', gap: isSmall ? '8px' : '10px', marginBottom: '32px', flexWrap: 'wrap' }}>
+                  {[
+                    { icon: Headphones, label: 'Customer Support', color: BRAND.blue },
+                    { icon: ClipboardList, label: 'Admin VA', color: BRAND.green },
+                    { icon: Zap, label: 'GHL Automation', color: '#f59e0b' },
+                    { icon: Code2, label: 'Web Development', color: '#8b5cf6' },
+                  ].map((chip, i) => {
+                    const ChipIcon = chip.icon;
+                    return (
+                      <motion.div
+                        key={chip.label}
+                        initial={{ opacity: 0, y: 16 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5, delay: 0.15 * i, ease: 'easeOut' }}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: isSmall ? '7px 12px' : '8px 16px',
+                          backgroundColor: isDark ? `${chip.color}18` : `${chip.color}10`,
+                          backdropFilter: 'blur(8px)',
+                          borderRadius: '100px',
+                          border: `1px solid ${isDark ? `${chip.color}35` : `${chip.color}25`}`,
+                        }}
+                      >
+                        <ChipIcon size={isSmall ? 13 : 14} style={{ color: chip.color, flexShrink: 0 }} />
+                        <span style={{ fontSize: isSmall ? '11px' : '13px', color: isDark ? `${chip.color}cc` : chip.color, fontWeight: '600', fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>{chip.label}</span>
+                      </motion.div>
+                    );
+                  })}
                 </div>
                 <div style={{ marginBottom: '24px' }}>
-                  <div style={{ 
-                    fontSize: isSmall ? '40px' : '64px', 
-                    fontWeight: '800', 
-                    color: isDark ? '#ffffff' : BRAND.brown, 
-                    lineHeight: '1.1', 
-                    letterSpacing: '-0.03em', 
+                  <div style={{
+                    fontSize: isSmall ? '36px' : '60px',
+                    fontWeight: '800',
+                    color: isDark ? '#ffffff' : BRAND.brown,
+                    lineHeight: '1.15',
+                    letterSpacing: '-0.03em',
                     fontFamily: FONTS.heading,
                     marginBottom: '16px',
                     textAlign: 'center',
                   }}>
-                    Your All-in-One
+                    Free Tools & Services for
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'center' }}>
                     <LayoutTextFlip
                       text=""
-                      words={["Productivity Hub", "Automation Suite", "VA Toolkit", "Business Hub"]}
+                      words={["Filipino VAs", "Freelancers", "Small Businesses", "Remote Teams"]}
                       duration={3000}
                       wordStyle={{
-                        fontSize: isSmall ? '36px' : '56px',
+                        fontSize: isSmall ? '32px' : '52px',
                         fontWeight: '800',
                         fontFamily: FONTS.heading,
                         color: isDark ? '#60a5fa' : BRAND.blue,
@@ -804,8 +837,8 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                     />
                   </div>
                 </div>
-                <p style={{ fontSize: isSmall ? '16px' : '20px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 0 40px', lineHeight: '1.7', fontFamily: FONTS.body }}>
-                  Finance tracking, image editing, document tools, and more — everything a Filipino VA and freelancer needs to manage their business.
+                <p style={{ fontSize: isSmall ? '15px' : '18px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 auto 40px', lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: '620px' }}>
+                  20+ free productivity tools, GoHighLevel CRM automation, admin VA support, and custom web builds — from someone who's been in your shoes.
                 </p>
                 <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                   <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, height: '56px', padding: '0 32px', fontSize: '16px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>Start Free <ChevronRight size={20} /></button>
@@ -1057,6 +1090,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       </section>
 
       {/* FOOTER */}
+      </main>
       <footer style={{ padding: '24px 32px', borderTop: '1px solid ' + theme.cardBorder, textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '24px', marginBottom: '12px', flexWrap: 'wrap' }}>
           <a href="/privacy" style={{ fontSize: '13px', color: theme.textMuted, textDecoration: 'none', fontFamily: FONTS.body }}>Privacy Policy</a>

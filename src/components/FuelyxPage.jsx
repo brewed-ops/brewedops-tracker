@@ -144,7 +144,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
             onClick={() => navigate('/')}
             style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px', cursor: 'pointer' }}
           >
-            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+            <img src="https://i.imgur.com/R52jwPvt.png" alt="BrewedOps Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
             <span style={{ fontSize: '18px', fontWeight: '700', fontFamily: FONTS.heading }}>
               <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
               <span style={{ color: BRAND.blue }}>Ops</span>
@@ -154,11 +154,14 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
           {/* Nav Links - Desktop */}
           {!isMobile && (
             <>
+              <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Home
+              </button>
               <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Portfolio
               </button>
-              <button onClick={() => navigate('/#services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                Services <ChevronDown size={14} />
+              <button onClick={() => navigate('/services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                Services
               </button>
               <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 Tools <ChevronDown size={14} />
@@ -240,6 +243,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
         </div>
       </nav>
 
+      <main>
       {/* ==================== HERO SECTION ==================== */}
       <section id="main-content" style={{
         background: isDark 
@@ -299,12 +303,15 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
               
               {/* App Logo & Name */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px', justifyContent: isTablet ? 'center' : 'flex-start' }}>
-                <img 
-                  src="https://i.imgur.com/RufDQlF.png" 
-                  alt="Fuelyx" 
-                  style={{ 
-                    width: '64px', 
-                    height: '64px', 
+                <img
+                  src="https://i.imgur.com/RufDQlF.png"
+                  alt="Fuelyx"
+                  width={64}
+                  height={64}
+                  loading="lazy"
+                  style={{
+                    width: '64px',
+                    height: '64px',
                     borderRadius: '16px',
                     boxShadow: '0 8px 32px rgba(20,184,166,0.3)',
                   }}
@@ -1105,6 +1112,8 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
         </div>
       </section>
 
+      </main>
+
       {/* ==================== FOOTER ==================== */}
       <footer style={{
         padding: isMobile ? '32px 20px' : '48px 64px',
@@ -1121,7 +1130,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
           gap: '20px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="https://i.imgur.com/R52jwPv.png" alt="Logo" style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+            <img src="https://i.imgur.com/R52jwPvt.png" alt="BrewedOps Logo" width={28} height={28} style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
             <span style={{ fontSize: '14px', color: theme.textMuted }}>
               © 2025 BrewedOps. Created by <span style={{ color: FUELYX.primary }}>Kenneth V.</span>
             </span>

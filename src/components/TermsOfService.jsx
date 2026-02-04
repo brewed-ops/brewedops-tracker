@@ -53,9 +53,6 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
       flexDirection: 'column',
       fontFamily: "'Montserrat', sans-serif"
     }}>
-      {/* Import Google Fonts */}
-      <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-      
       {/* Header */}
       <header style={{
         padding: '16px 24px',
@@ -80,9 +77,11 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             padding: '8px 0'
           }}
         >
-          <img 
-            src="https://i.imgur.com/R52jwPv.png" 
-            alt="BrewedOps Logo" 
+          <img
+            src="https://i.imgur.com/R52jwPvt.png"
+            alt="BrewedOps Logo"
+            width={36}
+            height={36}
             style={{ width: '36px', height: '36px', borderRadius: '10px' }}
           />
           <span style={{ 

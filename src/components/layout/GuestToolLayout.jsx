@@ -128,8 +128,10 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
             onClick={() => navigate('/')}
           >
             <img
-              src="https://i.imgur.com/R52jwPv.png"
-              alt="Logo"
+              src="https://i.imgur.com/R52jwPvt.png"
+              alt="BrewedOps Logo"
+              width={32}
+              height={32}
               style={{ width: '32px', height: '32px', borderRadius: '8px' }}
             />
             <span

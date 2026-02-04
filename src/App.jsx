@@ -13,6 +13,7 @@ const FuelyxPage = React.lazy(() => import('./components/FuelyxPage'));
 const PrivacyPolicy = React.lazy(() => import('./components/PrivacyPolicy'));
 const TermsOfService = React.lazy(() => import('./components/TermsOfService'));
 const AboutUs = React.lazy(() => import('./components/AboutUs'));
+const ServicesPage = React.lazy(() => import('./pages/ServicesPage'));
 const ResetPassword = React.lazy(() => import('./components/ResetPassword'));
 const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
 
@@ -657,6 +658,7 @@ return (
     <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
     <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
     <Route path="/fuelyx" element={<FuelyxPage isDark={isDark} setIsDark={setIsDark} />} />
+    <Route path="/services" element={<ServicesPage isDark={isDark} setIsDark={setIsDark} onNavigate={handleNavigate} />} />
     {/* Productivity tools - redirect to login (requires account) */}
     <Route path="/vakita" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />
     <Route path="/taskmanager" element={<LoginPage onLogin={handleLogin} onBack={() => navigate('/')} isDark={isDark} setIsDark={setIsDark} initialMode="login" />} />

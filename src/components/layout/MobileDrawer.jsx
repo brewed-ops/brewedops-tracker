@@ -186,26 +186,15 @@ const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {
 
             {/* Nav Items */}
             <div style={{ flex: 1, paddingTop: '8px' }}>
+              <button onClick={() => handleNav('/')} style={navItemStyle}>
+                Home
+              </button>
+
               <button onClick={() => handleNav('/portfolio')} style={navItemStyle}>
                 Portfolio
               </button>
 
-              <button
-                onClick={() => {
-                  onClose();
-                  const el = document.getElementById('services');
-                  if (el) {
-                    el.scrollIntoView({ behavior: 'smooth' });
-                  } else {
-                    navigate('/');
-                    setTimeout(() => {
-                      const target = document.getElementById('services');
-                      if (target) target.scrollIntoView({ behavior: 'smooth' });
-                    }, 300);
-                  }
-                }}
-                style={navItemStyle}
-              >
+              <button onClick={() => handleNav('/services')} style={navItemStyle}>
                 Services
               </button>
 
