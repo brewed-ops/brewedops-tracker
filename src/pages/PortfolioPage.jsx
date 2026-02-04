@@ -341,7 +341,7 @@ function PortfolioPage({ isDark, setIsDark }) {
       { name: 'Intercom', icon: 'https://cdn.simpleicons.org/intercom/1F8DED' },
       { name: 'Zendesk', icon: 'https://cdn.simpleicons.org/zendesk/03363D' },
       { name: 'HubSpot', icon: 'https://cdn.simpleicons.org/hubspot/FF7A59' },
-      { name: 'HighLevel', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Cdefs%3E%3ClinearGradient id="ghl" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" style="stop-color:%23FF5F1F"/%3E%3Cstop offset="50%25" style="stop-color:%23FF8C00"/%3E%3Cstop offset="100%25" style="stop-color:%23FFB347"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect rx="20" fill="url(%23ghl)" width="100" height="100"/%3E%3Ctext x="50" y="68" font-family="Arial Black" font-size="45" fill="white" text-anchor="middle" font-weight="bold"%3EHL%3C/text%3E%3C/svg%3E' },
+      { name: 'HighLevel', icon: 'https://i.imgur.com/2KaYt7S.jpeg' },
     ]},
     { name: 'Communication', tools: [
       { name: 'Slack', icon: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg' },
@@ -358,7 +358,7 @@ function PortfolioPage({ isDark, setIsDark }) {
     { name: 'eCommerce', tools: [
       { name: 'Shopify', icon: 'https://cdn.simpleicons.org/shopify/7AB55C' },
       { name: 'WooCommerce', icon: 'https://cdn.simpleicons.org/woocommerce/96588A' },
-      { name: 'Lightspeed', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"%3E%3Crect rx="15" fill="%23E6500E" width="100" height="100"/%3E%3Cpath d="M30 20 L30 80 L70 80 L70 68 L44 68 L44 20 Z" fill="white"/%3E%3C/svg%3E' },
+      { name: 'Lightspeed X-Series', icon: 'https://www.lightspeedhq.com/favicon.ico' },
     ]},
     { name: 'Development', tools: [
       { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
@@ -376,7 +376,7 @@ function PortfolioPage({ isDark, setIsDark }) {
   ];
 
   const experience = [
-    { role: 'Support Specialist', company: 'Lightspeed', period: 'March 2024 \u2013 Present', description: 'Resolve hardware issues, troubleshoot POS errors for eCommerce and Retail stores. CRM using Intercom, Zendesk, and Purecloud.', current: true },
+    { role: 'Support Specialist', company: 'Lightspeed X-Series', period: 'March 2024 \u2013 Present', description: 'Resolve hardware issues, troubleshoot POS errors for eCommerce and Retail stores. CRM using Intercom, Zendesk, and Purecloud.', current: true },
     { role: 'Customer Support Tier 2 SME', company: 'Concentrix', period: 'April 2022 \u2013 January 2024', description: 'Resolved complex issues via chat/email, worked with Tier 3 teams within SLA requirements.', current: false },
     { role: 'Sales Chat Support', company: 'Concentrix', period: 'October 2017 \u2013 August 2021', description: 'Live web chat support, upselling/cross-selling, order support, returns and exchanges.', current: false },
     { role: 'Chat Support \u2013 US TELCO', company: 'Alorica', period: 'December 2016 \u2013 July 2017', description: 'Billing solutions, troubleshooting, guiding customers to products and services.', current: false },
@@ -575,7 +575,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                   marginBottom: '20px',
                   color: isDark ? '#ffffff' : BRAND.brown,
                 }}>
-                  I Build the Systems That Let You Focus on Growth
+                  Your CRM, Support & Operations — Handled.
                 </h1>
 
                 <p style={{
@@ -585,7 +585,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                   marginBottom: '24px',
                   fontFamily: FONTS.body,
                 }}>
-                  11 years in customer support taught me exactly where business operations break down. Now I automate CRMs, build custom tools, and create workflows that remove bottlenecks — so you stop firefighting and start scaling.
+                  11 years in customer support. HighLevel CRM builds and automation. Inbox zero, pipeline management, and day-to-day admin — all handled by one dedicated VA.
                 </p>
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '12px' : '24px', marginBottom: '28px', fontSize: isMobile ? '14px' : '15px', color: theme.textMuted, justifyContent: isMobile ? 'center' : 'flex-start' }}>

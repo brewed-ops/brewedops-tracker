@@ -1035,8 +1035,8 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 icon: Code,
                 title: 'Web Development',
                 color: '#8b5cf6',
-                description: 'Custom web apps, dashboards, and tools — built with modern tech stacks.',
-                features: ['React & Vite Apps', 'API Integrations', 'Custom Dashboards', 'Responsive Design'],
+                description: 'Web apps, dashboards, and tools — vibe coded with AI-assisted modern tech stacks.',
+                features: ['React & Vite Apps', 'AI-Assisted Development', 'Custom Dashboards', 'Responsive Design'],
               },
             ].map((service) => {
               const ServiceIcon = service.icon;
