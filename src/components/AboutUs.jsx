@@ -1,25 +1,225 @@
 // AboutUs.jsx - About Us page for BrewedOps
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Code, Heart, Envelope, Phone, Sparkle, Lightning, Users, Target,
   Wallet, CheckSquare, FileText, Headset, Image, FilmStrip, NotePencil, QrCode,
   Coffee, Globe, Shield, DeviceMobile,
-  Camera, ForkKnife, Timer, Barbell, ChartBar, Trophy
+  Camera, ForkKnife, Timer, Barbell, ChartBar, Trophy,
+  CaretDown, Sun, Moon, List, Lock,
+  Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage,
+  GitMerge, FileDashed, BookOpen, MagnifyingGlass, TextT, Hash,
+  GitBranch, BracketsCurly, Clock, CurrencyDollar, Note,
+  FileMagnifyingGlass
 } from '@phosphor-icons/react';
 import SEO from './SEO';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 
 // BREWEDOPS BRAND
 const BRAND = { brown: '#3F200C', blue: '#004AAC', green: '#51AF43', cream: '#FFF0D4' };
 const FONTS = { heading: "'Montserrat', sans-serif", body: "'Poppins', sans-serif" };
 
-const AboutUs = ({ onBack, onNavigate, isDark }) => {
+// TOOLS DATA
+const TOOL_CATEGORIES = [
+  { name: 'Image Tools', tools: [
+    { icon: Image, title: 'BG Remover', path: '/bgremover' },
+    { icon: Scissors, title: 'Image Cropper', path: '/imagecropper' },
+    { icon: ArrowsOut, title: 'Image Resizer', path: '/imageresizer' },
+    { icon: ArrowsIn, title: 'Image Compressor', path: '/imagecompressor' },
+    { icon: ArrowsClockwise, title: 'Image Converter', path: '/imageconverter' },
+    { icon: Palette, title: 'Color Picker', path: '/colorpicker' },
+    { icon: FileImage, title: 'Image to PDF', path: '/imagetopdf' },
+  ]},
+  { name: 'Video Tools', tools: [
+    { icon: FilmStrip, title: 'Video Compressor', path: '/videocompressor' },
+    { icon: Scissors, title: 'Video Trimmer', path: '/videotrimmer' },
+  ]},
+  { name: 'Document Tools', tools: [
+    { icon: NotePencil, title: 'PDF Editor', path: '/pdfeditor' },
+    { icon: GitMerge, title: 'PDF Merge', path: '/pdfmerge' },
+    { icon: FileDashed, title: 'PDF Split', path: '/pdfsplit' },
+    { icon: BookOpen, title: 'Markdown Viewer', path: '/markdownviewer' },
+  ]},
+  { name: 'Other Tools', tools: [
+    { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
+    { icon: MagnifyingGlass, title: 'Find & Replace', path: '/findreplace' },
+    { icon: TextT, title: 'Case Converter', path: '/caseconverter' },
+    { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
+    { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
+    { icon: BracketsCurly, title: 'JSON Formatter', path: '/jsonformatter' },
+    { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
+    { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
+    { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
+  ]},
+];
+
+const PRODUCTIVITY_TOOLS = [
+  { icon: CurrencyDollar, title: 'Finance Tracker', path: '/finance' },
+  { icon: DeviceMobile, title: 'VA Kita', path: '/vakita' },
+  { icon: CheckSquare, title: 'Task Manager', path: '/taskmanager' },
+  { icon: Note, title: 'Brewed Notes', path: '/brewednotes' },
+];
+
+const AI_TOOLS = [
+  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'Generate GoHighLevel automation scenarios with AI' },
+  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'Extract text from images using AI-powered OCR' },
+];
+
+// TOOLS DROPDOWN
+const ToolsDropdown = ({ isDark, theme, onToolClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setIsOpen(true); };
+  const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => setIsOpen(false), 150); };
+  useEffect(() => {
+    const handleClickOutside = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setIsOpen(false); };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  return (
+    <div ref={dropdownRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
+      <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: isOpen ? BRAND.blue : theme.text, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        Tools <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {isOpen && (
+        <div style={{ position: 'absolute', top: '100%', left: '0', marginTop: '4px', backgroundColor: isDark ? '#171411' : '#ffffff', border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`, borderRadius: '12px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)', padding: '12px', zIndex: 1000 }}>
+          <div style={{ display: 'flex', gap: '20px' }}>
+            {TOOL_CATEGORIES.map((category) => (
+              <div key={category.name} style={{ minWidth: '130px' }}>
+                <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>{category.name}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  {category.tools.map((tool) => {
+                    const IconComponent = tool.icon;
+                    return (
+                      <button key={tool.path} onClick={() => { setIsOpen(false); onToolClick(tool.path); }}
+                        style={{ padding: '5px 8px', backgroundColor: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', textAlign: 'left' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = BRAND.blue; e.currentTarget.querySelector('svg').style.color = '#fff'; e.currentTarget.querySelector('span').style.color = '#fff'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.querySelector('svg').style.color = theme.textMuted; e.currentTarget.querySelector('span').style.color = theme.text; }}
+                      >
+                        <IconComponent size={13} style={{ color: theme.textMuted, flexShrink: 0 }} />
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>{tool.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', fontWeight: '600', color: BRAND.blue, fontFamily: FONTS.body }}><Lock size={10} /> PRODUCTIVITY</div>
+              {PRODUCTIVITY_TOOLS.map((tool) => { const IconComponent = tool.icon; return (<div key={tool.path} style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body }}><IconComponent size={11} />{tool.title}</div>); })}
+            </div>
+            <span style={{ fontSize: '10px', color: theme.textMuted, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>Coming soon</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// AI TOOLS DROPDOWN
+const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setIsOpen(true); };
+  const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => setIsOpen(false), 150); };
+  useEffect(() => {
+    const handleClickOutside = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setIsOpen(false); };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  return (
+    <div ref={dropdownRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
+      <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: isOpen ? BRAND.blue : theme.text, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        AI Tools <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {isOpen && (
+        <div style={{ position: 'absolute', top: '100%', left: '0', marginTop: '4px', backgroundColor: isDark ? '#171411' : '#ffffff', border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`, borderRadius: '12px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)', padding: '12px', zIndex: 1000, minWidth: '240px' }}>
+          <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>AI-Powered Tools</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {AI_TOOLS.map((tool) => { const IconComponent = tool.icon; return (
+              <button key={tool.path} onClick={() => { setIsOpen(false); onToolClick(tool.path); }}
+                style={{ padding: '8px 10px', backgroundColor: 'transparent', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: '10px', textAlign: 'left' }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = BRAND.blue; Array.from(e.currentTarget.querySelectorAll('svg, span')).forEach(el => el.style.color = '#fff'); }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; const spans = e.currentTarget.querySelectorAll('span'); if (spans[0]) spans[0].style.color = theme.text; if (spans[1]) spans[1].style.color = theme.textMuted; e.currentTarget.querySelector('svg').style.color = BRAND.blue; }}
+              >
+                <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: BRAND.blue + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><IconComponent size={16} weight="fill" style={{ color: BRAND.blue }} /></div>
+                <div><span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body, display: 'block' }}>{tool.title}</span><span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'block', marginTop: '2px' }}>{tool.description}</span></div>
+              </button>
+            ); })}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// APPS DROPDOWN
+const AppsDropdown = ({ isDark, theme, onAppClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setIsOpen(true); };
+  const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => setIsOpen(false), 150); };
+  useEffect(() => {
+    const handleClickOutside = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setIsOpen(false); };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  return (
+    <div ref={dropdownRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
+      <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: isOpen ? '#14b8a6' : theme.text, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        Apps <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {isOpen && (
+        <div style={{ position: 'absolute', top: '100%', left: '0', marginTop: '4px', backgroundColor: isDark ? '#171411' : '#ffffff', border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`, borderRadius: '12px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)', padding: '12px', zIndex: 1000, minWidth: '200px' }}>
+          <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>Mobile Apps</div>
+          <button onClick={() => { setIsOpen(false); onAppClick('/fuelyx'); }}
+            style={{ padding: '8px 10px', backgroundColor: 'transparent', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: '10px', textAlign: 'left', width: '100%' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#14b8a6'; Array.from(e.currentTarget.querySelectorAll('svg, span')).forEach(el => el.style.color = '#fff'); }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; const spans = e.currentTarget.querySelectorAll('span'); if (spans[0]) spans[0].style.color = theme.text; if (spans[1]) spans[1].style.color = theme.textMuted; e.currentTarget.querySelector('svg').style.color = '#14b8a6'; }}
+          >
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#14b8a618', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}><DeviceMobile size={16} weight="fill" style={{ color: '#14b8a6' }} /></div>
+            <div><span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body, display: 'block' }}>Fuelyx</span><span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'block', marginTop: '2px' }}>Filipino nutrition tracker</span></div>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
+  const navigate = useNavigate();
+  const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+  const isMobile = windowWidth < 640;
+  const isDesktop = windowWidth >= 1024;
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const theme = {
     bg: isDark ? '#0d0b09' : '#faf8f5',
     text: isDark ? '#f5f0eb' : '#3F200C',
     textMuted: isDark ? '#a09585' : '#7a6652',
     cardBg: isDark ? '#171411' : '#ffffff',
     cardBorder: isDark ? '#2a2420' : '#e8e0d4',
+  };
+
+  const navLinkStyle = {
+    fontSize: '14px',
+    fontWeight: '500',
+    color: theme.textMuted,
+    textDecoration: 'none',
+    fontFamily: FONTS.body,
+    padding: '0 8px',
   };
 
   const stats = [
@@ -51,47 +251,71 @@ const AboutUs = ({ onBack, onNavigate, isDark }) => {
       flexDirection: 'column',
       fontFamily: FONTS.heading
     }}>
-      {/* Header */}
-      <header style={{
-        padding: '16px 24px',
-        borderBottom: '1px solid ' + theme.cardBorder,
+      {/* NAV */}
+      <nav style={{
+        padding: isMobile ? '12px 16px' : '12px 32px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
+        borderBottom: '1px solid ' + theme.cardBorder,
         backgroundColor: theme.bg,
         position: 'sticky',
         top: 0,
-        zIndex: 10
+        zIndex: 100,
       }}>
-        <button 
-          onClick={() => onNavigate('home')}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            backgroundColor: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            padding: '8px 0'
-          }}
-        >
-          <img
-            src="https://i.imgur.com/R52jwPvt.png"
-            alt="BrewedOps Logo"
-            width={36}
-            height={36}
-            style={{ width: '36px', height: '36px', borderRadius: '10px' }}
-          />
-          <span style={{ 
-            fontSize: '20px', 
-            fontWeight: '700', 
-            color: theme.text,
-            letterSpacing: '-0.5px'
-          }}>
-            Brewed<span style={{ color: BRAND.blue }}>Ops</span>
-          </span>
-        </button>
-      </header>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px', cursor: 'pointer' }}>
+            <img src="https://i.imgur.com/R52jwPvt.png" alt="BrewedOps Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+            <span style={{ fontSize: '18px', fontWeight: '700', fontFamily: FONTS.heading }}>
+              <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
+              <span style={{ color: BRAND.blue }}>Ops</span>
+            </span>
+          </div>
+          {isDesktop && (
+            <>
+              <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>Home</button>
+              <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>Portfolio</button>
+              <button onClick={() => navigate('/services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>Services</button>
+              <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
+              <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
+              <AppsDropdown isDark={isDark} theme={theme} onAppClick={(path) => navigate(path)} />
+            </>
+          )}
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+          {isDesktop && (
+            <>
+              <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: BRAND.blue, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>About</button>
+              <a href="/privacy" style={navLinkStyle}>Privacy</a>
+            </>
+          )}
+          {setIsDark && (
+            <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+            </button>
+          )}
+          {isDesktop ? (
+            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
+              Account creation coming soon
+            </span>
+          ) : (
+            <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
+              <List size={18} />
+            </button>
+          )}
+        </div>
+      </nav>
+
+      {/* Mobile Drawer */}
+      <React.Suspense fallback={null}>
+        <MobileDrawer
+          isOpen={mobileMenuOpen}
+          onClose={() => setMobileMenuOpen(false)}
+          isDark={isDark}
+          navigate={navigate}
+          onNavigate={onNavigate}
+        />
+      </React.Suspense>
 
       {/* Main Content */}
       <main style={{ flex: 1, padding: '40px 24px' }}>

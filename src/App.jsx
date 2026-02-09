@@ -5,7 +5,7 @@ import { supabase } from './lib/supabase';
 import SEO from './components/SEO';
 import GuestToolLayout from './components/layout/GuestToolLayout';
 import LoadingFallback from './components/ui/LoadingFallback';
-import CanvasCursor from './components/ui/CanvasCursor';
+import { SmoothCursor } from './components/ui/smooth-cursor';
 
 // Lazy-loaded pages
 const HomePage = React.lazy(() => import('./components/HomePage'));
@@ -661,7 +661,7 @@ return (
     <Route path="/reset-password" element={<ResetPassword isDark={isDark} setIsDark={setIsDark} />} />
     <Route path="/privacy" element={<PrivacyPolicy onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
     <Route path="/terms" element={<TermsOfService onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
-    <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} />} />
+    <Route path="/about" element={<AboutUs onBack={() => navigate('/')} onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     <Route path="/fuelyx" element={<FuelyxPage isDark={isDark} setIsDark={setIsDark} />} />
     <Route path="/services" element={<ServicesPage isDark={isDark} setIsDark={setIsDark} onNavigate={handleNavigate} />} />
     {/* Productivity tools - redirect to login (requires account) */}
@@ -713,7 +713,7 @@ return (
 export default function App() {
   return (
     <BrowserRouter>
-      <CanvasCursor />
+      <SmoothCursor />
       <AppContent />
     </BrowserRouter>
   );

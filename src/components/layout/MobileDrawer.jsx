@@ -67,6 +67,7 @@ const AI_TOOLS = [
 const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {
   const [toolsExpanded, setToolsExpanded] = useState(false);
   const [aiToolsExpanded, setAiToolsExpanded] = useState(false);
+  const [appsExpanded, setAppsExpanded] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -334,12 +335,61 @@ const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {
                 </div>
               )}
 
+              {/* Apps (expandable) */}
               <button
-                onClick={() => handleNav('/fuelyx')}
-                style={{ ...navItemStyle, color: '#14b8a6', fontWeight: '600' }}
+                onClick={() => setAppsExpanded(!appsExpanded)}
+                style={navItemStyle}
               >
-                Fuelyx
+                <span>Apps</span>
+                <CaretDown
+                  size={16}
+                  style={{
+                    transform: appsExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+                    transition: 'transform 0.2s',
+                    color: theme.textMuted,
+                  }}
+                />
               </button>
+
+              {appsExpanded && (
+                <div style={{ paddingLeft: '16px', paddingBottom: '8px' }}>
+                  <div style={{ marginBottom: '12px' }}>
+                    <div
+                      style={{
+                        fontSize: '10px',
+                        fontWeight: '600',
+                        color: theme.textMuted,
+                        letterSpacing: '0.5px',
+                        textTransform: 'uppercase',
+                        fontFamily: FONTS.body,
+                        padding: '4px 24px',
+                      }}
+                    >
+                      Mobile Apps
+                    </div>
+                    <button
+                      onClick={() => handleNav('/fuelyx')}
+                      style={{
+                        width: '100%',
+                        padding: '8px 24px',
+                        backgroundColor: 'transparent',
+                        border: 'none',
+                        color: '#14b8a6',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        fontFamily: FONTS.body,
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        textAlign: 'left',
+                      }}
+                    >
+                      Fuelyx
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div style={{ height: '1px', backgroundColor: theme.cardBorder, margin: '8px 24px' }} />
 
@@ -351,50 +401,17 @@ const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {
               </button>
             </div>
 
-            {/* Auth Buttons */}
+            {/* Account notice */}
             <div
               style={{
-                padding: '20px 24px',
+                padding: '16px 24px',
                 borderTop: `1px solid ${theme.cardBorder}`,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '10px',
+                textAlign: 'center',
               }}
             >
-              <button
-                onClick={() => handleAction('login')}
-                style={{
-                  width: '100%',
-                  height: '44px',
-                  backgroundColor: 'transparent',
-                  color: theme.text,
-                  border: `1px solid ${theme.cardBorder}`,
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  fontFamily: FONTS.body,
-                  cursor: 'pointer',
-                }}
-              >
-                Login
-              </button>
-              <button
-                onClick={() => handleAction('signup')}
-                style={{
-                  width: '100%',
-                  height: '44px',
-                  backgroundColor: BRAND.blue,
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: '10px',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  fontFamily: FONTS.body,
-                  cursor: 'pointer',
-                }}
-              >
-                Sign Up Free
-              </button>
+              <span style={{ fontSize: '12px', color: theme.textMuted, fontFamily: FONTS.body }}>
+                Account creation coming soon
+              </span>
             </div>
           </motion.div>
         </>

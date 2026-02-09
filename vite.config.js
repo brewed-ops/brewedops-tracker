@@ -12,4 +12,7 @@ export default defineConfig({
   build: {
     sourcemap: true,
   },
+  optimizeDeps: {
+    exclude: ['onnxruntime-web'],
+  },
 })

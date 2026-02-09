@@ -52,7 +52,8 @@ import {
   List,
   Globe,
   Timer,
-  FileMagnifyingGlass
+  FileMagnifyingGlass,
+  DeviceMobile
 } from '@phosphor-icons/react';
 import SEO from '@/components/SEO';
 const MobileDrawer = React.lazy(() => import('@/components/layout/MobileDrawer'));
@@ -248,9 +249,9 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
                 );
               })}
             </div>
-            <button onClick={() => { setIsOpen(false); onLoginClick(); }} style={{ fontSize: '11px', color: BRAND.blue, backgroundColor: 'transparent', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: FONTS.body }}>
-              Sign in →
-            </button>
+            <span style={{ fontSize: '10px', color: theme.textMuted, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>
+              Coming soon
+            </span>
           </div>
         </div>
       )}
@@ -344,6 +345,49 @@ const LinkedInIcon = ({ size = 18 }) => (
     <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
   </svg>
 );
+
+// ============================================
+// APPS DROPDOWN
+// ============================================
+const AppsDropdown = ({ isDark, theme, onAppClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setIsOpen(true); };
+  const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => setIsOpen(false), 150); };
+  useEffect(() => {
+    const handleClickOutside = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setIsOpen(false); };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  return (
+    <div ref={dropdownRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
+      <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: isOpen ? '#14b8a6' : theme.text, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        Apps
+        <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {isOpen && (
+        <div style={{ position: 'absolute', top: '100%', left: '0', marginTop: '4px', backgroundColor: isDark ? '#171411' : '#ffffff', border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`, borderRadius: '12px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)', padding: '12px', zIndex: 1000, minWidth: '200px' }}>
+          <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>Mobile Apps</div>
+          <button
+            onClick={() => { setIsOpen(false); onAppClick('/fuelyx'); }}
+            style={{ padding: '8px 10px', backgroundColor: 'transparent', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: '10px', textAlign: 'left', width: '100%' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#14b8a6'; Array.from(e.currentTarget.querySelectorAll('svg, span')).forEach(el => el.style.color = '#fff'); }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; const spans = e.currentTarget.querySelectorAll('span'); if (spans[0]) spans[0].style.color = theme.text; if (spans[1]) spans[1].style.color = theme.textMuted; e.currentTarget.querySelector('svg').style.color = '#14b8a6'; }}
+          >
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#14b8a618', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <DeviceMobile size={16} weight="fill" style={{ color: '#14b8a6' }} />
+            </div>
+            <div>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body, display: 'block' }}>Fuelyx</span>
+              <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'block', marginTop: '2px' }}>Filipino nutrition tracker</span>
+            </div>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 // ============================================
 // MAIN COMPONENT
@@ -515,9 +559,7 @@ function PortfolioPage({ isDark, setIsDark }) {
               </button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} onLoginClick={() => navigate('/login')} />
               <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
-              <button onClick={() => navigate('/fuelyx')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: '#14b8a6', border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                Fuelyx
-              </button>
+              <AppsDropdown isDark={isDark} theme={theme} onAppClick={(path) => navigate(path)} />
             </>
           )}
         </div>
@@ -532,10 +574,9 @@ function PortfolioPage({ isDark, setIsDark }) {
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           {!isMobile ? (
-            <>
-              <button onClick={() => navigate('/login')} style={{ height: '36px', padding: '0 14px', backgroundColor: 'transparent', color: theme.text, border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', fontSize: '13px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', marginLeft: '4px' }}>Login</button>
-              <button onClick={() => navigate('/signup')} style={{ height: '36px', padding: '0 14px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer' }}>Sign Up</button>
-            </>
+            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
+              Account creation coming soon
+            </span>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
               <List size={18} />

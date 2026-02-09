@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CaretRight, CaretDown, Sun, Moon, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck, Sparkle, FileMagnifyingGlass } from '@phosphor-icons/react';
+import { CaretRight, CaretDown, Sun, Moon, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck, Sparkle, FileMagnifyingGlass, DeviceMobile } from '@phosphor-icons/react';
 import SEO from './SEO';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 import { createNoise3D } from "simplex-noise";
@@ -614,7 +614,7 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
             ))}
           </div>
 
-          <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+          <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: `1px solid ${theme.cardBorder}`, display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', fontWeight: '600', color: BRAND.blue, fontFamily: FONTS.body }}>
                 <Lock size={10} />
@@ -630,9 +630,9 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
                 );
               })}
             </div>
-            <button onClick={() => { setIsOpen(false); onLoginClick(); }} style={{ fontSize: '11px', color: BRAND.blue, backgroundColor: 'transparent', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: FONTS.body }}>
-              Sign in →
-            </button>
+            <span style={{ fontSize: '10px', color: theme.textMuted, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>
+              Coming soon
+            </span>
           </div>
         </div>
       )}
@@ -742,6 +742,99 @@ const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {
 };
 
 // ============================================
+// APPS DROPDOWN
+// ============================================
+const AppsDropdown = ({ isDark, theme, onAppClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setIsOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setIsOpen(false), 150);
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  return (
+    <div
+      ref={dropdownRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      style={{ position: 'relative' }}
+    >
+      <button
+        style={{
+          height: '40px',
+          padding: '0 12px',
+          backgroundColor: 'transparent',
+          color: isOpen ? '#14b8a6' : theme.text,
+          border: 'none',
+          fontSize: '14px',
+          fontWeight: '500',
+          fontFamily: FONTS.body,
+          cursor: 'pointer',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '4px',
+        }}
+      >
+        Apps
+        <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+
+      {isOpen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '100%',
+            left: '0',
+            marginTop: '4px',
+            backgroundColor: isDark ? '#171411' : '#ffffff',
+            border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`,
+            borderRadius: '12px',
+            boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)',
+            padding: '12px',
+            zIndex: 1000,
+            minWidth: '200px',
+          }}
+        >
+          <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>
+            Mobile Apps
+          </div>
+          <button
+            onClick={() => { setIsOpen(false); onAppClick('/fuelyx'); }}
+            style={{ padding: '8px 10px', backgroundColor: 'transparent', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: '10px', textAlign: 'left', width: '100%' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#14b8a6'; Array.from(e.currentTarget.querySelectorAll('svg, span')).forEach(el => el.style.color = '#fff'); }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; const spans = e.currentTarget.querySelectorAll('span'); if (spans[0]) spans[0].style.color = theme.text; if (spans[1]) spans[1].style.color = theme.textMuted; e.currentTarget.querySelector('svg').style.color = '#14b8a6'; }}
+          >
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#14b8a618', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <DeviceMobile size={16} weight="fill" style={{ color: '#14b8a6' }} />
+            </div>
+            <div>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body, display: 'block' }}>Fuelyx</span>
+              <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'block', marginTop: '2px' }}>Filipino nutrition tracker</span>
+            </div>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
 // MAIN HOMEPAGE
 // ============================================
 const HomePage = ({ onNavigate, isDark, setIsDark }) => {
@@ -830,9 +923,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               </button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} onLoginClick={handleLoginClick} />
               <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} />
-              <button onClick={() => navigate('/fuelyx')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: '#14b8a6', border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                Fuelyx
-              </button>
+              <AppsDropdown isDark={isDark} theme={theme} onAppClick={handleToolClick} />
             </>
           )}
         </div>
@@ -847,14 +938,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           {isDesktop ? (
-            <>
-              <button onClick={() => onNavigate('login')} style={{ height: '36px', padding: '0 14px', backgroundColor: 'transparent', color: theme.text, border: '1px solid ' + theme.cardBorder, borderRadius: '8px', fontSize: '13px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', marginLeft: '4px' }}>
-                Login
-              </button>
-              <button onClick={() => onNavigate('signup')} style={{ height: '36px', padding: '0 14px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer' }}>
-                Sign Up
-              </button>
-            </>
+            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
+              Account creation coming soon
+            </span>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
               <List size={18} />
@@ -864,7 +950,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
       </nav>
 
       {/* HERO with Vortex Background */}
-      <div id="main-content" style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream }}>
+      <div id="main-content" style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream, overflow: 'hidden' }}>
         <Vortex
           backgroundColor={isDark ? '#0d0b09' : BRAND.cream}
           particleCount={400}
@@ -878,99 +964,279 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           baseRadius={1}
           rangeRadius={1.5}
         >
-          <section style={{ padding: isSmall ? '60px 20px 0px' : '80px 64px 0px', maxWidth: '1400px', margin: '0 auto' }}>
+          <section style={{ padding: isSmall ? '40px 20px 0' : '60px 64px 0', maxWidth: '1400px', margin: '0 auto', position: 'relative' }}>
             <div style={{
               display: 'flex',
-              flexDirection: 'column',
+              flexDirection: isMobile ? 'column' : 'row',
               alignItems: 'center',
-              justifyContent: 'center',
+              justifyContent: 'space-between',
+              gap: isMobile ? '24px' : '0',
             }}>
-              <div style={{ textAlign: 'center', maxWidth: '800px' }}>
-                {/* Service indicator chips */}
-                <div style={{ display: 'flex', justifyContent: 'center', gap: isSmall ? '8px' : '10px', marginBottom: '32px', flexWrap: 'wrap' }}>
-                  {[
-                    { icon: Headphones, label: 'Customer Support', color: BRAND.blue },
-                    { icon: ClipboardText, label: 'Admin VA', color: BRAND.green },
-                    { icon: Lightning, label: 'GHL Automation', color: '#f59e0b' },
-                    { icon: Code, label: 'Web Development', color: '#8b5cf6' },
-                  ].map((chip, i) => {
-                    const ChipIcon = chip.icon;
-                    return (
-                      <motion.div
-                        key={chip.label}
-                        initial={{ opacity: 0, y: 16 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.15 * i, ease: 'easeOut' }}
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: isSmall ? '7px 12px' : '8px 16px',
-                          backgroundColor: isDark ? `${chip.color}18` : `${chip.color}10`,
-                          backdropFilter: 'blur(8px)',
-                          borderRadius: '100px',
-                          border: `1px solid ${isDark ? `${chip.color}35` : `${chip.color}25`}`,
-                        }}
-                      >
-                        <ChipIcon size={isSmall ? 13 : 14} style={{ color: chip.color, flexShrink: 0 }} />
-                        <span style={{ fontSize: isSmall ? '11px' : '13px', color: isDark ? `${chip.color}cc` : chip.color, fontWeight: '600', fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>{chip.label}</span>
-                      </motion.div>
-                    );
-                  })}
-                </div>
-                <div style={{ marginBottom: '24px' }}>
+              {/* Left: Text content */}
+              <div style={{
+                textAlign: isMobile ? 'center' : 'left',
+                maxWidth: isMobile ? '100%' : '50%',
+                flex: isMobile ? 'none' : '0 0 50%',
+                position: 'relative',
+                zIndex: 2,
+              }}>
+                <motion.div
+                  initial={{ opacity: 0, y: 24 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
+                  style={{ marginBottom: '18px' }}
+                >
                   <h1 style={{
-                    fontSize: isSmall ? '36px' : '60px',
+                    fontSize: isSmall ? '34px' : (isMobile ? '42px' : '54px'),
                     fontWeight: '800',
                     color: isDark ? '#ffffff' : BRAND.brown,
-                    lineHeight: '1.15',
+                    lineHeight: '1.08',
                     letterSpacing: '-0.03em',
                     fontFamily: FONTS.heading,
-                    marginBottom: '16px',
-                    textAlign: 'center',
-                    margin: '0 0 16px',
+                    margin: '0 0 14px',
                   }}>
-                    Your Dedicated VA for
+                    Stop Doing It All.{isMobile ? ' ' : <br />}
+                    <span style={{ color: isDark ? '#60a5fa' : BRAND.blue }}>Let's Handle It.</span>
                   </h1>
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
                     <LayoutTextFlip
                       text=""
                       words={["Your Business", "Growing Brands", "Digital Agencies", "Remote Teams"]}
                       duration={3000}
                       wordStyle={{
-                        fontSize: isSmall ? '32px' : '52px',
+                        fontSize: isSmall ? '24px' : (isMobile ? '30px' : '38px'),
                         fontWeight: '800',
                         fontFamily: FONTS.heading,
                         color: isDark ? '#60a5fa' : BRAND.blue,
-                        backgroundColor: isDark ? 'rgba(96, 165, 250, 0.15)' : 'rgba(0, 74, 172, 0.1)',
-                        border: isDark ? '1px solid rgba(96, 165, 250, 0.3)' : '1px solid rgba(0, 74, 172, 0.2)',
-                        padding: '8px 24px',
-                        borderRadius: '16px',
+                        backgroundColor: isDark ? 'rgba(96, 165, 250, 0.12)' : 'rgba(0, 74, 172, 0.08)',
+                        border: isDark ? '1px solid rgba(96, 165, 250, 0.25)' : '1px solid rgba(0, 74, 172, 0.15)',
+                        padding: '5px 18px',
+                        borderRadius: '12px',
                       }}
                     />
                   </div>
-                </div>
-                <p style={{ fontSize: isSmall ? '15px' : '18px', color: isDark ? 'rgba(255, 255, 255, 0.7)' : theme.textMuted, margin: '0 auto 40px', lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: '620px' }}>
-                  11+ years of customer support experience, dedicated to helping businesses streamline operations, automate workflows, and grow. Plus 22+ free tools and AI-powered utilities to boost your productivity.
-                </p>
-                <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  <button onClick={() => navigate('/services')} style={{ ...btnPrimary, height: '56px', padding: '0 32px', fontSize: '16px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.5)' }}>View Services <CaretRight size={20} /></button>
-                  <button onClick={() => onNavigate('login')} style={{ ...btnOutline, height: '56px', padding: '0 32px', fontSize: '16px', color: isDark ? '#fff' : theme.text, borderColor: isDark ? 'rgba(255, 255, 255, 0.3)' : theme.cardBorder, backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : 'transparent', backdropFilter: isDark ? 'blur(8px)' : 'none' }}>Sign In</button>
-                </div>
-                <p style={{ fontSize: '13px', color: isDark ? 'rgba(255, 255, 255, 0.5)' : theme.textMuted, marginTop: '24px', fontFamily: FONTS.body }}>
-                  Or explore our <a href="#free-tools" onClick={(e) => { e.preventDefault(); document.getElementById('free-tools')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>22+ free productivity tools & AI tools</a> — no sign-up needed.
-                </p>
+                </motion.div>
+
+                <motion.p
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
+                  style={{ fontSize: isSmall ? '14px' : '15px', color: isDark ? 'rgba(255, 255, 255, 0.65)' : theme.textMuted, margin: '0 0 28px', lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: isMobile ? '100%' : '460px' }}
+                >
+                  From inbox zero to fully automated CRM pipelines — I help founders and agencies reclaim their time so they can focus on growth, not grunt work.
+                </motion.p>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.45, ease: 'easeOut' }}
+                  style={{ display: 'flex', gap: '12px', justifyContent: isMobile ? 'center' : 'flex-start', flexWrap: 'wrap', alignItems: 'center' }}
+                >
+                  <button onClick={() => navigate('/services')} style={{ ...btnPrimary, height: '48px', padding: '0 26px', fontSize: '14px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.4)' }}>View Services <CaretRight size={16} /></button>
+                  <button onClick={() => navigate('/about')} style={{ ...btnOutline, height: '48px', padding: '0 26px', fontSize: '14px', color: isDark ? '#fff' : theme.text, borderColor: isDark ? 'rgba(255, 255, 255, 0.25)' : theme.cardBorder, backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'transparent' }}>About Us</button>
+                </motion.div>
+
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.65 }}
+                  style={{ fontSize: '12px', color: isDark ? 'rgba(255, 255, 255, 0.4)' : theme.textMuted, marginTop: '18px', fontFamily: FONTS.body }}
+                >
+                  Plus <a href="#free-tools" onClick={(e) => { e.preventDefault(); document.getElementById('free-tools')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>22+ free tools</a> you can use right now — no sign-up needed.
+                </motion.p>
               </div>
 
+              {/* Right: Hero image with floating badges */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+                style={{
+                  flex: isMobile ? 'none' : '0 0 52%',
+                  display: 'flex',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center',
+                  position: 'relative',
+                  alignSelf: 'flex-end',
+                  marginRight: isMobile ? 0 : '-32px',
+                }}
+              >
+                {/* Glow effect behind image */}
+                <div style={{
+                  position: 'absolute',
+                  bottom: '5%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '80%',
+                  height: '70%',
+                  background: isDark
+                    ? `radial-gradient(ellipse, ${BRAND.blue}30 0%, transparent 70%)`
+                    : `radial-gradient(ellipse, ${BRAND.blue}15 0%, transparent 70%)`,
+                  borderRadius: '50%',
+                  filter: 'blur(60px)',
+                  pointerEvents: 'none',
+                }} />
+
+                {/* CSS keyframes for GPU-accelerated smooth float */}
+                <style>{`
+                  @keyframes floatBadge1 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+                  @keyframes floatBadge2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
+                  @keyframes floatBadge3 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+                  @keyframes floatBadge4 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(9px); } }
+                `}</style>
+
+                {/* Floating badges */}
+                {!isMobile && (() => {
+                  const badgeBase = {
+                    zIndex: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    padding: '10px 16px',
+                    backgroundColor: isDark ? 'rgba(20, 17, 14, 0.9)' : 'rgba(255, 255, 255, 0.95)',
+                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                    borderRadius: '12px',
+                    backdropFilter: 'blur(12px)',
+                    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.08)',
+                    willChange: 'transform',
+                  };
+                  const labelStyle = { fontSize: '12px', fontWeight: '600', fontFamily: FONTS.body, color: isDark ? '#fff' : BRAND.brown };
+                  return (
+                    <>
+                      <motion.div
+                        initial={{ opacity: 0, x: -30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
+                        style={{ ...badgeBase, position: 'absolute', top: '10%', left: '-5%', animation: 'floatBadge1 3.5s ease-in-out infinite' }}
+                      >
+                        <Headphones size={18} weight="duotone" style={{ color: BRAND.blue }} />
+                        <span style={labelStyle}>Customer Support Pro</span>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 1.0, ease: 'easeOut' }}
+                        style={{ ...badgeBase, position: 'absolute', top: '32%', right: '-2%', animation: 'floatBadge2 4s ease-in-out 0.5s infinite' }}
+                      >
+                        <Lightning size={18} weight="duotone" style={{ color: '#f59e0b' }} />
+                        <span style={labelStyle}>HighLevel Automation</span>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 1.2, ease: 'easeOut' }}
+                        style={{ ...badgeBase, position: 'absolute', bottom: '22%', left: '-2%', animation: 'floatBadge3 4.5s ease-in-out 1s infinite' }}
+                      >
+                        <ChartLineUp size={18} weight="duotone" style={{ color: BRAND.green }} />
+                        <span style={labelStyle}>CRM Builder</span>
+                      </motion.div>
+
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, delay: 1.4, ease: 'easeOut' }}
+                        style={{ ...badgeBase, position: 'absolute', bottom: '8%', right: '5%', animation: 'floatBadge4 3.8s ease-in-out 0.8s infinite' }}
+                      >
+                        <ClipboardText size={18} weight="duotone" style={{ color: '#8b5cf6' }} />
+                        <span style={labelStyle}>Admin VA</span>
+                      </motion.div>
+                    </>
+                  );
+                })()}
+
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  maxWidth: isMobile ? '400px' : '600px',
+                  maskImage: `linear-gradient(to right, transparent 0%, black 8%, black 85%, transparent 100%), linear-gradient(to bottom, black 0%, black 88%, transparent 100%)`,
+                  WebkitMaskImage: `linear-gradient(to right, transparent 0%, black 8%, black 85%, transparent 100%), linear-gradient(to bottom, black 0%, black 88%, transparent 100%)`,
+                  maskComposite: 'intersect',
+                  WebkitMaskComposite: 'destination-in',
+                }}>
+                  <img
+                    src="/herbg2.png"
+                    alt="BrewedOps - Your dedicated virtual assistant"
+                    style={{
+                      width: '100%',
+                      height: 'auto',
+                      display: 'block',
+                      position: 'relative',
+                      zIndex: 1,
+                    }}
+                  />
+                </div>
+              </motion.div>
             </div>
           </section>
         </Vortex>
+
+        {/* Animated Wave Divider */}
+        <div style={{ position: 'relative', marginTop: '-2px', lineHeight: 0, overflow: 'hidden' }}>
+          <svg
+            viewBox="0 0 1440 120"
+            preserveAspectRatio="none"
+            style={{ display: 'block', width: '100%', height: isMobile ? '50px' : '80px' }}
+          >
+            <defs>
+              <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={BRAND.blue} stopOpacity="0.3" />
+                <stop offset="50%" stopColor={BRAND.green} stopOpacity="0.2" />
+                <stop offset="100%" stopColor={BRAND.blue} stopOpacity="0.3" />
+              </linearGradient>
+              <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={BRAND.blue} stopOpacity="0.15" />
+                <stop offset="50%" stopColor={BRAND.green} stopOpacity="0.1" />
+                <stop offset="100%" stopColor={BRAND.blue} stopOpacity="0.15" />
+              </linearGradient>
+            </defs>
+            {/* Back wave - slower */}
+            <path
+              fill="url(#waveGrad2)"
+              d="M0,60 C180,100 360,20 540,60 C720,100 900,20 1080,60 C1260,100 1440,40 1440,40 L1440,120 L0,120 Z"
+              style={{
+                animation: 'waveMove2 8s ease-in-out infinite alternate',
+              }}
+            />
+            {/* Middle wave */}
+            <path
+              fill="url(#waveGrad1)"
+              d="M0,80 C240,40 480,100 720,60 C960,20 1200,90 1440,50 L1440,120 L0,120 Z"
+              style={{
+                animation: 'waveMove1 6s ease-in-out infinite alternate',
+              }}
+            />
+            {/* Front wave - matches next section bg */}
+            <path
+              fill={isDark ? '#080604' : '#f5f0eb'}
+              d="M0,90 C160,70 320,110 480,85 C640,60 800,100 960,80 C1120,60 1280,95 1440,75 L1440,120 L0,120 Z"
+              style={{
+                animation: 'waveMove3 5s ease-in-out infinite alternate',
+              }}
+            />
+          </svg>
+          <style>{`
+            @keyframes waveMove1 {
+              0% { d: path("M0,80 C240,40 480,100 720,60 C960,20 1200,90 1440,50 L1440,120 L0,120 Z"); }
+              100% { d: path("M0,60 C240,90 480,30 720,70 C960,100 1200,40 1440,70 L1440,120 L0,120 Z"); }
+            }
+            @keyframes waveMove2 {
+              0% { d: path("M0,60 C180,100 360,20 540,60 C720,100 900,20 1080,60 C1260,100 1440,40 1440,40 L1440,120 L0,120 Z"); }
+              100% { d: path("M0,40 C180,20 360,90 540,50 C720,20 900,80 1080,40 C1260,10 1440,70 1440,70 L1440,120 L0,120 Z"); }
+            }
+            @keyframes waveMove3 {
+              0% { d: path("M0,90 C160,70 320,110 480,85 C640,60 800,100 960,80 C1120,60 1280,95 1440,75 L1440,120 L0,120 Z"); }
+              100% { d: path("M0,75 C160,95 320,65 480,90 C640,110 800,70 960,95 C1120,110 1280,75 1440,90 L1440,120 L0,120 Z"); }
+            }
+          `}</style>
+        </div>
       </div>
 
       {/* ABOUT SECTION */}
       <section style={{
         padding: isMobile ? '60px 20px' : '100px 64px',
-        backgroundColor: '#080604',
+        backgroundColor: isDark ? '#080604' : '#f5f0eb',
         position: 'relative',
         overflow: 'hidden',
       }}>
@@ -987,7 +1253,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
             <h2 style={{
               fontSize: isSmall ? '56px' : (isMobile ? '72px' : '120px'),
               fontWeight: '800',
-              color: '#ffffff',
+              color: isDark ? '#ffffff' : BRAND.brown,
               fontFamily: FONTS.heading,
               lineHeight: 1,
               margin: 0,
@@ -1002,7 +1268,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               fontFamily: FONTS.heading,
               fontWeight: '500',
               margin: 0,
-              color: 'rgba(255,255,255,0.85)',
+              color: isDark ? 'rgba(255,255,255,0.85)' : '#3F200C',
             }}>
               <span style={{ color: '#FF6B6B' }}>We help growing brands streamline operations and automate workflows</span>
               , delivering dedicated VA support, CRM automation, and custom-built digital tools with 11+ years of expertise
@@ -1025,9 +1291,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               <ScrollReveal key={value.title} delay={0.1 * idx} style={{ height: '100%' }}>
               <div style={{
                 padding: isSmall ? '24px 16px' : '36px 28px',
-                backgroundColor: '#0e0c09',
+                backgroundColor: isDark ? '#0e0c09' : '#ffffff',
                 borderRadius: '16px',
-                border: '1px solid rgba(255,255,255,0.07)',
+                border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid #e8e0d4',
                 textAlign: 'center',
                 position: 'relative',
                 overflow: 'hidden',
@@ -1038,7 +1304,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 <div style={{
                   position: 'absolute',
                   inset: 0,
-                  backgroundImage: 'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)',
+                  backgroundImage: isDark
+                    ? 'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)'
+                    : 'linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)',
                   backgroundSize: '28px 28px',
                   pointerEvents: 'none',
                 }} />
@@ -1058,7 +1326,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   <h3 style={{
                     fontSize: isSmall ? '16px' : '18px',
                     fontWeight: '700',
-                    color: '#ffffff',
+                    color: isDark ? '#ffffff' : BRAND.brown,
                     fontFamily: FONTS.heading,
                     margin: '0 0 8px',
                   }}>
@@ -1066,7 +1334,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   </h3>
                   <p style={{
                     fontSize: isSmall ? '12px' : '14px',
-                    color: 'rgba(255,255,255,0.55)',
+                    color: isDark ? 'rgba(255,255,255,0.55)' : '#7a6652',
                     lineHeight: 1.6,
                     fontFamily: FONTS.body,
                     margin: 0,
@@ -1528,9 +1796,9 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               );
             })}
           </div>
-          <button onClick={() => onNavigate('signup')} style={{ ...btnPrimary, height: '44px', padding: '0 24px' }}>
-            Sign Up Free <CaretRight size={18} />
-          </button>
+          <span style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body }}>
+            Account creation coming soon
+          </span>
         </div>
       </section>
 

@@ -4,7 +4,7 @@
  * Under-construction services page — clean, branded, highlights offerings.
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Headphones,
@@ -52,6 +52,7 @@ import {
   Globe,
   Timer,
   FileMagnifyingGlass,
+  DeviceMobile,
 } from '@phosphor-icons/react';
 import SEO from '@/components/SEO';
 import ScrollReveal from '@/components/ui/ScrollReveal';
@@ -245,9 +246,9 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
                 );
               })}
             </div>
-            <button onClick={() => { setIsOpen(false); onLoginClick(); }} style={{ fontSize: '11px', color: BRAND.blue, backgroundColor: 'transparent', border: 'none', cursor: 'pointer', fontWeight: '600', fontFamily: FONTS.body }}>
-              Sign in →
-            </button>
+            <span style={{ fontSize: '10px', color: theme.textMuted, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>
+              Coming soon
+            </span>
           </div>
         </div>
       )}
@@ -370,6 +371,49 @@ const SERVICES = [
 ];
 
 // ============================================
+// APPS DROPDOWN
+// ============================================
+const AppsDropdown = ({ isDark, theme, onAppClick }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef(null);
+  const timeoutRef = useRef(null);
+  const handleMouseEnter = () => { if (timeoutRef.current) clearTimeout(timeoutRef.current); setIsOpen(true); };
+  const handleMouseLeave = () => { timeoutRef.current = setTimeout(() => setIsOpen(false), 150); };
+  useEffect(() => {
+    const handleClickOutside = (e) => { if (dropdownRef.current && !dropdownRef.current.contains(e.target)) setIsOpen(false); };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+  return (
+    <div ref={dropdownRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
+      <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: isOpen ? '#14b8a6' : theme.text, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        Apps
+        <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
+      </button>
+      {isOpen && (
+        <div style={{ position: 'absolute', top: '100%', left: '0', marginTop: '4px', backgroundColor: isDark ? '#171411' : '#ffffff', border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`, borderRadius: '12px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)', padding: '12px', zIndex: 1000, minWidth: '200px' }}>
+          <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>Mobile Apps</div>
+          <button
+            onClick={() => { setIsOpen(false); onAppClick('/fuelyx'); }}
+            style={{ padding: '8px 10px', backgroundColor: 'transparent', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: '10px', textAlign: 'left', width: '100%' }}
+            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#14b8a6'; Array.from(e.currentTarget.querySelectorAll('svg, span')).forEach(el => el.style.color = '#fff'); }}
+            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; const spans = e.currentTarget.querySelectorAll('span'); if (spans[0]) spans[0].style.color = theme.text; if (spans[1]) spans[1].style.color = theme.textMuted; e.currentTarget.querySelector('svg').style.color = '#14b8a6'; }}
+          >
+            <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: '#14b8a618', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <DeviceMobile size={16} weight="fill" style={{ color: '#14b8a6' }} />
+            </div>
+            <div>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body, display: 'block' }}>Fuelyx</span>
+              <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'block', marginTop: '2px' }}>Filipino nutrition tracker</span>
+            </div>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// ============================================
 // SERVICES PAGE
 // ============================================
 const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
@@ -437,7 +481,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
               <button onClick={() => navigate('/services')} style={{ ...navLinkStyle, color: BRAND.blue, fontWeight: '600' }}>Services</button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} onLoginClick={() => navigate('/login')} />
               <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
-              <button onClick={() => navigate('/fuelyx')} style={{ ...navLinkStyle, color: '#14b8a6', fontWeight: '600' }}>Fuelyx</button>
+              <AppsDropdown isDark={isDark} theme={theme} onAppClick={(path) => navigate(path)} />
             </>
           )}
         </div>
@@ -452,14 +496,9 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           {isDesktop ? (
-            <>
-              <button onClick={() => navigate('/login')} style={{ height: '36px', padding: '0 14px', backgroundColor: 'transparent', color: theme.text, border: '1px solid ' + theme.cardBorder, borderRadius: '8px', fontSize: '13px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', marginLeft: '4px' }}>
-                Login
-              </button>
-              <button onClick={() => navigate('/signup')} style={{ height: '36px', padding: '0 14px', backgroundColor: BRAND.blue, color: '#fff', border: 'none', borderRadius: '8px', fontSize: '13px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer' }}>
-                Sign Up
-              </button>
-            </>
+            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
+              Account creation coming soon
+            </span>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
               <List size={18} />

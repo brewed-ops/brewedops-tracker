@@ -186,47 +186,11 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
 
-          {/* Login Button */}
-          <button
-            onClick={() => navigate('/login')}
-            style={{
-              height: '36px',
-              padding: '0 14px',
-              backgroundColor: 'transparent',
-              border: '1px solid ' + theme.cardBorder,
-              borderRadius: '8px',
-              color: theme.text,
-              fontSize: '13px',
-              fontWeight: '500',
-              fontFamily: FONTS.body,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-            }}
-          >
-            <SignIn size={14} />
-            {!isSmall && 'Login'}
-          </button>
-
-          {/* Sign Up Button */}
-          <button
-            onClick={() => navigate('/signup')}
-            style={{
-              height: '36px',
-              padding: '0 14px',
-              backgroundColor: BRAND.blue,
-              border: 'none',
-              borderRadius: '8px',
-              color: '#fff',
-              fontSize: '13px',
-              fontWeight: '600',
-              fontFamily: FONTS.body,
-              cursor: 'pointer',
-            }}
-          >
-            Sign Up
-          </button>
+          {!isSmall && (
+            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>
+              Account creation coming soon
+            </span>
+          )}
         </div>
       </header>
 
@@ -279,10 +243,10 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
             fontFamily: FONTS.body,
           }}
         >
-          <strong>Want more?</strong> Sign up free to access Finance Tracker, Task Manager & sync your work across devices.
+          <strong>More features coming soon!</strong> Finance Tracker, Task Manager & cross-device sync are on the way.
         </p>
         <button
-          onClick={() => navigate('/signup')}
+          onClick={() => navigate('/')}
           style={{
             height: '36px',
             padding: '0 20px',
@@ -296,7 +260,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
             cursor: 'pointer',
           }}
         >
-          Sign Up Free
+          Explore Tools
         </button>
       </div>
     </div>
