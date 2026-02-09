@@ -97,16 +97,16 @@ const Vortex = ({ children, className, containerClassName, particleCount = 700, 
   const updateParticle = (i, ctx, width, height) => {
     if (!width || !height || !noise3DRef.current) return;
     const particleProps = particlePropsRef.current;
-    let x = particleProps[i], y = particleProps[i+1];
+    let x = particleProps[i], y = particleProps[i + 1];
     const n = noise3DRef.current(x * xOff, y * yOff, tickRef.current * zOff) * noiseSteps * TAU;
-    const vx = lerp(particleProps[i+2], Math.cos(n), 0.5);
-    const vy = lerp(particleProps[i+3], Math.sin(n), 0.5);
-    let life = particleProps[i+4];
-    const ttl = particleProps[i+5], speed = particleProps[i+6];
+    const vx = lerp(particleProps[i + 2], Math.cos(n), 0.5);
+    const vy = lerp(particleProps[i + 3], Math.sin(n), 0.5);
+    let life = particleProps[i + 4];
+    const ttl = particleProps[i + 5], speed = particleProps[i + 6];
     const x2 = x + vx * speed, y2 = y + vy * speed;
-    drawParticle(x, y, x2, y2, life, ttl, particleProps[i+7], particleProps[i+8], ctx);
+    drawParticle(x, y, x2, y2, life, ttl, particleProps[i + 7], particleProps[i + 8], ctx);
     life++;
-    particleProps[i] = x2; particleProps[i+1] = y2; particleProps[i+2] = vx; particleProps[i+3] = vy; particleProps[i+4] = life;
+    particleProps[i] = x2; particleProps[i + 1] = y2; particleProps[i + 2] = vx; particleProps[i + 3] = vy; particleProps[i + 4] = life;
     if (x2 > width || x2 < 0 || y2 > height || y2 < 0 || life > ttl) initParticle(i, width, height);
   };
 
@@ -248,7 +248,7 @@ const TOOL_CATEGORIES = [
       { icon: Scissors, title: 'Video Trimmer', path: '/videotrimmer' },
     ]
   },
-  
+
   {
     name: 'Document Tools',
     tools: [
@@ -259,19 +259,19 @@ const TOOL_CATEGORIES = [
     ]
   },
   {
-  name: 'Other Tools',
-  tools: [
-    { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
-    { icon: MagnifyingGlass, title: 'Find & Replace', path: '/findreplace' },
-    { icon: TextT, title: 'Case Converter', path: '/caseconverter' },
-    { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
-    { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
-    { icon: BracketsCurly, title: 'JSON Formatter', path: '/jsonformatter' },
-    { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
-    { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
-    { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
-  ]
-},
+    name: 'Other Tools',
+    tools: [
+      { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
+      { icon: MagnifyingGlass, title: 'Find & Replace', path: '/findreplace' },
+      { icon: TextT, title: 'Case Converter', path: '/caseconverter' },
+      { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
+      { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
+      { icon: BracketsCurly, title: 'JSON Formatter', path: '/jsonformatter' },
+      { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
+      { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
+      { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
+    ]
+  },
 ];
 
 const TOOL_TIMELINE = [
@@ -368,7 +368,7 @@ const useWindowSize = () => {
 // ============================================
 const ThreeDMarquee = ({ isDark, theme }) => {
   const navigate = useNavigate();
-  
+
   // Create rows of tools for marquee effect
   const row1 = ALL_TOOLS.slice(0, 8);
   const row2 = ALL_TOOLS.slice(8, 16);
@@ -895,328 +895,341 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: isDark ? theme.bg : '#faf8f5' }}>
       <main>
-      <SEO
-        title="BrewedOps - VA Services, GHL Automation, AI Tools & 22+ Free Productivity Tools"
-        description="Expert customer support, admin VA, GoHighLevel CRM automation, and web development services — backed by 11+ years experience. Plus 22+ free tools and AI-powered utilities including GHL Scenario Generator and AI Text Extractor."
-        keywords="BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free online tools, AI text extractor, OCR, GHL scenario generator"
-      />
-      {/* NAV */}
-      <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#faf8f5', position: 'sticky', top: 0, zIndex: 100 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px' }}>
-            <img src="https://i.imgur.com/R52jwPvt.png" alt="Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
-            <span style={{ fontSize: '18px', fontWeight: '700', fontFamily: FONTS.heading }}>
-              <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
-              <span style={{ color: BRAND.blue }}>Ops</span>
-            </span>
+        <SEO
+          title="BrewedOps - VA Services, GHL Automation, AI Tools & 22+ Free Productivity Tools"
+          description="Expert customer support, admin VA, GoHighLevel CRM automation, and web development services — backed by 11+ years experience. Plus 22+ free tools and AI-powered utilities including GHL Scenario Generator and AI Text Extractor."
+          keywords="BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free online tools, AI text extractor, OCR, GHL scenario generator"
+        />
+        {/* NAV */}
+        <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#faf8f5', position: 'sticky', top: 0, zIndex: 100 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px' }}>
+              <img src="https://i.imgur.com/R52jwPvt.png" alt="Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+              <span style={{ fontSize: '18px', fontWeight: '700', fontFamily: FONTS.heading }}>
+                <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
+                <span style={{ color: BRAND.blue }}>Ops</span>
+              </span>
+            </div>
+            {isDesktop && (
+              <>
+                <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: BRAND.blue, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  Home
+                </button>
+                <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  Portfolio
+                </button>
+                <button onClick={() => navigate('/services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                  Services
+                </button>
+                <ToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} onLoginClick={handleLoginClick} />
+                <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} />
+                <AppsDropdown isDark={isDark} theme={theme} onAppClick={handleToolClick} />
+              </>
+            )}
           </div>
-          {isDesktop && (
-            <>
-              <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: BRAND.blue, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                Home
-              </button>
-              <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                Portfolio
-              </button>
-              <button onClick={() => navigate('/services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                Services
-              </button>
-              <ToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} onLoginClick={handleLoginClick} />
-              <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} />
-              <AppsDropdown isDark={isDark} theme={theme} onAppClick={handleToolClick} />
-            </>
-          )}
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-          {isDesktop && (
-            <>
-              <a href="/about" style={navLinkStyle}>About</a>
-              <a href="/privacy" style={navLinkStyle}>Privacy</a>
-            </>
-          )}
-          <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          {isDesktop ? (
-            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
-              Account creation coming soon
-            </span>
-          ) : (
-            <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
-              <List size={18} />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+            {isDesktop && (
+              <>
+                <a href="/about" style={navLinkStyle}>About</a>
+                <a href="/privacy" style={navLinkStyle}>Privacy</a>
+              </>
+            )}
+            <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
             </button>
-          )}
-        </div>
-      </nav>
+            {isDesktop ? (
+              <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
+                Account creation coming soon
+              </span>
+            ) : (
+              <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
+                <List size={18} />
+              </button>
+            )}
+          </div>
+        </nav>
 
-      {/* HERO with Vortex Background */}
-      <div id="main-content" style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream, overflow: 'hidden' }}>
-        <Vortex
-          backgroundColor={isDark ? '#0d0b09' : BRAND.cream}
-          particleCount={400}
-          baseHue={25}
-          rangeHue={40}
-          baseSaturation={45}
-          baseLightness={50}
-          rangeY={200}
-          baseSpeed={0.0}
-          rangeSpeed={1.0}
-          baseRadius={1}
-          rangeRadius={1.5}
-        >
-          <section style={{ padding: isSmall ? '40px 20px 0' : '60px 64px 0', maxWidth: '1400px', margin: '0 auto', position: 'relative' }}>
-            <div style={{
-              display: 'flex',
-              flexDirection: isMobile ? 'column' : 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              gap: isMobile ? '24px' : '0',
-            }}>
-              {/* Left: Text content */}
+        {/* HERO with Vortex Background */}
+        <div id="main-content" style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream, overflow: 'hidden' }}>
+          <Vortex
+            backgroundColor={isDark ? '#0d0b09' : BRAND.cream}
+            particleCount={400}
+            baseHue={25}
+            rangeHue={40}
+            baseSaturation={45}
+            baseLightness={50}
+            rangeY={200}
+            baseSpeed={0.0}
+            rangeSpeed={1.0}
+            baseRadius={1}
+            rangeRadius={1.5}
+          >
+            <section style={{ padding: isSmall ? '40px 20px 0' : '60px 64px 0', maxWidth: '1400px', margin: '0 auto', position: 'relative' }}>
               <div style={{
-                textAlign: isMobile ? 'center' : 'left',
-                maxWidth: isMobile ? '100%' : '50%',
-                flex: isMobile ? 'none' : '0 0 50%',
-                position: 'relative',
-                zIndex: 2,
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: isMobile ? '24px' : '0',
               }}>
-                <motion.div
-                  initial={{ opacity: 0, y: 24 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
-                  style={{ marginBottom: '18px' }}
-                >
-                  <h1 style={{
-                    fontSize: isSmall ? '34px' : (isMobile ? '42px' : '54px'),
-                    fontWeight: '800',
-                    color: isDark ? '#ffffff' : BRAND.brown,
-                    lineHeight: '1.08',
-                    letterSpacing: '-0.03em',
-                    fontFamily: FONTS.heading,
-                    margin: '0 0 14px',
-                  }}>
-                    Stop Doing It All.{isMobile ? ' ' : <br />}
-                    <span style={{ color: isDark ? '#60a5fa' : BRAND.blue }}>Let's Handle It.</span>
-                  </h1>
-                  <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
-                    <LayoutTextFlip
-                      text=""
-                      words={["Your Business", "Growing Brands", "Digital Agencies", "Remote Teams"]}
-                      duration={3000}
-                      wordStyle={{
-                        fontSize: isSmall ? '24px' : (isMobile ? '30px' : '38px'),
-                        fontWeight: '800',
-                        fontFamily: FONTS.heading,
-                        color: isDark ? '#60a5fa' : BRAND.blue,
-                        backgroundColor: isDark ? 'rgba(96, 165, 250, 0.12)' : 'rgba(0, 74, 172, 0.08)',
-                        border: isDark ? '1px solid rgba(96, 165, 250, 0.25)' : '1px solid rgba(0, 74, 172, 0.15)',
-                        padding: '5px 18px',
-                        borderRadius: '12px',
-                      }}
-                    />
-                  </div>
-                </motion.div>
-
-                <motion.p
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
-                  style={{ fontSize: isSmall ? '14px' : '15px', color: isDark ? 'rgba(255, 255, 255, 0.65)' : theme.textMuted, margin: '0 0 28px', lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: isMobile ? '100%' : '460px' }}
-                >
-                  From inbox zero to fully automated CRM pipelines — I help founders and agencies reclaim their time so they can focus on growth, not grunt work.
-                </motion.p>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.45, ease: 'easeOut' }}
-                  style={{ display: 'flex', gap: '12px', justifyContent: isMobile ? 'center' : 'flex-start', flexWrap: 'wrap', alignItems: 'center' }}
-                >
-                  <button onClick={() => navigate('/services')} style={{ ...btnPrimary, height: '48px', padding: '0 26px', fontSize: '14px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.4)' }}>View Services <CaretRight size={16} /></button>
-                  <button onClick={() => navigate('/about')} style={{ ...btnOutline, height: '48px', padding: '0 26px', fontSize: '14px', color: isDark ? '#fff' : theme.text, borderColor: isDark ? 'rgba(255, 255, 255, 0.25)' : theme.cardBorder, backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'transparent' }}>About Us</button>
-                </motion.div>
-
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.5, delay: 0.65 }}
-                  style={{ fontSize: '12px', color: isDark ? 'rgba(255, 255, 255, 0.4)' : theme.textMuted, marginTop: '18px', fontFamily: FONTS.body }}
-                >
-                  Plus <a href="#free-tools" onClick={(e) => { e.preventDefault(); document.getElementById('free-tools')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>22+ free tools</a> you can use right now — no sign-up needed.
-                </motion.p>
-              </div>
-
-              {/* Right: Hero image with floating badges */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-                style={{
-                  flex: isMobile ? 'none' : '0 0 52%',
-                  display: 'flex',
-                  alignItems: 'flex-end',
-                  justifyContent: 'center',
-                  position: 'relative',
-                  alignSelf: 'flex-end',
-                  marginRight: isMobile ? 0 : '-32px',
-                }}
-              >
-                {/* Glow effect behind image */}
+                {/* Left: Text content */}
                 <div style={{
-                  position: 'absolute',
-                  bottom: '5%',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '80%',
-                  height: '70%',
-                  background: isDark
-                    ? `radial-gradient(ellipse, ${BRAND.blue}30 0%, transparent 70%)`
-                    : `radial-gradient(ellipse, ${BRAND.blue}15 0%, transparent 70%)`,
-                  borderRadius: '50%',
-                  filter: 'blur(60px)',
-                  pointerEvents: 'none',
-                }} />
+                  textAlign: isMobile ? 'center' : 'left',
+                  maxWidth: isMobile ? '100%' : '50%',
+                  flex: isMobile ? 'none' : '0 0 50%',
+                  position: 'relative',
+                  zIndex: 2,
+                }}>
+                  <motion.div
+                    initial={{ opacity: 0, y: 24 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
+                    style={{ marginBottom: '18px' }}
+                  >
+                    <h1 style={{
+                      fontSize: isSmall ? '34px' : (isMobile ? '42px' : '54px'),
+                      fontWeight: '800',
+                      color: isDark ? '#ffffff' : BRAND.brown,
+                      lineHeight: '1.08',
+                      letterSpacing: '-0.03em',
+                      fontFamily: FONTS.heading,
+                      margin: '0 0 14px',
+                    }}>
+                      Stop Doing It All.{isMobile ? ' ' : <br />}
+                      <span style={{ color: isDark ? '#60a5fa' : BRAND.blue }}>Let's Handle It.</span>
+                    </h1>
+                    <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
+                      <LayoutTextFlip
+                        text=""
+                        words={["Your Business", "Growing Brands", "Digital Agencies", "Remote Teams"]}
+                        duration={3000}
+                        wordStyle={{
+                          fontSize: isSmall ? '24px' : (isMobile ? '30px' : '38px'),
+                          fontWeight: '800',
+                          fontFamily: FONTS.heading,
+                          color: isDark ? '#60a5fa' : BRAND.blue,
+                          backgroundColor: isDark ? 'rgba(96, 165, 250, 0.12)' : 'rgba(0, 74, 172, 0.08)',
+                          border: isDark ? '1px solid rgba(96, 165, 250, 0.25)' : '1px solid rgba(0, 74, 172, 0.15)',
+                          padding: '5px 18px',
+                          borderRadius: '12px',
+                        }}
+                      />
+                    </div>
+                  </motion.div>
 
-                {/* CSS keyframes for GPU-accelerated smooth float */}
-                <style>{`
+                  <motion.p
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.35, ease: 'easeOut' }}
+                    style={{ fontSize: isSmall ? '14px' : '15px', color: isDark ? 'rgba(255, 255, 255, 0.65)' : theme.textMuted, margin: '0 0 28px', lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: isMobile ? '100%' : '460px' }}
+                  >
+                    From inbox zero to fully automated CRM pipelines — I help founders and agencies reclaim their time so they can focus on growth, not grunt work.
+                  </motion.p>
+
+                  <motion.div
+                    initial={{ opacity: 0, y: 16 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.45, ease: 'easeOut' }}
+                    style={{ display: 'flex', gap: '12px', justifyContent: isMobile ? 'center' : 'flex-start', flexWrap: 'wrap', alignItems: 'center' }}
+                  >
+                    <button onClick={() => navigate('/services')} style={{ ...btnPrimary, height: '48px', padding: '0 26px', fontSize: '14px', boxShadow: '0 4px 20px rgba(0, 74, 172, 0.4)' }}>View Services <CaretRight size={16} /></button>
+                    <button onClick={() => navigate('/about')} style={{ ...btnOutline, height: '48px', padding: '0 26px', fontSize: '14px', color: isDark ? '#fff' : theme.text, borderColor: isDark ? 'rgba(255, 255, 255, 0.25)' : theme.cardBorder, backgroundColor: isDark ? 'rgba(255, 255, 255, 0.08)' : 'transparent' }}>About Us</button>
+                  </motion.div>
+
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.5, delay: 0.65 }}
+                    style={{ fontSize: '12px', color: isDark ? 'rgba(255, 255, 255, 0.4)' : theme.textMuted, marginTop: '18px', fontFamily: FONTS.body }}
+                  >
+                    Plus <a href="#free-tools" onClick={(e) => { e.preventDefault(); document.getElementById('free-tools')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: isDark ? '#60a5fa' : BRAND.blue, textDecoration: 'none', fontWeight: '500' }}>22+ free tools</a> you can use right now — no sign-up needed.
+                  </motion.p>
+                </div>
+
+                {/* Right: Hero image with floating badges */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+                  style={{
+                    flex: isMobile ? 'none' : '0 0 52%',
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    justifyContent: 'center',
+                    position: 'relative',
+                    alignSelf: 'flex-end',
+                    marginRight: isMobile ? 0 : '-32px',
+                  }}
+                >
+                  {/* Glow effect behind image */}
+                  <div style={{
+                    position: 'absolute',
+                    bottom: '5%',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '80%',
+                    height: '70%',
+                    background: isDark
+                      ? `radial-gradient(ellipse, ${BRAND.blue}30 0%, transparent 70%)`
+                      : `radial-gradient(ellipse, ${BRAND.blue}15 0%, transparent 70%)`,
+                    borderRadius: '50%',
+                    filter: 'blur(60px)',
+                    pointerEvents: 'none',
+                  }} />
+
+                  {/* CSS keyframes for GPU-accelerated smooth float */}
+                  <style>{`
                   @keyframes floatBadge1 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
                   @keyframes floatBadge2 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(12px); } }
                   @keyframes floatBadge3 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
                   @keyframes floatBadge4 { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(9px); } }
                 `}</style>
 
-                {/* Floating badges */}
-                {!isMobile && (() => {
-                  const badgeBase = {
-                    zIndex: 10,
+                  {/* Floating badges */}
+                  {!isMobile && (() => {
+                    const badgeBase = {
+                      zIndex: 10,
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      padding: '10px 16px',
+                      backgroundColor: isDark ? 'rgba(20, 17, 14, 0.9)' : 'rgba(255, 255, 255, 0.95)',
+                      border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
+                      borderRadius: '12px',
+                      backdropFilter: 'blur(12px)',
+                      boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.08)',
+                      willChange: 'transform',
+                    };
+                    const labelStyle = { fontSize: '12px', fontWeight: '600', fontFamily: FONTS.body, color: isDark ? '#fff' : BRAND.brown };
+                    return (
+                      <>
+                        <motion.div
+                          initial={{ opacity: 0, x: -30 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
+                          style={{ ...badgeBase, position: 'absolute', top: '10%', left: '-5%', animation: 'floatBadge1 3.5s ease-in-out infinite' }}
+                        >
+                          <Headphones size={18} weight="duotone" style={{ color: BRAND.blue }} />
+                          <span style={labelStyle}>Customer Support Pro</span>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, x: 30 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 1.0, ease: 'easeOut' }}
+                          style={{ ...badgeBase, position: 'absolute', top: '32%', right: '-2%', animation: 'floatBadge2 4s ease-in-out 0.5s infinite' }}
+                        >
+                          <Lightning size={18} weight="duotone" style={{ color: '#f59e0b' }} />
+                          <span style={labelStyle}>HighLevel Automation</span>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 1.2, ease: 'easeOut' }}
+                          style={{ ...badgeBase, position: 'absolute', bottom: '22%', left: '-2%', animation: 'floatBadge3 4.5s ease-in-out 1s infinite' }}
+                        >
+                          <ChartLineUp size={18} weight="duotone" style={{ color: BRAND.green }} />
+                          <span style={labelStyle}>CRM Builder</span>
+                        </motion.div>
+
+                        <motion.div
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ duration: 0.6, delay: 1.4, ease: 'easeOut' }}
+                          style={{ ...badgeBase, position: 'absolute', bottom: '8%', right: '5%', animation: 'floatBadge4 3.8s ease-in-out 0.8s infinite' }}
+                        >
+                          <ClipboardText size={18} weight="duotone" style={{ color: '#8b5cf6' }} />
+                          <span style={labelStyle}>Admin VA</span>
+                        </motion.div>
+                      </>
+                    );
+                  })()}
+
+                  <div style={{
+                    position: 'relative',
+                    width: '100%',
+                    maxWidth: isMobile ? '400px' : '600px',
+                    minHeight: isMobile ? '300px' : '500px',
                     display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    padding: '10px 16px',
-                    backgroundColor: isDark ? 'rgba(20, 17, 14, 0.9)' : 'rgba(255, 255, 255, 0.95)',
-                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}`,
-                    borderRadius: '12px',
-                    backdropFilter: 'blur(12px)',
-                    boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.4)' : '0 8px 32px rgba(0,0,0,0.08)',
-                    willChange: 'transform',
-                  };
-                  const labelStyle = { fontSize: '12px', fontWeight: '600', fontFamily: FONTS.body, color: isDark ? '#fff' : BRAND.brown };
-                  return (
-                    <>
-                      <motion.div
-                        initial={{ opacity: 0, x: -30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
-                        style={{ ...badgeBase, position: 'absolute', top: '10%', left: '-5%', animation: 'floatBadge1 3.5s ease-in-out infinite' }}
-                      >
-                        <Headphones size={18} weight="duotone" style={{ color: BRAND.blue }} />
-                        <span style={labelStyle}>Customer Support Pro</span>
-                      </motion.div>
+                    alignItems: 'flex-end',
+                    maskImage: `linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%), linear-gradient(to bottom, black 0%, black 85%, transparent 100%)`,
+                    WebkitMaskImage: `linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%), linear-gradient(to bottom, black 0%, black 85%, transparent 100%)`,
+                    maskComposite: 'intersect',
+                    WebkitMaskComposite: 'source-in', // More standard for intersection in older WebKit
+                  }}>
+                    <img
+                      src="/herbg2.png"
+                      alt="BrewedOps - Your dedicated virtual assistant"
+                      onLoad={(e) => {
+                        // Ensure the parent container knows the image is loaded
+                        e.target.style.opacity = 1;
+                      }}
+                      onError={(e) => {
+                        console.error("Failed to load hero image /herbg2.png");
+                        // Fallback to herobg1.png if herbg2 fails
+                        e.target.src = "/herobg1.png";
+                      }}
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        display: 'block',
+                        position: 'relative',
+                        zIndex: 1,
+                        transition: 'opacity 0.3s ease-in-out',
+                      }}
+                    />
+                  </div>
+                </motion.div>
+              </div>
+            </section>
+          </Vortex>
 
-                      <motion.div
-                        initial={{ opacity: 0, x: 30 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 1.0, ease: 'easeOut' }}
-                        style={{ ...badgeBase, position: 'absolute', top: '32%', right: '-2%', animation: 'floatBadge2 4s ease-in-out 0.5s infinite' }}
-                      >
-                        <Lightning size={18} weight="duotone" style={{ color: '#f59e0b' }} />
-                        <span style={labelStyle}>HighLevel Automation</span>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 1.2, ease: 'easeOut' }}
-                        style={{ ...badgeBase, position: 'absolute', bottom: '22%', left: '-2%', animation: 'floatBadge3 4.5s ease-in-out 1s infinite' }}
-                      >
-                        <ChartLineUp size={18} weight="duotone" style={{ color: BRAND.green }} />
-                        <span style={labelStyle}>CRM Builder</span>
-                      </motion.div>
-
-                      <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.6, delay: 1.4, ease: 'easeOut' }}
-                        style={{ ...badgeBase, position: 'absolute', bottom: '8%', right: '5%', animation: 'floatBadge4 3.8s ease-in-out 0.8s infinite' }}
-                      >
-                        <ClipboardText size={18} weight="duotone" style={{ color: '#8b5cf6' }} />
-                        <span style={labelStyle}>Admin VA</span>
-                      </motion.div>
-                    </>
-                  );
-                })()}
-
-                <div style={{
-                  position: 'relative',
-                  width: '100%',
-                  maxWidth: isMobile ? '400px' : '600px',
-                  maskImage: `linear-gradient(to right, transparent 0%, black 8%, black 85%, transparent 100%), linear-gradient(to bottom, black 0%, black 88%, transparent 100%)`,
-                  WebkitMaskImage: `linear-gradient(to right, transparent 0%, black 8%, black 85%, transparent 100%), linear-gradient(to bottom, black 0%, black 88%, transparent 100%)`,
-                  maskComposite: 'intersect',
-                  WebkitMaskComposite: 'destination-in',
-                }}>
-                  <img
-                    src="/herbg2.png"
-                    alt="BrewedOps - Your dedicated virtual assistant"
-                    style={{
-                      width: '100%',
-                      height: 'auto',
-                      display: 'block',
-                      position: 'relative',
-                      zIndex: 1,
-                    }}
-                  />
-                </div>
-              </motion.div>
-            </div>
-          </section>
-        </Vortex>
-
-        {/* Animated Wave Divider */}
-        <div style={{ position: 'relative', marginTop: '-2px', lineHeight: 0, overflow: 'hidden' }}>
-          <svg
-            viewBox="0 0 1440 120"
-            preserveAspectRatio="none"
-            style={{ display: 'block', width: '100%', height: isMobile ? '50px' : '80px' }}
-          >
-            <defs>
-              <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor={BRAND.blue} stopOpacity="0.3" />
-                <stop offset="50%" stopColor={BRAND.green} stopOpacity="0.2" />
-                <stop offset="100%" stopColor={BRAND.blue} stopOpacity="0.3" />
-              </linearGradient>
-              <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
-                <stop offset="0%" stopColor={BRAND.blue} stopOpacity="0.15" />
-                <stop offset="50%" stopColor={BRAND.green} stopOpacity="0.1" />
-                <stop offset="100%" stopColor={BRAND.blue} stopOpacity="0.15" />
-              </linearGradient>
-            </defs>
-            {/* Back wave - slower */}
-            <path
-              fill="url(#waveGrad2)"
-              d="M0,60 C180,100 360,20 540,60 C720,100 900,20 1080,60 C1260,100 1440,40 1440,40 L1440,120 L0,120 Z"
-              style={{
-                animation: 'waveMove2 8s ease-in-out infinite alternate',
-              }}
-            />
-            {/* Middle wave */}
-            <path
-              fill="url(#waveGrad1)"
-              d="M0,80 C240,40 480,100 720,60 C960,20 1200,90 1440,50 L1440,120 L0,120 Z"
-              style={{
-                animation: 'waveMove1 6s ease-in-out infinite alternate',
-              }}
-            />
-            {/* Front wave - matches next section bg */}
-            <path
-              fill={isDark ? '#080604' : '#f5f0eb'}
-              d="M0,90 C160,70 320,110 480,85 C640,60 800,100 960,80 C1120,60 1280,95 1440,75 L1440,120 L0,120 Z"
-              style={{
-                animation: 'waveMove3 5s ease-in-out infinite alternate',
-              }}
-            />
-          </svg>
-          <style>{`
+          {/* Animated Wave Divider */}
+          <div style={{ position: 'relative', marginTop: '-2px', lineHeight: 0, overflow: 'hidden' }}>
+            <svg
+              viewBox="0 0 1440 120"
+              preserveAspectRatio="none"
+              style={{ display: 'block', width: '100%', height: isMobile ? '50px' : '80px' }}
+            >
+              <defs>
+                <linearGradient id="waveGrad1" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor={BRAND.blue} stopOpacity="0.3" />
+                  <stop offset="50%" stopColor={BRAND.green} stopOpacity="0.2" />
+                  <stop offset="100%" stopColor={BRAND.blue} stopOpacity="0.3" />
+                </linearGradient>
+                <linearGradient id="waveGrad2" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stopColor={BRAND.blue} stopOpacity="0.15" />
+                  <stop offset="50%" stopColor={BRAND.green} stopOpacity="0.1" />
+                  <stop offset="100%" stopColor={BRAND.blue} stopOpacity="0.15" />
+                </linearGradient>
+              </defs>
+              {/* Back wave - slower */}
+              <path
+                fill="url(#waveGrad2)"
+                d="M0,60 C180,100 360,20 540,60 C720,100 900,20 1080,60 C1260,100 1440,40 1440,40 L1440,120 L0,120 Z"
+                style={{
+                  animation: 'waveMove2 8s ease-in-out infinite alternate',
+                }}
+              />
+              {/* Middle wave */}
+              <path
+                fill="url(#waveGrad1)"
+                d="M0,80 C240,40 480,100 720,60 C960,20 1200,90 1440,50 L1440,120 L0,120 Z"
+                style={{
+                  animation: 'waveMove1 6s ease-in-out infinite alternate',
+                }}
+              />
+              {/* Front wave - matches next section bg */}
+              <path
+                fill={isDark ? '#080604' : '#f5f0eb'}
+                d="M0,90 C160,70 320,110 480,85 C640,60 800,100 960,80 C1120,60 1280,95 1440,75 L1440,120 L0,120 Z"
+                style={{
+                  animation: 'waveMove3 5s ease-in-out infinite alternate',
+                }}
+              />
+            </svg>
+            <style>{`
             @keyframes waveMove1 {
               0% { d: path("M0,80 C240,40 480,100 720,60 C960,20 1200,90 1440,50 L1440,120 L0,120 Z"); }
               100% { d: path("M0,60 C240,90 480,30 720,70 C960,100 1200,40 1440,70 L1440,120 L0,120 Z"); }
@@ -1230,579 +1243,579 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               100% { d: path("M0,75 C160,95 320,65 480,90 C640,110 800,70 960,95 C1120,110 1280,75 1440,90 L1440,120 L0,120 Z"); }
             }
           `}</style>
-        </div>
-      </div>
-
-      {/* ABOUT SECTION */}
-      <section style={{
-        padding: isMobile ? '60px 20px' : '100px 64px',
-        backgroundColor: isDark ? '#080604' : '#f5f0eb',
-        position: 'relative',
-        overflow: 'hidden',
-      }}>
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          {/* Top: ABOUT heading + Description */}
-          <ScrollReveal>
-          <div style={{
-            display: 'flex',
-            flexDirection: isMobile ? 'column' : 'row',
-            alignItems: isMobile ? 'flex-start' : 'center',
-            gap: isMobile ? '24px' : '60px',
-            marginBottom: isMobile ? '48px' : '72px',
-          }}>
-            <h2 style={{
-              fontSize: isSmall ? '56px' : (isMobile ? '72px' : '120px'),
-              fontWeight: '800',
-              color: isDark ? '#ffffff' : BRAND.brown,
-              fontFamily: FONTS.heading,
-              lineHeight: 1,
-              margin: 0,
-              letterSpacing: '-0.04em',
-              flexShrink: 0,
-            }}>
-              ABOUT
-            </h2>
-            <p style={{
-              fontSize: isSmall ? '17px' : (isMobile ? '20px' : '26px'),
-              lineHeight: 1.45,
-              fontFamily: FONTS.heading,
-              fontWeight: '500',
-              margin: 0,
-              color: isDark ? 'rgba(255,255,255,0.85)' : '#3F200C',
-            }}>
-              <span style={{ color: '#FF6B6B' }}>We help growing brands streamline operations and automate workflows</span>
-              , delivering dedicated VA support, CRM automation, and custom-built digital tools with 11+ years of expertise
-            </p>
           </div>
-          </ScrollReveal>
+        </div>
 
-          {/* Value Cards */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: isSmall ? '1fr 1fr' : (isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'),
-            gap: isSmall ? '12px' : '16px',
-          }}>
-            {[
-              { Icon: Heart, title: 'Passion', description: 'We love what we do and it shows in every project we deliver.', color: '#ef4444', weight: 'fill' },
-              { Icon: LightbulbFilament, title: 'Innovation', description: 'Always pushing boundaries to find creative solutions.', color: '#3b82f6', weight: 'fill' },
-              { Icon: ChartLineUp, title: 'Growth', description: 'Committed to continuous learning and improvement.', color: '#f59e0b', weight: 'bold' },
-              { Icon: ShieldCheck, title: 'Trust', description: 'Building lasting relationships through transparency and reliability.', color: '#22c55e', weight: 'fill' },
-            ].map((value, idx) => (
-              <ScrollReveal key={value.title} delay={0.1 * idx} style={{ height: '100%' }}>
+        {/* ABOUT SECTION */}
+        <section style={{
+          padding: isMobile ? '60px 20px' : '100px 64px',
+          backgroundColor: isDark ? '#080604' : '#f5f0eb',
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+            {/* Top: ABOUT heading + Description */}
+            <ScrollReveal>
               <div style={{
-                padding: isSmall ? '24px 16px' : '36px 28px',
-                backgroundColor: isDark ? '#0e0c09' : '#ffffff',
-                borderRadius: '16px',
-                border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid #e8e0d4',
-                textAlign: 'center',
-                position: 'relative',
-                overflow: 'hidden',
-                height: '100%',
-                boxSizing: 'border-box',
+                display: 'flex',
+                flexDirection: isMobile ? 'column' : 'row',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                gap: isMobile ? '24px' : '60px',
+                marginBottom: isMobile ? '48px' : '72px',
               }}>
-                {/* Grid pattern */}
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: isDark
-                    ? 'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)'
-                    : 'linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)',
-                  backgroundSize: '28px 28px',
-                  pointerEvents: 'none',
-                }} />
-                <div style={{ position: 'relative', zIndex: 1 }}>
-                  <div style={{
-                    width: '56px',
-                    height: '56px',
-                    borderRadius: '14px',
-                    backgroundColor: `${value.color}15`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    margin: '0 auto 20px',
-                  }}>
-                    <value.Icon size={28} color={value.color} weight={value.weight} />
-                  </div>
-                  <h3 style={{
-                    fontSize: isSmall ? '16px' : '18px',
-                    fontWeight: '700',
-                    color: isDark ? '#ffffff' : BRAND.brown,
-                    fontFamily: FONTS.heading,
-                    margin: '0 0 8px',
-                  }}>
-                    {value.title}
-                  </h3>
-                  <p style={{
-                    fontSize: isSmall ? '12px' : '14px',
-                    color: isDark ? 'rgba(255,255,255,0.55)' : '#7a6652',
-                    lineHeight: 1.6,
-                    fontFamily: FONTS.body,
-                    margin: 0,
-                  }}>
-                    {value.description}
-                  </p>
-                </div>
-              </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* SERVICES OVERVIEW */}
-      <section style={{
-        padding: isMobile ? '60px 20px' : '80px 64px',
-        backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
-      }}>
-        <ScrollReveal>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <p style={{
-              fontSize: '11px',
-              fontWeight: '600',
-              letterSpacing: '4px',
-              color: isDark ? '#a09585' : '#7a6652',
-              marginBottom: '12px',
-              fontFamily: FONTS.body,
-              textTransform: 'uppercase',
-            }}>
-              Services
-            </p>
-            <h2 style={{
-              fontSize: isMobile ? '28px' : '40px',
-              fontWeight: '800',
-              color: isDark ? '#fff' : BRAND.brown,
-              fontFamily: FONTS.heading,
-              lineHeight: '1.2',
-              margin: '0 0 12px',
-            }}>
-              How I Can Help
-            </h2>
-            <p style={{ fontSize: '16px', color: isDark ? 'rgba(255,255,255,0.6)' : theme.textMuted, fontFamily: FONTS.body, maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
-              11+ years of customer support experience packaged into services that help your business grow.
-            </p>
-          </div>
-
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '20px' }}>
-            {[
-              {
-                icon: Headphones,
-                title: 'Customer Support',
-                color: BRAND.blue,
-                description: 'Professional customer service — email, phone, live chat, and ticket management.',
-                features: ['Tier 1 & Tier 2 Support', 'SLA Management', 'CRM-Based Ticketing', 'Quality Monitoring'],
-              },
-              {
-                icon: ClipboardText,
-                title: 'Admin VA',
-                color: BRAND.green,
-                description: 'Day-to-day operations handled so you can focus on growing your business.',
-                features: ['Inbox & Calendar Management', 'Data Entry & Reports', 'Travel & Scheduling', 'Process Documentation'],
-              },
-              {
-                icon: Lightning,
-                title: 'GHL Automation',
-                color: '#f59e0b',
-                description: 'GoHighLevel CRM setup, workflow automation, and pipeline management.',
-                features: ['Full CRM Build & Config', 'Automated Follow-ups', 'Pipeline & Lead Scoring', 'SMS & Email Sequences'],
-              },
-              {
-                icon: Code,
-                title: 'Web Development',
-                color: '#8b5cf6',
-                description: 'Web apps, dashboards, and tools — vibe coded with AI-assisted modern tech stacks.',
-                features: ['React & Vite Apps', 'AI-Assisted Development', 'Custom Dashboards', 'Responsive Design'],
-              },
-            ].map((service) => {
-              const ServiceIcon = service.icon;
-              return (
-                <div
-                  key={service.title}
-                  style={{
-                    padding: isMobile ? '24px' : '32px',
-                    backgroundColor: isDark ? '#171411' : '#ffffff',
-                    border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
-                    borderRadius: '16px',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = service.color; e.currentTarget.style.boxShadow = `0 0 24px ${service.color}15`; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = isDark ? '#2a2420' : '#e8e0d4'; e.currentTarget.style.boxShadow = 'none'; }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                    <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: service.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <ServiceIcon size={22} style={{ color: service.color }} />
-                    </div>
-                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: 0 }}>
-                      {service.title}
-                    </h3>
-                  </div>
-                  <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 16px' }}>
-                    {service.description}
-                  </p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {service.features.map((feature) => (
-                      <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: service.color, flexShrink: 0 }} />
-                        <span style={{ fontSize: '13px', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body }}>{feature}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: '32px' }}>
-            <button onClick={() => navigate('/services')} style={{ ...btnOutline, height: '44px', padding: '0 24px', fontSize: '14px', color: isDark ? '#fff' : BRAND.brown, borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.cardBorder }}>
-              View All Services <CaretRight size={16} />
-            </button>
-          </div>
-        </div>
-        </ScrollReveal>
-      </section>
-
-      {/* PROJECTS SHOWCASE */}
-      <section style={{
-        padding: isMobile ? '60px 20px' : '80px 64px',
-        backgroundColor: isDark ? '#171411' : '#ffffff',
-        borderTop: '1px solid ' + theme.cardBorder,
-        borderBottom: '1px solid ' + theme.cardBorder,
-      }}>
-        <ScrollReveal>
-        <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-            <p style={{
-              fontSize: '11px',
-              fontWeight: '600',
-              letterSpacing: '4px',
-              color: isDark ? '#a09585' : '#7a6652',
-              marginBottom: '12px',
-              fontFamily: FONTS.body,
-              textTransform: 'uppercase',
-            }}>
-              Projects
-            </p>
-            <h2 style={{
-              fontSize: isMobile ? '28px' : '40px',
-              fontWeight: '800',
-              color: isDark ? '#fff' : BRAND.brown,
-              fontFamily: FONTS.heading,
-              lineHeight: '1.2',
-              margin: 0,
-            }}>
-              Built by a VA, for VAs
-            </h2>
-          </div>
-
-          <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '24px' }}>
-            {/* BrewedOps Tools */}
-            <div style={{
-              flex: 1,
-              padding: isMobile ? '24px' : '32px',
-              backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
-              border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
-              borderRadius: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: BRAND.blue + '15', borderRadius: '100px', marginBottom: '16px', alignSelf: 'flex-start' }}>
-                <Wrench size={12} style={{ color: BRAND.blue }} />
-                <span style={{ fontSize: '11px', fontWeight: '600', color: BRAND.blue, fontFamily: FONTS.body }}>WEB APP</span>
-              </div>
-              <h3 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: '0 0 12px' }}>
-                BrewedOps Tools
-              </h3>
-              <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px', flex: 1 }}>
-                A productivity hub with 22+ free tools for Filipino VAs and freelancers — image editing, PDF tools, finance tracking, task management, and more. All browser-based, no installs needed.
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
-                {['React', 'Supabase', 'Vite', 'Tailwind CSS'].map((tech) => (
-                  <span key={tech} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '100px', backgroundColor: isDark ? '#1e1a16' : '#e8e0d4', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body, fontWeight: '500' }}>{tech}</span>
-                ))}
-              </div>
-              <button onClick={() => navigate('/portfolio')} style={{ ...btnPrimary, height: '40px', padding: '0 20px', fontSize: '13px', alignSelf: 'flex-start' }}>
-                View Project <CaretRight size={16} />
-              </button>
-            </div>
-
-            {/* Fuelyx */}
-            <div style={{
-              flex: 1,
-              padding: isMobile ? '24px' : '32px',
-              backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
-              border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
-              borderRadius: '16px',
-              display: 'flex',
-              flexDirection: 'column',
-            }}>
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: '#14b8a615', borderRadius: '100px', marginBottom: '16px', alignSelf: 'flex-start' }}>
-                <Globe size={12} style={{ color: '#14b8a6' }} />
-                <span style={{ fontSize: '11px', fontWeight: '600', color: '#14b8a6', fontFamily: FONTS.body }}>MOBILE APP</span>
-              </div>
-              <h3 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: '0 0 12px' }}>
-                Fuelyx
-              </h3>
-              <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px', flex: 1 }}>
-                A calorie tracking and fasting app built for Filipinos. Log local foods, monitor fasting windows, scan meals with AI, and hit your health goals — all in one app.
-              </p>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
-                {['React Native', 'Expo', 'Supabase', 'AI Scanner'].map((tech) => (
-                  <span key={tech} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '100px', backgroundColor: isDark ? '#1e1a16' : '#e8e0d4', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body, fontWeight: '500' }}>{tech}</span>
-                ))}
-              </div>
-              <button onClick={() => navigate('/fuelyx')} style={{ ...btnPrimary, height: '40px', padding: '0 20px', fontSize: '13px', backgroundColor: '#14b8a6', boxShadow: '0 4px 16px rgba(20,184,166,0.3)', alignSelf: 'flex-start' }}>
-                Learn More <CaretRight size={16} />
-              </button>
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'center', marginTop: '32px' }}>
-            <button onClick={() => navigate('/portfolio')} style={{ ...btnOutline, height: '44px', padding: '0 24px', fontSize: '14px', color: isDark ? '#fff' : BRAND.brown, borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.cardBorder }}>
-              View Full Portfolio <CaretRight size={16} />
-            </button>
-          </div>
-        </div>
-        </ScrollReveal>
-      </section>
-
-      {/* ZIGZAG TOOLS TIMELINE */}
-      <section id="free-tools" style={{
-        backgroundColor: isDark ? '#0d0b09' : BRAND.cream,
-        padding: isMobile ? '60px 20px' : '80px 64px',
-        position: 'relative',
-      }}>
-        {/* Section Header */}
-        <ScrollReveal>
-        <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 60px' }}>
-          <p style={{
-            fontSize: '11px',
-            fontWeight: '600',
-            letterSpacing: '4px',
-            color: isDark ? '#a09585' : '#7a6652',
-            marginBottom: '12px',
-            fontFamily: FONTS.body,
-            textTransform: 'uppercase',
-          }}>
-            Bonus
-          </p>
-          <h2 style={{
-            fontSize: isMobile ? '32px' : '48px',
-            fontWeight: '800',
-            color: isDark ? '#fff' : BRAND.brown,
-            fontFamily: FONTS.heading,
-            lineHeight: '1.15',
-          }}>
-            22+ Free Productivity Tools
-          </h2>
-        </div>
-        </ScrollReveal>
-
-        {/* Timeline Container */}
-        <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative' }}>
-          {/* Vertical center line (desktop only) */}
-          {!isMobile && (
-            <div style={{
-              position: 'absolute',
-              left: '50%',
-              top: '40px',
-              bottom: '40px',
-              width: '2px',
-              background: isDark
-                ? 'linear-gradient(to bottom, transparent, #2a2420 10%, #2a2420 90%, transparent)'
-                : 'linear-gradient(to bottom, transparent, #d4c8b8 10%, #d4c8b8 90%, transparent)',
-            }} />
-          )}
-
-          {TOOL_TIMELINE.map((category, index) => {
-            const isEven = index % 2 === 0;
-            const IconComp = category.icon;
-            const accentColor = category.accent;
-            const accentBg = isDark
-              ? `${accentColor}25`
-              : `${accentColor}15`;
-
-            return (
-              <div
-                key={category.name}
-                style={{
-                  display: 'flex',
-                  flexDirection: isMobile ? 'column' : (isEven ? 'row' : 'row-reverse'),
-                  alignItems: isMobile ? 'flex-start' : 'center',
-                  gap: isMobile ? '0' : '60px',
-                  marginBottom: index < TOOL_TIMELINE.length - 1 ? (isMobile ? '48px' : '64px') : 0,
-                  position: 'relative',
-                }}
-              >
-                {/* Text Content */}
-                <div style={{
-                  flex: 1,
-                  textAlign: isMobile ? 'left' : (isEven ? 'right' : 'left'),
-                  paddingLeft: isMobile ? '60px' : 0,
-                }}>
-                  <h3 style={{
-                    fontSize: isMobile ? '22px' : '28px',
-                    fontWeight: '700',
-                    color: isDark ? '#f5f0eb' : BRAND.brown,
-                    fontFamily: FONTS.heading,
-                    marginBottom: '8px',
-                  }}>
-                    {category.name}
-                  </h3>
-                  <p style={{
-                    fontSize: isMobile ? '14px' : '16px',
-                    color: isDark ? '#a09585' : '#7a6652',
-                    lineHeight: '1.7',
-                    fontFamily: FONTS.body,
-                    marginBottom: '16px',
-                  }}>
-                    {category.description}
-                  </p>
-                  <div style={{
-                    display: 'flex',
-                    flexWrap: 'wrap',
-                    gap: '8px',
-                    justifyContent: isMobile ? 'flex-start' : (isEven ? 'flex-end' : 'flex-start'),
-                  }}>
-                    {category.tools.map((tool) => (
-                      <button
-                        key={tool.path}
-                        onClick={() => navigate(tool.path)}
-                        style={{
-                          padding: '6px 14px',
-                          fontSize: '12px',
-                          fontWeight: '500',
-                          fontFamily: FONTS.body,
-                          color: isDark ? '#d4c8b8' : '#5a4a3a',
-                          backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(63,32,12,0.06)',
-                          border: `1px solid ${isDark ? '#2a2420' : '#e0d4c4'}`,
-                          borderRadius: '100px',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s',
-                        }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(63,32,12,0.12)';
-                          e.currentTarget.style.borderColor = accentColor;
-                          e.currentTarget.style.color = isDark ? '#fff' : accentColor;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(63,32,12,0.06)';
-                          e.currentTarget.style.borderColor = isDark ? '#2a2420' : '#e0d4c4';
-                          e.currentTarget.style.color = isDark ? '#d4c8b8' : '#5a4a3a';
-                        }}
-                      >
-                        {tool.title}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Icon Circle */}
-                <div style={{
-                  width: isMobile ? '40px' : '72px',
-                  height: isMobile ? '40px' : '72px',
-                  borderRadius: '50%',
-                  backgroundColor: accentBg,
-                  border: `2px solid ${accentColor}`,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
+                <h2 style={{
+                  fontSize: isSmall ? '56px' : (isMobile ? '72px' : '120px'),
+                  fontWeight: '800',
+                  color: isDark ? '#ffffff' : BRAND.brown,
+                  fontFamily: FONTS.heading,
+                  lineHeight: 1,
+                  margin: 0,
+                  letterSpacing: '-0.04em',
                   flexShrink: 0,
-                  position: isMobile ? 'absolute' : 'relative',
-                  left: isMobile ? '0' : 'auto',
-                  top: isMobile ? '0' : 'auto',
-                  zIndex: 2,
-                  boxShadow: `0 0 20px ${accentColor}20`,
                 }}>
-                  <IconComp size={isMobile ? 18 : 28} style={{ color: accentColor }} />
-                </div>
-
-                {/* Empty flex spacer for desktop zigzag */}
-                {!isMobile && <div style={{ flex: 1 }} />}
+                  ABOUT
+                </h2>
+                <p style={{
+                  fontSize: isSmall ? '17px' : (isMobile ? '20px' : '26px'),
+                  lineHeight: 1.45,
+                  fontFamily: FONTS.heading,
+                  fontWeight: '500',
+                  margin: 0,
+                  color: isDark ? 'rgba(255,255,255,0.85)' : '#3F200C',
+                }}>
+                  <span style={{ color: '#FF6B6B' }}>We help growing brands streamline operations and automate workflows</span>
+                  , delivering dedicated VA support, CRM automation, and custom-built digital tools with 11+ years of expertise
+                </p>
               </div>
-            );
-          })}
-        </div>
-      </section>
+            </ScrollReveal>
 
-      {/* TOOLS SHOWCASE */}
-      <section style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder, overflow: 'hidden' }}>
-        
-        {/* Desktop: 3D Marquee */}
-        {isDesktop && (
-          <ThreeDMarquee isDark={isDark} theme={theme} />
-        )}
-
-        {/* Mobile: Tool Cards Grid */}
-        {!isDesktop && (
-          <div style={{ padding: isSmall ? '48px 20px' : '64px 32px', maxWidth: '1100px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-              <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 12px', fontFamily: FONTS.heading }}>
-                Free Tools — No Sign-Up Needed
-              </h2>
-              <p style={{ fontSize: '15px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>
-                Bonus tools to help with your daily workflow
-              </p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : 'repeat(2, 1fr)', gap: '16px' }}>
-              {TOOL_CATEGORIES.map((category) => (
-                <div key={category.name} style={{ backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '16px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '10px', textTransform: 'uppercase', fontFamily: FONTS.body }}>
-                    {category.name}
+            {/* Value Cards */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: isSmall ? '1fr 1fr' : (isMobile ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)'),
+              gap: isSmall ? '12px' : '16px',
+            }}>
+              {[
+                { Icon: Heart, title: 'Passion', description: 'We love what we do and it shows in every project we deliver.', color: '#ef4444', weight: 'fill' },
+                { Icon: LightbulbFilament, title: 'Innovation', description: 'Always pushing boundaries to find creative solutions.', color: '#3b82f6', weight: 'fill' },
+                { Icon: ChartLineUp, title: 'Growth', description: 'Committed to continuous learning and improvement.', color: '#f59e0b', weight: 'bold' },
+                { Icon: ShieldCheck, title: 'Trust', description: 'Building lasting relationships through transparency and reliability.', color: '#22c55e', weight: 'fill' },
+              ].map((value, idx) => (
+                <ScrollReveal key={value.title} delay={0.1 * idx} style={{ height: '100%' }}>
+                  <div style={{
+                    padding: isSmall ? '24px 16px' : '36px 28px',
+                    backgroundColor: isDark ? '#0e0c09' : '#ffffff',
+                    borderRadius: '16px',
+                    border: isDark ? '1px solid rgba(255,255,255,0.07)' : '1px solid #e8e0d4',
+                    textAlign: 'center',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    height: '100%',
+                    boxSizing: 'border-box',
+                  }}>
+                    {/* Grid pattern */}
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backgroundImage: isDark
+                        ? 'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)'
+                        : 'linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)',
+                      backgroundSize: '28px 28px',
+                      pointerEvents: 'none',
+                    }} />
+                    <div style={{ position: 'relative', zIndex: 1 }}>
+                      <div style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '14px',
+                        backgroundColor: `${value.color}15`,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 20px',
+                      }}>
+                        <value.Icon size={28} color={value.color} weight={value.weight} />
+                      </div>
+                      <h3 style={{
+                        fontSize: isSmall ? '16px' : '18px',
+                        fontWeight: '700',
+                        color: isDark ? '#ffffff' : BRAND.brown,
+                        fontFamily: FONTS.heading,
+                        margin: '0 0 8px',
+                      }}>
+                        {value.title}
+                      </h3>
+                      <p style={{
+                        fontSize: isSmall ? '12px' : '14px',
+                        color: isDark ? 'rgba(255,255,255,0.55)' : '#7a6652',
+                        lineHeight: 1.6,
+                        fontFamily: FONTS.body,
+                        margin: 0,
+                      }}>
+                        {value.description}
+                      </p>
+                    </div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-                    {category.tools.map((tool) => {
-                      const IconComponent = tool.icon;
-                      return (
-                        <button
-                          key={tool.path}
-                          onClick={() => navigate(tool.path)}
-                          style={{ padding: '8px', backgroundColor: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px' }}
-                        >
-                          <IconComponent size={16} style={{ color: theme.textMuted }} />
-                          <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body }}>{tool.title}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>
-        )}
-      </section>
+        </section>
 
-      {/* Productivity CTA */}
-      <section id="services" style={{ padding: isSmall ? '48px 20px' : '64px 32px', backgroundColor: isDark ? theme.bg : '#faf8f5' }}>
-        <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.blue + '10', borderRadius: '100px', marginBottom: '16px' }}>
-            <Lock size={12} style={{ color: BRAND.blue }} />
-            <span style={{ fontSize: '11px', fontWeight: '600', color: BRAND.blue, fontFamily: FONTS.body }}>LOGIN REQUIRED</span>
-          </div>
-          <h3 style={{ fontSize: isSmall ? '22px' : '28px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 12px', fontFamily: FONTS.heading }}>
-            Unlock the Productivity Suite
-          </h3>
-          <p style={{ fontSize: '15px', color: theme.textMuted, margin: '0 0 24px', fontFamily: FONTS.body }}>
-            Finance Tracker, VA Kita, Task Manager & Brewed Notes — synced across devices
-          </p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '24px' }}>
-            {PRODUCTIVITY_TOOLS.map((tool) => {
-              const IconComponent = tool.icon;
+        {/* SERVICES OVERVIEW */}
+        <section style={{
+          padding: isMobile ? '60px 20px' : '80px 64px',
+          backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
+        }}>
+          <ScrollReveal>
+            <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                <p style={{
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  letterSpacing: '4px',
+                  color: isDark ? '#a09585' : '#7a6652',
+                  marginBottom: '12px',
+                  fontFamily: FONTS.body,
+                  textTransform: 'uppercase',
+                }}>
+                  Services
+                </p>
+                <h2 style={{
+                  fontSize: isMobile ? '28px' : '40px',
+                  fontWeight: '800',
+                  color: isDark ? '#fff' : BRAND.brown,
+                  fontFamily: FONTS.heading,
+                  lineHeight: '1.2',
+                  margin: '0 0 12px',
+                }}>
+                  How I Can Help
+                </h2>
+                <p style={{ fontSize: '16px', color: isDark ? 'rgba(255,255,255,0.6)' : theme.textMuted, fontFamily: FONTS.body, maxWidth: '550px', margin: '0 auto', lineHeight: '1.7' }}>
+                  11+ years of customer support experience packaged into services that help your business grow.
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: '20px' }}>
+                {[
+                  {
+                    icon: Headphones,
+                    title: 'Customer Support',
+                    color: BRAND.blue,
+                    description: 'Professional customer service — email, phone, live chat, and ticket management.',
+                    features: ['Tier 1 & Tier 2 Support', 'SLA Management', 'CRM-Based Ticketing', 'Quality Monitoring'],
+                  },
+                  {
+                    icon: ClipboardText,
+                    title: 'Admin VA',
+                    color: BRAND.green,
+                    description: 'Day-to-day operations handled so you can focus on growing your business.',
+                    features: ['Inbox & Calendar Management', 'Data Entry & Reports', 'Travel & Scheduling', 'Process Documentation'],
+                  },
+                  {
+                    icon: Lightning,
+                    title: 'GHL Automation',
+                    color: '#f59e0b',
+                    description: 'GoHighLevel CRM setup, workflow automation, and pipeline management.',
+                    features: ['Full CRM Build & Config', 'Automated Follow-ups', 'Pipeline & Lead Scoring', 'SMS & Email Sequences'],
+                  },
+                  {
+                    icon: Code,
+                    title: 'Web Development',
+                    color: '#8b5cf6',
+                    description: 'Web apps, dashboards, and tools — vibe coded with AI-assisted modern tech stacks.',
+                    features: ['React & Vite Apps', 'AI-Assisted Development', 'Custom Dashboards', 'Responsive Design'],
+                  },
+                ].map((service) => {
+                  const ServiceIcon = service.icon;
+                  return (
+                    <div
+                      key={service.title}
+                      style={{
+                        padding: isMobile ? '24px' : '32px',
+                        backgroundColor: isDark ? '#171411' : '#ffffff',
+                        border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
+                        borderRadius: '16px',
+                        transition: 'all 0.2s',
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.borderColor = service.color; e.currentTarget.style.boxShadow = `0 0 24px ${service.color}15`; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.borderColor = isDark ? '#2a2420' : '#e8e0d4'; e.currentTarget.style.boxShadow = 'none'; }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
+                        <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: service.color + '15', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <ServiceIcon size={22} style={{ color: service.color }} />
+                        </div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: 0 }}>
+                          {service.title}
+                        </h3>
+                      </div>
+                      <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 16px' }}>
+                        {service.description}
+                      </p>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        {service.features.map((feature) => (
+                          <div key={feature} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: service.color, flexShrink: 0 }} />
+                            <span style={{ fontSize: '13px', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body }}>{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: '32px' }}>
+                <button onClick={() => navigate('/services')} style={{ ...btnOutline, height: '44px', padding: '0 24px', fontSize: '14px', color: isDark ? '#fff' : BRAND.brown, borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.cardBorder }}>
+                  View All Services <CaretRight size={16} />
+                </button>
+              </div>
+            </div>
+          </ScrollReveal>
+        </section>
+
+        {/* PROJECTS SHOWCASE */}
+        <section style={{
+          padding: isMobile ? '60px 20px' : '80px 64px',
+          backgroundColor: isDark ? '#171411' : '#ffffff',
+          borderTop: '1px solid ' + theme.cardBorder,
+          borderBottom: '1px solid ' + theme.cardBorder,
+        }}>
+          <ScrollReveal>
+            <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '48px' }}>
+                <p style={{
+                  fontSize: '11px',
+                  fontWeight: '600',
+                  letterSpacing: '4px',
+                  color: isDark ? '#a09585' : '#7a6652',
+                  marginBottom: '12px',
+                  fontFamily: FONTS.body,
+                  textTransform: 'uppercase',
+                }}>
+                  Projects
+                </p>
+                <h2 style={{
+                  fontSize: isMobile ? '28px' : '40px',
+                  fontWeight: '800',
+                  color: isDark ? '#fff' : BRAND.brown,
+                  fontFamily: FONTS.heading,
+                  lineHeight: '1.2',
+                  margin: 0,
+                }}>
+                  Built by a VA, for VAs
+                </h2>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', gap: '24px' }}>
+                {/* BrewedOps Tools */}
+                <div style={{
+                  flex: 1,
+                  padding: isMobile ? '24px' : '32px',
+                  backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
+                  border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
+                  borderRadius: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: BRAND.blue + '15', borderRadius: '100px', marginBottom: '16px', alignSelf: 'flex-start' }}>
+                    <Wrench size={12} style={{ color: BRAND.blue }} />
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: BRAND.blue, fontFamily: FONTS.body }}>WEB APP</span>
+                  </div>
+                  <h3 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: '0 0 12px' }}>
+                    BrewedOps Tools
+                  </h3>
+                  <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px', flex: 1 }}>
+                    A productivity hub with 22+ free tools for Filipino VAs and freelancers — image editing, PDF tools, finance tracking, task management, and more. All browser-based, no installs needed.
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+                    {['React', 'Supabase', 'Vite', 'Tailwind CSS'].map((tech) => (
+                      <span key={tech} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '100px', backgroundColor: isDark ? '#1e1a16' : '#e8e0d4', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body, fontWeight: '500' }}>{tech}</span>
+                    ))}
+                  </div>
+                  <button onClick={() => navigate('/portfolio')} style={{ ...btnPrimary, height: '40px', padding: '0 20px', fontSize: '13px', alignSelf: 'flex-start' }}>
+                    View Project <CaretRight size={16} />
+                  </button>
+                </div>
+
+                {/* Fuelyx */}
+                <div style={{
+                  flex: 1,
+                  padding: isMobile ? '24px' : '32px',
+                  backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
+                  border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'),
+                  borderRadius: '16px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: '#14b8a615', borderRadius: '100px', marginBottom: '16px', alignSelf: 'flex-start' }}>
+                    <Globe size={12} style={{ color: '#14b8a6' }} />
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: '#14b8a6', fontFamily: FONTS.body }}>MOBILE APP</span>
+                  </div>
+                  <h3 style={{ fontSize: isMobile ? '22px' : '26px', fontWeight: '700', color: isDark ? '#f5f0eb' : BRAND.brown, fontFamily: FONTS.heading, margin: '0 0 12px' }}>
+                    Fuelyx
+                  </h3>
+                  <p style={{ fontSize: '14px', color: isDark ? '#a09585' : '#7a6652', lineHeight: '1.7', fontFamily: FONTS.body, margin: '0 0 20px', flex: 1 }}>
+                    A calorie tracking and fasting app built for Filipinos. Log local foods, monitor fasting windows, scan meals with AI, and hit your health goals — all in one app.
+                  </p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+                    {['React Native', 'Expo', 'Supabase', 'AI Scanner'].map((tech) => (
+                      <span key={tech} style={{ fontSize: '11px', padding: '4px 10px', borderRadius: '100px', backgroundColor: isDark ? '#1e1a16' : '#e8e0d4', color: isDark ? '#d4c8b8' : '#5a4a3a', fontFamily: FONTS.body, fontWeight: '500' }}>{tech}</span>
+                    ))}
+                  </div>
+                  <button onClick={() => navigate('/fuelyx')} style={{ ...btnPrimary, height: '40px', padding: '0 20px', fontSize: '13px', backgroundColor: '#14b8a6', boxShadow: '0 4px 16px rgba(20,184,166,0.3)', alignSelf: 'flex-start' }}>
+                    Learn More <CaretRight size={16} />
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ textAlign: 'center', marginTop: '32px' }}>
+                <button onClick={() => navigate('/portfolio')} style={{ ...btnOutline, height: '44px', padding: '0 24px', fontSize: '14px', color: isDark ? '#fff' : BRAND.brown, borderColor: isDark ? 'rgba(255,255,255,0.2)' : theme.cardBorder }}>
+                  View Full Portfolio <CaretRight size={16} />
+                </button>
+              </div>
+            </div>
+          </ScrollReveal>
+        </section>
+
+        {/* ZIGZAG TOOLS TIMELINE */}
+        <section id="free-tools" style={{
+          backgroundColor: isDark ? '#0d0b09' : BRAND.cream,
+          padding: isMobile ? '60px 20px' : '80px 64px',
+          position: 'relative',
+        }}>
+          {/* Section Header */}
+          <ScrollReveal>
+            <div style={{ textAlign: 'center', maxWidth: '600px', margin: '0 auto 60px' }}>
+              <p style={{
+                fontSize: '11px',
+                fontWeight: '600',
+                letterSpacing: '4px',
+                color: isDark ? '#a09585' : '#7a6652',
+                marginBottom: '12px',
+                fontFamily: FONTS.body,
+                textTransform: 'uppercase',
+              }}>
+                Bonus
+              </p>
+              <h2 style={{
+                fontSize: isMobile ? '32px' : '48px',
+                fontWeight: '800',
+                color: isDark ? '#fff' : BRAND.brown,
+                fontFamily: FONTS.heading,
+                lineHeight: '1.15',
+              }}>
+                22+ Free Productivity Tools
+              </h2>
+            </div>
+          </ScrollReveal>
+
+          {/* Timeline Container */}
+          <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative' }}>
+            {/* Vertical center line (desktop only) */}
+            {!isMobile && (
+              <div style={{
+                position: 'absolute',
+                left: '50%',
+                top: '40px',
+                bottom: '40px',
+                width: '2px',
+                background: isDark
+                  ? 'linear-gradient(to bottom, transparent, #2a2420 10%, #2a2420 90%, transparent)'
+                  : 'linear-gradient(to bottom, transparent, #d4c8b8 10%, #d4c8b8 90%, transparent)',
+              }} />
+            )}
+
+            {TOOL_TIMELINE.map((category, index) => {
+              const isEven = index % 2 === 0;
+              const IconComp = category.icon;
+              const accentColor = category.accent;
+              const accentBg = isDark
+                ? `${accentColor}25`
+                : `${accentColor}15`;
+
               return (
-                <div key={tool.path} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: isDark ? '#2a2420' : '#faf8f5', borderRadius: '100px' }}>
-                  <IconComponent size={16} style={{ color: theme.textMuted }} />
-                  <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body }}>{tool.title}</span>
+                <div
+                  key={category.name}
+                  style={{
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : (isEven ? 'row' : 'row-reverse'),
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    gap: isMobile ? '0' : '60px',
+                    marginBottom: index < TOOL_TIMELINE.length - 1 ? (isMobile ? '48px' : '64px') : 0,
+                    position: 'relative',
+                  }}
+                >
+                  {/* Text Content */}
+                  <div style={{
+                    flex: 1,
+                    textAlign: isMobile ? 'left' : (isEven ? 'right' : 'left'),
+                    paddingLeft: isMobile ? '60px' : 0,
+                  }}>
+                    <h3 style={{
+                      fontSize: isMobile ? '22px' : '28px',
+                      fontWeight: '700',
+                      color: isDark ? '#f5f0eb' : BRAND.brown,
+                      fontFamily: FONTS.heading,
+                      marginBottom: '8px',
+                    }}>
+                      {category.name}
+                    </h3>
+                    <p style={{
+                      fontSize: isMobile ? '14px' : '16px',
+                      color: isDark ? '#a09585' : '#7a6652',
+                      lineHeight: '1.7',
+                      fontFamily: FONTS.body,
+                      marginBottom: '16px',
+                    }}>
+                      {category.description}
+                    </p>
+                    <div style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: '8px',
+                      justifyContent: isMobile ? 'flex-start' : (isEven ? 'flex-end' : 'flex-start'),
+                    }}>
+                      {category.tools.map((tool) => (
+                        <button
+                          key={tool.path}
+                          onClick={() => navigate(tool.path)}
+                          style={{
+                            padding: '6px 14px',
+                            fontSize: '12px',
+                            fontWeight: '500',
+                            fontFamily: FONTS.body,
+                            color: isDark ? '#d4c8b8' : '#5a4a3a',
+                            backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(63,32,12,0.06)',
+                            border: `1px solid ${isDark ? '#2a2420' : '#e0d4c4'}`,
+                            borderRadius: '100px',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(63,32,12,0.12)';
+                            e.currentTarget.style.borderColor = accentColor;
+                            e.currentTarget.style.color = isDark ? '#fff' : accentColor;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(63,32,12,0.06)';
+                            e.currentTarget.style.borderColor = isDark ? '#2a2420' : '#e0d4c4';
+                            e.currentTarget.style.color = isDark ? '#d4c8b8' : '#5a4a3a';
+                          }}
+                        >
+                          {tool.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Icon Circle */}
+                  <div style={{
+                    width: isMobile ? '40px' : '72px',
+                    height: isMobile ? '40px' : '72px',
+                    borderRadius: '50%',
+                    backgroundColor: accentBg,
+                    border: `2px solid ${accentColor}`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    flexShrink: 0,
+                    position: isMobile ? 'absolute' : 'relative',
+                    left: isMobile ? '0' : 'auto',
+                    top: isMobile ? '0' : 'auto',
+                    zIndex: 2,
+                    boxShadow: `0 0 20px ${accentColor}20`,
+                  }}>
+                    <IconComp size={isMobile ? 18 : 28} style={{ color: accentColor }} />
+                  </div>
+
+                  {/* Empty flex spacer for desktop zigzag */}
+                  {!isMobile && <div style={{ flex: 1 }} />}
                 </div>
               );
             })}
           </div>
-          <span style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body }}>
-            Account creation coming soon
-          </span>
-        </div>
-      </section>
+        </section>
 
-      {/* FOOTER */}
+        {/* TOOLS SHOWCASE */}
+        <section style={{ backgroundColor: isDark ? '#0d0b09' : BRAND.cream, borderTop: '1px solid ' + theme.cardBorder, overflow: 'hidden' }}>
+
+          {/* Desktop: 3D Marquee */}
+          {isDesktop && (
+            <ThreeDMarquee isDark={isDark} theme={theme} />
+          )}
+
+          {/* Mobile: Tool Cards Grid */}
+          {!isDesktop && (
+            <div style={{ padding: isSmall ? '48px 20px' : '64px 32px', maxWidth: '1100px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '32px' }}>
+                <h2 style={{ fontSize: isSmall ? '24px' : '28px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 12px', fontFamily: FONTS.heading }}>
+                  Free Tools — No Sign-Up Needed
+                </h2>
+                <p style={{ fontSize: '15px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>
+                  Bonus tools to help with your daily workflow
+                </p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : 'repeat(2, 1fr)', gap: '16px' }}>
+                {TOOL_CATEGORIES.map((category) => (
+                  <div key={category.name} style={{ backgroundColor: isDark ? theme.cardBg : '#fff', borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '16px' }}>
+                    <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '10px', textTransform: 'uppercase', fontFamily: FONTS.body }}>
+                      {category.name}
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                      {category.tools.map((tool) => {
+                        const IconComponent = tool.icon;
+                        return (
+                          <button
+                            key={tool.path}
+                            onClick={() => navigate(tool.path)}
+                            style={{ padding: '8px', backgroundColor: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '10px' }}
+                          >
+                            <IconComponent size={16} style={{ color: theme.textMuted }} />
+                            <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body }}>{tool.title}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </section>
+
+        {/* Productivity CTA */}
+        <section id="services" style={{ padding: isSmall ? '48px 20px' : '64px 32px', backgroundColor: isDark ? theme.bg : '#faf8f5' }}>
+          <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '4px 12px', backgroundColor: isDark ? BRAND.blue + '20' : BRAND.blue + '10', borderRadius: '100px', marginBottom: '16px' }}>
+              <Lock size={12} style={{ color: BRAND.blue }} />
+              <span style={{ fontSize: '11px', fontWeight: '600', color: BRAND.blue, fontFamily: FONTS.body }}>LOGIN REQUIRED</span>
+            </div>
+            <h3 style={{ fontSize: isSmall ? '22px' : '28px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, margin: '0 0 12px', fontFamily: FONTS.heading }}>
+              Unlock the Productivity Suite
+            </h3>
+            <p style={{ fontSize: '15px', color: theme.textMuted, margin: '0 0 24px', fontFamily: FONTS.body }}>
+              Finance Tracker, VA Kita, Task Manager & Brewed Notes — synced across devices
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '24px' }}>
+              {PRODUCTIVITY_TOOLS.map((tool) => {
+                const IconComponent = tool.icon;
+                return (
+                  <div key={tool.path} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 16px', backgroundColor: isDark ? '#2a2420' : '#faf8f5', borderRadius: '100px' }}>
+                    <IconComponent size={16} style={{ color: theme.textMuted }} />
+                    <span style={{ fontSize: '13px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body }}>{tool.title}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <span style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body }}>
+              Account creation coming soon
+            </span>
+          </div>
+        </section>
+
+        {/* FOOTER */}
       </main>
       <footer style={{ padding: '32px 32px 24px', borderTop: '1px solid ' + theme.cardBorder }}>
         <div style={{ maxWidth: '800px', margin: '0 auto' }}>
@@ -1818,10 +1831,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           </div>
           <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', marginBottom: '16px' }}>
             <a href="https://www.facebook.com/brewed.ops/" target="_blank" rel="noopener noreferrer" style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, textDecoration: 'none', border: '1px solid ' + theme.cardBorder }} title="Facebook">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
             </a>
             <a href="https://x.com/BrewedOps" target="_blank" rel="noopener noreferrer" style={{ width: '36px', height: '36px', borderRadius: '8px', backgroundColor: isDark ? '#1e1a16' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, textDecoration: 'none', border: '1px solid ' + theme.cardBorder }} title="X (Twitter)">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
             </a>
           </div>
           <p style={{ fontSize: '12px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body, textAlign: 'center' }}>© 2026 BrewedOps. Made by Kenneth V.</p>
