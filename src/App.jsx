@@ -6,6 +6,34 @@ import SEO from './components/SEO';
 import GuestToolLayout from './components/layout/GuestToolLayout';
 import LoadingFallback from './components/ui/LoadingFallback';
 import { SmoothCursor } from './components/ui/smooth-cursor';
+import { AnimatePresence, motion } from 'framer-motion';
+
+// Scrolls to top on every route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+// Page transition wrapper
+function PageTransition({ children }) {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="popLayout">
+      <motion.div
+        key={location.pathname}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.12, ease: 'easeOut' }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
 
 // Lazy-loaded pages
 const HomePage = React.lazy(() => import('./components/HomePage'));
@@ -67,70 +95,32 @@ const FONTS = {
   body: "'Poppins', sans-serif",
 };
 
-// Inject Google Fonts and Global Styles
-if (typeof document !== 'undefined' && !document.getElementById('brewedops-fonts')) {
-  const link = document.createElement('link');
-  link.id = 'brewedops-fonts';
-  link.rel = 'stylesheet';
-  link.href = 'https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Poppins:wght@400;500;600&display=swap';
-  document.head.appendChild(link);
-  
-  // Add comprehensive base font styles
+// Inject global styles (fonts already loaded via index.html non-render-blocking)
+if (typeof document !== 'undefined' && !document.getElementById('brewedops-global-styles')) {
   const style = document.createElement('style');
   style.id = 'brewedops-global-styles';
   style.textContent = `
-    * { 
-      font-family: 'Poppins', sans-serif; 
+    * {
+      font-family: 'Poppins', sans-serif;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
-    h1, h2, h3, h4, h5, h6 { 
-      font-family: 'Montserrat', sans-serif; 
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Montserrat', sans-serif;
     }
     button, input, select, textarea {
       font-family: 'Poppins', sans-serif;
     }
-    @keyframes spin { 
-      from { transform: rotate(0deg); } 
-      to { transform: rotate(360deg); } 
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
-    /* Brand text helper classes */
-    .brand-heading { font-family: 'Montserrat', sans-serif; }
-    .brand-body { font-family: 'Poppins', sans-serif; }
-    .brand-text-brown { color: #3F200C; }
-    .brand-text-blue { color: #004AAC; }
-    .brand-text-green { color: #51AF43; }
   `;
   document.head.appendChild(style);
 }
 
-// Constants and utilities
-import {
-  CATEGORIES,
-  CURRENCIES,
-  WALLET_TYPES,
-  DEFAULT_WALLETS,
-  XP_CONFIG,
-  LEVEL_THRESHOLDS,
-  PROFILE_FRAMES,
-  BADGE_TIERS,
-  ACHIEVEMENT_CATEGORIES,
-  ACHIEVEMENTS,
-  WEEKLY_CHALLENGES,
-} from './lib/constants';
 import { getTheme } from './lib/theme';
-import {
-  calculateLevel,
-  getXPForNextLevel,
-  getLevelProgress,
-  getUnlockedFrames,
-  getFrameById,
-  getAnimatedFrameStyle,
-  getAvatarInnerStyle,
-  getTierStyle,
-} from './lib/gamification';
 import { useWindowSize } from './lib/hooks';
-import { formatAmount, getInitial } from './lib/utils';
 
 
 // Skip-to-content link for accessibility
@@ -142,30 +132,6 @@ const SkipLink = () => (
     Skip to content
   </a>
 );
-
-// Badge colors for light and dark mode (kept here as it's UI-specific styling)
-const getBadgeStyle = (type, isDark) => {
-  const darkStyles = {
-    utilities: { bg: '#1a2e4a', color: '#60a5fa', border: '#2563eb' },
-    subscription: { bg: '#001a40', color: '#3373c4', border: '#003d8f' },
-    food: { bg: '#2e1f10', color: '#fb923c', border: '#ea580c' },
-    shopping: { bg: '#3a1530', color: '#f472b6', border: '#db2777' },
-    healthcare: { bg: '#0a2618', color: '#34d399', border: '#059669' },
-    entertainment: { bg: '#2e2210', color: '#fbbf24', border: '#d97706' },
-    other: { bg: '#1e1a16', color: '#a09585', border: '#4a4038' },
-  };
-  const lightStyles = {
-    utilities: { bg: '#dbeafe', color: '#1d4ed8', border: '#93c5fd' },
-    subscription: { bg: '#ede9fe', color: '#003380', border: '#c4b5fd' },
-    food: { bg: '#ffedd5', color: '#c2410c', border: '#fdba74' },
-    shopping: { bg: '#fce7f3', color: '#be185d', border: '#f9a8d4' },
-    healthcare: { bg: '#ecfdf5', color: '#047857', border: '#6ee7b7' },
-    entertainment: { bg: '#fff8eb', color: '#b45309', border: '#fcd34d' },
-    other: { bg: '#faf8f5', color: '#6b5f52', border: '#e8e0d4' },
-  };
-  const styles = isDark ? darkStyles : lightStyles;
-  return styles[type] || styles.other;
-};
 
 // ============================================
 // LOGIN PAGE
@@ -652,7 +618,9 @@ useEffect(() => {
  // Public routes
 return (
   <React.Suspense fallback={<LoadingFallback />}>
+  <ScrollToTop />
   <SkipLink />
+  <PageTransition>
   <Routes>
     <Route path="/" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
     <Route path="/portfolio" element={<PortfolioPage isDark={isDark} setIsDark={setIsDark} />} />
@@ -703,6 +671,7 @@ return (
     {/* Catch-all route */}
     <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
   </Routes>
+  </PageTransition>
   </React.Suspense>
 );
 }

@@ -1159,16 +1159,16 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                     WebkitMaskComposite: 'source-in', // More standard for intersection in older WebKit
                   }}>
                     <img
-                      src="/herbg2.png"
+                      src="/herbg2.webp"
                       alt="BrewedOps - Your dedicated virtual assistant"
+                      fetchpriority="high"
+                      width={1200}
+                      height={889}
                       onLoad={(e) => {
-                        // Ensure the parent container knows the image is loaded
                         e.target.style.opacity = 1;
                       }}
                       onError={(e) => {
-                        console.error("Failed to load hero image /herbg2.png");
-                        // Fallback to herobg1.png if herbg2 fails
-                        e.target.src = "/herobg1.png";
+                        e.target.src = "/herbg2.png";
                       }}
                       style={{
                         width: '100%',

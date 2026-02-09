@@ -11,6 +11,17 @@ export default defineConfig({
   },
   build: {
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-motion': ['framer-motion', 'motion'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          'vendor-icons': ['@phosphor-icons/react'],
+          'vendor-recharts': ['recharts'],
+        },
+      },
+    },
   },
   optimizeDeps: {
     exclude: ['onnxruntime-web'],

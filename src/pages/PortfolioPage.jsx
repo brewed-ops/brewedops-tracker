@@ -608,14 +608,20 @@ function PortfolioPage({ isDark, setIsDark }) {
               height: '95%',
               pointerEvents: 'none',
               zIndex: 0,
-              maskImage: 'radial-gradient(ellipse 85% 80% at 60% 55%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 80%)',
-              WebkitMaskImage: 'radial-gradient(ellipse 85% 80% at 60% 55%, rgba(0,0,0,1) 30%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0) 80%)',
+              ...(isDark ? {
+                maskImage: 'radial-gradient(ellipse 80% 75% at 55% 50%, black 35%, transparent 70%)',
+                WebkitMaskImage: 'radial-gradient(ellipse 80% 75% at 55% 50%, black 35%, transparent 70%)',
+              } : {}),
             }}>
               <img
-                src="https://i.imgur.com/Z5kBKUU.png"
-                alt=""
-                width={750}
-                height={900}
+                src={isDark ? "/portfolioimage-dark.webp" : "/portfolioimage-light.webp"}
+                alt="Portfolio"
+                loading="lazy"
+                width={1024}
+                height={1536}
+                onError={(e) => {
+                  e.target.src = isDark ? "/portfolioimage-dark.png" : "/portfolioimage-light.png";
+                }}
                 style={{
                   width: '100%',
                   height: '100%',
@@ -631,12 +637,13 @@ function PortfolioPage({ isDark, setIsDark }) {
             preserveAspectRatio="none"
             style={{
               position: 'absolute',
-              bottom: 0,
+              bottom: '-1px',
               left: 0,
               width: '100%',
               height: '80px',
               zIndex: 2,
               display: 'block',
+              lineHeight: 0,
             }}
           >
             <path
@@ -780,7 +787,6 @@ function PortfolioPage({ isDark, setIsDark }) {
         <section style={{
           padding: isMobile ? '48px 16px' : '72px 32px',
           backgroundColor: theme.bgAlt,
-          borderTop: `1px solid ${theme.cardBorder}`,
           borderBottom: `1px solid ${theme.cardBorder}`,
         }}>
           <ScrollReveal>
