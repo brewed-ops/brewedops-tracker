@@ -996,7 +996,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                       margin: '0 0 14px',
                     }}>
                       Stop Doing It All.{isMobile ? ' ' : <br />}
-                      <span style={{ color: isDark ? '#60a5fa' : BRAND.blue }}>Let's Handle It.</span>
+                      <span style={{ color: isDark ? '#60a5fa' : BRAND.blue }}>Let Me Handle It.</span>
                     </h1>
                     <div style={{ display: 'flex', justifyContent: isMobile ? 'center' : 'flex-start' }}>
                       <LayoutTextFlip
