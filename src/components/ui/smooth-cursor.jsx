@@ -58,9 +58,9 @@ const CursorSVG = ({ isHovering }) => {
 
 export function SmoothCursor({
   springConfig = {
-    damping: 45,
-    stiffness: 400,
-    mass: 1,
+    damping: 35,
+    stiffness: 3000,
+    mass: 0.1,
     restDelta: 0.001,
   }
 }) {
@@ -77,14 +77,14 @@ export function SmoothCursor({
   const cursorX = useSpring(0, springConfig)
   const cursorY = useSpring(0, springConfig)
   const rotation = useSpring(0, {
-    ...springConfig,
-    damping: 60,
-    stiffness: 300,
+    damping: 40,
+    stiffness: 800,
+    mass: 0.2,
   })
   const scale = useSpring(1, {
-    ...springConfig,
-    stiffness: 500,
-    damping: 35,
+    damping: 25,
+    stiffness: 1000,
+    mass: 0.2,
   })
 
   useEffect(() => {
