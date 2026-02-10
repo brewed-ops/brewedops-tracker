@@ -741,8 +741,8 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
               We're still setting things up, but you can reach out now. We'd love to hear about your business needs.
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', flexWrap: 'wrap' }}>
-              <a
-                href="mailto:hello@brewedops.com"
+              <button
+                onClick={() => navigate('/book')}
                 style={{
                   height: '44px',
                   padding: '0 24px',
@@ -764,8 +764,8 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                 }}
               >
                 <Envelope size={16} />
-                Get in Touch
-              </a>
+                Book a Free Call
+              </button>
               <button
                 onClick={() => navigate('/')}
                 style={{

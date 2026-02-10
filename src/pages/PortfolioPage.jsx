@@ -711,10 +711,8 @@ function PortfolioPage({ isDark, setIsDark }) {
 
                 {/* CTA Buttons */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginBottom: '28px', justifyContent: isMobile ? 'center' : 'flex-start' }}>
-                  <a
-                    href="https://connect.brewedops.com/widget/booking/etoVHFeyWv1bqRkpxZee"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    onClick={() => navigate('/book')}
                     style={{
                       padding: isMobile ? '14px 24px' : '16px 32px',
                       backgroundColor: BRAND.blue,
@@ -732,7 +730,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                     }}
                   >
                     Book a Call <CaretRight size={18} />
-                  </a>
+                  </button>
                   <a
                     href="https://wa.me/639933074618"
                     target="_blank"
@@ -1228,10 +1226,8 @@ function PortfolioPage({ isDark, setIsDark }) {
               Book a free call. I'll map out which manual processes in your business are costing you the most time — and show you how to automate them.
             </p>
             <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-              <a
-                href="https://connect.brewedops.com/widget/booking/etoVHFeyWv1bqRkpxZee"
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => navigate('/book')}
                 style={{
                   padding: isMobile ? '14px 24px' : '16px 32px',
                   backgroundColor: '#fff',
@@ -1249,7 +1245,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                 }}
               >
                 <ChatCircle size={isMobile ? 18 : 20} />Book a Free Call
-              </a>
+              </button>
             </div>
           </div>
           </ScrollReveal>
