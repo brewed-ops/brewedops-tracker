@@ -101,6 +101,14 @@ function BookingPage({ isDark, setIsDark }) {
 
   const isMobile = windowWidth < 768;
   const isTablet = windowWidth < 1024;
+  const [flowActive, setFlowActive] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const scrollToCalendar = () => {
     const el = document.getElementById('booking-calendar');
@@ -126,11 +134,12 @@ function BookingPage({ isDark, setIsDark }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottom: `1px solid ${theme.cardBorder}`,
+        borderBottom: isScrolled ? `1px solid ${theme.cardBorder}` : '1px solid transparent',
         backgroundColor: theme.bg,
         position: 'sticky',
         top: 0,
         zIndex: 100,
+        transition: 'border-color 0.3s',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
@@ -168,126 +177,451 @@ function BookingPage({ isDark, setIsDark }) {
             </span>
           </div>
         </div>
-        <button
-          onClick={() => setIsDark(!isDark)}
-          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: 'transparent',
-            border: `1px solid ${theme.cardBorder}`,
-            borderRadius: '8px',
-            color: theme.textMuted,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {isDark ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <button
+            onClick={() => setIsDark(!isDark)}
+            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+            style={{
+              width: '36px',
+              height: '36px',
+              backgroundColor: 'transparent',
+              border: `1px solid ${theme.cardBorder}`,
+              borderRadius: '8px',
+              color: theme.textMuted,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          </button>
+          <button
+            onClick={() => navigate('/services')}
+            style={{
+              position: 'relative',
+              overflow: 'hidden',
+              height: '38px',
+              padding: '0 22px',
+              backgroundColor: BRAND.blue,
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '10px',
+              fontSize: '14px',
+              fontWeight: '500',
+              fontFamily: FONTS.body,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              whiteSpace: 'nowrap',
+              boxShadow: '0 2px 12px rgba(0,74,172,0.35)',
+              animation: 'servicesBtnPulse 2.5s ease-in-out infinite',
+            }}
+          >
+            <span style={{
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+              animation: 'servicesBtnShimmer 3s ease-in-out infinite',
+              pointerEvents: 'none',
+            }} />
+            Services
+            <CaretRight size={14} />
+          </button>
+        </div>
       </nav>
 
       <main>
         {/* ============================================ */}
-        {/* HERO — Headline, Subheadline, CTA */}
+        {/* HERO — Split: Copy left, Calendar right */}
         {/* ============================================ */}
-        <section style={{
-          padding: isMobile ? '48px 20px 40px' : '64px 32px 52px',
-          textAlign: 'center',
-          maxWidth: '820px',
-          margin: '0 auto',
-        }}>
-          <ScrollReveal>
-            {/* Trust badge */}
+        <section
+          id="booking-calendar"
+          style={{
+            padding: isMobile ? '40px 20px' : '52px 32px',
+            maxWidth: '1280px',
+            margin: '0 auto',
+          }}
+        >
+          <div style={{
+            display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
+            alignItems: isMobile ? 'center' : 'center',
+            gap: isMobile ? '36px' : '48px',
+          }}>
+            {/* LEFT — Copy */}
             <div style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '8px 16px',
-              backgroundColor: isDark ? 'rgba(0,74,172,0.15)' : 'rgba(0,74,172,0.08)',
-              borderRadius: '100px',
-              marginBottom: '24px',
-              border: `1px solid ${isDark ? 'rgba(0,74,172,0.3)' : 'rgba(0,74,172,0.15)'}`,
+              flex: isMobile ? 'unset' : '0 0 42%',
+              textAlign: isMobile ? 'center' : 'left',
             }}>
-              <CalendarCheck size={16} weight="fill" style={{ color: BRAND.blue }} />
-              <span style={{
-                fontSize: '13px',
-                fontWeight: '600',
-                color: BRAND.blue,
-                fontFamily: FONTS.body,
-                letterSpacing: '0.02em',
-              }}>
-                FREE 30-MINUTE STRATEGY CALL
-              </span>
+              <ScrollReveal>
+                {/* Trust badge */}
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '7px 16px',
+                  backgroundColor: isDark ? 'rgba(0,74,172,0.15)' : 'rgba(0,74,172,0.08)',
+                  borderRadius: '100px',
+                  marginBottom: '22px',
+                  border: `1px solid ${isDark ? 'rgba(0,74,172,0.3)' : 'rgba(0,74,172,0.15)'}`,
+                }}>
+                  <CalendarCheck size={16} weight="fill" style={{ color: BRAND.blue }} />
+                  <span style={{
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    color: BRAND.blue,
+                    fontFamily: FONTS.body,
+                    letterSpacing: '0.04em',
+                  }}>
+                    FREE 30-MINUTE DISCOVERY CALL
+                  </span>
+                </div>
+
+                {/* Headline */}
+                <h1 style={{
+                  fontSize: isMobile ? '34px' : isTablet ? '38px' : '46px',
+                  fontWeight: '800',
+                  fontFamily: FONTS.heading,
+                  lineHeight: '1.15',
+                  marginBottom: '18px',
+                  color: theme.text,
+                  letterSpacing: '-0.02em',
+                }}>
+                  Let's Find What's{' '}
+                  <span style={{ color: BRAND.blue }}>
+                    Slowing You Down.
+                  </span>
+                </h1>
+
+                {/* Subheadline */}
+                <p style={{
+                  fontSize: isMobile ? '17px' : '19px',
+                  color: theme.textMuted,
+                  lineHeight: '1.65',
+                  marginBottom: '26px',
+                  fontFamily: FONTS.body,
+                }}>
+                  In 30 minutes, we'll diagnose the bottlenecks eating your time — and map out exactly what to automate.
+                  <br />
+                  <strong style={{ color: theme.text }}>No pitch. Just clarity.</strong>
+                </p>
+
+                {/* Trust indicators */}
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                  {[
+                    'Pinpoint your biggest time drains',
+                    'Identify what to automate first',
+                    'Leave with a clear action plan',
+                  ].map((item, i) => (
+                    <div key={i} style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      justifyContent: isMobile ? 'center' : 'flex-start',
+                    }}>
+                      <CheckCircle size={18} weight="fill" style={{ color: BRAND.green, flexShrink: 0 }} />
+                      <span style={{
+                        fontSize: '15px',
+                        color: theme.textMuted,
+                        fontFamily: FONTS.body,
+                        fontWeight: '500',
+                      }}>
+                        {item}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </ScrollReveal>
             </div>
 
-            {/* Headline — desire-driven, specific */}
-            <h1 style={{
-              fontSize: isMobile ? '36px' : isTablet ? '48px' : '58px',
-              fontWeight: '800',
-              fontFamily: FONTS.heading,
-              lineHeight: '1.12',
-              marginBottom: '20px',
-              color: theme.text,
-              letterSpacing: '-0.02em',
+            {/* RIGHT — Calendar */}
+            <div style={{
+              flex: isMobile ? 'unset' : '1 1 58%',
+              width: isMobile ? '100%' : 'auto',
             }}>
-              Reclaim 20+ Hours a Week.{' '}
-              <span style={{
-                color: BRAND.blue,
-                display: isMobile ? 'inline' : 'block',
+              <div style={{
+                backgroundColor: theme.cardBg,
+                borderRadius: '16px',
+                border: `1px solid ${theme.cardBorder}`,
+                padding: isMobile ? '8px' : '16px',
+                boxShadow: isDark
+                  ? '0 8px 32px rgba(0,0,0,0.3)'
+                  : '0 8px 32px rgba(63,32,12,0.08)',
               }}>
-                Without Hiring Full-Time.
-              </span>
-            </h1>
+                <GHLCalendarEmbed />
+              </div>
+            </div>
+          </div>
+        </section>
 
-            {/* Subheadline — visceral, specific */}
-            <p style={{
-              fontSize: isMobile ? '18px' : '22px',
-              color: theme.textMuted,
-              lineHeight: '1.6',
-              maxWidth: '640px',
-              margin: '0 auto 36px',
-              fontFamily: FONTS.body,
-            }}>
-              You're doing everything yourself. It's not sustainable.
-              <br />
-              <strong style={{ color: theme.text }}>Let's fix that — for free.</strong>
-            </p>
-
-            {/* Primary CTA */}
-            <button
-              onClick={scrollToCalendar}
-              style={{
-                padding: isMobile ? '16px 32px' : '18px 40px',
-                backgroundColor: BRAND.blue,
-                color: '#fff',
-                border: 'none',
-                borderRadius: '12px',
-                fontWeight: '700',
+        {/* ============================================ */}
+        {/* AUTOMATION FLOWCHART */}
+        {/* ============================================ */}
+        <section style={{
+          padding: isMobile ? '40px 20px' : '52px 32px',
+          backgroundColor: isDark ? '#100e0b' : BRAND.cream,
+          borderTop: `1px solid ${theme.cardBorder}`,
+          borderBottom: `1px solid ${theme.cardBorder}`,
+        }}>
+          <style>{`
+            @keyframes triggerGlow {
+              0%, 100% { opacity: 0.5; transform: scale(1); }
+              50% { opacity: 1; transform: scale(1.08); }
+            }
+            @keyframes servicesBtnPulse {
+              0%, 100% { box-shadow: 0 2px 12px rgba(0,74,172,0.35); transform: scale(1); }
+              50% { box-shadow: 0 4px 20px rgba(0,74,172,0.55), 0 0 0 4px rgba(0,74,172,0.12); transform: scale(1.04); }
+            }
+            @keyframes servicesBtnShimmer {
+              0% { left: -100%; }
+              60% { left: 100%; }
+              100% { left: 100%; }
+            }
+          `}</style>
+          <ScrollReveal>
+            <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+              <h2 style={{
+                fontSize: isMobile ? '26px' : '36px',
+                fontWeight: '800',
+                fontFamily: FONTS.heading,
+                marginBottom: '10px',
+                color: theme.text,
+                lineHeight: '1.2',
+              }}>
+                Your Business on Autopilot
+              </h2>
+              <p style={{
                 fontSize: isMobile ? '16px' : '18px',
+                color: theme.textMuted,
                 fontFamily: FONTS.body,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '10px',
-                boxShadow: '0 4px 20px rgba(0,74,172,0.35)',
-                transition: 'all 0.2s ease',
-              }}
-            >
-              <CalendarCheck size={20} weight="bold" />
-              Book Your Free Strategy Call
-              <CaretRight size={18} weight="bold" />
-            </button>
+                lineHeight: '1.6',
+                margin: '0 auto 40px',
+                maxWidth: '500px',
+              }}>
+                One trigger fires. Everything else runs itself.
+              </p>
 
-            <p style={{
-              fontSize: '14px',
-              color: theme.textSubtle,
-              marginTop: '14px',
-              fontFamily: FONTS.body,
-            }}>
-              No pitch. No obligation. Just a clear plan.
-            </p>
+              {/* Flowchart */}
+              <div style={{ position: 'relative' }}>
+                {/* Trigger Node */}
+                <div
+                  style={{ display: 'flex', justifyContent: 'center' }}
+                  onMouseEnter={() => setFlowActive(true)}
+                  onMouseLeave={() => setFlowActive(false)}
+                >
+                  <div style={{
+                    position: 'relative',
+                    width: isMobile ? '110px' : '130px',
+                    height: isMobile ? '110px' : '130px',
+                    cursor: 'pointer',
+                  }}>
+                    {/* Pulsing glow ring */}
+                    <div style={{
+                      position: 'absolute',
+                      inset: '-12px',
+                      borderRadius: '50%',
+                      background: `radial-gradient(circle, ${BRAND.blue}${flowActive ? '40' : '18'} 0%, transparent 70%)`,
+                      animation: 'triggerGlow 3s ease-in-out infinite',
+                      transition: 'background 0.4s ease, transform 0.4s ease',
+                      transform: flowActive ? 'scale(1.2)' : 'scale(1)',
+                    }} />
+                    {/* Hexagon */}
+                    <div style={{
+                      position: 'relative',
+                      width: '100%',
+                      height: '100%',
+                      clipPath: 'polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%)',
+                      background: flowActive
+                        ? `linear-gradient(135deg, #0062e6 0%, ${BRAND.blue} 40%, #002d6b 100%)`
+                        : `linear-gradient(135deg, ${BRAND.blue} 0%, #003080 100%)`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexDirection: 'column',
+                      gap: '3px',
+                      transition: 'background 0.3s ease',
+                    }}>
+                      <Lightning size={isMobile ? 26 : 32} weight="fill" style={{ color: '#fff' }} />
+                      <span style={{
+                        color: 'rgba(255,255,255,0.9)',
+                        fontSize: isMobile ? '9px' : '10px',
+                        fontWeight: '800',
+                        fontFamily: FONTS.heading,
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                      }}>
+                        Trigger
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Trigger label */}
+                <p style={{
+                  fontSize: isMobile ? '13px' : '15px',
+                  color: theme.text,
+                  fontFamily: FONTS.body,
+                  fontWeight: '600',
+                  margin: '12px 0 0',
+                }}>
+                  New Lead Captured
+                </p>
+
+                {/* Vertical connector */}
+                <div style={{
+                  position: 'relative',
+                  width: '2px',
+                  height: '32px',
+                  margin: '0 auto',
+                  backgroundColor: isDark ? 'rgba(0,74,172,0.15)' : 'rgba(0,74,172,0.12)',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundColor: BRAND.blue,
+                    transformOrigin: 'top',
+                    transform: flowActive ? 'scaleY(1)' : 'scaleY(0)',
+                    transition: `transform 0.3s ease ${flowActive ? '0.05s' : '0s'}`,
+                    boxShadow: flowActive ? `0 0 8px ${BRAND.blue}` : 'none',
+                  }} />
+                </div>
+
+                {/* Junction dot */}
+                <div style={{
+                  width: '12px',
+                  height: '12px',
+                  borderRadius: '50%',
+                  backgroundColor: BRAND.blue,
+                  margin: '0 auto',
+                  transition: `transform 0.3s ease ${flowActive ? '0.25s' : '0s'}, box-shadow 0.3s ease ${flowActive ? '0.25s' : '0s'}`,
+                  transform: flowActive ? 'scale(1.5)' : 'scale(1)',
+                  boxShadow: flowActive
+                    ? `0 0 14px ${BRAND.blue}, 0 0 0 4px rgba(0,74,172,0.25)`
+                    : `0 0 0 4px ${isDark ? 'rgba(0,74,172,0.2)' : 'rgba(0,74,172,0.12)'}`,
+                }} />
+
+                {/* Horizontal connector */}
+                {!isMobile && (
+                  <div style={{
+                    position: 'relative',
+                    height: '2px',
+                    margin: '-6px auto 0',
+                    maxWidth: '75%',
+                    backgroundColor: isDark ? 'rgba(0,74,172,0.15)' : 'rgba(0,74,172,0.12)',
+                    overflow: 'hidden',
+                  }}>
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backgroundColor: BRAND.blue,
+                      transformOrigin: 'center',
+                      transform: flowActive ? 'scaleX(1)' : 'scaleX(0)',
+                      transition: `transform 0.4s ease ${flowActive ? '0.3s' : '0s'}`,
+                      boxShadow: flowActive ? `0 0 8px ${BRAND.blue}` : 'none',
+                    }} />
+                  </div>
+                )}
+
+                {/* Action Cards Grid */}
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(4, 1fr)',
+                  gap: isMobile ? '0 12px' : '0 20px',
+                  marginTop: isMobile ? '0' : '-1px',
+                }}>
+                  {[
+                    { icon: <Clock size={24} weight="duotone" style={{ color: BRAND.blue }} />, label: 'Instant Follow-Up' },
+                    { icon: <ChartLineUp size={24} weight="duotone" style={{ color: BRAND.blue }} />, label: 'Pipeline Updated' },
+                    { icon: <CalendarCheck size={24} weight="duotone" style={{ color: BRAND.blue }} />, label: 'Appointment Set' },
+                    { icon: <Handshake size={24} weight="duotone" style={{ color: BRAND.blue }} />, label: 'Team Notified' },
+                  ].map((action, i) => (
+                    <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                      {/* Branch line with flow */}
+                      <div style={{
+                        position: 'relative',
+                        width: '2px',
+                        height: isMobile ? '20px' : '28px',
+                        backgroundColor: isDark ? 'rgba(0,74,172,0.15)' : 'rgba(0,74,172,0.12)',
+                        overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          position: 'absolute',
+                          inset: 0,
+                          backgroundColor: BRAND.blue,
+                          transformOrigin: 'top',
+                          transform: flowActive ? 'scaleY(1)' : 'scaleY(0)',
+                          transition: `transform 0.25s ease ${flowActive ? `${0.55 + i * 0.06}s` : '0s'}`,
+                          boxShadow: flowActive ? `0 0 8px ${BRAND.blue}` : 'none',
+                        }} />
+                      </div>
+                      {/* Dot */}
+                      <div style={{
+                        width: '6px',
+                        height: '6px',
+                        borderRadius: '50%',
+                        backgroundColor: BRAND.blue,
+                        marginBottom: '8px',
+                        transition: `transform 0.25s ease ${flowActive ? `${0.7 + i * 0.06}s` : '0s'}, opacity 0.25s ease ${flowActive ? `${0.7 + i * 0.06}s` : '0s'}`,
+                        transform: flowActive ? 'scale(1.6)' : 'scale(1)',
+                        opacity: flowActive ? 1 : 0.4,
+                      }} />
+                      {/* Card */}
+                      <div style={{
+                        padding: isMobile ? '16px 12px' : '20px 16px',
+                        backgroundColor: theme.cardBg,
+                        borderRadius: '12px',
+                        border: `1px solid ${flowActive ? `${BRAND.blue}50` : theme.cardBorder}`,
+                        width: '100%',
+                        textAlign: 'center',
+                        transition: `box-shadow 0.35s ease ${flowActive ? `${0.75 + i * 0.06}s` : '0s'}, border-color 0.35s ease ${flowActive ? `${0.75 + i * 0.06}s` : '0s'}`,
+                        boxShadow: flowActive
+                          ? (isDark ? `0 4px 24px rgba(0,74,172,0.3), 0 0 0 1px ${BRAND.blue}30` : `0 4px 24px rgba(0,74,172,0.18), 0 0 0 1px ${BRAND.blue}20`)
+                          : (isDark ? '0 2px 8px rgba(0,0,0,0.2)' : '0 2px 8px rgba(63,32,12,0.06)'),
+                      }}>
+                        <div style={{
+                          width: '44px',
+                          height: '44px',
+                          borderRadius: '10px',
+                          backgroundColor: isDark ? 'rgba(0,74,172,0.15)' : 'rgba(0,74,172,0.08)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          margin: '0 auto 10px',
+                        }}>
+                          {action.icon}
+                        </div>
+                        <p style={{
+                          fontSize: isMobile ? '12px' : '14px',
+                          fontWeight: '600',
+                          color: theme.text,
+                          fontFamily: FONTS.body,
+                          margin: 0,
+                          lineHeight: '1.3',
+                        }}>
+                          {action.label}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Footer note */}
+              <p style={{
+                fontSize: '14px',
+                color: theme.textMuted,
+                fontFamily: FONTS.body,
+                marginTop: '28px',
+              }}>
+                Powered by <strong style={{ color: theme.text }}>GoHighLevel</strong> automation, built by BrewedOps.
+              </p>
+            </div>
           </ScrollReveal>
         </section>
 
@@ -487,58 +821,6 @@ function BookingPage({ isDark, setIsDark }) {
                   </span>
                 </p>
               </div>
-            </div>
-          </ScrollReveal>
-        </section>
-
-        {/* ============================================ */}
-        {/* GHL CALENDAR EMBED — full width, no max constraint */}
-        {/* ============================================ */}
-        <section
-          id="booking-calendar"
-          style={{
-            padding: isMobile ? '40px 12px' : '52px 32px',
-            backgroundColor: isDark ? '#100e0b' : BRAND.cream,
-            borderTop: `1px solid ${theme.cardBorder}`,
-            borderBottom: `1px solid ${theme.cardBorder}`,
-          }}
-        >
-          <ScrollReveal>
-            <div style={{ textAlign: 'center', marginBottom: '32px', maxWidth: '700px', margin: '0 auto 32px' }}>
-              <h2 style={{
-                fontSize: isMobile ? '28px' : '38px',
-                fontWeight: '800',
-                fontFamily: FONTS.heading,
-                marginBottom: '12px',
-                color: theme.text,
-                lineHeight: '1.2',
-              }}>
-                Grab Your Spot
-              </h2>
-              <p style={{
-                fontSize: isMobile ? '17px' : '20px',
-                color: theme.textMuted,
-                fontFamily: FONTS.body,
-                lineHeight: '1.6',
-                margin: 0,
-              }}>
-                30 minutes. Zero pressure. Pick a time below.
-              </p>
-            </div>
-
-            {/* Calendar embed — constrained to natural calendar size */}
-            <div style={{
-              maxWidth: '1080px',
-              margin: '0 auto',
-              backgroundColor: theme.cardBg,
-              borderRadius: '16px',
-              border: `1px solid ${theme.cardBorder}`,
-              padding: isMobile ? '8px' : '16px',
-              boxShadow: isDark
-                ? '0 8px 32px rgba(0,0,0,0.3)'
-                : '0 8px 32px rgba(63,32,12,0.08)',
-            }}>
-              <GHLCalendarEmbed />
             </div>
           </ScrollReveal>
         </section>

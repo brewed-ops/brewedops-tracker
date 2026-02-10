@@ -10,7 +10,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CaretLeft, Sun, Moon, SignIn } from '@phosphor-icons/react';
+import { CaretLeft, CaretRight, Sun, Moon, SignIn } from '@phosphor-icons/react';
 import SEO from '../SEO';
 
 // ============================================
@@ -64,6 +64,13 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
   const theme = getTheme(isDark);
   const { width } = useWindowSize();
   const isSmall = width < 480;
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <>
@@ -90,7 +97,8 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
           alignItems: 'center',
           justifyContent: 'space-between',
           backgroundColor: isDark ? theme.cardBg : '#ffffff',
-          borderBottom: '1px solid ' + theme.cardBorder,
+          borderBottom: isScrolled ? '1px solid ' + theme.cardBorder : '1px solid transparent',
+          transition: 'border-color 0.3s',
           position: 'sticky',
           top: 0,
           zIndex: 100,
@@ -187,12 +195,57 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
           </button>
 
           {!isSmall && (
-            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>
-              Account creation coming soon
-            </span>
+            <button
+              onClick={() => navigate('/services')}
+              style={{
+                position: 'relative',
+                overflow: 'hidden',
+                height: '38px',
+                padding: '0 22px',
+                backgroundColor: '#004AAC',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: '500',
+                fontFamily: FONTS.body,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 2px 12px rgba(0,74,172,0.35)',
+                animation: 'servicesBtnPulse 2.5s ease-in-out infinite',
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+                animation: 'servicesBtnShimmer 3s ease-in-out infinite',
+                pointerEvents: 'none',
+              }} />
+              Services
+              <CaretRight size={14} />
+            </button>
           )}
         </div>
       </header>
+
+      <style>{`
+        @keyframes servicesBtnPulse {
+          0%, 100% { box-shadow: 0 2px 12px rgba(0,74,172,0.35); transform: scale(1); }
+          50% { box-shadow: 0 4px 20px rgba(0,74,172,0.55), 0 0 0 4px rgba(0,74,172,0.12); transform: scale(1.04); }
+        }
+        @keyframes servicesBtnShimmer {
+          0% { left: -100%; }
+          60% { left: 100%; }
+          100% { left: 100%; }
+        }
+      `}</style>
 
       {/* ============================================ */}
       {/* MAIN CONTENT */}

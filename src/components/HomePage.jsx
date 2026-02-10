@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CaretRight, CaretDown, Sun, Moon, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck, Sparkle, FileMagnifyingGlass, DeviceMobile } from '@phosphor-icons/react';
+import { CaretRight, CaretDown, Sun, Moon, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck, Sparkle, FileMagnifyingGlass, DeviceMobile, CalendarCheck, Handshake, Envelope, ChatCircle, GearSix } from '@phosphor-icons/react';
 import SEO from './SEO';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 import { createNoise3D } from "simplex-noise";
@@ -512,6 +512,15 @@ const ThreeDMarquee = ({ isDark, theme }) => {
             from { transform: translateX(-33.33%); }
             to { transform: translateX(0); }
           }
+        @keyframes servicesBtnPulse {
+          0%, 100% { box-shadow: 0 2px 12px rgba(0,74,172,0.35); transform: scale(1); }
+          50% { box-shadow: 0 4px 20px rgba(0,74,172,0.55), 0 0 0 4px rgba(0,74,172,0.12); transform: scale(1.04); }
+        }
+        @keyframes servicesBtnShimmer {
+          0% { left: -100%; }
+          60% { left: 100%; }
+          100% { left: 100%; }
+        }
         `}
       </style>
     </div>
@@ -846,6 +855,23 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
   const isDesktop = width >= 1024;
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [flowActive, setFlowActive] = useState(false);
+  const [flowStep, setFlowStep] = useState(0);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Sequential flow animation — each step activates the next element
+  useEffect(() => {
+    if (!flowActive) { setFlowStep(0); return; }
+    const delays = [0, 250, 500, 750, 1000, 1250, 1500, 1800, 2000, 2100, 2250, 2400];
+    const timers = delays.map((ms, i) => setTimeout(() => setFlowStep(i + 1), ms));
+    return () => timers.forEach(clearTimeout);
+  }, [flowActive]);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const handleToolClick = (path) => navigate(path);
   const handleLoginClick = () => onNavigate('login');
@@ -901,7 +927,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
           keywords="BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free online tools, AI text extractor, OCR, GHL scenario generator"
         />
         {/* NAV */}
-        <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid ' + theme.cardBorder, backgroundColor: isDark ? theme.bg : '#faf8f5', position: 'sticky', top: 0, zIndex: 100 }}>
+        <nav style={{ padding: isSmall ? '12px 16px' : '12px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: isScrolled ? '1px solid ' + theme.cardBorder : '1px solid transparent', backgroundColor: isDark ? theme.bg : '#faf8f5', position: 'sticky', top: 0, zIndex: 100, transition: 'border-color 0.3s' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px' }}>
               <img src="https://i.imgur.com/R52jwPvt.png" alt="Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
@@ -917,9 +943,6 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 </button>
                 <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                   Portfolio
-                </button>
-                <button onClick={() => navigate('/services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                  Services
                 </button>
                 <ToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} onLoginClick={handleLoginClick} />
                 <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={handleToolClick} />
@@ -938,9 +961,43 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               {isDark ? <Sun size={16} /> : <Moon size={16} />}
             </button>
             {isDesktop ? (
-              <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
-                Account creation coming soon
-              </span>
+              <button
+                onClick={() => navigate('/services')}
+                style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  marginLeft: '8px',
+                  height: '38px',
+                  padding: '0 22px',
+                  backgroundColor: '#004AAC',
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  fontFamily: "'Poppins', sans-serif",
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  whiteSpace: 'nowrap',
+                  boxShadow: '0 2px 12px rgba(0,74,172,0.35)',
+                  animation: 'servicesBtnPulse 2.5s ease-in-out infinite',
+                }}
+              >
+                <span style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: '-100%',
+                  width: '100%',
+                  height: '100%',
+                  background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+                  animation: 'servicesBtnShimmer 3s ease-in-out infinite',
+                  pointerEvents: 'none',
+                }} />
+                Services
+                <CaretRight size={14} />
+              </button>
             ) : (
               <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
                 <List size={18} />
@@ -1360,6 +1417,326 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
               ))}
             </div>
           </div>
+        </section>
+
+        {/* ============================================ */}
+        {/* AUTOMATION FLOWCHART */}
+        {/* ============================================ */}
+        <section style={{
+          padding: isMobile ? '48px 20px' : '64px 64px',
+          backgroundColor: isDark ? '#0d0b09' : '#faf8f5',
+        }}>
+          <style>{`
+            @keyframes triggerGlowHome {
+              0%, 100% { box-shadow: 0 2px 8px rgba(0,74,172,0.1); transform: scale(1); }
+              50% { box-shadow: 0 4px 20px rgba(0,74,172,0.25); transform: scale(1.02); }
+            }
+          `}</style>
+          <ScrollReveal>
+            <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
+              <h2 style={{
+                fontSize: isMobile ? '26px' : '36px',
+                fontWeight: '800',
+                fontFamily: FONTS.heading,
+                marginBottom: '10px',
+                color: isDark ? '#ffffff' : BRAND.brown,
+                lineHeight: '1.2',
+              }}>
+                Your Business on Autopilot
+              </h2>
+              <p style={{
+                fontSize: isMobile ? '16px' : '18px',
+                color: theme.textMuted,
+                fontFamily: FONTS.body,
+                lineHeight: '1.6',
+                margin: '0 auto 40px',
+                maxWidth: '500px',
+              }}>
+                One trigger fires. Everything else runs itself.
+              </p>
+
+              {/* GHL-style Workflow Builder */}
+              <div style={{
+                position: 'relative',
+                borderRadius: '16px',
+                border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                backgroundColor: isDark ? 'rgba(0,0,0,0.3)' : `${BRAND.cream}40`,
+                backgroundImage: `radial-gradient(circle, ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)'} 1px, transparent 1px)`,
+                backgroundSize: '20px 20px',
+                padding: isSmall ? '24px 16px' : '36px 32px',
+                overflow: 'hidden',
+              }}
+              onMouseEnter={() => setFlowActive(true)}
+              onMouseLeave={() => setFlowActive(false)}
+              >
+                {/* Vertical flow — step-based sequential animation */}
+                {(() => {
+                  const nodeWidth = isSmall ? '220px' : '280px';
+                  const lineBg = isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.10)';
+                  const lineColor = BRAND.blue;         /* all lines = blue */
+                  const highlightBorder = '#e8860c';    /* all node borders on highlight = orange */
+                  const s = flowStep;
+
+                  /* Connector — line fills blue, circle border turns orange */
+                  const Connector = ({ step }) => {
+                    const active = s >= step;
+                    return (
+                      <div style={{
+                        position: 'relative',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        height: '48px', width: '22px',
+                      }}>
+                        <div style={{
+                          position: 'absolute', left: '50%', top: 0, bottom: 0,
+                          width: '2px', transform: 'translateX(-50%)',
+                          backgroundColor: lineBg, overflow: 'hidden',
+                        }}>
+                          <div style={{
+                            position: 'absolute', inset: 0,
+                            backgroundColor: active ? lineColor : 'transparent',
+                            transformOrigin: 'top',
+                            transform: active ? 'scaleY(1)' : 'scaleY(0)',
+                            transition: 'transform 0.45s ease',
+                          }} />
+                        </div>
+                        <div style={{
+                          position: 'relative', zIndex: 1,
+                          width: '22px', height: '22px', borderRadius: '50%',
+                          border: `1.5px solid ${active ? highlightBorder : (isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)')}`,
+                          backgroundColor: theme.cardBg,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          fontSize: '12px', fontWeight: '600',
+                          color: active ? highlightBorder : theme.textMuted,
+                          transition: 'all 0.3s ease 0.2s',
+                        }}>+</div>
+                      </div>
+                    );
+                  };
+
+                  /* Action node — border turns orange, icon keeps its own color */
+                  const ActionNode = ({ icon: Icon, title, subtitle, iconColor, step, iconWeight }) => {
+                    const active = s >= step;
+                    return (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        padding: '14px 18px', width: nodeWidth,
+                        backgroundColor: theme.cardBg, borderRadius: '12px',
+                        border: `1.5px solid ${active ? highlightBorder : theme.cardBorder}`,
+                        boxShadow: active
+                          ? `0 4px 20px ${highlightBorder}25, 0 0 0 2px ${highlightBorder}12`
+                          : `0 2px 8px ${isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)'}`,
+                        transform: active ? 'scale(1.03)' : 'scale(1)',
+                        transition: 'all 0.4s ease',
+                      }}>
+                        <div style={{
+                          width: '36px', height: '36px', borderRadius: '10px',
+                          backgroundColor: `${iconColor}15`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                          <Icon size={18} weight={iconWeight || 'duotone'} style={{ color: iconColor }} />
+                        </div>
+                        <div style={{ flex: 1, textAlign: 'left' }}>
+                          <div style={{ fontSize: '14px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body, lineHeight: '1.3' }}>{title}</div>
+                          <div style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, lineHeight: '1.4', marginTop: '2px' }}>{subtitle}</div>
+                        </div>
+                      </div>
+                    );
+                  };
+
+                  /* Branch line — always fills blue */
+                  const BranchLine = ({ step }) => {
+                    const active = s >= step;
+                    return (
+                      <div style={{
+                        width: '2px', height: '24px',
+                        backgroundColor: lineBg, overflow: 'hidden',
+                        position: 'relative',
+                      }}>
+                        <div style={{
+                          position: 'absolute', inset: 0,
+                          backgroundColor: active ? lineColor : 'transparent',
+                          transformOrigin: 'top',
+                          transform: active ? 'scaleY(1)' : 'scaleY(0)',
+                          transition: 'transform 0.35s ease',
+                        }} />
+                      </div>
+                    );
+                  };
+
+                  return (
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+
+                      {/* Step 1: Trigger Node */}
+                      <div style={{
+                        display: 'flex', alignItems: 'center', gap: '12px',
+                        width: nodeWidth, padding: '14px 18px',
+                        backgroundColor: isDark ? `${BRAND.blue}18` : `${BRAND.blue}0a`,
+                        borderRadius: '12px',
+                        border: `1.5px solid ${s >= 1 ? highlightBorder : (isDark ? `${BRAND.blue}40` : `${BRAND.blue}25`)}`,
+                        borderLeft: `4px solid ${BRAND.blue}`,
+                        boxShadow: s >= 1
+                          ? `0 4px 24px ${highlightBorder}30, 0 0 0 3px ${highlightBorder}15`
+                          : `0 2px 8px ${isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)'}`,
+                        transform: s >= 1 ? 'scale(1.03)' : 'scale(1)',
+                        transition: 'all 0.4s ease',
+                        cursor: 'pointer',
+                        animation: s < 1 ? 'triggerGlowHome 3s ease-in-out infinite' : 'none',
+                      }}>
+                        <div style={{
+                          width: '36px', height: '36px', borderRadius: '10px',
+                          background: `linear-gradient(135deg, ${BRAND.blue}, ${BRAND.blue}cc)`,
+                          display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
+                        }}>
+                          <Lightning size={18} weight="fill" style={{ color: '#fff' }} />
+                        </div>
+                        <div style={{ flex: 1, textAlign: 'left' }}>
+                          <div style={{ fontSize: '14px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, fontFamily: FONTS.body, lineHeight: '1.3' }}>New Lead Captured</div>
+                          <div style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, lineHeight: '1.4', marginTop: '2px' }}>Form Submission</div>
+                        </div>
+                      </div>
+
+                      <Connector step={2} />
+                      <ActionNode icon={Clock} title="Instant Follow-Up" subtitle="Send SMS & Email" iconColor={BRAND.blue} step={3} />
+                      <Connector step={4} />
+                      <ActionNode icon={ChartLineUp} title="Pipeline Updated" subtitle="Move to New Stage" iconColor={BRAND.blue} step={5} />
+                      <Connector step={6} />
+
+                      {/* Step 7: If/Else Condition */}
+                      <ActionNode icon={BracketsCurly} title="If/Else Condition" subtitle="Check Lead Score" iconColor={BRAND.blue} step={7} iconWeight="bold" />
+
+                      {/* Branch section */}
+                      <div style={{ width: '100%', maxWidth: isSmall ? '560px' : '640px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <BranchLine step={8} />
+
+                        {/* Step 9: Horizontal bar — blue */}
+                        {!isMobile && (
+                          <div style={{
+                            width: '70%', height: '2px',
+                            backgroundColor: lineBg,
+                            position: 'relative', overflow: 'hidden',
+                          }}>
+                            <div style={{
+                              position: 'absolute', inset: 0,
+                              backgroundColor: s >= 9 ? lineColor : 'transparent',
+                              transformOrigin: 'center',
+                              transform: s >= 9 ? 'scaleX(1)' : 'scaleX(0)',
+                              transition: 'transform 0.4s ease',
+                            }} />
+                          </div>
+                        )}
+
+                        {/* Branch cards */}
+                        <div style={{
+                          display: isMobile ? 'flex' : 'grid',
+                          gridTemplateColumns: isMobile ? undefined : 'repeat(3, 1fr)',
+                          flexDirection: isMobile ? 'column' : undefined,
+                          alignItems: isMobile ? 'center' : 'stretch',
+                          gap: isMobile ? '0' : '40px',
+                          width: '100%',
+                        }}>
+                          {[
+                            { icon: CalendarCheck, title: 'Appointment Set', subtitle: 'Hot lead — book call', iconColor: BRAND.green, step: 10 },
+                            { icon: Handshake, title: 'Team Notified', subtitle: 'Assign to sales rep', iconColor: BRAND.blue, step: 11 },
+                            { icon: Timer, title: 'Nurture Sequence', subtitle: 'Add to drip campaign', iconColor: '#c4813a', step: 12 },
+                          ].map((branch, i) => {
+                            const active = s >= branch.step;
+                            return (
+                              <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <BranchLine step={branch.step} />
+                                <div style={{
+                                  padding: '14px 16px',
+                                  backgroundColor: theme.cardBg,
+                                  borderRadius: '10px',
+                                  border: `1.5px solid ${active ? highlightBorder : theme.cardBorder}`,
+                                  borderBottom: `3px solid ${active ? highlightBorder : theme.cardBorder}`,
+                                  boxShadow: active
+                                    ? `0 4px 16px ${highlightBorder}20`
+                                    : `0 2px 8px ${isDark ? 'rgba(0,0,0,0.2)' : 'rgba(0,0,0,0.04)'}`,
+                                  transform: active ? 'scale(1.03)' : 'scale(1)',
+                                  transition: 'all 0.4s ease',
+                                  textAlign: 'center',
+                                  width: isMobile ? nodeWidth : '100%',
+                                  flex: 1,
+                                }}>
+                                  <div style={{
+                                    width: '32px', height: '32px', borderRadius: '8px',
+                                    backgroundColor: `${branch.iconColor}12`,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    margin: '0 auto 8px',
+                                  }}>
+                                    <branch.icon size={16} weight="duotone" style={{ color: branch.iconColor }} />
+                                  </div>
+                                  <div style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{branch.title}</div>
+                                  <div style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginTop: '3px' }}>{branch.subtitle}</div>
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                    </div>
+                  );
+                })()}
+
+                {/* Connected tools row */}
+                <div style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  gap: '10px',
+                  marginTop: '28px',
+                  paddingTop: '20px',
+                  borderTop: `1px dashed ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)'}`,
+                }}>
+                  {[
+                    { icon: GearSix, label: 'GoHighLevel CRM' },
+                    { icon: Envelope, label: 'Email & SMS' },
+                    { icon: Lightning, label: 'AI Assistant' },
+                  ].map((tool, i) => {
+                    const ToolIcon = tool.icon;
+                    return (
+                      <div key={i} style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '6px 12px',
+                        borderRadius: '20px',
+                        border: `1px dashed ${isDark ? 'rgba(255,255,255,0.15)' : 'rgba(0,0,0,0.12)'}`,
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                      }}>
+                        <ToolIcon size={14} style={{ color: theme.textMuted }} />
+                        <span style={{ fontSize: '11px', fontWeight: '600', color: theme.textMuted, fontFamily: FONTS.body }}>{tool.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Hover hint */}
+                <p style={{
+                  textAlign: 'center',
+                  fontSize: '12px',
+                  color: theme.textMuted,
+                  fontFamily: FONTS.body,
+                  marginTop: '16px',
+                  marginBottom: 0,
+                  opacity: 0.7,
+                }}>
+                  Hover to activate the flow
+                </p>
+              </div>
+
+              {/* Footer note */}
+              <p style={{
+                fontSize: '14px',
+                color: theme.textMuted,
+                fontFamily: FONTS.body,
+                marginTop: '28px',
+              }}>
+                Powered by <strong style={{ color: isDark ? '#f5f0eb' : BRAND.brown }}>GoHighLevel</strong> automation, built by BrewedOps.
+              </p>
+            </div>
+          </ScrollReveal>
         </section>
 
         {/* SERVICES OVERVIEW */}

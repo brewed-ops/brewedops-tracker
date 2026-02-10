@@ -6,11 +6,11 @@ import {
   Wallet, CheckSquare, FileText, Headset, Image, FilmStrip, NotePencil, QrCode,
   Coffee, Globe, Shield, DeviceMobile,
   Camera, ForkKnife, Timer, Barbell, ChartBar, Trophy,
-  CaretDown, Sun, Moon, List, Lock,
+  CaretDown, CaretRight, Sun, Moon, List, Lock,
   Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage,
   GitMerge, FileDashed, BookOpen, MagnifyingGlass, TextT, Hash,
   GitBranch, BracketsCurly, Clock, CurrencyDollar, Note,
-  FileMagnifyingGlass
+  FileMagnifyingGlass, Headphones, GearSix, ClipboardText, CalendarCheck, CheckCircle, Handshake
 } from '@phosphor-icons/react';
 import SEO from './SEO';
 import ScrollReveal from '@/components/ui/ScrollReveal';
@@ -198,11 +198,17 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
   const isMobile = windowWidth < 640;
   const isDesktop = windowWidth >= 1024;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
   const theme = {
@@ -223,9 +229,9 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
   };
 
   const stats = [
+    { value: '3', label: 'Core Services' },
     { value: '22+', label: 'Free Tools' },
     { value: '1', label: 'Mobile App' },
-    { value: '100%', label: 'Free to Use' },
     { value: '24/7', label: 'Available' },
   ];
 
@@ -241,8 +247,8 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
     <>
     <SEO
       title="About Us | BrewedOps"
-      description="Learn about BrewedOps - free productivity tools built for Filipino Virtual Assistants and Freelancers."
-      keywords="BrewedOps about, Filipino VA, freelancer tools, productivity platform"
+      description="BrewedOps offers HighLevel automation, customer support, and virtual assistant services — plus 22+ free productivity tools for VAs and freelancers."
+      keywords="BrewedOps about, GoHighLevel automation, customer support, virtual assistant, Filipino VA, freelancer tools"
     />
     <div style={{
       minHeight: '100vh',
@@ -257,11 +263,12 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottom: '1px solid ' + theme.cardBorder,
+        borderBottom: isScrolled ? '1px solid ' + theme.cardBorder : '1px solid transparent',
         backgroundColor: theme.bg,
         position: 'sticky',
         top: 0,
         zIndex: 100,
+        transition: 'border-color 0.3s',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px', cursor: 'pointer' }}>
@@ -275,7 +282,6 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
             <>
               <button onClick={() => navigate('/')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>Home</button>
               <button onClick={() => navigate('/portfolio')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>Portfolio</button>
-              <button onClick={() => navigate('/services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>Services</button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
               <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
               <AppsDropdown isDark={isDark} theme={theme} onAppClick={(path) => navigate(path)} />
@@ -295,9 +301,43 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
             </button>
           )}
           {isDesktop ? (
-            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
-              Account creation coming soon
-            </span>
+            <button
+              onClick={() => navigate('/services')}
+              style={{
+                position: 'relative',
+                overflow: 'hidden',
+                marginLeft: '8px',
+                height: '38px',
+                padding: '0 22px',
+                backgroundColor: BRAND.blue,
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: '500',
+                fontFamily: FONTS.body,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 2px 12px rgba(0,74,172,0.35)',
+                animation: 'servicesBtnPulse 2.5s ease-in-out infinite',
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+                animation: 'servicesBtnShimmer 3s ease-in-out infinite',
+                pointerEvents: 'none',
+              }} />
+              Services
+              <CaretRight size={14} />
+            </button>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
               <List size={18} />
@@ -305,6 +345,18 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
           )}
         </div>
       </nav>
+
+      <style>{`
+        @keyframes servicesBtnPulse {
+          0%, 100% { box-shadow: 0 2px 12px rgba(0,74,172,0.35); transform: scale(1); }
+          50% { box-shadow: 0 4px 20px rgba(0,74,172,0.55), 0 0 0 4px rgba(0,74,172,0.12); transform: scale(1.04); }
+        }
+        @keyframes servicesBtnShimmer {
+          0% { left: -100%; }
+          60% { left: 100%; }
+          100% { left: 100%; }
+        }
+      `}</style>
 
       {/* Mobile Drawer */}
       <React.Suspense fallback={null}>
@@ -344,16 +396,16 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
             }}>
               About <span style={{ color: BRAND.blue }}>BrewedOps</span>
             </h1>
-            <p style={{ 
-              fontSize: '18px', 
-              color: theme.textMuted, 
+            <p style={{
+              fontSize: '18px',
+              color: theme.textMuted,
               margin: 0,
               lineHeight: '1.6',
-              maxWidth: '600px',
+              maxWidth: '640px',
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              A comprehensive productivity platform with 22+ free tools built specifically for Filipino Virtual Assistants and Freelancers
+              HighLevel automation, customer support, and virtual assistant services — backed by 22+ free tools built for VAs and freelancers.
             </p>
           </div>
           </ScrollReveal>
@@ -385,6 +437,83 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
           </div>
           </ScrollReveal>
 
+          {/* Core Services */}
+          <ScrollReveal>
+          <div style={{ marginBottom: '32px' }}>
+            <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: '0 0 20px', textAlign: 'center' }}>
+              What We Do
+            </h2>
+            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: '16px' }}>
+              {[
+                {
+                  icon: GearSix, color: '#f59e0b', title: 'HighLevel Automation',
+                  desc: 'We build GoHighLevel workflows that capture leads, nurture them automatically, and book appointments — zero manual follow-up.',
+                  items: ['CRM Setup & Build', 'Workflow Automation', 'Pipeline Management', 'Smart Notifications'],
+                },
+                {
+                  icon: Headphones, color: BRAND.blue, title: 'Customer Support',
+                  desc: 'Every email answered. Every chat handled. Every call picked up. Your customers get white-glove service without you lifting a finger.',
+                  items: ['Email & Ticket Support', 'Live Chat Handling', 'Phone Support', 'Client Onboarding'],
+                },
+                {
+                  icon: ClipboardText, color: BRAND.green, title: 'Virtual Assistant',
+                  desc: 'Inbox drowning? Calendar chaos? We take over the operational tasks that eat your hours so you can run the business.',
+                  items: ['Inbox Management', 'Calendar & Scheduling', 'Data Entry & Reporting', 'CRM Updates'],
+                },
+              ].map((service, idx) => {
+                const ServiceIcon = service.icon;
+                return (
+                  <div key={idx} style={{
+                    padding: '28px 24px',
+                    backgroundColor: theme.cardBg,
+                    borderRadius: '16px',
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderTop: `3px solid ${service.color}`,
+                  }}>
+                    <div style={{
+                      width: '48px', height: '48px', borderRadius: '12px',
+                      backgroundColor: `${service.color}18`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      marginBottom: '16px',
+                    }}>
+                      <ServiceIcon size={24} weight="fill" style={{ color: service.color }} />
+                    </div>
+                    <h3 style={{ fontSize: '18px', fontWeight: '700', color: theme.text, margin: '0 0 10px', fontFamily: FONTS.heading }}>
+                      {service.title}
+                    </h3>
+                    <p style={{ fontSize: '14px', color: theme.textMuted, lineHeight: '1.7', margin: '0 0 16px', fontFamily: FONTS.body }}>
+                      {service.desc}
+                    </p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                      {service.items.map((item, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <CheckCircle size={14} weight="fill" style={{ color: service.color, flexShrink: 0 }} />
+                          <span style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body, fontWeight: '500' }}>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div style={{ textAlign: 'center', marginTop: '24px' }}>
+              <button
+                onClick={() => navigate('/services')}
+                style={{
+                  height: '46px', padding: '0 28px',
+                  backgroundColor: BRAND.blue, color: '#fff', border: 'none',
+                  borderRadius: '10px', fontSize: '15px', fontWeight: '600',
+                  fontFamily: FONTS.body, cursor: 'pointer',
+                  display: 'inline-flex', alignItems: 'center', gap: '8px',
+                  boxShadow: '0 4px 16px rgba(0,74,172,0.3)',
+                }}
+              >
+                View All Services <CaretRight size={16} weight="bold" />
+              </button>
+            </div>
+          </div>
+          </ScrollReveal>
+
           {/* Story Section */}
           <ScrollReveal>
           <div style={{
@@ -407,30 +536,30 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
                 <Code style={{ width: '22px', height: '22px', color: '#22c55e' }} />
               </div>
               <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: 0 }}>
-                Built Through Vibe Coding
+                The BrewedOps Story
               </h2>
             </div>
-            <p style={{ 
-              fontSize: '16px', 
-              color: theme.textMuted, 
+            <p style={{
+              fontSize: '16px',
+              color: theme.textMuted,
               lineHeight: '1.8',
               margin: '0 0 16px'
             }}>
-              BrewedOps was created by <strong style={{ color: theme.text }}>Kenneth</strong> through the power of 
-              vibe coding — a creative approach where ideas flow naturally into functional software. What started 
-              as a personal tool to manage freelance finances has evolved into a comprehensive platform with 
-              <strong style={{ color: theme.text }}> 22+ free tools</strong> designed specifically for the needs 
-              of Filipino VAs and freelancers.
+              BrewedOps was created by <strong style={{ color: theme.text }}>Kenneth</strong> — a Filipino virtual assistant
+              and developer who understands the daily grind of remote work firsthand. What started as a personal tool to manage
+              freelance finances evolved into a full service business offering <strong style={{ color: theme.text }}>GoHighLevel automation,
+              customer support, and virtual assistant services</strong> to businesses that want to scale without burning out.
             </p>
-            <p style={{ 
-              fontSize: '16px', 
-              color: theme.textMuted, 
+            <p style={{
+              fontSize: '16px',
+              color: theme.textMuted,
               lineHeight: '1.8',
               margin: 0
             }}>
-              From financial tracking with multi-currency support to image editing, PDF manipulation, and productivity 
-              tools — every feature in BrewedOps was built with intention, understanding the unique challenges of 
-              working remotely for clients around the world.
+              Along the way, Kenneth built <strong style={{ color: theme.text }}>22+ free productivity tools</strong> and a
+              mobile nutrition app (<strong style={{ color: '#14b8a6' }}>Fuelyx</strong>) — all through vibe coding, a creative
+              approach where ideas flow naturally into functional software. Every tool and service at BrewedOps was built with
+              intention, understanding the unique challenges of working remotely for clients around the world.
             </p>
           </div>
           </ScrollReveal>
@@ -577,7 +706,7 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
           </div>
           </ScrollReveal>
 
-          {/* Features Highlights */}
+          {/* Why BrewedOps */}
           <ScrollReveal>
           <div style={{
             display: 'grid',
@@ -585,66 +714,31 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
             gap: '16px',
             marginBottom: '32px'
           }}>
-            <div style={{
-              padding: '24px',
-              backgroundColor: theme.cardBg,
-              borderRadius: '12px',
-              border: '1px solid ' + theme.cardBorder,
-              textAlign: 'center'
-            }}>
-              <Lightning style={{ width: '32px', height: '32px', color: '#f59e0b', margin: '0 auto 12px' }} />
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-                Fast & Intuitive
-              </h3>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
-                Designed for efficiency and ease of use
-              </p>
-            </div>
-            <div style={{
-              padding: '24px',
-              backgroundColor: theme.cardBg,
-              borderRadius: '12px',
-              border: '1px solid ' + theme.cardBorder,
-              textAlign: 'center'
-            }}>
-              <Shield style={{ width: '32px', height: '32px', color: '#22c55e', margin: '0 auto 12px' }} />
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-                Secure & Private
-              </h3>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
-                Your data stays safe with us
-              </p>
-            </div>
-            <div style={{
-              padding: '24px',
-              backgroundColor: theme.cardBg,
-              borderRadius: '12px',
-              border: '1px solid ' + theme.cardBorder,
-              textAlign: 'center'
-            }}>
-              <Globe style={{ width: '32px', height: '32px', color: '#3b82f6', margin: '0 auto 12px' }} />
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-                Works Anywhere
-              </h3>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
-                Access from any device
-              </p>
-            </div>
-            <div style={{
-              padding: '24px',
-              backgroundColor: theme.cardBg,
-              borderRadius: '12px',
-              border: '1px solid ' + theme.cardBorder,
-              textAlign: 'center'
-            }}>
-              <Users style={{ width: '32px', height: '32px', color: '#004AAC', margin: '0 auto 12px' }} />
-              <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px' }}>
-                Built for VAs
-              </h3>
-              <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0 }}>
-                Features tailored for freelancers
-              </p>
-            </div>
+            {[
+              { icon: Lightning, color: '#f59e0b', title: 'Real Results', desc: 'Automation that saves hours, not just looks pretty' },
+              { icon: Handshake, color: BRAND.blue, title: 'Human + Systems', desc: 'Real people backed by smart automation' },
+              { icon: Shield, color: BRAND.green, title: 'Reliable & Secure', desc: 'Your operations and data stay safe with us' },
+              { icon: CalendarCheck, color: '#8b5cf6', title: 'Free Discovery Call', desc: '30-min call to map your automation roadmap' },
+            ].map((item, idx) => {
+              const ItemIcon = item.icon;
+              return (
+                <div key={idx} style={{
+                  padding: '24px',
+                  backgroundColor: theme.cardBg,
+                  borderRadius: '12px',
+                  border: '1px solid ' + theme.cardBorder,
+                  textAlign: 'center'
+                }}>
+                  <ItemIcon size={32} weight="fill" style={{ color: item.color, margin: '0 auto 12px', display: 'block' }} />
+                  <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: '0 0 8px', fontFamily: FONTS.heading }}>
+                    {item.title}
+                  </h3>
+                  <p style={{ fontSize: '14px', color: theme.textMuted, margin: 0, fontFamily: FONTS.body }}>
+                    {item.desc}
+                  </p>
+                </div>
+              );
+            })}
           </div>
           </ScrollReveal>
 

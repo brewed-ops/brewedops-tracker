@@ -403,7 +403,7 @@ function PortfolioPage({ isDark, setIsDark }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => setIsScrolled(window.scrollY > 0);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -531,8 +531,9 @@ function PortfolioPage({ isDark, setIsDark }) {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        borderBottom: `1px solid ${theme.cardBorder}`,
+        borderBottom: isScrolled ? `1px solid ${theme.cardBorder}` : '1px solid transparent',
         backgroundColor: isScrolled ? (isDark ? 'rgba(13,11,9,0.95)' : 'rgba(255,255,255,0.95)') : theme.bg,
+        transition: 'border-color 0.3s',
         backdropFilter: isScrolled ? 'blur(12px)' : 'none',
         position: 'sticky',
         top: 0,
@@ -554,9 +555,6 @@ function PortfolioPage({ isDark, setIsDark }) {
               <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: BRAND.blue, border: 'none', fontSize: '14px', fontWeight: '600', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
                 Portfolio
               </button>
-              <button onClick={() => navigate('/services')} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                Services
-              </button>
               <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} onLoginClick={() => navigate('/login')} />
               <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
               <AppsDropdown isDark={isDark} theme={theme} onAppClick={(path) => navigate(path)} />
@@ -574,9 +572,43 @@ function PortfolioPage({ isDark, setIsDark }) {
             {isDark ? <Sun size={16} /> : <Moon size={16} />}
           </button>
           {!isMobile ? (
-            <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, marginLeft: '8px', whiteSpace: 'nowrap' }}>
-              Account creation coming soon
-            </span>
+            <button
+              onClick={() => navigate('/services')}
+              style={{
+                position: 'relative',
+                overflow: 'hidden',
+                marginLeft: '8px',
+                height: '38px',
+                padding: '0 22px',
+                backgroundColor: '#004AAC',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '10px',
+                fontSize: '14px',
+                fontWeight: '500',
+                fontFamily: "'Poppins', sans-serif",
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap',
+                boxShadow: '0 2px 12px rgba(0,74,172,0.35)',
+                animation: 'servicesBtnPulse 2.5s ease-in-out infinite',
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: 0,
+                left: '-100%',
+                width: '100%',
+                height: '100%',
+                background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%)',
+                animation: 'servicesBtnShimmer 3s ease-in-out infinite',
+                pointerEvents: 'none',
+              }} />
+              Services
+              <CaretRight size={14} />
+            </button>
           ) : (
             <button onClick={() => setMobileMenuOpen(true)} aria-label="Open navigation menu" style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: `1px solid ${theme.cardBorder}`, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '4px' }}>
               <List size={18} />
@@ -584,6 +616,17 @@ function PortfolioPage({ isDark, setIsDark }) {
           )}
         </div>
       </nav>
+      <style>{`
+        @keyframes servicesBtnPulse {
+          0%, 100% { box-shadow: 0 2px 12px rgba(0,74,172,0.35); transform: scale(1); }
+          50% { box-shadow: 0 4px 20px rgba(0,74,172,0.55), 0 0 0 4px rgba(0,74,172,0.12); transform: scale(1.04); }
+        }
+        @keyframes servicesBtnShimmer {
+          0% { left: -100%; }
+          60% { left: 100%; }
+          100% { left: 100%; }
+        }
+      `}</style>
 
       <main>
         {/* ============================================ */}

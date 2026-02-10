@@ -409,9 +409,24 @@ const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {
                 textAlign: 'center',
               }}
             >
-              <span style={{ fontSize: '12px', color: theme.textMuted, fontFamily: FONTS.body }}>
-                Account creation coming soon
-              </span>
+              <button
+                onClick={() => handleNav('/services')}
+                style={{
+                  width: '100%',
+                  height: '42px',
+                  backgroundColor: BRAND.blue,
+                  color: '#ffffff',
+                  border: 'none',
+                  borderRadius: '10px',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  fontFamily: FONTS.body,
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 12px rgba(0,74,172,0.35)',
+                }}
+              >
+                View Services
+              </button>
             </div>
           </motion.div>
         </>
