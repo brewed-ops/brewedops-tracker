@@ -12,20 +12,14 @@ import {
   Phone,
   ChatCircle,
   Ticket,
-  ClipboardText,
   Calendar,
   Tray,
-  UserCheck,
   Lightning,
   GearSix,
-  Database,
   Sun,
   Moon,
-  CaretLeft,
   CaretDown,
-  HardHat,
   List,
-  Bell,
   Image,
   Scissors,
   ArrowsOutCardinal,
@@ -49,7 +43,6 @@ import {
   CurrencyDollar,
   Note,
   CheckSquare,
-  Globe,
   Timer,
   FileMagnifyingGlass,
   DeviceMobile,
@@ -589,9 +582,9 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                 gap: '0',
               }}>
                 {[
-                  { label: 'HighLevel Automation', color: '#f59e0b', Icon: Lightning },
-                  { label: 'Customer Support', color: BRAND.blue, Icon: Headphones },
-                  { label: 'Virtual Assistant', color: BRAND.green, Icon: ClipboardText },
+                  { label: 'HighLevel Automation', color: '#f59e0b' },
+                  { label: 'Customer Support', color: BRAND.blue },
+                  { label: 'Virtual Assistant', color: BRAND.green },
                 ].map((svc, i, arr) => (
                   <React.Fragment key={i}>
                     <div style={{
@@ -607,17 +600,13 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                     onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
                       <div style={{
-                        width: '32px',
-                        height: '32px',
-                        borderRadius: '8px',
-                        backgroundColor: `${svc.color}18`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        backgroundColor: svc.color,
                         flexShrink: 0,
-                      }}>
-                        <svc.Icon size={16} weight="fill" style={{ color: svc.color }} />
-                      </div>
+                        boxShadow: `0 0 8px ${svc.color}50`,
+                      }} />
                       <span style={{
                         fontSize: isSmall ? '13px' : '14px',
                         fontWeight: '600',
@@ -696,33 +685,16 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                     backgroundColor: '#f59e0b',
                     boxShadow: '0 0 12px rgba(245,158,11,0.4)',
                   }} />
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
+                  <span style={{
+                    fontSize: isSmall ? '18px' : '22px',
+                    fontWeight: '800',
+                    color: '#f59e0b',
+                    fontFamily: FONTS.heading,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
                   }}>
-                    <div style={{
-                      width: isSmall ? '36px' : '42px',
-                      height: isSmall ? '36px' : '42px',
-                      borderRadius: '10px',
-                      backgroundColor: isDark ? 'rgba(245,158,11,0.15)' : 'rgba(245,158,11,0.08)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      <Lightning size={isSmall ? 18 : 22} weight="fill" style={{ color: '#f59e0b' }} />
-                    </div>
-                    <span style={{
-                      fontSize: isSmall ? '18px' : '22px',
-                      fontWeight: '800',
-                      color: '#f59e0b',
-                      fontFamily: FONTS.heading,
-                      letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
-                    }}>
-                      GHL Automation
-                    </span>
-                  </div>
+                    GHL Automation
+                  </span>
                 </div>
                 <h2 style={{
                   fontSize: isSmall ? '28px' : '38px',
@@ -1065,46 +1037,46 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                 </p>
               </div>
 
-              {/* Feature grid */}
+              {/* What's included checklist */}
               <div style={{
-                display: 'grid',
-                gridTemplateColumns: isSmall ? '1fr 1fr' : 'repeat(4, 1fr)',
-                gap: '12px',
                 marginTop: '36px',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '20px',
               }}>
-                {[
-                  { icon: GearSix, text: 'CRM Setup & Build' },
-                  { icon: Lightning, text: 'Workflow Automation' },
-                  { icon: Database, text: 'Pipeline Management' },
-                  { icon: Bell, text: 'Smart Notifications' },
-                ].map((feat, i) => {
-                  const FeatIcon = feat.icon;
-                  return (
+                <div style={{
+                  display: 'flex',
+                  flexDirection: isSmall ? 'column' : 'row',
+                  justifyContent: 'center',
+                  gap: isSmall ? '10px' : '24px',
+                  flexWrap: 'wrap',
+                }}>
+                  {[
+                    'CRM setup & build',
+                    'Workflow automation',
+                    'Pipeline management',
+                    'Smart notifications',
+                  ].map((item, i) => (
                     <div key={i} style={{
-                      padding: '16px',
-                      backgroundColor: theme.cardBg,
-                      borderRadius: '12px',
-                      border: `1px solid ${theme.cardBorder}`,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '10px',
+                      gap: '8px',
                     }}>
-                      <FeatIcon size={18} style={{ color: '#f59e0b', flexShrink: 0 }} />
-                      <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{feat.text}</span>
+                      <CheckCircle size={16} weight="fill" style={{ color: '#f59e0b', flexShrink: 0 }} />
+                      <span style={{ fontSize: '14px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body }}>{item}</span>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
+                <p style={{
+                  fontSize: '13px',
+                  color: theme.textMuted,
+                  fontFamily: FONTS.body,
+                  margin: 0,
+                }}>
+                  Powered by <strong style={{ color: theme.text }}>GoHighLevel</strong> — built and managed by BrewedOps.
+                </p>
               </div>
-
-              <p style={{
-                textAlign: 'center',
-                fontSize: '14px',
-                color: theme.textMuted,
-                fontFamily: FONTS.body,
-                marginTop: '24px',
-              }}>
-                Powered by <strong style={{ color: theme.text }}>GoHighLevel</strong> automation, built by BrewedOps.
-              </p>
             </div>
           </ScrollReveal>
         </section>
@@ -1141,33 +1113,16 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                     backgroundColor: BRAND.blue,
                     boxShadow: `0 0 12px ${BRAND.blue}40`,
                   }} />
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
+                  <span style={{
+                    fontSize: isSmall ? '18px' : '22px',
+                    fontWeight: '800',
+                    color: BRAND.blue,
+                    fontFamily: FONTS.heading,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
                   }}>
-                    <div style={{
-                      width: isSmall ? '36px' : '42px',
-                      height: isSmall ? '36px' : '42px',
-                      borderRadius: '10px',
-                      backgroundColor: isDark ? 'rgba(0,74,172,0.15)' : 'rgba(0,74,172,0.08)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      <Headphones size={isSmall ? 18 : 22} weight="fill" style={{ color: BRAND.blue }} />
-                    </div>
-                    <span style={{
-                      fontSize: isSmall ? '18px' : '22px',
-                      fontWeight: '800',
-                      color: BRAND.blue,
-                      fontFamily: FONTS.heading,
-                      letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
-                    }}>
-                      Customer Support
-                    </span>
-                  </div>
+                    Customer Support
+                  </span>
                 </div>
                 <h2 style={{
                   fontSize: isSmall ? '28px' : '38px',
@@ -1218,22 +1173,9 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                 }}>
                   {/* Dashboard header */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px', paddingBottom: '16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '10px',
-                        backgroundColor: isDark ? `${BRAND.blue}20` : `${BRAND.blue}10`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                        <Headphones size={18} weight="fill" style={{ color: BRAND.blue }} />
-                      </div>
-                      <div>
-                        <span style={{ fontSize: '15px', fontWeight: '700', color: theme.text, fontFamily: FONTS.heading, display: 'block', lineHeight: '1.2' }}>Support Dashboard</span>
-                        <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body }}>Real-time overview</span>
-                      </div>
+                    <div>
+                      <span style={{ fontSize: '15px', fontWeight: '700', color: theme.text, fontFamily: FONTS.heading, display: 'block', lineHeight: '1.2' }}>Support Dashboard</span>
+                      <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body }}>Real-time overview</span>
                     </div>
                     <div style={{
                       display: 'flex',
@@ -1386,33 +1328,16 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                     backgroundColor: BRAND.green,
                     boxShadow: `0 0 12px ${BRAND.green}40`,
                   }} />
-                  <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
+                  <span style={{
+                    fontSize: isSmall ? '18px' : '22px',
+                    fontWeight: '800',
+                    color: BRAND.green,
+                    fontFamily: FONTS.heading,
+                    letterSpacing: '0.04em',
+                    textTransform: 'uppercase',
                   }}>
-                    <div style={{
-                      width: isSmall ? '36px' : '42px',
-                      height: isSmall ? '36px' : '42px',
-                      borderRadius: '10px',
-                      backgroundColor: isDark ? 'rgba(81,175,67,0.15)' : 'rgba(81,175,67,0.08)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                    }}>
-                      <ClipboardText size={isSmall ? 18 : 22} weight="fill" style={{ color: BRAND.green }} />
-                    </div>
-                    <span style={{
-                      fontSize: isSmall ? '18px' : '22px',
-                      fontWeight: '800',
-                      color: BRAND.green,
-                      fontFamily: FONTS.heading,
-                      letterSpacing: '0.04em',
-                      textTransform: 'uppercase',
-                    }}>
-                      Admin VA
-                    </span>
-                  </div>
+                    Admin VA
+                  </span>
                 </div>
                 <h2 style={{
                   fontSize: isSmall ? '28px' : '38px',
@@ -1466,22 +1391,9 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                 }}>
                   {/* Dashboard header */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px', paddingBottom: '16px', borderBottom: `1px solid ${theme.cardBorder}` }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <div style={{
-                        width: '36px',
-                        height: '36px',
-                        borderRadius: '10px',
-                        backgroundColor: isDark ? `${BRAND.green}20` : `${BRAND.green}10`,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                      }}>
-                        <ClipboardText size={18} weight="fill" style={{ color: BRAND.green }} />
-                      </div>
-                      <div>
-                        <span style={{ fontSize: '15px', fontWeight: '700', color: theme.text, fontFamily: FONTS.heading, display: 'block', lineHeight: '1.2' }}>VA Workspace</span>
-                        <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body }}>Today's operations</span>
-                      </div>
+                    <div>
+                      <span style={{ fontSize: '15px', fontWeight: '700', color: theme.text, fontFamily: FONTS.heading, display: 'block', lineHeight: '1.2' }}>VA Workspace</span>
+                      <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body }}>Today's operations</span>
                     </div>
                     <div style={{
                       display: 'flex',
