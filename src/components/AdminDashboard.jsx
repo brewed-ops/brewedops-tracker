@@ -80,14 +80,14 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         .from('user_profiles')
         .select('*');
 
-      if (upError) console.error('User profiles error:', upError);
+
 
       // Try to get profiles table (may contain nickname, avatar)
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
         .select('*');
 
-      if (profilesError) console.error('Profiles error (may be expected):', profilesError);
+
 
       // Get all expenses (contains user_email and user_nickname)
       const { data: expenses, error: expError } = await supabase
@@ -95,7 +95,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         .select('*')
         .order('created_at', { ascending: false });
 
-      if (expError) console.error('Expenses error:', expError);
+
 
       // Try to get auth users via edge function (has actual emails)
       let authUsers = [];
@@ -116,9 +116,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             authUsers = result.users || [];
           }
         }
-      } catch (e) {
-        console.log('Could not fetch auth users (edge function may not exist):', e);
-      }
+      } catch { /* ignored */ }
 
       // Build user map
       const userMap = {};
@@ -167,9 +165,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
             totalClients += clientCount;
             totalInvoices += invoiceCount;
             totalIncome += incomeTotal;
-          } catch (e) {
-            console.error('Error parsing VAKita data:', e);
-          }
+          } catch { /* ignored */ }
 
           if (existingUser) {
             // Update existing user with user_profiles data
@@ -294,11 +290,8 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
         activeUsers
       });
 
-      console.log('Fetched users:', userList.length, userList);
 
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
+    } catch { /* ignored */ }
   };
 
   const fetchFeedbacks = async () => {
@@ -310,9 +303,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
       if (error) throw error;
       setFeedbacks(data || []);
-    } catch (error) {
-      console.error('Error fetching feedbacks:', error);
-    }
+    } catch { /* ignored */ }
   };
 
   // Load detailed user data
@@ -370,9 +361,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
 
       setUserExpenses(expenses || []);
 
-    } catch (error) {
-      console.error('Error loading user details:', error);
-    } finally {
+    } catch { /* ignored */ } finally {
       setLoadingUserData(false);
     }
   };
@@ -431,7 +420,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       setShowEditUserModal(false);
       alert(`User updated successfully!`);
     } catch (error) {
-      console.error('Error updating user:', error);
       alert('Failed to update user: ' + error.message);
     } finally {
       setSavingUser(false);
@@ -478,7 +466,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       setCreateUserForm({ email: '', password: '', nickname: '' });
       fetchUsers();
     } catch (error) {
-      console.error('Error creating user:', error);
       alert('Failed to create user: ' + error.message);
     } finally {
       setCreatingUser(false);
@@ -506,7 +493,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       setConfirmText('');
       alert('User deleted successfully');
     } catch (error) {
-      console.error('Error deleting user:', error);
       alert('Failed to delete user: ' + error.message);
     }
   };
@@ -561,7 +547,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       alert(`User ${resetType} data has been reset`);
       fetchUsers();
     } catch (error) {
-      console.error('Error resetting user data:', error);
       alert('Failed to reset data: ' + error.message);
     }
   };
@@ -573,9 +558,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       await supabase.from('expenses').delete().eq('id', expenseId);
       setUserExpenses(prev => prev.filter(e => e.id !== expenseId));
       fetchUsers();
-    } catch (error) {
-      console.error('Error deleting expense:', error);
-    }
+    } catch { /* ignored */ }
   };
 
   const handleDeleteWallet = async (walletId) => {
@@ -588,7 +571,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       setUserWallets(prev => prev.filter(w => w.id !== walletId));
       alert('Wallet deleted');
     } catch (error) {
-      console.error('Error deleting wallet:', error);
       alert('Failed to delete wallet: ' + error.message);
     }
   };
@@ -602,9 +584,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       }).eq('user_id', selectedUser.id);
       setUserVAKitaData(prev => ({ ...prev, clients: updatedClients }));
       alert('Client deleted');
-    } catch (error) {
-      console.error('Error deleting client:', error);
-    }
+    } catch { /* ignored */ }
   };
 
   const handleDeleteInvoice = async (invoiceId) => {
@@ -616,9 +596,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       }).eq('user_id', selectedUser.id);
       setUserVAKitaData(prev => ({ ...prev, invoices: updatedInvoices }));
       alert('Invoice deleted');
-    } catch (error) {
-      console.error('Error deleting invoice:', error);
-    }
+    } catch { /* ignored */ }
   };
 
   const handleDeleteIncome = async (incomeId) => {
@@ -630,9 +608,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       }).eq('user_id', selectedUser.id);
       setUserVAKitaData(prev => ({ ...prev, income: updatedIncome }));
       alert('Income entry deleted');
-    } catch (error) {
-      console.error('Error deleting income:', error);
-    }
+    } catch { /* ignored */ }
   };
 
   const handleDeleteProspect = async (prospectId) => {
@@ -644,9 +620,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       }).eq('user_id', selectedUser.id);
       setUserVAKitaData(prev => ({ ...prev, prospects: updatedProspects }));
       alert('Prospect deleted');
-    } catch (error) {
-      console.error('Error deleting prospect:', error);
-    }
+    } catch { /* ignored */ }
   };
 
   // Adjust level
@@ -680,7 +654,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       setUserProfileData(prev => ({ ...prev, xp: newXP }));
       alert(`User level ${adjustment > 0 ? 'increased' : 'decreased'} to Level ${newLevel}`);
     } catch (error) {
-      console.error('Error adjusting level:', error);
       alert('Failed to adjust level: ' + error.message);
     }
   };
@@ -695,7 +668,6 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       if (error) throw error;
       alert(`Password reset email sent to ${selectedUser.email}`);
     } catch (error) {
-      console.error('Error:', error);
       alert('Failed to send password reset: ' + error.message);
     }
   };
@@ -716,9 +688,7 @@ const AdminDashboard = ({ onLogout, isDark, setIsDark }) => {
       await supabase.from('feedbacks').delete().eq('id', id);
       setFeedbacks(prev => prev.filter(f => f.id !== id));
       if (viewingFeedback?.id === id) setViewingFeedback(null);
-    } catch (error) {
-      console.error('Error:', error);
-    }
+    } catch { /* ignored */ }
   };
 
   // Filtered data

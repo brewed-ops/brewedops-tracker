@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  CaretRight, CaretDown, Sun, Moon, CaretLeft,
+  CaretRight, CaretDown, CaretLeft,
   DeviceMobile, Lightning, Target, TrendUp, Clock, Camera,
   AppleLogo, Barbell, ChartBar, Heart, Shield, Star,
   Download, Play, Check, ArrowRight, Sparkle, Trophy,
@@ -19,6 +19,7 @@ import {
   Lock, CurrencyDollar, Note, CheckSquare, FileMagnifyingGlass
 } from '@phosphor-icons/react';
 import SEO from './SEO';
+import ThemeToggle from './ui/ThemeToggle';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 
@@ -284,7 +285,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
     
     window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
@@ -388,24 +389,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
               <a href="/privacy" style={navLinkStyle}>Privacy</a>
             </>
           )}
-          <button
-            onClick={() => setIsDark(!isDark)}
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            style={{
-              width: '36px',
-              height: '36px',
-              backgroundColor: 'transparent',
-              border: '1px solid ' + theme.cardBorder,
-              borderRadius: '8px',
-              color: theme.textMuted,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
+          <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
           {!isMobile ? (
             <button
               onClick={() => navigate('/services')}

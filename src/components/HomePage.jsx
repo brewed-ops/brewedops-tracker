@@ -8,8 +8,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CaretRight, CaretDown, Sun, Moon, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck, Sparkle, FileMagnifyingGlass, DeviceMobile, CalendarCheck, Handshake, Envelope, ChatCircle, GearSix } from '@phosphor-icons/react';
+import { CaretRight, CaretDown, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck, Sparkle, FileMagnifyingGlass, DeviceMobile, CalendarCheck, Handshake, Envelope, ChatCircle, GearSix } from '@phosphor-icons/react';
 import SEO from './SEO';
+import ThemeToggle from './ui/ThemeToggle';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
 import { createNoise3D } from "simplex-noise";
 import { motion } from "framer-motion";
@@ -869,7 +870,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -957,9 +958,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                 <a href="/privacy" style={navLinkStyle}>Privacy</a>
               </>
             )}
-            <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
+            <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
             {isDesktop ? (
               <button
                 onClick={() => navigate('/services')}

@@ -10,8 +10,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CaretLeft, CaretRight, Sun, Moon, SignIn } from '@phosphor-icons/react';
+import { CaretLeft, CaretRight, SignIn } from '@phosphor-icons/react';
 import SEO from '../SEO';
+import ThemeToggle from '../ui/ThemeToggle';
 
 // ============================================
 // BRAND CONFIGURATION
@@ -68,7 +69,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -175,24 +176,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
         {/* Right: Theme + Auth Buttons */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* Theme Toggle */}
-          <button
-            onClick={() => setIsDark(!isDark)}
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            style={{
-              width: '36px',
-              height: '36px',
-              backgroundColor: 'transparent',
-              border: '1px solid ' + theme.cardBorder,
-              borderRadius: '8px',
-              color: theme.textMuted,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
+          <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
 
           {!isSmall && (
             <button

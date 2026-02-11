@@ -26,7 +26,7 @@ const LANGUAGES = [
   { code: 'tgl', name: 'Tagalog' },
 ];
 
-// Multiple API keys for fallback
+// OCR.space free-tier API keys (public demo keys)
 const API_KEYS = [
   'K85482751488957',
   'K87654321098765',

@@ -43,12 +43,10 @@ const getTheme = (isDark) => ({
 // ============================================
 // OPENAI CONFIGURATION
 // ============================================
-// Set your OpenAI API key here or via environment variable
-// For production, use a Supabase Edge Function proxy instead
+// Production: set VITE_OPENAI_EDGE_URL to proxy through Supabase Edge Function
+// Fallback: VITE_OPENAI_API_KEY for direct calls (key will be in client bundle)
 const OPENAI_CONFIG = {
-  // Direct API key (for local dev only - do NOT expose in production)
   apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
-  // Supabase Edge Function URL (use this in production)
   edgeFunctionUrl: import.meta.env.VITE_OPENAI_EDGE_URL || '',
   model: 'gpt-4o-mini',
 };
@@ -460,7 +458,6 @@ const GHLScenarioGenerator = ({ isDark }) => {
       ];
 
       if (OPENAI_CONFIG.edgeFunctionUrl) {
-        // Production: call Supabase Edge Function
         const res = await fetch(OPENAI_CONFIG.edgeFunctionUrl, {
           method: 'POST',
           headers: {
@@ -476,7 +473,6 @@ const GHLScenarioGenerator = ({ isDark }) => {
         const data = await res.json();
         responseText = data.content || '';
       } else if (OPENAI_CONFIG.apiKey) {
-        // Dev mode: direct OpenAI API call
         const res = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -511,7 +507,7 @@ const GHLScenarioGenerator = ({ isDark }) => {
       setCooldownRemaining(COOLDOWN_MS);
     } catch (err) {
       if (err.message === 'API_NOT_CONFIGURED') {
-        setError('API key not configured. Add VITE_OPENAI_API_KEY to your .env file or set VITE_GHL_SCENARIO_API_URL for the Supabase Edge Function endpoint.');
+        setError('API not configured. Set VITE_OPENAI_EDGE_URL or VITE_OPENAI_API_KEY in your .env file.');
       } else {
         setError(err.message || 'Failed to generate scenario. Please try again.');
       }

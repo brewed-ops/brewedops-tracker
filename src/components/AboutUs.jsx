@@ -6,12 +6,13 @@ import {
   Wallet, CheckSquare, FileText, Headset, Image, FilmStrip, NotePencil, QrCode,
   Coffee, Globe, Shield, DeviceMobile,
   Camera, ForkKnife, Timer, Barbell, ChartBar, Trophy,
-  CaretDown, CaretRight, Sun, Moon, List, Lock,
+  CaretDown, CaretRight, List, Lock,
   Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage,
   GitMerge, FileDashed, BookOpen, MagnifyingGlass, TextT, Hash,
   GitBranch, BracketsCurly, Clock, CurrencyDollar, Note,
   FileMagnifyingGlass, Headphones, GearSix, ClipboardText, CalendarCheck, CheckCircle, Handshake
 } from '@phosphor-icons/react';
+import ThemeToggle from './ui/ThemeToggle';
 import SEO from './SEO';
 import ScrollReveal from '@/components/ui/ScrollReveal';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
@@ -204,7 +205,7 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
     const handleResize = () => setWindowWidth(window.innerWidth);
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
     window.addEventListener('resize', handleResize);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('scroll', handleScroll);
@@ -296,9 +297,7 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
             </>
           )}
           {setIsDark && (
-            <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
-              {isDark ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
+            <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
           )}
           {isDesktop ? (
             <button

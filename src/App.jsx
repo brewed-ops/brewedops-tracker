@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-ro
 import { WarningCircle, Check, SpinnerGap, CaretLeft, Moon, Sun } from '@phosphor-icons/react';
 import { supabase } from './lib/supabase';
 import SEO from './components/SEO';
+import ErrorBoundary from './components/ErrorBoundary';
 import GuestToolLayout from './components/layout/GuestToolLayout';
 import LoadingFallback from './components/ui/LoadingFallback';
 import { SmoothCursor } from './components/ui/smooth-cursor';
@@ -76,6 +77,7 @@ const TimezoneConverter = React.lazy(() => import('./components/TimezoneConverte
 const PomodoroTimer = React.lazy(() => import('./components/PomodoroTimer'));
 const GHLScenarioGenerator = React.lazy(() => import('./components/GHLScenarioGenerator'));
 const TextExtractor = React.lazy(() => import('./components/TextExtractor'));
+const NotFound = React.lazy(() => import('./pages/NotFound'));
 
 // shadcn Sidebar imports
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
@@ -672,8 +674,8 @@ return (
     <Route path="/ghl-scenario" element={<GuestToolLayout toolName="GHL Scenario Generator" isDark={isDark} setIsDark={setIsDark}><GHLScenarioGenerator isDark={isDark} /></GuestToolLayout>} />
     <Route path="/text-extractor" element={<GuestToolLayout toolName="AI Text Extractor" isDark={isDark} setIsDark={setIsDark}><TextExtractor isDark={isDark} /></GuestToolLayout>} />
 
-    {/* Catch-all route */}
-    <Route path="*" element={<HomePage onNavigate={handleNavigate} isDark={isDark} setIsDark={setIsDark} />} />
+    {/* 404 catch-all */}
+    <Route path="*" element={<NotFound isDark={isDark} />} />
   </Routes>
   </PageTransition>
   </React.Suspense>
@@ -685,9 +687,11 @@ return (
 // ============================================
 export default function App() {
   return (
-    <BrowserRouter>
-      <SmoothCursor />
-      <AppContent />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <SmoothCursor />
+        <AppContent />
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }

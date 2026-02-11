@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import {
   CheckCircle,
   CalendarCheck,
-  Moon,
-  Sun,
   ArrowRight,
 } from '@phosphor-icons/react';
 import SEO from '@/components/SEO';
+import ThemeToggle from '../components/ui/ThemeToggle';
 
 // ============================================
 // BRAND CONFIGURATION
@@ -99,24 +98,7 @@ function ThankYouPage({ isDark, setIsDark }) {
             <span style={{ color: BRAND.blue }}>Ops</span>
           </span>
         </div>
-        <button
-          onClick={() => setIsDark(!isDark)}
-          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-          style={{
-            width: '36px',
-            height: '36px',
-            backgroundColor: 'transparent',
-            border: `1px solid ${theme.cardBorder}`,
-            borderRadius: '8px',
-            color: theme.textMuted,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          {isDark ? <Sun size={16} /> : <Moon size={16} />}
-        </button>
+        <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
       </nav>
 
       {/* Main content — centered */}

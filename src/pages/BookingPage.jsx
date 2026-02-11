@@ -6,8 +6,6 @@ import {
   Quotes,
   Lightning,
   CalendarCheck,
-  Moon,
-  Sun,
   Clock,
   ChartLineUp,
   Handshake,
@@ -16,6 +14,7 @@ import {
 } from '@phosphor-icons/react';
 import SEO from '@/components/SEO';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import ThemeToggle from '../components/ui/ThemeToggle';
 
 // ============================================
 // BRAND CONFIGURATION (local, matching other pages)
@@ -106,7 +105,7 @@ function BookingPage({ isDark, setIsDark }) {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -178,24 +177,7 @@ function BookingPage({ isDark, setIsDark }) {
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <button
-            onClick={() => setIsDark(!isDark)}
-            aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-            style={{
-              width: '36px',
-              height: '36px',
-              backgroundColor: 'transparent',
-              border: `1px solid ${theme.cardBorder}`,
-              borderRadius: '8px',
-              color: theme.textMuted,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
+          <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
           <button
             onClick={() => navigate('/services')}
             style={{

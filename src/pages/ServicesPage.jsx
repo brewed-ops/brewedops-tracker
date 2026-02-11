@@ -16,8 +16,6 @@ import {
   Tray,
   Lightning,
   GearSix,
-  Sun,
-  Moon,
   CaretDown,
   List,
   Image,
@@ -54,6 +52,7 @@ import {
 } from '@phosphor-icons/react';
 import SEO from '@/components/SEO';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import ThemeToggle from '../components/ui/ThemeToggle';
 const MobileDrawer = React.lazy(() => import('@/components/layout/MobileDrawer'));
 
 // ============================================
@@ -135,7 +134,7 @@ const PRODUCTIVITY_TOOLS = [
 // ============================================
 // TOOLS DROPDOWN COMPONENT
 // ============================================
-const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
+const ToolsDropdown = ({ isDark, theme, onToolClick }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = React.useRef(null);
   const timeoutRef = React.useRef(null);
@@ -167,6 +166,7 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
       style={{ position: 'relative' }}
     >
       <button
+        aria-expanded={isOpen}
         style={{
           height: '40px',
           padding: '0 8px',
@@ -193,7 +193,7 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
             top: '100%',
             left: '0',
             marginTop: '4px',
-            backgroundColor: isDark ? '#111113' : '#ffffff',
+            backgroundColor: theme.cardBg,
             border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`,
             borderRadius: '12px',
             boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)',
@@ -288,7 +288,7 @@ const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {
 
   return (
     <div ref={dropdownRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
-      <button style={{ height: '40px', padding: '0 8px', backgroundColor: 'transparent', color: isOpen ? BRAND.blue : theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+      <button aria-expanded={isOpen} style={{ height: '40px', padding: '0 8px', backgroundColor: 'transparent', color: isOpen ? BRAND.blue : theme.textMuted, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
         AI Tools
         <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
       </button>
@@ -338,7 +338,7 @@ const AppsDropdown = ({ isDark, theme, onAppClick }) => {
   }, []);
   return (
     <div ref={dropdownRef} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} style={{ position: 'relative' }}>
-      <button style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: isOpen ? '#14b8a6' : theme.text, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
+      <button aria-expanded={isOpen} style={{ height: '40px', padding: '0 12px', backgroundColor: 'transparent', color: isOpen ? '#14b8a6' : theme.text, border: 'none', fontSize: '14px', fontWeight: '500', fontFamily: FONTS.body, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}>
         Apps
         <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
       </button>
@@ -388,7 +388,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 0);
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -440,7 +440,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
             <>
               <button onClick={() => navigate('/')} style={navLinkStyle}>Home</button>
               <button onClick={() => navigate('/portfolio')} style={navLinkStyle}>Portfolio</button>
-              <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} onLoginClick={() => navigate('/login')} />
+              <ToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
               <AIToolsDropdown isDark={isDark} theme={theme} onToolClick={(path) => navigate(path)} />
               <AppsDropdown isDark={isDark} theme={theme} onAppClick={(path) => navigate(path)} />
             </>
@@ -453,9 +453,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
               <a href="/privacy" style={navLinkStyle}>Privacy</a>
             </>
           )}
-          <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '36px', height: '36px', backgroundColor: 'transparent', border: '1px solid ' + theme.cardBorder, borderRadius: '8px', color: theme.textMuted, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', marginLeft: '8px' }}>
-            {isDark ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
+          <ThemeToggle isDark={isDark} setIsDark={setIsDark} />
           {isDesktop ? (
             <button
               onClick={() => {
@@ -634,8 +632,9 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                 justifyContent: 'center',
               }}>
                 <img
-                  src="/serv1.jpeg"
+                  src="/serv1.webp"
                   alt="BrewedOps services — CRM automation, customer support, and virtual assistant"
+                  onError={(e) => { e.target.src = "/serv1.jpeg"; }}
                   style={{
                     maxWidth: isSmall ? '100%' : '620px',
                     width: '100%',
@@ -1191,7 +1190,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                   </div>
 
                   {/* Channel cards */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : '1fr 1fr', gap: '12px' }}>
                     {[
                       { icon: Envelope, label: 'Email', stat: '24', note: 'replied today', color: BRAND.blue },
                       { icon: ChatCircle, label: 'Chat', stat: '3', note: 'active now', color: BRAND.blue },
@@ -1409,7 +1408,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
                   </div>
 
                   {/* Quick Stats Row */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: isSmall ? '1fr' : '1fr 1fr 1fr', gap: '10px' }}>
                     {[
                       { label: 'Emails', value: '47', sub: 'processed' },
                       { label: 'Meetings', value: '6', sub: 'scheduled' },

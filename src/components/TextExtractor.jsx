@@ -38,6 +38,8 @@ const getTheme = (isDark) => ({
 // ============================================
 // OPENAI CONFIGURATION
 // ============================================
+// Production: set VITE_OPENAI_EDGE_URL to proxy through Supabase Edge Function
+// Fallback: VITE_OPENAI_API_KEY for direct calls (key will be in client bundle)
 const OPENAI_CONFIG = {
   apiKey: import.meta.env.VITE_OPENAI_API_KEY || '',
   edgeFunctionUrl: import.meta.env.VITE_OPENAI_EDGE_URL || '',
@@ -76,7 +78,6 @@ const loadPdfJs = () =>
 // ============================================
 const extractTextFromImage = async (base64DataUrl) => {
   if (OPENAI_CONFIG.edgeFunctionUrl) {
-    // Production: call Supabase Edge Function
     const res = await fetch(OPENAI_CONFIG.edgeFunctionUrl, {
       method: 'POST',
       headers: {
@@ -97,7 +98,6 @@ const extractTextFromImage = async (base64DataUrl) => {
     throw new Error('API_NOT_CONFIGURED');
   }
 
-  // Dev mode: direct OpenAI API call
   const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
@@ -394,7 +394,7 @@ const TextExtractor = ({ isDark }) => {
       }
     } catch (err) {
       if (err.message === 'API_NOT_CONFIGURED') {
-        setError('OpenAI API key not configured. Add VITE_OPENAI_API_KEY to your .env file.');
+        setError('API not configured. Set VITE_OPENAI_EDGE_URL or VITE_OPENAI_API_KEY in your .env file.');
       } else {
         setError(err.message || 'Failed to extract text. Please try again.');
       }
