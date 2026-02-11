@@ -80,7 +80,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
           }}
         >
           <img
-            src="https://i.imgur.com/R52jwPvt.png"
+            src="/BrewedOpsLogo.png"
             alt="BrewedOps Logo"
             width={36}
             height={36}

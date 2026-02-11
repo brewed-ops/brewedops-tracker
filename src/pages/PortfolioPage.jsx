@@ -540,7 +540,7 @@ function PortfolioPage({ isDark, setIsDark }) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: isMobile ? '0' : '20px', cursor: 'pointer' }}>
-            <img src="https://i.imgur.com/R52jwPvt.png" alt="BrewedOps Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+            <img src="/BrewedOpsLogo.png" alt="BrewedOps Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
             <span style={{ fontSize: '18px', fontWeight: '700', fontFamily: FONTS.heading }}>
               <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
               <span style={{ color: BRAND.blue }}>Ops</span>
@@ -1299,7 +1299,7 @@ function PortfolioPage({ isDark, setIsDark }) {
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', justifyContent: 'space-between', alignItems: 'center', gap: isMobile ? '20px' : '24px', marginBottom: '24px', textAlign: isMobile ? 'center' : 'left' }}>
             <div onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}>
-              <img src="https://i.imgur.com/R52jwPvt.png" alt="BrewedOps Logo" width={28} height={28} style={{ width: '28px', height: '28px', borderRadius: '8px' }} />
+              <img src="/BrewedOpsLogo.png" alt="BrewedOps Logo" width={28} height={28} style={{ width: '28px', height: '28px', borderRadius: '8px' }} />
               <span style={{ fontSize: '16px', fontWeight: '700', fontFamily: FONTS.heading }}>
                 <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
                 <span style={{ color: BRAND.blue }}>Ops</span>

@@ -359,7 +359,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
             onClick={() => navigate('/')}
             style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px', cursor: 'pointer' }}
           >
-            <img src="https://i.imgur.com/R52jwPvt.png" alt="BrewedOps Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+            <img src="/BrewedOpsLogo.png" alt="BrewedOps Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
             <span style={{ fontSize: '18px', fontWeight: '700', fontFamily: FONTS.heading }}>
               <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
               <span style={{ color: BRAND.blue }}>Ops</span>
@@ -1343,7 +1343,7 @@ const FuelyxPage = ({ isDark, setIsDark }) => {
           gap: '20px',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img src="https://i.imgur.com/R52jwPvt.png" alt="BrewedOps Logo" width={28} height={28} style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
+            <img src="/BrewedOpsLogo.png" alt="BrewedOps Logo" width={28} height={28} style={{ width: '28px', height: '28px', borderRadius: '6px' }} />
             <span style={{ fontSize: '14px', color: theme.textMuted }}>
               © 2025 BrewedOps. Created by <span style={{ color: FUELYX.primary }}>Kenneth V.</span>
             </span>

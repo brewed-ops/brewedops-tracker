@@ -164,7 +164,7 @@ function BookingPage({ isDark, setIsDark }) {
             style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
           >
             <img
-              src="https://i.imgur.com/R52jwPvt.png"
+              src="/BrewedOpsLogo.png"
               alt="BrewedOps Logo"
               width={32}
               height={32}

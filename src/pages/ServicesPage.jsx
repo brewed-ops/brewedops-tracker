@@ -430,7 +430,7 @@ const ServicesPage = ({ isDark, setIsDark, onNavigate }) => {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           <button onClick={() => navigate('/')} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '20px', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
-            <img src="https://i.imgur.com/R52jwPvt.png" alt="Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
+            <img src="/BrewedOpsLogo.png" alt="Logo" width={32} height={32} style={{ width: '32px', height: '32px', borderRadius: '8px' }} />
             <span style={{ fontSize: '18px', fontWeight: '700', fontFamily: FONTS.heading }}>
               <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
               <span style={{ color: BRAND.blue }}>Ops</span>
