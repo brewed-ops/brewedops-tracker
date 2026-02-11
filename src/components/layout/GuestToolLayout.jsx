@@ -137,7 +137,7 @@ const GuestToolLayout = ({ children, toolName, isDark, setIsDark }) => {
             onClick={() => navigate('/')}
           >
             <img
-              src="/BrewedOpsLogo.png"
+              src="/BrewedOpsLogo-64.png"
               alt="BrewedOps Logo"
               width={32}
               height={32}

@@ -5,9 +5,10 @@ const SEO = ({
   description = 'Expert VA services, GoHighLevel CRM automation, and web development — backed by 11+ years of customer support experience. Plus 22+ free productivity tools.',
   keywords = 'BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free tools',
   url,
-  image = 'https://i.imgur.com/R52jwPv.png',
+  image = 'https://brewedops.com/BrewedOpsLogo.png',
 }) => {
-  const pageUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://brewedops.com');
+  const rawUrl = url || (typeof window !== 'undefined' ? window.location.href : 'https://brewedops.com');
+  const pageUrl = rawUrl.replace('://www.brewedops.com', '://brewedops.com');
   const canonicalUrl = pageUrl.split('?')[0].split('#')[0];
 
   return (

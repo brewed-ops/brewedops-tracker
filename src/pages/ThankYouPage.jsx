@@ -87,7 +87,7 @@ function ThankYouPage({ isDark, setIsDark }) {
           style={{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }}
         >
           <img
-            src="/BrewedOpsLogo.png"
+            src="/BrewedOpsLogo-64.png"
             alt="BrewedOps Logo"
             width={32}
             height={32}

@@ -7,6 +7,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import GuestToolLayout from './components/layout/GuestToolLayout';
 import LoadingFallback from './components/ui/LoadingFallback';
 import { SmoothCursor } from './components/ui/smooth-cursor';
+import AccessibilityToggle from './components/ui/AccessibilityToggle';
 import { AnimatePresence, motion } from 'framer-motion';
 
 // Scrolls to top on every route change
@@ -104,6 +105,8 @@ if (typeof document !== 'undefined' && !document.getElementById('brewedops-globa
   const style = document.createElement('style');
   style.id = 'brewedops-global-styles';
   style.textContent = `
+    @font-face { font-family: 'Montserrat'; font-display: swap; src: local('Montserrat'); }
+    @font-face { font-family: 'Poppins'; font-display: swap; src: local('Poppins'); }
     * {
       font-family: 'Poppins', sans-serif;
       -webkit-font-smoothing: antialiased;
@@ -690,6 +693,7 @@ export default function App() {
     <ErrorBoundary>
       <BrowserRouter>
         <SmoothCursor />
+        <AccessibilityToggle />
         <AppContent />
       </BrowserRouter>
     </ErrorBoundary>

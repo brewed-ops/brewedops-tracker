@@ -4,7 +4,7 @@ const ThemeToggle = ({ isDark, setIsDark }) => {
   const uid = useId().replace(/:/g, '');
 
   return (
-    <label className={`tt-switch-${uid}`} style={{ position: 'relative', display: 'inline-block', width: '60px', height: '34px', flexShrink: 0 }}>
+    <label className={`tt-switch-${uid}`} aria-label="Toggle dark mode" style={{ position: 'relative', display: 'inline-block', width: '60px', height: '34px', flexShrink: 0 }}>
       <style>{`
         .tt-switch-${uid} input { opacity: 0; width: 0; height: 0; position: absolute; }
         .tt-slider-${uid} {
