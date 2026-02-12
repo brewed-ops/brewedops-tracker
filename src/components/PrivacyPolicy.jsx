@@ -130,7 +130,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
               <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.6' }}>
                 <strong>BrewedOps</strong> ("we", "our", or "us") is committed to protecting your privacy. 
                 This Privacy Policy explains how we collect, use, disclose, and safeguard your information 
-                when you use our productivity platform with 22+ tools for Filipino virtual assistants and freelancers,
+                when you use our productivity platform with 26+ tools for Filipino virtual assistants and freelancers,
                 as well as our mobile application <strong>Fuelyx</strong> (nutrition & fitness tracker for Android).
               </p>
             </div>
@@ -217,7 +217,7 @@ const PrivacyPolicy = ({ onBack, onNavigate, isDark }) => {
           <Section icon={Eye} title="How We Use Your Information">
             <p>We use your information to:</p>
             <ul style={{ margin: '12px 0', paddingLeft: '20px' }}>
-              <li>Provide and maintain our 22+ productivity tools</li>
+              <li>Provide and maintain our 26+ productivity tools</li>
               <li>Process your financial data and generate reports</li>
               <li>Store your notes, tasks, and organizational data</li>
               <li>Send invoice emails through Gmail integration (when authorized)</li>

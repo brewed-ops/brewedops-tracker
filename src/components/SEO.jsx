@@ -2,7 +2,7 @@ import { Helmet } from 'react-helmet-async';
 
 const SEO = ({
   title = 'BrewedOps | VA Services, GHL Automation & Free Tools',
-  description = 'Expert VA services, GoHighLevel CRM automation, and web development — backed by 11+ years of customer support experience. Plus 22+ free productivity tools.',
+  description = 'Expert VA services, GoHighLevel CRM automation, and web development — backed by 11+ years of customer support experience. Plus 26+ free productivity tools.',
   keywords = 'BrewedOps, virtual assistant services, GHL automation, GoHighLevel, customer support, admin VA, web development, free tools',
   url,
   image = 'https://brewedops.com/BrewedOpsLogo.png',

@@ -129,7 +129,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             }}>
               <p style={{ fontSize: '14px', color: theme.text, margin: 0, lineHeight: '1.6' }}>
                 Welcome to <strong>BrewedOps</strong>! These Terms of Service ("Terms") govern your use of our
-                productivity platform with 22+ tools for freelancers, as well as our mobile application <strong>Fuelyx</strong> (nutrition & fitness tracker). By using BrewedOps or Fuelyx, you agree to these Terms.
+                productivity platform with 26+ tools for freelancers, as well as our mobile application <strong>Fuelyx</strong> (nutrition & fitness tracker). By using BrewedOps or Fuelyx, you agree to these Terms.
               </p>
             </div>
           </div>
@@ -141,7 +141,7 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
           </Section>
 
           <Section icon={FileText} title="Description of Service">
-            <p>BrewedOps is a comprehensive productivity platform with <strong style={{ color: theme.text }}>22+ free tools</strong> designed for Filipino virtual assistants and freelancers:</p>
+            <p>BrewedOps is a comprehensive productivity platform with <strong style={{ color: theme.text }}>26+ free tools</strong> designed for Filipino virtual assistants and freelancers:</p>
             
             <p style={{ marginTop: '16px' }}><strong style={{ color: theme.text }}>Productivity Tools (4):</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
@@ -170,6 +170,11 @@ const TermsOfService = ({ onBack, onNavigate, isDark }) => {
             <p><strong style={{ color: theme.text }}>Other Tools (9):</strong></p>
             <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
               <li>QR Generator, Find & Replace, Case Converter, Word Counter, Mermaid Reader, JSON Formatter, Cron Generator, Timezone Converter, Focus Timer</li>
+            </ul>
+
+            <p><strong style={{ color: theme.text }}>AI Tools (4):</strong></p>
+            <ul style={{ margin: '8px 0 16px', paddingLeft: '20px' }}>
+              <li>GHL Scenario Generator, AI Text Extractor, AI Proposal Writer, AI GHL Advisor</li>
             </ul>
 
             <p><strong style={{ color: '#14b8a6' }}>Fuelyx Mobile App (Android):</strong></p>

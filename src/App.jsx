@@ -267,7 +267,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
     <div style={{ minHeight: '100vh', backgroundColor: isDark ? '#0d0b09' : '#faf8f5', display: 'flex', flexDirection: 'column' }}>
       <SEO
         title={isSignup ? 'Sign Up | BrewedOps' : 'Login | BrewedOps'}
-        description="Sign in or create your free BrewedOps account. Access 22+ free tools and the productivity suite for Filipino VAs and Freelancers."
+        description="Sign in or create your free BrewedOps account. Access 26+ free tools and the productivity suite for Filipino VAs and Freelancers."
         keywords="BrewedOps login, BrewedOps sign up, Filipino VA tools"
       />
       {/* Header */}

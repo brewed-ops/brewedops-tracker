@@ -233,7 +233,7 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
 
   const stats = [
     { value: '3', label: 'Core Services' },
-    { value: '22+', label: 'Free Tools' },
+    { value: '26+', label: 'Free Tools' },
     { value: '1', label: 'Mobile App' },
     { value: '24/7', label: 'Available' },
   ];
@@ -244,13 +244,14 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
     { name: 'Video Tools', count: 2, icon: FilmStrip, color: '#ef4444', tools: 'Video Compressor, Video Trimmer' },
     { name: 'Document Tools', count: 4, icon: NotePencil, color: '#22c55e', tools: 'PDF Editor, PDF Merge, PDF Split, Markdown Viewer' },
     { name: 'Other Tools', count: 9, icon: QrCode, color: '#f59e0b', tools: 'QR Generator, Find & Replace, Case Converter, Word Counter, Mermaid Reader, JSON Formatter, Cron Generator, Timezone, Focus Timer' },
+    { name: 'AI Tools', count: 4, icon: Sparkle, color: '#8b5cf6', tools: 'GHL Scenario Generator, AI Text Extractor, AI Proposal Writer, AI GHL Advisor' },
   ];
 
   return (
     <>
     <SEO
       title="About Us | BrewedOps"
-      description="BrewedOps offers HighLevel automation, customer support, and virtual assistant services — plus 22+ free productivity tools for VAs and freelancers."
+      description="BrewedOps offers HighLevel automation, customer support, and virtual assistant services — plus 26+ free productivity tools for VAs and freelancers."
       keywords="BrewedOps about, GoHighLevel automation, customer support, virtual assistant, Filipino VA, freelancer tools"
     />
     <div style={{
@@ -406,7 +407,7 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
               marginLeft: 'auto',
               marginRight: 'auto'
             }}>
-              HighLevel automation, customer support, and virtual assistant services — backed by 22+ free tools built for VAs and freelancers.
+              HighLevel automation, customer support, and virtual assistant services — backed by 26+ free tools built for VAs and freelancers.
             </p>
           </div>
           </ScrollReveal>
@@ -557,7 +558,7 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
               lineHeight: '1.8',
               margin: 0
             }}>
-              Along the way, Kenneth built <strong style={{ color: theme.text }}>22+ free productivity tools</strong> and a
+              Along the way, Kenneth built <strong style={{ color: theme.text }}>26+ free productivity tools</strong> and a
               mobile nutrition app (<strong style={{ color: '#14b8a6' }}>Fuelyx</strong>) — all through vibe coding, a creative
               approach where ideas flow naturally into functional software. Every tool and service at BrewedOps was built with
               intention, understanding the unique challenges of working remotely for clients around the world.
@@ -575,7 +576,7 @@ const AboutUs = ({ onBack, onNavigate, isDark, setIsDark }) => {
             marginBottom: '32px'
           }}>
             <h2 style={{ fontSize: '24px', fontWeight: '700', color: theme.text, margin: '0 0 24px', textAlign: 'center' }}>
-              22+ Tools Across 5 Categories
+              26+ Tools Across 6 Categories
             </h2>
             <div style={{ display: 'grid', gap: '16px' }}>
               {toolCategories.map((cat, idx) => (

@@ -7,23 +7,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ScrollReveal from '@/components/ui/ScrollReveal';
+import { BentoCard, BentoGrid } from '@/components/ui/bento-grid';
 import {
   CaretRight,
   CaretDown,
-  Code,
   Lightning,
-  GearSix,
   Star,
   ArrowSquareOut,
   Envelope,
   Medal,
   ChatCircle,
-  CheckCircle,
   Briefcase,
   MapPin,
   CalendarBlank,
   Headphones,
-  Wrench,
   Image,
   Scissors,
   ArrowsOut,
@@ -52,7 +49,10 @@ import {
   Timer,
   FileMagnifyingGlass,
   DeviceMobile,
-  PenNib
+  PenNib,
+  Gear,
+  ChatsCircle,
+  Terminal
 } from '@phosphor-icons/react';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import SEO from '@/components/SEO';
@@ -401,7 +401,6 @@ function PortfolioPage({ isDark, setIsDark }) {
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   const isMobile = windowWidth < 768;
-  const isTablet = windowWidth < 1024;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -417,37 +416,6 @@ function PortfolioPage({ isDark, setIsDark }) {
   }, []);
 
   // ---- DATA ----
-
-  const services = [
-    {
-      icon: GearSix,
-      title: 'GHL CRM Setup',
-      description: 'A CRM that works the way your team actually sells. Pipelines, contact management, and custom fields \u2014 all configured around your workflow.',
-      features: ['Pipeline Setup', 'Contact Management', 'Custom Fields', 'Team Access'],
-      color: BRAND.blue,
-    },
-    {
-      icon: Lightning,
-      title: 'GHL Automation',
-      description: 'Automated follow-ups, SMS campaigns, and trigger-based workflows that nurture leads while you focus on closing deals.',
-      features: ['Email Sequences', 'SMS Campaigns', 'Trigger Actions', 'Lead Scoring'],
-      color: BRAND.green,
-    },
-    {
-      icon: Code,
-      title: 'Vibe Coding',
-      description: 'Custom web applications, dashboards, and internal tools built with React and Supabase \u2014 designed around your specific process.',
-      features: ['React Apps', 'Custom Dashboards', 'API Integrations', 'Responsive UI'],
-      color: '#8b5cf6',
-    },
-    {
-      icon: Headphones,
-      title: 'Customer Support',
-      description: '11+ years handling Tier 2 escalations, technical support, and SLA-driven operations across chat, email, and phone.',
-      features: ['Tier 2 Escalations', 'Technical Support', 'SLA Management', 'CRM Expert'],
-      color: '#f59e0b',
-    },
-  ];
 
   const toolCategories = [
     {
@@ -509,7 +477,7 @@ function PortfolioPage({ isDark, setIsDark }) {
   ];
 
   const skills = [
-    { category: 'Admin', items: ['Calendar Management', 'Email Management', 'Google Sheet Dashboard', 'Scheduling'], color: BRAND.blue },
+    { category: 'Admin VA', items: ['Calendar Management', 'Email Management', 'Google Sheet Dashboard', 'Scheduling'], color: BRAND.blue },
     { category: 'Technical', items: ['Troubleshooting', 'CRMs', 'AI Prompts', 'Creating Guides & Articles'], color: BRAND.green },
     { category: 'Specialized', items: ['Email Support', 'Tech Support', 'Chat Support', 'Data Entry'], color: '#8b5cf6' },
   ];
@@ -533,7 +501,7 @@ function PortfolioPage({ isDark, setIsDark }) {
     <div style={{ minHeight: '100vh', backgroundColor: theme.bg, color: theme.text, fontFamily: FONTS.body }}>
       <SEO
         title="Portfolio | BrewedOps - VA Services, GHL Automation & AI Tools"
-        description="Kenneth V's portfolio — GHL CRM setup, automation, vibe coding, AI-powered tools, and 11+ years of customer support experience. 22+ free tools and AI utilities."
+        description="Kenneth V's portfolio — GHL CRM setup, automation, vibe coding, AI-powered tools, and 11+ years of customer support experience. 26+ free tools and AI utilities."
         keywords="BrewedOps portfolio, GHL CRM, automation, web development, Filipino VA services, AI text extractor, GHL scenario generator"
       />
 
@@ -638,6 +606,20 @@ function PortfolioPage({ isDark, setIsDark }) {
           60% { left: 100%; }
           100% { left: 100%; }
         }
+        @keyframes badgeFloat {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-6px); }
+        }
+        .hero-badge-float {
+          animation: badgeFloat 3s ease-in-out infinite;
+        }
+        @keyframes workflowPan {
+          0% { transform: translateX(0) translateY(0) scale(1.8); }
+          25% { transform: translateX(-15%) translateY(-5%) scale(1.8); }
+          50% { transform: translateX(-30%) translateY(0%) scale(1.8); }
+          75% { transform: translateX(-15%) translateY(5%) scale(1.8); }
+          100% { transform: translateX(0) translateY(0) scale(1.8); }
+        }
       `}</style>
 
       <main>
@@ -716,22 +698,24 @@ function PortfolioPage({ isDark, setIsDark }) {
               <div style={{ flex: '1 1 auto', maxWidth: isMobile ? '100%' : '620px', textAlign: isMobile ? 'center' : 'left' }}>
                 {/* Badges */}
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px', marginBottom: '24px', justifyContent: isMobile ? 'center' : 'flex-start' }}>
-                  <div style={{
+                  <div className="hero-badge-float" style={{
                     display: 'inline-flex', alignItems: 'center', gap: '8px',
                     padding: '10px 16px',
                     backgroundColor: isDark ? 'rgba(81, 175, 67, 0.1)' : 'rgba(81, 175, 67, 0.08)',
                     border: `1px solid ${BRAND.green}30`,
                     borderRadius: '100px',
+                    animationDelay: '0s',
                   }}>
                     <Medal size={16} style={{ color: BRAND.green }} />
                     <span style={{ fontSize: '13px', color: BRAND.green, fontWeight: '600', fontFamily: FONTS.body }}>HL Accelerator Student</span>
                   </div>
-                  <div style={{
+                  <div className="hero-badge-float" style={{
                     display: 'inline-flex', alignItems: 'center', gap: '8px',
                     padding: '10px 16px',
                     backgroundColor: isDark ? 'rgba(0, 74, 172, 0.1)' : 'rgba(0, 74, 172, 0.08)',
                     border: `1px solid ${BRAND.blue}30`,
                     borderRadius: '100px',
+                    animationDelay: '1.5s',
                   }}>
                     <Briefcase size={16} style={{ color: BRAND.blue }} />
                     <span style={{ fontSize: '13px', color: BRAND.blue, fontWeight: '600', fontFamily: FONTS.body }}>11+ Years Customer Support</span>
@@ -746,7 +730,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                   marginBottom: '20px',
                   color: isDark ? '#ffffff' : BRAND.brown,
                 }}>
-                  Your CRM, Support & Operations — Handled.
+                  Stop Hiring Three People. <span style={{ color: BRAND.blue }}>Hire One.</span>
                 </h1>
 
                 <p style={{
@@ -756,7 +740,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                   marginBottom: '24px',
                   fontFamily: FONTS.body,
                 }}>
-                  11 years in customer support. HighLevel CRM builds and automation. Inbox zero, pipeline management, and day-to-day admin — all handled by one dedicated VA.
+                  CRM builds, customer support, and admin ops — handled by one dedicated VA with 11 years of experience. Your systems run, your inbox stays at zero, and your leads actually get followed up.
                 </p>
 
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '12px' : '24px', marginBottom: '28px', fontSize: isMobile ? '14px' : '15px', color: theme.textMuted, justifyContent: isMobile ? 'center' : 'flex-start' }}>
@@ -837,6 +821,39 @@ function PortfolioPage({ isDark, setIsDark }) {
         {/* ============================================ */}
         {/* TECH STACK */}
         {/* ============================================ */}
+        <style>{`
+          .tool-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            cursor: default;
+          }
+          .tool-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 24px ${isDark ? 'rgba(0,0,0,0.4)' : 'rgba(63,32,12,0.1)'};
+            border-color: ${isDark ? '#3a3430' : '#d8cfc2'};
+          }
+          .tool-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: ${isDark ? 'rgba(0, 74, 172, 0.06)' : 'rgba(0, 74, 172, 0.03)'};
+            border-radius: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+          }
+          .tool-card:hover::after {
+            opacity: 1;
+          }
+          .tool-card .tool-card-header {
+            transition: color 0.3s ease;
+          }
+          .tool-card:hover .tool-card-header {
+            color: ${BRAND.blue};
+          }
+        `}</style>
         <section style={{
           padding: isMobile ? '48px 16px' : '72px 32px',
           backgroundColor: theme.bgAlt,
@@ -850,48 +867,67 @@ function PortfolioPage({ isDark, setIsDark }) {
                 <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, maxWidth: '450px', margin: '0 auto', fontFamily: FONTS.body }}>Platforms and technologies I use daily to deliver exceptional results.</p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '12px' : '20px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '12px' : '16px' }}>
                 {toolCategories.map((category, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      padding: isMobile ? '16px' : '24px 28px',
-                      backgroundColor: theme.cardBg,
-                      border: `1px solid ${theme.cardBorder}`,
-                      borderRadius: isMobile ? '12px' : '16px',
-                    }}
-                  >
-                    <h3 style={{
-                      fontSize: isMobile ? '11px' : '12px',
-                      fontWeight: '700',
-                      textTransform: 'uppercase',
-                      letterSpacing: '2px',
-                      marginBottom: isMobile ? '12px' : '16px',
-                      color: BRAND.blue,
-                      fontFamily: FONTS.heading,
-                    }}>
-                      {category.name}
-                    </h3>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '10px' }}>
-                      {category.tools.map((tool, j) => (
-                        <div
-                          key={j}
-                          style={{
+                  <ScrollReveal key={i} delay={i * 0.06} style={{ height: '100%' }}>
+                    <div
+                      className="tool-card"
+                      style={{
+                        backgroundColor: theme.cardBg,
+                        border: `1px solid ${theme.cardBorder}`,
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {/* Header */}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: isMobile ? '14px 16px' : '18px 20px',
+                        position: 'relative',
+                        zIndex: 1,
+                      }}>
+                        <span className="tool-card-header" style={{
+                          fontSize: isMobile ? '13px' : '14px',
+                          color: theme.textMuted,
+                          fontFamily: FONTS.body,
+                          fontWeight: '500',
+                        }}>{category.name}</span>
+                        <span style={{
+                          fontSize: '12px',
+                          color: theme.textMuted,
+                          fontFamily: FONTS.body,
+                        }}>{category.tools.length} tools</span>
+                      </div>
+
+                      {/* Tools */}
+                      <div style={{
+                        display: 'flex',
+                        flexWrap: 'wrap',
+                        gap: isMobile ? '6px' : '8px',
+                        padding: isMobile ? '0 16px 16px' : '0 20px 20px',
+                        position: 'relative',
+                        zIndex: 1,
+                      }}>
+                        {category.tools.map((tool, j) => (
+                          <div key={j} style={{
                             display: 'flex',
                             alignItems: 'center',
-                            gap: isMobile ? '6px' : '10px',
-                            padding: isMobile ? '8px 10px' : '10px 16px',
-                            backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)',
-                            borderRadius: isMobile ? '8px' : '10px',
-                            border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
-                          }}
-                        >
-                          <img src={tool.icon} alt={tool.name} style={{ width: isMobile ? '18px' : '22px', height: isMobile ? '18px' : '22px', objectFit: 'contain' }} />
-                          <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{tool.name}</span>
-                        </div>
-                      ))}
+                            gap: isMobile ? '6px' : '8px',
+                            padding: isMobile ? '7px 10px' : '8px 14px',
+                            backgroundColor: isDark ? 'rgba(42, 36, 32, 0.6)' : 'rgba(250, 248, 245, 0.8)',
+                            borderRadius: '8px',
+                            border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`,
+                          }}>
+                            <img src={tool.icon} alt={tool.name} style={{ width: isMobile ? '16px' : '20px', height: isMobile ? '16px' : '20px', objectFit: 'contain' }} />
+                            <span style={{ fontSize: isMobile ? '12px' : '13px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body }}>{tool.name}</span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  </ScrollReveal>
                 ))}
               </div>
             </div>
@@ -899,7 +935,7 @@ function PortfolioPage({ isDark, setIsDark }) {
         </section>
 
         {/* ============================================ */}
-        {/* PROJECTS */}
+        {/* WHAT YOU GET — BENTO GRID */}
         {/* ============================================ */}
         <section style={{
           padding: isMobile ? '48px 16px' : '80px 32px',
@@ -907,222 +943,155 @@ function PortfolioPage({ isDark, setIsDark }) {
         }}>
           <ScrollReveal>
             <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
-                <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.green, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Portfolio</span>
-                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>What I've Built</h2>
-                <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.textMuted, maxWidth: '500px', margin: '0 auto', fontFamily: FONTS.body }}>Real products and tools that solve real problems for real users.</p>
+              <div style={{ textAlign: 'center', marginBottom: isMobile ? '36px' : '56px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '1.5px', color: theme.textMuted, textTransform: 'uppercase', fontFamily: FONTS.body, display: 'block', marginBottom: '12px' }}>What you get</span>
+                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, lineHeight: '1.2', marginBottom: '16px' }}>One person. Three problems solved.</h2>
+                <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.textMuted, lineHeight: '1.7', fontFamily: FONTS.body, maxWidth: '540px', margin: '0 auto' }}>
+                  Most teams hire separately for support, automation, and dev. I handle all three — one reliable person who already understands your systems.
+                </p>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '16px' : '28px' }}>
-                {/* BrewedOps Card */}
-                <div style={{
-                  backgroundColor: theme.cardBg,
-                  border: `1px solid ${theme.cardBorder}`,
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                }}>
-                  <div style={{
-                    width: '100%',
-                    aspectRatio: '16 / 10',
-                    overflow: 'hidden',
-                    borderBottom: `1px solid ${theme.cardBorder}`,
-                  }}>
-                    <img
-                      src="https://i.imgur.com/NYgLMDT.png"
-                      alt="BrewedOps Tools Screenshot"
-                      loading="lazy"
-                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'left top' }}
-                    />
-                  </div>
-                  <div style={{ padding: isMobile ? '20px' : '28px' }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', backgroundColor: `${BRAND.green}12`, borderRadius: '100px', marginBottom: '14px' }}>
-                      <span style={{ fontSize: '11px', color: BRAND.green, fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '0.5px' }}>FEATURED PROJECT</span>
-                    </div>
-                    <h3 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '800', fontFamily: FONTS.heading, marginBottom: '8px' }}>
-                      <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
-                      <span style={{ color: BRAND.blue }}>Ops</span>
-                      <span style={{ color: isDark ? '#fff' : BRAND.brown }}> Tools</span>
-                    </h3>
-                    <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '16px', fontFamily: FONTS.body }}>
-                      A productivity hub for Filipino VAs & freelancers with 22+ free tools, AI-powered utilities, finance tracking, task management, and premium features.
-                    </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
-                      {['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'].map((tag) => (
-                        <span key={tag} style={{
-                          fontSize: '12px',
-                          padding: '6px 12px',
-                          backgroundColor: `${BRAND.blue}10`,
-                          color: BRAND.blue,
-                          borderRadius: '100px',
-                          fontWeight: '600',
-                          fontFamily: FONTS.body,
-                        }}>{tag}</span>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => navigate('/')}
-                      style={{
-                        padding: '12px 24px',
-                        backgroundColor: BRAND.blue,
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontWeight: '600',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        fontFamily: FONTS.body,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                      }}
-                    >
-                      View Project <ArrowSquareOut size={16} />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Fuelyx Card */}
-                <div style={{
-                  backgroundColor: theme.cardBg,
-                  border: `1px solid ${theme.cardBorder}`,
-                  borderRadius: '16px',
-                  overflow: 'hidden',
-                }}>
-                  <div style={{
-                    width: '100%',
-                    aspectRatio: '16 / 10',
-                    overflow: 'hidden',
-                    borderBottom: `1px solid ${theme.cardBorder}`,
-                    background: isDark ? '#0c1929' : '#f0fdfa',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}>
-                    {/* Fuelyx icon + label as visual */}
-                    <div style={{ textAlign: 'center' }}>
+              <BentoGrid className={isMobile ? '!grid-cols-1 !auto-rows-auto' : '!grid-cols-3 !auto-rows-[20rem]'}>
+                {/* CRM Card — spans 2 cols */}
+                <BentoCard
+                  name="Your CRM actually works"
+                  className={isMobile ? '!col-span-1' : '!col-span-2'}
+                  Icon={Gear}
+                  description="GoHighLevel pipelines, automations, and workflows that match how your team sells. Follow-ups fire on time. Leads don't fall through cracks."
+                  href="/services"
+                  cta="View CRM services"
+                  background={
+                    <div className="absolute inset-0 overflow-hidden" style={{ opacity: isDark ? 0.6 : 0.45 }}>
+                      <img
+                        src="/hlflow.png"
+                        alt=""
+                        style={{
+                          width: '100%',
+                          height: '100%',
+                          objectFit: 'cover',
+                          animation: 'workflowPan 12s ease-in-out infinite',
+                          transformOrigin: 'center center',
+                          filter: isDark ? 'brightness(1.2)' : 'none',
+                        }}
+                      />
+                      {/* Bottom fade so text stays readable */}
                       <div style={{
-                        width: '64px',
-                        height: '64px',
-                        borderRadius: '16px',
-                        background: 'linear-gradient(135deg, #134e4a, #14b8a6)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 12px',
-                      }}>
-                        <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12" />
-                          <path d="M12 2v10l4.5 4.5" />
-                          <path d="M2 12h10" />
-                        </svg>
-                      </div>
-                      <div style={{ fontSize: '28px', fontWeight: '800', color: '#14b8a6', fontFamily: FONTS.heading }}>Fuelyx</div>
-                      <div style={{ fontSize: '14px', color: isDark ? '#5eead4' : '#0d9488', fontFamily: FONTS.body, marginTop: '4px' }}>Your Nutrition, Simplified</div>
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        height: '60%',
+                        background: `linear-gradient(to top, ${theme.cardBg} 20%, transparent 100%)`,
+                        pointerEvents: 'none',
+                      }} />
                     </div>
-                  </div>
-                  <div style={{ padding: isMobile ? '20px' : '28px' }}>
-                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', backgroundColor: 'rgba(20, 184, 166, 0.1)', borderRadius: '100px', marginBottom: '14px' }}>
-                      <span style={{ fontSize: '11px', color: '#14b8a6', fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '0.5px' }}>MOBILE APP</span>
-                    </div>
-                    <h3 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '800', fontFamily: FONTS.heading, color: '#14b8a6', marginBottom: '8px' }}>
-                      Fuelyx
-                    </h3>
-                    <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '16px', fontFamily: FONTS.body }}>
-                      Track calories, log Filipino foods, monitor fasting, and achieve your health goals -- all in one beautiful, easy-to-use app built for Filipinos.
-                    </p>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
-                      {['React Native', 'Expo', 'Supabase', 'AI Scanner', 'Fasting Timer'].map((tag) => (
-                        <span key={tag} style={{
-                          fontSize: '12px',
-                          padding: '6px 12px',
-                          backgroundColor: 'rgba(20, 184, 166, 0.1)',
-                          color: '#14b8a6',
-                          borderRadius: '100px',
-                          fontWeight: '600',
-                          fontFamily: FONTS.body,
-                        }}>{tag}</span>
-                      ))}
-                    </div>
-                    <button
-                      onClick={() => navigate('/fuelyx')}
-                      style={{
-                        padding: '12px 24px',
-                        backgroundColor: '#14b8a6',
-                        color: '#fff',
-                        border: 'none',
-                        borderRadius: '10px',
-                        fontWeight: '600',
-                        fontSize: '14px',
-                        cursor: 'pointer',
-                        fontFamily: FONTS.body,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '8px',
-                      }}
-                    >
-                      View Project <ArrowSquareOut size={16} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ScrollReveal>
-        </section>
+                  }
+                />
 
-        {/* ============================================ */}
-        {/* SERVICES */}
-        {/* ============================================ */}
-        <section style={{
-          padding: isMobile ? '48px 16px' : '80px 32px',
-          backgroundColor: theme.bgAlt,
-        }}>
-          <ScrollReveal>
-            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
-                <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.blue, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Services</span>
-                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>How I Can Help</h2>
-                <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.textMuted, maxWidth: '520px', margin: '0 auto', fontFamily: FONTS.body }}>From automation to customer support, I help businesses scale efficiently.</p>
-              </div>
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-                gap: isMobile ? '16px' : '24px',
-              }}>
-                {services.map((service, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      padding: isMobile ? '24px 20px' : '32px 24px',
-                      backgroundColor: theme.cardBg,
-                      border: `1px solid ${theme.cardBorder}`,
-                      borderRadius: '16px',
-                    }}
-                  >
-                    <div style={{
-                      width: isMobile ? '48px' : '56px',
-                      height: isMobile ? '48px' : '56px',
-                      borderRadius: '14px',
-                      backgroundColor: `${service.color}15`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      marginBottom: isMobile ? '16px' : '20px',
-                    }}>
-                      <service.icon size={isMobile ? 24 : 28} style={{ color: service.color }} />
-                    </div>
-                    <h3 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '700', fontFamily: FONTS.heading, marginBottom: '10px', color: isDark ? '#fff' : BRAND.brown }}>{service.title}</h3>
-                    <p style={{ fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, lineHeight: '1.65', marginBottom: isMobile ? '16px' : '20px', fontFamily: FONTS.body }}>{service.description}</p>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                      {service.features.map((feature, j) => (
-                        <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, fontFamily: FONTS.body }}>
-                          <CheckCircle size={14} style={{ color: service.color, flexShrink: 0 }} />
-                          {feature}
+                {/* Support Card — spans 1 col */}
+                <BentoCard
+                  name="Your customers get real answers"
+                  className="!col-span-1"
+                  Icon={ChatsCircle}
+                  description="11 years of Tier 2 escalations across Intercom, Zendesk, and live chat. I resolve issues — not just route tickets."
+                  href="/services"
+                  cta="View support services"
+                  background={
+                    <div className="absolute inset-0 flex flex-col items-end pr-6 pt-6 transition-opacity duration-300" style={{ opacity: 0.75 }}>
+                      {/* Mini chat bubbles */}
+                      {[
+                        { msg: 'My order hasn\'t arrived yet', align: 'right' },
+                        { msg: 'Let me check your tracking #', align: 'left' },
+                        { msg: 'Found it — reshipping now', align: 'left' },
+                      ].map((chat, i) => (
+                        <div key={i} style={{
+                          padding: '6px 12px',
+                          borderRadius: chat.align === 'left' ? '10px 10px 10px 4px' : '10px 10px 4px 10px',
+                          backgroundColor: chat.align === 'left'
+                            ? (isDark ? `${BRAND.green}30` : `${BRAND.green}18`)
+                            : (isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)'),
+                          border: `1px solid ${chat.align === 'left'
+                            ? (isDark ? `${BRAND.green}50` : `${BRAND.green}35`)
+                            : (isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)')}`,
+                          fontSize: '11px',
+                          color: isDark ? '#c4b5a3' : '#5e4d38',
+                          fontFamily: FONTS.body,
+                          alignSelf: chat.align === 'left' ? 'flex-start' : 'flex-end',
+                          marginBottom: '6px',
+                          maxWidth: '85%',
+                          marginLeft: chat.align === 'left' ? '12px' : '0',
+                        }}>
+                          {chat.msg}
                         </div>
                       ))}
                     </div>
-                  </div>
-                ))}
-              </div>
+                  }
+                />
+
+                {/* Dev Card — spans full width */}
+                <BentoCard
+                  name="Your tools get built"
+                  className={isMobile ? '!col-span-1' : '!col-span-3'}
+                  Icon={Terminal}
+                  description="Internal dashboards, client portals, custom tools — production-grade web apps with React and Supabase, designed around your actual process."
+                  href="/services"
+                  cta="View dev services"
+                  background={
+                    <div className="absolute inset-0 flex items-center justify-center transition-opacity duration-300" style={{ opacity: 0.7 }}>
+                      {/* Mini code editor */}
+                      <div style={{
+                        padding: '16px 20px',
+                        borderRadius: '10px',
+                        backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                        border: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.06)'}`,
+                        fontFamily: "'Courier New', monospace",
+                        fontSize: '12px',
+                        lineHeight: '1.8',
+                        marginTop: '-20px',
+                        color: isDark ? '#a09585' : '#7a6652',
+                      }}>
+                        <div><span style={{ color: '#a78bfa' }}>const</span> <span style={{ color: '#5a9be6' }}>dashboard</span> = <span style={{ color: '#6bc45a' }}>createApp</span>{'({'}</div>
+                        <div style={{ paddingLeft: '16px' }}><span style={{ color: '#fbbf24' }}>auth</span>: <span style={{ color: '#6bc45a' }}>'supabase'</span>,</div>
+                        <div style={{ paddingLeft: '16px' }}><span style={{ color: '#fbbf24' }}>ui</span>: <span style={{ color: '#6bc45a' }}>'react'</span>,</div>
+                        <div style={{ paddingLeft: '16px' }}><span style={{ color: '#fbbf24' }}>deploy</span>: <span style={{ color: '#6bc45a' }}>'vercel'</span></div>
+                        <div>{'});'}</div>
+                      </div>
+                    </div>
+                  }
+                />
+              </BentoGrid>
+
+              {/* CTA */}
+              <ScrollReveal delay={0.2}>
+                <div style={{
+                  marginTop: isMobile ? '28px' : '40px',
+                  textAlign: 'center',
+                }}>
+                  <button
+                    onClick={() => navigate('/services')}
+                    style={{
+                      padding: '14px 28px',
+                      backgroundColor: BRAND.blue,
+                      color: '#fff',
+                      border: 'none',
+                      borderRadius: '10px',
+                      fontWeight: '600',
+                      fontSize: '14px',
+                      cursor: 'pointer',
+                      fontFamily: FONTS.body,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                      transition: 'opacity 0.2s ease',
+                    }}
+                  >
+                    View services & book a call <ArrowSquareOut size={15} />
+                  </button>
+                  <p style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body, marginTop: '12px', opacity: 0.7 }}>
+                    Free intro call — no commitment
+                  </p>
+                </div>
+              </ScrollReveal>
             </div>
           </ScrollReveal>
         </section>
@@ -1140,25 +1109,33 @@ function PortfolioPage({ isDark, setIsDark }) {
                 <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#f59e0b', textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Background</span>
                 <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>Career History</h2>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '20px' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '0' : '0' }}>
                 {experience.map((exp, i) => (
-                  <div key={i} style={{ position: 'relative', paddingLeft: isMobile ? '20px' : '28px', borderLeft: `3px solid ${exp.current ? BRAND.green : theme.cardBorder}` }}>
-                    <div style={{ position: 'absolute', left: isMobile ? '-6px' : '-8px', top: isMobile ? '20px' : '24px', width: isMobile ? '12px' : '13px', height: isMobile ? '12px' : '13px', borderRadius: '50%', backgroundColor: exp.current ? BRAND.green : theme.cardBorder, zIndex: 2 }} />
-                    <div style={{
-                      padding: isMobile ? '20px 16px' : '24px',
-                      backgroundColor: theme.cardBg,
-                      border: `1px solid ${theme.cardBorder}`,
-                      borderRadius: '12px',
-                    }}>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                        <h3 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, fontFamily: FONTS.heading }}>{exp.role}</h3>
-                        {exp.current && <span style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: '700', backgroundColor: `${BRAND.green}15`, color: BRAND.green }}>Current</span>}
+                  <div key={i} style={{ display: 'flex', gap: isMobile ? '14px' : '20px' }}>
+                    {/* Timeline column */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flexShrink: 0, width: '13px' }}>
+                      <div style={{
+                        width: exp.current ? '11px' : '9px',
+                        height: exp.current ? '11px' : '9px',
+                        borderRadius: '50%',
+                        backgroundColor: exp.current ? BRAND.green : theme.cardBorder,
+                        flexShrink: 0,
+                        marginTop: isMobile ? '6px' : '8px',
+                      }} />
+                      {i < experience.length - 1 && (
+                        <div style={{ width: '1px', flex: 1, backgroundColor: theme.cardBorder, minHeight: '20px' }} />
+                      )}
+                    </div>
+                    {/* Content */}
+                    <div style={{ paddingBottom: isMobile ? '20px' : '28px', flex: 1 }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: '8px', marginBottom: '4px' }}>
+                        <h3 style={{ fontSize: isMobile ? '15px' : '16px', fontWeight: '600', color: isDark ? '#fff' : BRAND.brown, fontFamily: FONTS.heading, lineHeight: '1.4' }}>{exp.role}</h3>
+                        {exp.current && <span style={{ fontSize: '10px', fontWeight: '600', color: BRAND.green, letterSpacing: '0.5px' }}>NOW</span>}
                       </div>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '12px' : '20px', marginBottom: '10px', fontSize: isMobile ? '12px' : '14px', color: theme.textMuted, fontFamily: FONTS.body }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={14} />{exp.company}</div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><CalendarBlank size={14} />{exp.period}</div>
+                      <div style={{ fontSize: isMobile ? '12px' : '13px', color: theme.textMuted, fontFamily: FONTS.body, marginBottom: '6px' }}>
+                        {exp.company} &middot; {exp.period}
                       </div>
-                      <p style={{ fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, lineHeight: '1.65', fontFamily: FONTS.body }}>{exp.description}</p>
+                      <p style={{ fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, lineHeight: '1.6', fontFamily: FONTS.body, opacity: 0.8 }}>{exp.description}</p>
                     </div>
                   </div>
                 ))}
@@ -1181,45 +1158,66 @@ function PortfolioPage({ isDark, setIsDark }) {
                 <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#8b5cf6', textTransform: 'uppercase', marginBottom: '8px', display: 'block', fontFamily: FONTS.body }}>Expertise</span>
                 <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>Core Skills</h2>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '12px' : '20px', alignItems: 'start' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '12px' : '16px' }}>
                 {skills.map((skill, i) => (
-                  <div
-                    key={i}
-                    style={{
-                      padding: isMobile ? '16px 14px' : '24px',
-                      backgroundColor: theme.cardBg,
-                      border: `1px solid ${theme.cardBorder}`,
-                      borderRadius: isMobile ? '12px' : '16px',
-                    }}
-                  >
-                    <h3 style={{
-                      fontSize: isMobile ? '14px' : '16px',
-                      fontWeight: '700',
-                      marginBottom: isMobile ? '10px' : '14px',
-                      color: skill.color,
-                      fontFamily: FONTS.heading,
-                    }}>
-                      {skill.category}
-                    </h3>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '8px' }}>
-                      {skill.items.map((item, j) => (
-                        <span key={j} style={{
-                          padding: isMobile ? '6px 10px' : '7px 12px',
-                          backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)',
-                          borderRadius: '6px',
-                          fontSize: isMobile ? '11px' : '12px',
+                  <ScrollReveal key={i} delay={i * 0.08} style={{ height: '100%' }}>
+                    <div
+                      className="tool-card"
+                      style={{
+                        backgroundColor: theme.cardBg,
+                        border: `1px solid ${theme.cardBorder}`,
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {/* Header */}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: isMobile ? '14px 16px' : '18px 20px',
+                        position: 'relative',
+                        zIndex: 1,
+                      }}>
+                        <span className="tool-card-header" style={{
+                          fontSize: isMobile ? '13px' : '14px',
                           color: theme.textMuted,
-                          fontWeight: '500',
                           fontFamily: FONTS.body,
-                          border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
-                          lineHeight: '1.4',
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          whiteSpace: 'nowrap',
-                        }}>{item}</span>
-                      ))}
+                          fontWeight: '500',
+                        }}>{skill.category}</span>
+                        <span style={{
+                          fontSize: '12px',
+                          color: theme.textMuted,
+                          fontFamily: FONTS.body,
+                        }}>{skill.items.length} skills</span>
+                      </div>
+
+                      {/* Skills */}
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: isMobile ? '6px' : '8px',
+                        padding: isMobile ? '0 16px 16px' : '0 20px 20px',
+                        position: 'relative',
+                        zIndex: 1,
+                        flex: 1,
+                      }}>
+                        {skill.items.map((item, j) => (
+                          <div key={j} style={{
+                            padding: isMobile ? '9px 12px' : '10px 14px',
+                            backgroundColor: isDark ? 'rgba(42, 36, 32, 0.6)' : 'rgba(250, 248, 245, 0.8)',
+                            borderRadius: '8px',
+                            border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`,
+                            fontSize: isMobile ? '12px' : '13px',
+                            fontWeight: '500',
+                            color: theme.text,
+                            fontFamily: FONTS.body,
+                          }}>{item}</div>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                  </ScrollReveal>
                 ))}
               </div>
             </div>
