@@ -18,7 +18,7 @@
         { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
         { "key": "Permissions-Policy", "value": "geolocation=(), microphone=(), camera=()" },
         { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains; preload" },
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://widgets.leadconnectorhq.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.imgur.com https://brewedops.com https://*.supabase.co; connect-src 'self' https://*.supabase.co https://api.openai.com https://widgets.leadconnectorhq.com; frame-src 'self' https://widgets.leadconnectorhq.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" }
+        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://widgets.leadconnectorhq.com https://services.leadconnectorhq.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://widgets.leadconnectorhq.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https://i.imgur.com https://brewedops.com https://*.supabase.co https://*.leadconnectorhq.com; connect-src 'self' https://*.supabase.co https://api.openai.com https://widgets.leadconnectorhq.com https://services.leadconnectorhq.com; frame-src 'self' https://widgets.leadconnectorhq.com; worker-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests" }
       ]
     }
   ]
