@@ -452,15 +452,15 @@ function PortfolioPage({ isDark, setIsDark }) {
   const toolCategories = [
     {
       name: 'CRM & Support', tools: [
-        { name: 'Intercom', icon: 'https://cdn.simpleicons.org/intercom/1F8DED' },
-        { name: 'Zendesk', icon: 'https://cdn.simpleicons.org/zendesk/03363D' },
-        { name: 'HubSpot', icon: 'https://cdn.simpleicons.org/hubspot/FF7A59' },
+        { name: 'Intercom', icon: '/icons/intercom.svg' },
+        { name: 'Zendesk', icon: '/icons/zendesk.svg' },
+        { name: 'HubSpot', icon: '/icons/hubspot.svg' },
         { name: 'HighLevel', icon: '/GoHighLevellogo.webp' },
       ]
     },
     {
       name: 'Communication', tools: [
-        { name: 'Slack', icon: 'https://cdn.simpleicons.org/slack/4A154B' },
+        { name: 'Slack', icon: '/icons/slack.svg' },
         { name: 'Zoom', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%232D8CFF" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-4.35-3.47c-.05.02-.1.05-.15.09l-2.7 1.85V8.8c0-.88-.72-1.6-1.6-1.6H6.4c-.88 0-1.6.72-1.6 1.6v6.4c0 .88.72 1.6 1.6 1.6h8.8c.88 0 1.6-.72 1.6-1.6v-1.67l2.7 1.85c.05.04.1.07.15.09.35.14.75-.1.75-.49V9.02c0-.39-.4-.63-.75-.49z"/%3E%3C/svg%3E' },
         { name: 'Google Meet', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%2300897B" d="M12 0C5.372 0 0 5.373 0 12s5.372 12 12 12 12-5.373 12-12S18.628 0 12 0zm5.2 16.1l-2.7-2v1.5c0 .6-.4 1-1 1H7.6c-.6 0-1-.4-1-1V8.4c0-.6.4-1 1-1h5.9c.6 0 1 .4 1 1v1.5l2.7-2c.3-.2.6 0 .6.3v7.6c0 .3-.3.5-.6.3z"/%3E%3C/svg%3E' },
         { name: 'Skype', icon: '/skypeicon.png' },
@@ -468,34 +468,34 @@ function PortfolioPage({ isDark, setIsDark }) {
     },
     {
       name: 'Project Management', tools: [
-        { name: 'Trello', icon: 'https://cdn.simpleicons.org/trello/0052CC' },
-        { name: 'ClickUp', icon: 'https://cdn.simpleicons.org/clickup/7B68EE' },
-        { name: 'Notion', icon: isDark ? 'https://cdn.simpleicons.org/notion/FFFFFF' : 'https://cdn.simpleicons.org/notion/000000' },
-        { name: 'Asana', icon: 'https://cdn.simpleicons.org/asana/F06A6A' },
+        { name: 'Trello', icon: '/icons/trello.svg' },
+        { name: 'ClickUp', icon: '/icons/clickup.svg' },
+        { name: 'Notion', icon: isDark ? '/icons/notion-light.svg' : '/icons/notion-dark.svg' },
+        { name: 'Asana', icon: '/icons/asana.svg' },
       ]
     },
     {
       name: 'eCommerce', tools: [
-        { name: 'Shopify', icon: 'https://cdn.simpleicons.org/shopify/7AB55C' },
+        { name: 'Shopify', icon: '/icons/shopify.svg' },
         { name: 'WooCommerce', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%2396588A" d="M2.227 4.857A2.228 2.228 0 000 7.088v7.199a2.226 2.226 0 002.227 2.227h7.039l2.712 2.631-.456-2.631h10.251A2.226 2.226 0 0024 14.287V7.088a2.227 2.227 0 00-2.227-2.231H2.227zm1.078 1.572c.387.012.744.217.963.618.725 1.327 1.5 4.074 1.855 5.621.206.896 1.001 3.689 1.512 3.039.698-.89 1.26-3.207 1.688-4.479.152-.453.729-2.358 1.47-2.358.74 0 .763 1.884.897 2.655.203 1.168.542 3.474 1.122 3.474.432 0 1.082-1.614 1.49-2.584a23.51 23.51 0 011.337-2.86c.315-.551.695-.934 1.095-.542.4.392.09 1.57-.143 2.324-.592 1.916-.842 3.397-.44 3.397.3 0 .836-.664 1.327-1.39l-.007.022a.652.652 0 011.109.688 7.293 7.293 0 01-2.219 2.374c-.86.56-1.56.283-1.845-.372-.372-.857-.221-1.922.024-2.867-.467.652-.976 1.221-1.484 1.221-1.075 0-1.437-1.811-1.654-2.953-.125-.659-.255-1.378-.39-1.937-.396 1.292-.74 2.745-1.249 3.975-.377.91-.86 1.95-1.582 1.95C5.846 17.465 5 14.296 4.66 12.963c-.318-1.242-.717-2.921-1.2-4.043-.12-.279-.082-.48.019-.591a.66.66 0 01-.174.1z"/%3E%3C/svg%3E' },
         { name: 'Lightspeed X-Series', icon: '/lightspeedicon.png' },
       ]
     },
     {
       name: 'Development', tools: [
-        { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
-        { name: 'Vite', icon: 'https://cdn.simpleicons.org/vite/646CFF' },
-        { name: 'Tailwind', icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4' },
-        { name: 'Supabase', icon: 'https://cdn.simpleicons.org/supabase/3FCF8E' },
-        { name: 'n8n', icon: 'https://cdn.simpleicons.org/n8n/EA4B71' },
+        { name: 'React', icon: '/icons/react.svg' },
+        { name: 'Vite', icon: '/icons/vite.svg' },
+        { name: 'Tailwind', icon: '/icons/tailwindcss.svg' },
+        { name: 'Supabase', icon: '/icons/supabase.svg' },
+        { name: 'n8n', icon: '/icons/n8n.svg' },
       ]
     },
     {
       name: 'Productivity', tools: [
-        { name: 'Google Workspace', icon: 'https://cdn.simpleicons.org/google/4285F4' },
+        { name: 'Google Workspace', icon: '/icons/google.svg' },
         { name: 'Microsoft 365', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%230078D4" d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/%3E%3C/svg%3E' },
         { name: 'ChatGPT', icon: '/chatgpticon.png' },
-        { name: 'Claude', icon: 'https://cdn.simpleicons.org/anthropic/D97757' },
+        { name: 'Claude', icon: '/icons/anthropic.svg' },
       ]
     },
   ];
