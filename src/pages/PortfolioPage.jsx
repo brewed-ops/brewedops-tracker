@@ -332,19 +332,19 @@ const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {
 // ============================================
 const FacebookIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+    <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
   </svg>
 );
 
 const DiscordIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z"/>
+    <path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189z" />
   </svg>
 );
 
 const LinkedInIcon = ({ size = 18 }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
   </svg>
 );
 
@@ -450,42 +450,54 @@ function PortfolioPage({ isDark, setIsDark }) {
   ];
 
   const toolCategories = [
-    { name: 'CRM & Support', tools: [
-      { name: 'Intercom', icon: 'https://cdn.simpleicons.org/intercom/1F8DED' },
-      { name: 'Zendesk', icon: 'https://cdn.simpleicons.org/zendesk/03363D' },
-      { name: 'HubSpot', icon: 'https://cdn.simpleicons.org/hubspot/FF7A59' },
-      { name: 'HighLevel', icon: 'https://i.imgur.com/2KaYt7S.jpeg' },
-    ]},
-    { name: 'Communication', tools: [
-      { name: 'Slack', icon: 'https://upload.wikimedia.org/wikipedia/commons/d/d5/Slack_icon_2019.svg' },
-      { name: 'Zoom', icon: 'https://cdn.simpleicons.org/zoom/0B5CFF' },
-      { name: 'Google Meet', icon: 'https://cdn.simpleicons.org/googlemeet/00897B' },
-      { name: 'Skype', icon: 'https://upload.wikimedia.org/wikipedia/commons/6/60/Skype_logo_%282019%E2%80%93present%29.svg' },
-    ]},
-    { name: 'Project Management', tools: [
-      { name: 'Trello', icon: 'https://cdn.simpleicons.org/trello/0052CC' },
-      { name: 'ClickUp', icon: 'https://cdn.simpleicons.org/clickup/7B68EE' },
-      { name: 'Notion', icon: 'https://cdn.simpleicons.org/notion/000000' },
-      { name: 'Asana', icon: 'https://cdn.simpleicons.org/asana/F06A6A' },
-    ]},
-    { name: 'eCommerce', tools: [
-      { name: 'Shopify', icon: 'https://cdn.simpleicons.org/shopify/7AB55C' },
-      { name: 'WooCommerce', icon: 'https://cdn.simpleicons.org/woocommerce/96588A' },
-      { name: 'Lightspeed X-Series', icon: 'https://www.lightspeedhq.com/favicon.ico' },
-    ]},
-    { name: 'Development', tools: [
-      { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
-      { name: 'Vite', icon: 'https://cdn.simpleicons.org/vite/646CFF' },
-      { name: 'Tailwind', icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4' },
-      { name: 'Supabase', icon: 'https://cdn.simpleicons.org/supabase/3FCF8E' },
-      { name: 'n8n', icon: 'https://cdn.simpleicons.org/n8n/EA4B71' },
-    ]},
-    { name: 'Productivity', tools: [
-      { name: 'Google Workspace', icon: 'https://cdn.simpleicons.org/google/4285F4' },
-      { name: 'Microsoft 365', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%230078D4" d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/%3E%3C/svg%3E' },
-      { name: 'ChatGPT', icon: 'https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg' },
-      { name: 'Claude', icon: 'https://cdn.simpleicons.org/anthropic/191919' },
-    ]},
+    {
+      name: 'CRM & Support', tools: [
+        { name: 'Intercom', icon: 'https://cdn.simpleicons.org/intercom/1F8DED' },
+        { name: 'Zendesk', icon: 'https://cdn.simpleicons.org/zendesk/03363D' },
+        { name: 'HubSpot', icon: 'https://cdn.simpleicons.org/hubspot/FF7A59' },
+        { name: 'HighLevel', icon: '/GoHighLevellogo.webp' },
+      ]
+    },
+    {
+      name: 'Communication', tools: [
+        { name: 'Slack', icon: 'https://cdn.simpleicons.org/slack/4A154B' },
+        { name: 'Zoom', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%232D8CFF" d="M24 12c0 6.627-5.373 12-12 12S0 18.627 0 12 5.373 0 12 0s12 5.373 12 12zm-4.35-3.47c-.05.02-.1.05-.15.09l-2.7 1.85V8.8c0-.88-.72-1.6-1.6-1.6H6.4c-.88 0-1.6.72-1.6 1.6v6.4c0 .88.72 1.6 1.6 1.6h8.8c.88 0 1.6-.72 1.6-1.6v-1.67l2.7 1.85c.05.04.1.07.15.09.35.14.75-.1.75-.49V9.02c0-.39-.4-.63-.75-.49z"/%3E%3C/svg%3E' },
+        { name: 'Google Meet', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%2300897B" d="M12 0C5.372 0 0 5.373 0 12s5.372 12 12 12 12-5.373 12-12S18.628 0 12 0zm5.2 16.1l-2.7-2v1.5c0 .6-.4 1-1 1H7.6c-.6 0-1-.4-1-1V8.4c0-.6.4-1 1-1h5.9c.6 0 1 .4 1 1v1.5l2.7-2c.3-.2.6 0 .6.3v7.6c0 .3-.3.5-.6.3z"/%3E%3C/svg%3E' },
+        { name: 'Skype', icon: '/skypeicon.png' },
+      ]
+    },
+    {
+      name: 'Project Management', tools: [
+        { name: 'Trello', icon: 'https://cdn.simpleicons.org/trello/0052CC' },
+        { name: 'ClickUp', icon: 'https://cdn.simpleicons.org/clickup/7B68EE' },
+        { name: 'Notion', icon: isDark ? 'https://cdn.simpleicons.org/notion/FFFFFF' : 'https://cdn.simpleicons.org/notion/000000' },
+        { name: 'Asana', icon: 'https://cdn.simpleicons.org/asana/F06A6A' },
+      ]
+    },
+    {
+      name: 'eCommerce', tools: [
+        { name: 'Shopify', icon: 'https://cdn.simpleicons.org/shopify/7AB55C' },
+        { name: 'WooCommerce', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%2396588A" d="M2.227 4.857A2.228 2.228 0 000 7.088v7.199a2.226 2.226 0 002.227 2.227h7.039l2.712 2.631-.456-2.631h10.251A2.226 2.226 0 0024 14.287V7.088a2.227 2.227 0 00-2.227-2.231H2.227zm1.078 1.572c.387.012.744.217.963.618.725 1.327 1.5 4.074 1.855 5.621.206.896 1.001 3.689 1.512 3.039.698-.89 1.26-3.207 1.688-4.479.152-.453.729-2.358 1.47-2.358.74 0 .763 1.884.897 2.655.203 1.168.542 3.474 1.122 3.474.432 0 1.082-1.614 1.49-2.584a23.51 23.51 0 011.337-2.86c.315-.551.695-.934 1.095-.542.4.392.09 1.57-.143 2.324-.592 1.916-.842 3.397-.44 3.397.3 0 .836-.664 1.327-1.39l-.007.022a.652.652 0 011.109.688 7.293 7.293 0 01-2.219 2.374c-.86.56-1.56.283-1.845-.372-.372-.857-.221-1.922.024-2.867-.467.652-.976 1.221-1.484 1.221-1.075 0-1.437-1.811-1.654-2.953-.125-.659-.255-1.378-.39-1.937-.396 1.292-.74 2.745-1.249 3.975-.377.91-.86 1.95-1.582 1.95C5.846 17.465 5 14.296 4.66 12.963c-.318-1.242-.717-2.921-1.2-4.043-.12-.279-.082-.48.019-.591a.66.66 0 01-.174.1z"/%3E%3C/svg%3E' },
+        { name: 'Lightspeed X-Series', icon: '/lightspeedicon.png' },
+      ]
+    },
+    {
+      name: 'Development', tools: [
+        { name: 'React', icon: 'https://cdn.simpleicons.org/react/61DAFB' },
+        { name: 'Vite', icon: 'https://cdn.simpleicons.org/vite/646CFF' },
+        { name: 'Tailwind', icon: 'https://cdn.simpleicons.org/tailwindcss/06B6D4' },
+        { name: 'Supabase', icon: 'https://cdn.simpleicons.org/supabase/3FCF8E' },
+        { name: 'n8n', icon: 'https://cdn.simpleicons.org/n8n/EA4B71' },
+      ]
+    },
+    {
+      name: 'Productivity', tools: [
+        { name: 'Google Workspace', icon: 'https://cdn.simpleicons.org/google/4285F4' },
+        { name: 'Microsoft 365', icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"%3E%3Cpath fill="%230078D4" d="M11.4 24H0V12.6h11.4V24zM24 24H12.6V12.6H24V24zM11.4 11.4H0V0h11.4v11.4zM24 11.4H12.6V0H24v11.4z"/%3E%3C/svg%3E' },
+        { name: 'ChatGPT', icon: '/chatgpticon.png' },
+        { name: 'Claude', icon: 'https://cdn.simpleicons.org/anthropic/D97757' },
+      ]
+    },
   ];
 
   const experience = [
@@ -794,7 +806,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                     }}
                   >
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                     </svg>
                     WhatsApp
                   </a>
@@ -831,58 +843,58 @@ function PortfolioPage({ isDark, setIsDark }) {
           borderBottom: `1px solid ${theme.cardBorder}`,
         }}>
           <ScrollReveal>
-          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
-              <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.green, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Tech Stack</span>
-              <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>Tools I Work With</h2>
-              <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, maxWidth: '450px', margin: '0 auto', fontFamily: FONTS.body }}>Platforms and technologies I use daily to deliver exceptional results.</p>
-            </div>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.green, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Tech Stack</span>
+                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>Tools I Work With</h2>
+                <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, maxWidth: '450px', margin: '0 auto', fontFamily: FONTS.body }}>Platforms and technologies I use daily to deliver exceptional results.</p>
+              </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '12px' : '20px' }}>
-              {toolCategories.map((category, i) => (
-                <div
-                  key={i}
-                  style={{
-                    padding: isMobile ? '16px' : '24px 28px',
-                    backgroundColor: theme.cardBg,
-                    border: `1px solid ${theme.cardBorder}`,
-                    borderRadius: isMobile ? '12px' : '16px',
-                  }}
-                >
-                  <h3 style={{
-                    fontSize: isMobile ? '11px' : '12px',
-                    fontWeight: '700',
-                    textTransform: 'uppercase',
-                    letterSpacing: '2px',
-                    marginBottom: isMobile ? '12px' : '16px',
-                    color: BRAND.blue,
-                    fontFamily: FONTS.heading,
-                  }}>
-                    {category.name}
-                  </h3>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '10px' }}>
-                    {category.tools.map((tool, j) => (
-                      <div
-                        key={j}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: isMobile ? '6px' : '10px',
-                          padding: isMobile ? '8px 10px' : '10px 16px',
-                          backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)',
-                          borderRadius: isMobile ? '8px' : '10px',
-                          border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
-                        }}
-                      >
-                        <img src={tool.icon} alt={tool.name} style={{ width: isMobile ? '18px' : '22px', height: isMobile ? '18px' : '22px', objectFit: 'contain' }} />
-                        <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{tool.name}</span>
-                      </div>
-                    ))}
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '12px' : '20px' }}>
+                {toolCategories.map((category, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      padding: isMobile ? '16px' : '24px 28px',
+                      backgroundColor: theme.cardBg,
+                      border: `1px solid ${theme.cardBorder}`,
+                      borderRadius: isMobile ? '12px' : '16px',
+                    }}
+                  >
+                    <h3 style={{
+                      fontSize: isMobile ? '11px' : '12px',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      letterSpacing: '2px',
+                      marginBottom: isMobile ? '12px' : '16px',
+                      color: BRAND.blue,
+                      fontFamily: FONTS.heading,
+                    }}>
+                      {category.name}
+                    </h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '10px' }}>
+                      {category.tools.map((tool, j) => (
+                        <div
+                          key={j}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: isMobile ? '6px' : '10px',
+                            padding: isMobile ? '8px 10px' : '10px 16px',
+                            backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)',
+                            borderRadius: isMobile ? '8px' : '10px',
+                            border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
+                          }}
+                        >
+                          <img src={tool.icon} alt={tool.name} style={{ width: isMobile ? '18px' : '22px', height: isMobile ? '18px' : '22px', objectFit: 'contain' }} />
+                          <span style={{ fontSize: isMobile ? '12px' : '14px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{tool.name}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
           </ScrollReveal>
         </section>
 
@@ -894,166 +906,166 @@ function PortfolioPage({ isDark, setIsDark }) {
           backgroundColor: theme.bg,
         }}>
           <ScrollReveal>
-          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
-              <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.green, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Portfolio</span>
-              <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>What I've Built</h2>
-              <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.textMuted, maxWidth: '500px', margin: '0 auto', fontFamily: FONTS.body }}>Real products and tools that solve real problems for real users.</p>
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '16px' : '28px' }}>
-              {/* BrewedOps Card */}
-              <div style={{
-                backgroundColor: theme.cardBg,
-                border: `1px solid ${theme.cardBorder}`,
-                borderRadius: '16px',
-                overflow: 'hidden',
-              }}>
-                <div style={{
-                  width: '100%',
-                  aspectRatio: '16 / 10',
-                  overflow: 'hidden',
-                  borderBottom: `1px solid ${theme.cardBorder}`,
-                }}>
-                  <img
-                    src="https://i.imgur.com/NYgLMDT.png"
-                    alt="BrewedOps Tools Screenshot"
-                    loading="lazy"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'left top' }}
-                  />
-                </div>
-                <div style={{ padding: isMobile ? '20px' : '28px' }}>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', backgroundColor: `${BRAND.green}12`, borderRadius: '100px', marginBottom: '14px' }}>
-                    <span style={{ fontSize: '11px', color: BRAND.green, fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '0.5px' }}>FEATURED PROJECT</span>
-                  </div>
-                  <h3 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '800', fontFamily: FONTS.heading, marginBottom: '8px' }}>
-                    <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
-                    <span style={{ color: BRAND.blue }}>Ops</span>
-                    <span style={{ color: isDark ? '#fff' : BRAND.brown }}> Tools</span>
-                  </h3>
-                  <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '16px', fontFamily: FONTS.body }}>
-                    A productivity hub for Filipino VAs & freelancers with 22+ free tools, AI-powered utilities, finance tracking, task management, and premium features.
-                  </p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
-                    {['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'].map((tag) => (
-                      <span key={tag} style={{
-                        fontSize: '12px',
-                        padding: '6px 12px',
-                        backgroundColor: `${BRAND.blue}10`,
-                        color: BRAND.blue,
-                        borderRadius: '100px',
-                        fontWeight: '600',
-                        fontFamily: FONTS.body,
-                      }}>{tag}</span>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => navigate('/')}
-                    style={{
-                      padding: '12px 24px',
-                      backgroundColor: BRAND.blue,
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '10px',
-                      fontWeight: '600',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      fontFamily: FONTS.body,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                    }}
-                  >
-                    View Project <ArrowSquareOut size={16} />
-                  </button>
-                </div>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.green, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Portfolio</span>
+                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>What I've Built</h2>
+                <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.textMuted, maxWidth: '500px', margin: '0 auto', fontFamily: FONTS.body }}>Real products and tools that solve real problems for real users.</p>
               </div>
 
-              {/* Fuelyx Card */}
-              <div style={{
-                backgroundColor: theme.cardBg,
-                border: `1px solid ${theme.cardBorder}`,
-                borderRadius: '16px',
-                overflow: 'hidden',
-              }}>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '16px' : '28px' }}>
+                {/* BrewedOps Card */}
                 <div style={{
-                  width: '100%',
-                  aspectRatio: '16 / 10',
+                  backgroundColor: theme.cardBg,
+                  border: `1px solid ${theme.cardBorder}`,
+                  borderRadius: '16px',
                   overflow: 'hidden',
-                  borderBottom: `1px solid ${theme.cardBorder}`,
-                  background: isDark ? '#0c1929' : '#f0fdfa',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
                 }}>
-                  {/* Fuelyx icon + label as visual */}
-                  <div style={{ textAlign: 'center' }}>
-                    <div style={{
-                      width: '64px',
-                      height: '64px',
-                      borderRadius: '16px',
-                      background: 'linear-gradient(135deg, #134e4a, #14b8a6)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      margin: '0 auto 12px',
-                    }}>
-                      <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12" />
-                        <path d="M12 2v10l4.5 4.5" />
-                        <path d="M2 12h10" />
-                      </svg>
+                  <div style={{
+                    width: '100%',
+                    aspectRatio: '16 / 10',
+                    overflow: 'hidden',
+                    borderBottom: `1px solid ${theme.cardBorder}`,
+                  }}>
+                    <img
+                      src="https://i.imgur.com/NYgLMDT.png"
+                      alt="BrewedOps Tools Screenshot"
+                      loading="lazy"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'left top' }}
+                    />
+                  </div>
+                  <div style={{ padding: isMobile ? '20px' : '28px' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', backgroundColor: `${BRAND.green}12`, borderRadius: '100px', marginBottom: '14px' }}>
+                      <span style={{ fontSize: '11px', color: BRAND.green, fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '0.5px' }}>FEATURED PROJECT</span>
                     </div>
-                    <div style={{ fontSize: '28px', fontWeight: '800', color: '#14b8a6', fontFamily: FONTS.heading }}>Fuelyx</div>
-                    <div style={{ fontSize: '14px', color: isDark ? '#5eead4' : '#0d9488', fontFamily: FONTS.body, marginTop: '4px' }}>Your Nutrition, Simplified</div>
+                    <h3 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '800', fontFamily: FONTS.heading, marginBottom: '8px' }}>
+                      <span style={{ color: isDark ? '#fff' : BRAND.brown }}>Brewed</span>
+                      <span style={{ color: BRAND.blue }}>Ops</span>
+                      <span style={{ color: isDark ? '#fff' : BRAND.brown }}> Tools</span>
+                    </h3>
+                    <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '16px', fontFamily: FONTS.body }}>
+                      A productivity hub for Filipino VAs & freelancers with 22+ free tools, AI-powered utilities, finance tracking, task management, and premium features.
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+                      {['React', 'Supabase', 'Tailwind CSS', 'Vite', 'shadcn/ui'].map((tag) => (
+                        <span key={tag} style={{
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          backgroundColor: `${BRAND.blue}10`,
+                          color: BRAND.blue,
+                          borderRadius: '100px',
+                          fontWeight: '600',
+                          fontFamily: FONTS.body,
+                        }}>{tag}</span>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => navigate('/')}
+                      style={{
+                        padding: '12px 24px',
+                        backgroundColor: BRAND.blue,
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '10px',
+                        fontWeight: '600',
+                        fontSize: '14px',
+                        cursor: 'pointer',
+                        fontFamily: FONTS.body,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      View Project <ArrowSquareOut size={16} />
+                    </button>
                   </div>
                 </div>
-                <div style={{ padding: isMobile ? '20px' : '28px' }}>
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', backgroundColor: 'rgba(20, 184, 166, 0.1)', borderRadius: '100px', marginBottom: '14px' }}>
-                    <span style={{ fontSize: '11px', color: '#14b8a6', fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '0.5px' }}>MOBILE APP</span>
+
+                {/* Fuelyx Card */}
+                <div style={{
+                  backgroundColor: theme.cardBg,
+                  border: `1px solid ${theme.cardBorder}`,
+                  borderRadius: '16px',
+                  overflow: 'hidden',
+                }}>
+                  <div style={{
+                    width: '100%',
+                    aspectRatio: '16 / 10',
+                    overflow: 'hidden',
+                    borderBottom: `1px solid ${theme.cardBorder}`,
+                    background: isDark ? '#0c1929' : '#f0fdfa',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    {/* Fuelyx icon + label as visual */}
+                    <div style={{ textAlign: 'center' }}>
+                      <div style={{
+                        width: '64px',
+                        height: '64px',
+                        borderRadius: '16px',
+                        background: 'linear-gradient(135deg, #134e4a, #14b8a6)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 12px',
+                      }}>
+                        <svg width={32} height={32} viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M12 2a10 10 0 0 1 10 10c0 5.523-4.477 10-10 10S2 17.523 2 12" />
+                          <path d="M12 2v10l4.5 4.5" />
+                          <path d="M2 12h10" />
+                        </svg>
+                      </div>
+                      <div style={{ fontSize: '28px', fontWeight: '800', color: '#14b8a6', fontFamily: FONTS.heading }}>Fuelyx</div>
+                      <div style={{ fontSize: '14px', color: isDark ? '#5eead4' : '#0d9488', fontFamily: FONTS.body, marginTop: '4px' }}>Your Nutrition, Simplified</div>
+                    </div>
                   </div>
-                  <h3 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '800', fontFamily: FONTS.heading, color: '#14b8a6', marginBottom: '8px' }}>
-                    Fuelyx
-                  </h3>
-                  <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '16px', fontFamily: FONTS.body }}>
-                    Track calories, log Filipino foods, monitor fasting, and achieve your health goals -- all in one beautiful, easy-to-use app built for Filipinos.
-                  </p>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
-                    {['React Native', 'Expo', 'Supabase', 'AI Scanner', 'Fasting Timer'].map((tag) => (
-                      <span key={tag} style={{
-                        fontSize: '12px',
-                        padding: '6px 12px',
-                        backgroundColor: 'rgba(20, 184, 166, 0.1)',
-                        color: '#14b8a6',
-                        borderRadius: '100px',
+                  <div style={{ padding: isMobile ? '20px' : '28px' }}>
+                    <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', padding: '6px 12px', backgroundColor: 'rgba(20, 184, 166, 0.1)', borderRadius: '100px', marginBottom: '14px' }}>
+                      <span style={{ fontSize: '11px', color: '#14b8a6', fontWeight: '700', fontFamily: FONTS.body, letterSpacing: '0.5px' }}>MOBILE APP</span>
+                    </div>
+                    <h3 style={{ fontSize: isMobile ? '22px' : '28px', fontWeight: '800', fontFamily: FONTS.heading, color: '#14b8a6', marginBottom: '8px' }}>
+                      Fuelyx
+                    </h3>
+                    <p style={{ fontSize: isMobile ? '13px' : '15px', color: theme.textMuted, lineHeight: '1.7', marginBottom: '16px', fontFamily: FONTS.body }}>
+                      Track calories, log Filipino foods, monitor fasting, and achieve your health goals -- all in one beautiful, easy-to-use app built for Filipinos.
+                    </p>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
+                      {['React Native', 'Expo', 'Supabase', 'AI Scanner', 'Fasting Timer'].map((tag) => (
+                        <span key={tag} style={{
+                          fontSize: '12px',
+                          padding: '6px 12px',
+                          backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                          color: '#14b8a6',
+                          borderRadius: '100px',
+                          fontWeight: '600',
+                          fontFamily: FONTS.body,
+                        }}>{tag}</span>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => navigate('/fuelyx')}
+                      style={{
+                        padding: '12px 24px',
+                        backgroundColor: '#14b8a6',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '10px',
                         fontWeight: '600',
+                        fontSize: '14px',
+                        cursor: 'pointer',
                         fontFamily: FONTS.body,
-                      }}>{tag}</span>
-                    ))}
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                      }}
+                    >
+                      View Project <ArrowSquareOut size={16} />
+                    </button>
                   </div>
-                  <button
-                    onClick={() => navigate('/fuelyx')}
-                    style={{
-                      padding: '12px 24px',
-                      backgroundColor: '#14b8a6',
-                      color: '#fff',
-                      border: 'none',
-                      borderRadius: '10px',
-                      fontWeight: '600',
-                      fontSize: '14px',
-                      cursor: 'pointer',
-                      fontFamily: FONTS.body,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '8px',
-                    }}
-                  >
-                    View Project <ArrowSquareOut size={16} />
-                  </button>
                 </div>
               </div>
             </div>
-          </div>
           </ScrollReveal>
         </section>
 
@@ -1065,53 +1077,53 @@ function PortfolioPage({ isDark, setIsDark }) {
           backgroundColor: theme.bgAlt,
         }}>
           <ScrollReveal>
-          <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
-              <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.blue, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Services</span>
-              <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>How I Can Help</h2>
-              <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.textMuted, maxWidth: '520px', margin: '0 auto', fontFamily: FONTS.body }}>From automation to customer support, I help businesses scale efficiently.</p>
-            </div>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
-              gap: isMobile ? '16px' : '24px',
-            }}>
-              {services.map((service, i) => (
-                <div
-                  key={i}
-                  style={{
-                    padding: isMobile ? '24px 20px' : '32px 24px',
-                    backgroundColor: theme.cardBg,
-                    border: `1px solid ${theme.cardBorder}`,
-                    borderRadius: '16px',
-                  }}
-                >
-                  <div style={{
-                    width: isMobile ? '48px' : '56px',
-                    height: isMobile ? '48px' : '56px',
-                    borderRadius: '14px',
-                    backgroundColor: `${service.color}15`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    marginBottom: isMobile ? '16px' : '20px',
-                  }}>
-                    <service.icon size={isMobile ? 24 : 28} style={{ color: service.color }} />
+            <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.blue, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Services</span>
+                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown, marginBottom: '10px' }}>How I Can Help</h2>
+                <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.textMuted, maxWidth: '520px', margin: '0 auto', fontFamily: FONTS.body }}>From automation to customer support, I help businesses scale efficiently.</p>
+              </div>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : isTablet ? 'repeat(2, 1fr)' : 'repeat(4, 1fr)',
+                gap: isMobile ? '16px' : '24px',
+              }}>
+                {services.map((service, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      padding: isMobile ? '24px 20px' : '32px 24px',
+                      backgroundColor: theme.cardBg,
+                      border: `1px solid ${theme.cardBorder}`,
+                      borderRadius: '16px',
+                    }}
+                  >
+                    <div style={{
+                      width: isMobile ? '48px' : '56px',
+                      height: isMobile ? '48px' : '56px',
+                      borderRadius: '14px',
+                      backgroundColor: `${service.color}15`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      marginBottom: isMobile ? '16px' : '20px',
+                    }}>
+                      <service.icon size={isMobile ? 24 : 28} style={{ color: service.color }} />
+                    </div>
+                    <h3 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '700', fontFamily: FONTS.heading, marginBottom: '10px', color: isDark ? '#fff' : BRAND.brown }}>{service.title}</h3>
+                    <p style={{ fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, lineHeight: '1.65', marginBottom: isMobile ? '16px' : '20px', fontFamily: FONTS.body }}>{service.description}</p>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      {service.features.map((feature, j) => (
+                        <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, fontFamily: FONTS.body }}>
+                          <CheckCircle size={14} style={{ color: service.color, flexShrink: 0 }} />
+                          {feature}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <h3 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '700', fontFamily: FONTS.heading, marginBottom: '10px', color: isDark ? '#fff' : BRAND.brown }}>{service.title}</h3>
-                  <p style={{ fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, lineHeight: '1.65', marginBottom: isMobile ? '16px' : '20px', fontFamily: FONTS.body }}>{service.description}</p>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {service.features.map((feature, j) => (
-                      <div key={j} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, fontFamily: FONTS.body }}>
-                        <CheckCircle size={14} style={{ color: service.color, flexShrink: 0 }} />
-                        {feature}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
           </ScrollReveal>
         </section>
 
@@ -1123,35 +1135,35 @@ function PortfolioPage({ isDark, setIsDark }) {
           backgroundColor: theme.bg,
         }}>
           <ScrollReveal>
-          <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
-              <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#f59e0b', textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Background</span>
-              <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>Career History</h2>
-            </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '20px' }}>
-              {experience.map((exp, i) => (
-                <div key={i} style={{ position: 'relative', paddingLeft: isMobile ? '20px' : '28px', borderLeft: `3px solid ${exp.current ? BRAND.green : theme.cardBorder}` }}>
-                  <div style={{ position: 'absolute', left: isMobile ? '-6px' : '-8px', top: isMobile ? '20px' : '24px', width: isMobile ? '12px' : '13px', height: isMobile ? '12px' : '13px', borderRadius: '50%', backgroundColor: exp.current ? BRAND.green : theme.cardBorder, zIndex: 2 }} />
-                  <div style={{
-                    padding: isMobile ? '20px 16px' : '24px',
-                    backgroundColor: theme.cardBg,
-                    border: `1px solid ${theme.cardBorder}`,
-                    borderRadius: '12px',
-                  }}>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                      <h3 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, fontFamily: FONTS.heading }}>{exp.role}</h3>
-                      {exp.current && <span style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: '700', backgroundColor: `${BRAND.green}15`, color: BRAND.green }}>Current</span>}
+            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#f59e0b', textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Background</span>
+                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>Career History</h2>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: isMobile ? '16px' : '20px' }}>
+                {experience.map((exp, i) => (
+                  <div key={i} style={{ position: 'relative', paddingLeft: isMobile ? '20px' : '28px', borderLeft: `3px solid ${exp.current ? BRAND.green : theme.cardBorder}` }}>
+                    <div style={{ position: 'absolute', left: isMobile ? '-6px' : '-8px', top: isMobile ? '20px' : '24px', width: isMobile ? '12px' : '13px', height: isMobile ? '12px' : '13px', borderRadius: '50%', backgroundColor: exp.current ? BRAND.green : theme.cardBorder, zIndex: 2 }} />
+                    <div style={{
+                      padding: isMobile ? '20px 16px' : '24px',
+                      backgroundColor: theme.cardBg,
+                      border: `1px solid ${theme.cardBorder}`,
+                      borderRadius: '12px',
+                    }}>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                        <h3 style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '700', color: isDark ? '#fff' : BRAND.brown, fontFamily: FONTS.heading }}>{exp.role}</h3>
+                        {exp.current && <span style={{ padding: '4px 10px', borderRadius: '100px', fontSize: '11px', fontWeight: '700', backgroundColor: `${BRAND.green}15`, color: BRAND.green }}>Current</span>}
+                      </div>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '12px' : '20px', marginBottom: '10px', fontSize: isMobile ? '12px' : '14px', color: theme.textMuted, fontFamily: FONTS.body }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={14} />{exp.company}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><CalendarBlank size={14} />{exp.period}</div>
+                      </div>
+                      <p style={{ fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, lineHeight: '1.65', fontFamily: FONTS.body }}>{exp.description}</p>
                     </div>
-                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '12px' : '20px', marginBottom: '10px', fontSize: isMobile ? '12px' : '14px', color: theme.textMuted, fontFamily: FONTS.body }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><Briefcase size={14} />{exp.company}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}><CalendarBlank size={14} />{exp.period}</div>
-                    </div>
-                    <p style={{ fontSize: isMobile ? '13px' : '14px', color: theme.textMuted, lineHeight: '1.65', fontFamily: FONTS.body }}>{exp.description}</p>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
           </ScrollReveal>
         </section>
 
@@ -1164,53 +1176,53 @@ function PortfolioPage({ isDark, setIsDark }) {
           backgroundColor: theme.bg,
         }}>
           <ScrollReveal>
-          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
-              <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#8b5cf6', textTransform: 'uppercase', marginBottom: '8px', display: 'block', fontFamily: FONTS.body }}>Expertise</span>
-              <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>Core Skills</h2>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '12px' : '20px', alignItems: 'start' }}>
-              {skills.map((skill, i) => (
-                <div
-                  key={i}
-                  style={{
-                    padding: isMobile ? '16px 14px' : '24px',
-                    backgroundColor: theme.cardBg,
-                    border: `1px solid ${theme.cardBorder}`,
-                    borderRadius: isMobile ? '12px' : '16px',
-                  }}
-                >
-                  <h3 style={{
-                    fontSize: isMobile ? '14px' : '16px',
-                    fontWeight: '700',
-                    marginBottom: isMobile ? '10px' : '14px',
-                    color: skill.color,
-                    fontFamily: FONTS.heading,
-                  }}>
-                    {skill.category}
-                  </h3>
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '8px' }}>
-                    {skill.items.map((item, j) => (
-                      <span key={j} style={{
-                        padding: isMobile ? '6px 10px' : '7px 12px',
-                        backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)',
-                        borderRadius: '6px',
-                        fontSize: isMobile ? '11px' : '12px',
-                        color: theme.textMuted,
-                        fontWeight: '500',
-                        fontFamily: FONTS.body,
-                        border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
-                        lineHeight: '1.4',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        whiteSpace: 'nowrap',
-                      }}>{item}</span>
-                    ))}
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: isMobile ? '24px' : '40px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: '#8b5cf6', textTransform: 'uppercase', marginBottom: '8px', display: 'block', fontFamily: FONTS.body }}>Expertise</span>
+                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>Core Skills</h2>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)', gap: isMobile ? '12px' : '20px', alignItems: 'start' }}>
+                {skills.map((skill, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      padding: isMobile ? '16px 14px' : '24px',
+                      backgroundColor: theme.cardBg,
+                      border: `1px solid ${theme.cardBorder}`,
+                      borderRadius: isMobile ? '12px' : '16px',
+                    }}
+                  >
+                    <h3 style={{
+                      fontSize: isMobile ? '14px' : '16px',
+                      fontWeight: '700',
+                      marginBottom: isMobile ? '10px' : '14px',
+                      color: skill.color,
+                      fontFamily: FONTS.heading,
+                    }}>
+                      {skill.category}
+                    </h3>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: isMobile ? '6px' : '8px' }}>
+                      {skill.items.map((item, j) => (
+                        <span key={j} style={{
+                          padding: isMobile ? '6px 10px' : '7px 12px',
+                          backgroundColor: isDark ? 'rgba(42, 36, 32, 0.8)' : 'rgba(250, 248, 245, 0.8)',
+                          borderRadius: '6px',
+                          fontSize: isMobile ? '11px' : '12px',
+                          color: theme.textMuted,
+                          fontWeight: '500',
+                          fontFamily: FONTS.body,
+                          border: `1px solid ${isDark ? '#332d26' : '#e8e0d4'}`,
+                          lineHeight: '1.4',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          whiteSpace: 'nowrap',
+                        }}>{item}</span>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
           </ScrollReveal>
         </section>
 
@@ -1222,34 +1234,34 @@ function PortfolioPage({ isDark, setIsDark }) {
           backgroundColor: theme.bgAlt,
         }}>
           <ScrollReveal>
-          <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
-            <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
-              <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.blue, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Testimonials</span>
-              <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>What Clients Say</h2>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '16px' : '28px' }}>
-              {testimonials.map((t, i) => (
-                <div key={i} style={{
-                  padding: isMobile ? '24px 20px' : '32px',
-                  backgroundColor: theme.cardBg,
-                  border: `1px solid ${theme.cardBorder}`,
-                  borderRadius: '16px',
-                }}>
-                  <div style={{ display: 'flex', gap: '4px', marginBottom: isMobile ? '16px' : '20px' }}>
-                    {[...Array(5)].map((_, j) => <Star key={j} size={isMobile ? 14 : 16} fill={BRAND.green} color={BRAND.green} />)}
-                  </div>
-                  <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.text, lineHeight: '1.7', marginBottom: isMobile ? '20px' : '24px', fontStyle: 'italic', fontFamily: FONTS.body }}>"{t.content}"</p>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: isMobile ? '40px' : '48px', height: isMobile ? '40px' : '48px', borderRadius: '50%', backgroundColor: isDark ? '#2a2420' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? '20px' : '24px' }}>{t.avatar}</div>
-                    <div>
-                      <div style={{ fontWeight: '600', fontSize: isMobile ? '13px' : '15px', fontFamily: FONTS.body }}>{t.name}</div>
-                      <div style={{ fontSize: isMobile ? '12px' : '13px', color: theme.textMuted, fontFamily: FONTS.body }}>{t.role}</div>
+            <div style={{ maxWidth: '1000px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: isMobile ? '32px' : '56px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', letterSpacing: '3px', color: BRAND.blue, textTransform: 'uppercase', marginBottom: '10px', display: 'block', fontFamily: FONTS.body }}>Testimonials</span>
+                <h2 style={{ fontSize: isMobile ? '28px' : '40px', fontWeight: '800', fontFamily: FONTS.heading, color: isDark ? '#fff' : BRAND.brown }}>What Clients Say</h2>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)', gap: isMobile ? '16px' : '28px' }}>
+                {testimonials.map((t, i) => (
+                  <div key={i} style={{
+                    padding: isMobile ? '24px 20px' : '32px',
+                    backgroundColor: theme.cardBg,
+                    border: `1px solid ${theme.cardBorder}`,
+                    borderRadius: '16px',
+                  }}>
+                    <div style={{ display: 'flex', gap: '4px', marginBottom: isMobile ? '16px' : '20px' }}>
+                      {[...Array(5)].map((_, j) => <Star key={j} size={isMobile ? 14 : 16} fill={BRAND.green} color={BRAND.green} />)}
+                    </div>
+                    <p style={{ fontSize: isMobile ? '14px' : '16px', color: theme.text, lineHeight: '1.7', marginBottom: isMobile ? '20px' : '24px', fontStyle: 'italic', fontFamily: FONTS.body }}>"{t.content}"</p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: isMobile ? '40px' : '48px', height: isMobile ? '40px' : '48px', borderRadius: '50%', backgroundColor: isDark ? '#2a2420' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: isMobile ? '20px' : '24px' }}>{t.avatar}</div>
+                      <div>
+                        <div style={{ fontWeight: '600', fontSize: isMobile ? '13px' : '15px', fontFamily: FONTS.body }}>{t.name}</div>
+                        <div style={{ fontSize: isMobile ? '12px' : '13px', color: theme.textMuted, fontFamily: FONTS.body }}>{t.role}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
           </ScrollReveal>
         </section>
 
@@ -1261,36 +1273,36 @@ function PortfolioPage({ isDark, setIsDark }) {
           backgroundColor: BRAND.blue,
         }}>
           <ScrollReveal>
-          <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
-            <h2 style={{ fontSize: isMobile ? '28px' : '42px', fontWeight: '800', fontFamily: FONTS.heading, color: '#fff', marginBottom: '16px', lineHeight: '1.2' }}>
-              Let's Find What's Slowing You Down
-            </h2>
-            <p style={{ fontSize: isMobile ? '14px' : '17px', color: 'rgba(255,255,255,0.85)', lineHeight: '1.7', marginBottom: '32px', fontFamily: FONTS.body }}>
-              Book a free call. I'll map out which manual processes in your business are costing you the most time — and show you how to automate them.
-            </p>
-            <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
-              <button
-                onClick={() => navigate('/book')}
-                style={{
-                  padding: isMobile ? '14px 24px' : '16px 32px',
-                  backgroundColor: '#fff',
-                  color: BRAND.blue,
-                  border: 'none',
-                  borderRadius: '12px',
-                  fontWeight: '700',
-                  fontSize: isMobile ? '14px' : '16px',
-                  fontFamily: FONTS.body,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  textDecoration: 'none',
-                  cursor: 'pointer',
-                }}
-              >
-                <ChatCircle size={isMobile ? 18 : 20} />Book a Free Call
-              </button>
+            <div style={{ maxWidth: '700px', margin: '0 auto', textAlign: 'center' }}>
+              <h2 style={{ fontSize: isMobile ? '28px' : '42px', fontWeight: '800', fontFamily: FONTS.heading, color: '#fff', marginBottom: '16px', lineHeight: '1.2' }}>
+                Let's Find What's Slowing You Down
+              </h2>
+              <p style={{ fontSize: isMobile ? '14px' : '17px', color: 'rgba(255,255,255,0.85)', lineHeight: '1.7', marginBottom: '32px', fontFamily: FONTS.body }}>
+                Book a free call. I'll map out which manual processes in your business are costing you the most time — and show you how to automate them.
+              </p>
+              <div style={{ display: 'flex', justifyContent: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                <button
+                  onClick={() => navigate('/book')}
+                  style={{
+                    padding: isMobile ? '14px 24px' : '16px 32px',
+                    backgroundColor: '#fff',
+                    color: BRAND.blue,
+                    border: 'none',
+                    borderRadius: '12px',
+                    fontWeight: '700',
+                    fontSize: isMobile ? '14px' : '16px',
+                    fontFamily: FONTS.body,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <ChatCircle size={isMobile ? 18 : 20} />Book a Free Call
+                </button>
+              </div>
             </div>
-          </div>
           </ScrollReveal>
         </section>
       </main>
