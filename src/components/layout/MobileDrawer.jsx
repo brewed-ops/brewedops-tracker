@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, CaretDown, Lock, Lightning, FileMagnifyingGlass, Image, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, BookOpen, QrCode, MagnifyingGlass, TextT, Hash, GitBranch, BracketsCurly, Clock, Globe, Timer } from '@phosphor-icons/react';
+import { X, CaretDown, Lock, Lightning, FileMagnifyingGlass, Image, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, BookOpen, QrCode, MagnifyingGlass, TextT, Hash, GitBranch, BracketsCurly, Clock, Globe, Timer, PenNib, ChatCircle } from '@phosphor-icons/react';
 
 const BRAND = {
   brown: '#3F200C',
@@ -62,6 +62,8 @@ const TOOL_CATEGORIES = [
 const AI_TOOLS = [
   { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario' },
   { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor' },
+  { icon: PenNib, title: 'AI Proposal Writer', path: '/proposal-writer' },
+  { icon: ChatCircle, title: 'AI GHL Advisor', path: '/ghl-advisor' },
 ];
 
 const MobileDrawer = ({ isOpen, onClose, isDark, navigate, onNavigate }) => {

@@ -78,6 +78,8 @@ const TimezoneConverter = React.lazy(() => import('./components/TimezoneConverte
 const PomodoroTimer = React.lazy(() => import('./components/PomodoroTimer'));
 const GHLScenarioGenerator = React.lazy(() => import('./components/GHLScenarioGenerator'));
 const TextExtractor = React.lazy(() => import('./components/TextExtractor'));
+const ProposalWriter = React.lazy(() => import('./components/ProposalWriter'));
+const GHLAdvisor = React.lazy(() => import('./components/GHLAdvisor'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 
 // shadcn Sidebar imports
@@ -276,7 +278,7 @@ const LoginPage = ({ onLogin, onBack, isDark, setIsDark, initialMode = 'login' }
             Back
           </button>
         ) : <div />}
-        <button onClick={() => setIsDark(!isDark)} style={{ width: '40px', height: '40px', backgroundColor: 'transparent', border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'), borderRadius: '10px', color: isDark ? '#a09585' : '#7a6652', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button onClick={() => setIsDark(!isDark)} aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'} style={{ width: '40px', height: '40px', backgroundColor: 'transparent', border: '1px solid ' + (isDark ? '#2a2420' : '#e8e0d4'), borderRadius: '10px', color: isDark ? '#a09585' : '#7a6652', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {isDark ? <Sun style={{ width: '18px', height: '18px' }} /> : <Moon style={{ width: '18px', height: '18px' }} />}
         </button>
       </div>
@@ -676,6 +678,8 @@ return (
     {/* AI Tools */}
     <Route path="/ghl-scenario" element={<GuestToolLayout toolName="GHL Scenario Generator" isDark={isDark} setIsDark={setIsDark}><GHLScenarioGenerator isDark={isDark} /></GuestToolLayout>} />
     <Route path="/text-extractor" element={<GuestToolLayout toolName="AI Text Extractor" isDark={isDark} setIsDark={setIsDark}><TextExtractor isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/proposal-writer" element={<GuestToolLayout toolName="AI Proposal Writer" isDark={isDark} setIsDark={setIsDark}><ProposalWriter isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/ghl-advisor" element={<GuestToolLayout toolName="AI GHL Advisor" isDark={isDark} setIsDark={setIsDark}><GHLAdvisor isDark={isDark} /></GuestToolLayout>} />
 
     {/* 404 catch-all */}
     <Route path="*" element={<NotFound isDark={isDark} />} />

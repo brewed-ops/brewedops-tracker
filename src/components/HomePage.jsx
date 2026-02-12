@@ -8,7 +8,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CaretRight, CaretDown, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck, Sparkle, FileMagnifyingGlass, DeviceMobile, CalendarCheck, Handshake, Envelope, ChatCircle, GearSix } from '@phosphor-icons/react';
+import { CaretRight, CaretDown, Image, FileText, Wrench, Lock, Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage, FilmStrip, NotePencil, GitMerge, FileDashed, QrCode, MagnifyingGlass, TextT, Hash, CurrencyDollar, Headphones, CheckSquare, Note, GitBranch, BracketsCurly, Clock, BookOpen, List, Lightning, ClipboardText, Code, Globe, Timer, Heart, LightbulbFilament, ChartLineUp, ShieldCheck, Sparkle, FileMagnifyingGlass, DeviceMobile, CalendarCheck, Handshake, Envelope, ChatCircle, GearSix, PenNib } from '@phosphor-icons/react';
 import SEO from './SEO';
 import ThemeToggle from './ui/ThemeToggle';
 const MobileDrawer = React.lazy(() => import('./layout/MobileDrawer'));
@@ -316,6 +316,8 @@ const PRODUCTIVITY_TOOLS = [
 const AI_TOOLS = [
   { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'AI-generated GHL CRM practice scenarios with workflow diagrams' },
   { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'OCR-powered text extraction from images and scanned PDFs' },
+  { icon: PenNib, title: 'AI Proposal Writer', path: '/proposal-writer', description: 'Generate tailored Upwork proposals from job descriptions' },
+  { icon: ChatCircle, title: 'AI GHL Advisor', path: '/ghl-advisor', description: 'Get expert GoHighLevel CRM advice with screenshot analysis' },
 ];
 
 // All tools flat for marquee
@@ -1218,8 +1220,10 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                       src="/herbg2.webp"
                       alt="BrewedOps - Your dedicated virtual assistant"
                       fetchpriority="high"
-                      width={1200}
-                      height={889}
+                      loading="eager"
+                      decoding="async"
+                      width={600}
+                      height={445}
                       onLoad={(e) => {
                         e.target.style.opacity = 1;
                       }}

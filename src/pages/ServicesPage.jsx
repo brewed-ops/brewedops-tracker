@@ -20,35 +20,37 @@ import {
   List,
   Image,
   Scissors,
-  ArrowsOutCardinal,
+  ArrowsOut,
   ArrowsIn,
   ArrowsClockwise,
   Palette,
   FileImage,
   FilmStrip,
-  PencilLine,
+  NotePencil,
   GitMerge,
-  GitFork,
+  FileDashed,
   BookOpen,
   QrCode,
   MagnifyingGlass,
-  TextAa,
+  TextT,
   Hash,
   GitBranch,
   BracketsCurly,
   Clock,
+  Globe,
   Lock,
   CurrencyDollar,
   Note,
   CheckSquare,
   Timer,
   FileMagnifyingGlass,
-  DeviceMobile,
   CheckCircle,
   CaretRight,
   ChartLineUp,
   Handshake,
   CalendarCheck,
+  PenNib,
+  GitFork,
 } from '@phosphor-icons/react';
 import SEO from '@/components/SEO';
 import ScrollReveal from '@/components/ui/ScrollReveal';
@@ -87,7 +89,7 @@ const TOOL_CATEGORIES = [
     tools: [
       { icon: Image, title: 'BG Remover', path: '/bgremover' },
       { icon: Scissors, title: 'Image Cropper', path: '/imagecropper' },
-      { icon: ArrowsOutCardinal, title: 'Image Resizer', path: '/imageresizer' },
+      { icon: ArrowsOut, title: 'Image Resizer', path: '/imageresizer' },
       { icon: ArrowsIn, title: 'Image Compressor', path: '/imagecompressor' },
       { icon: ArrowsClockwise, title: 'Image Converter', path: '/imageconverter' },
       { icon: Palette, title: 'Color Picker', path: '/colorpicker' },
@@ -104,9 +106,9 @@ const TOOL_CATEGORIES = [
   {
     name: 'Document Tools',
     tools: [
-      { icon: PencilLine, title: 'PDF Editor', path: '/pdfeditor' },
+      { icon: NotePencil, title: 'PDF Editor', path: '/pdfeditor' },
       { icon: GitMerge, title: 'PDF Merge', path: '/pdfmerge' },
-      { icon: GitFork, title: 'PDF Split', path: '/pdfsplit' },
+      { icon: FileDashed, title: 'PDF Split', path: '/pdfsplit' },
       { icon: BookOpen, title: 'Markdown Viewer', path: '/markdownviewer' },
     ],
   },
@@ -115,11 +117,13 @@ const TOOL_CATEGORIES = [
     tools: [
       { icon: QrCode, title: 'QR Generator', path: '/qrgenerator' },
       { icon: MagnifyingGlass, title: 'Find & Replace', path: '/findreplace' },
-      { icon: TextAa, title: 'Case Converter', path: '/caseconverter' },
+      { icon: TextT, title: 'Case Converter', path: '/caseconverter' },
       { icon: Hash, title: 'Word Counter', path: '/wordcounter' },
       { icon: GitBranch, title: 'Mermaid Reader', path: '/mermaid' },
       { icon: BracketsCurly, title: 'JSON Formatter', path: '/jsonformatter' },
       { icon: Clock, title: 'Cron Generator', path: '/crongenerator' },
+      { icon: Globe, title: 'Timezone', path: '/timezoneconverter' },
+      { icon: Timer, title: 'Focus Timer', path: '/pomodoro' },
     ],
   },
 ];
@@ -260,6 +264,8 @@ const ToolsDropdown = ({ isDark, theme, onToolClick }) => {
 const AI_TOOLS = [
   { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'AI-generated GHL CRM practice scenarios with workflow diagrams' },
   { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'OCR-powered text extraction from images and scanned PDFs' },
+  { icon: PenNib, title: 'AI Proposal Writer', path: '/proposal-writer', description: 'Generate tailored Upwork proposals from job descriptions' },
+  { icon: ChatCircle, title: 'AI GHL Advisor', path: '/ghl-advisor', description: 'Get expert GoHighLevel CRM advice with screenshot analysis' },
 ];
 
 const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {

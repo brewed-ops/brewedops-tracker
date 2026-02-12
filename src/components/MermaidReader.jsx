@@ -253,7 +253,7 @@ const SaveModal = ({ isOpen, onClose, onSave, isDark, theme, isLoading, currentN
       <div style={{ backgroundColor: theme.cardBg, borderRadius: '12px', border: '1px solid ' + theme.cardBorder, padding: '24px', width: '100%', maxWidth: '400px', margin: '20px' }} onClick={(e) => e.stopPropagation()}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '20px' }}>
           <h3 style={{ fontSize: '16px', fontWeight: '600', color: theme.text, margin: 0, fontFamily: FONTS.heading }}>Save Diagram</h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '4px' }}><X size={18} /></button>
+          <button onClick={onClose} aria-label="Close save dialog" style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '4px' }}><X size={18} /></button>
         </div>
         <form onSubmit={(e) => { e.preventDefault(); if (name.trim()) onSave(name.trim()); }}>
           <label style={{ display: 'block', fontSize: '13px', fontWeight: '500', color: theme.textMuted, marginBottom: '6px', fontFamily: FONTS.body }}>Diagram Name</label>
@@ -598,8 +598,8 @@ const MermaidReader = ({ isDark = true, user = null }) => {
                     </div>
                   )}
                 </div>
-                <button onClick={handleCopy} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Copy">{copied ? <Check size={12} style={{ color: BRAND.green }} /> : <Copy size={12} />}</button>
-                <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); setCodeBeforeColor(null); }} style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Clear"><Trash size={12} /></button>
+                <button onClick={handleCopy} aria-label="Copy code" style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Copy">{copied ? <Check size={12} style={{ color: BRAND.green }} /> : <Copy size={12} />}</button>
+                <button onClick={() => { setCode(''); setSvgContent(''); setCurrentDiagramId(null); setCurrentDiagramName(''); setCodeBeforeColor(null); }} aria-label="Clear code" style={{ ...btnStyle, width: '26px', height: '26px', padding: 0 }} title="Clear"><Trash size={12} /></button>
               </div>
             </div>
             <div style={{ padding: '8px', flexShrink: 0, display: 'flex', gap: '4px' }}>
@@ -618,7 +618,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           {/* Preview Header */}
           <div style={{ padding: '8px 12px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between', backgroundColor: theme.cardBg, flexWrap: 'wrap', gap: '8px', flexShrink: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <button onClick={() => setIsCodeCollapsed(!isCodeCollapsed)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0, backgroundColor: isCodeCollapsed ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent' }} title={isCodeCollapsed ? 'Show Code' : 'Hide Code'}>{isCodeCollapsed ? <SidebarSimple size={14} /> : <SidebarSimple size={14} />}</button>
+              <button onClick={() => setIsCodeCollapsed(!isCodeCollapsed)} aria-label={isCodeCollapsed ? 'Show Code' : 'Hide Code'} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0, backgroundColor: isCodeCollapsed ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent' }} title={isCodeCollapsed ? 'Show Code' : 'Hide Code'}>{isCodeCollapsed ? <SidebarSimple size={14} /> : <SidebarSimple size={14} />}</button>
               <Eye size={14} style={{ color: theme.textMuted }} />
               <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>Preview</span>
               <span style={{ fontSize: '10px', color: theme.textMuted, backgroundColor: isDark ? '#1e1a16' : '#faf8f5', padding: '2px 6px', borderRadius: '4px' }}>{Math.round(scale * 100)}%</span>
@@ -632,11 +632,11 @@ const MermaidReader = ({ isDark = true, user = null }) => {
                   )}
                 </>
               )}
-              <button onClick={zoomOut} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><MagnifyingGlassMinus size={14} /></button>
-              <button onClick={zoomIn} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><MagnifyingGlassPlus size={14} /></button>
-              <button onClick={resetView} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ArrowCounterClockwise size={14} /></button>
+              <button onClick={zoomOut} aria-label="Zoom out" style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><MagnifyingGlassMinus size={14} /></button>
+              <button onClick={zoomIn} aria-label="Zoom in" style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><MagnifyingGlassPlus size={14} /></button>
+              <button onClick={resetView} aria-label="Reset view" style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ArrowCounterClockwise size={14} /></button>
               <div style={{ width: '1px', height: '20px', backgroundColor: theme.cardBorder }} />
-              <button onClick={() => setKey((k) => k + 1)} style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ArrowsClockwise size={14} /></button>
+              <button onClick={() => setKey((k) => k + 1)} aria-label="Refresh diagram" style={{ ...btnStyle, width: '28px', height: '28px', padding: 0 }}><ArrowsClockwise size={14} /></button>
               <button onClick={handleDownloadSVG} disabled={!svgContent} style={{ ...btnStyle, height: '28px', opacity: svgContent ? 1 : 0.5 }}><DownloadSimple size={12} /> SVG</button>
               <button onClick={handleDownloadPNG} disabled={!svgContent} style={{ ...btnStyle, height: '28px', backgroundColor: svgContent ? '#6366f1' : 'transparent', borderColor: svgContent ? '#6366f1' : theme.cardBorder, color: svgContent ? '#fff' : theme.textMuted }}><DownloadSimple size={12} /> PNG</button>
             </div>
@@ -673,7 +673,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
           <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, width: '300px', backgroundColor: theme.cardBg, borderLeft: '1px solid ' + theme.cardBorder, display: 'flex', flexDirection: 'column' }} onClick={(e) => e.stopPropagation()}>
             <div style={{ padding: '16px', borderBottom: '1px solid ' + theme.cardBorder, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               <h3 style={{ fontSize: '14px', fontWeight: '600', color: theme.text, margin: 0 }}>My Diagrams ({savedDiagrams.length}/{MAX_SAVED_DIAGRAMS})</h3>
-              <button onClick={() => setIsSidebarOpen(false)} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer' }}><X size={18} /></button>
+              <button onClick={() => setIsSidebarOpen(false)} aria-label="Close sidebar" style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer' }}><X size={18} /></button>
             </div>
             <div style={{ padding: '12px' }}>
               <button onClick={createNewDiagram} style={{ width: '100%', height: '36px', backgroundColor: BRAND.blue, border: 'none', borderRadius: '8px', color: '#fff', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>+ New Diagram</button>
@@ -687,7 +687,7 @@ const MermaidReader = ({ isDark = true, user = null }) => {
                     <div key={d.id} style={{ padding: '10px', backgroundColor: currentDiagramId === d.id ? (isDark ? '#1e1a16' : '#faf8f5') : 'transparent', border: '1px solid ' + (currentDiagramId === d.id ? BRAND.blue : theme.cardBorder), borderRadius: '6px', cursor: 'pointer' }} onClick={() => loadDiagram(d)}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <span style={{ fontSize: '12px', fontWeight: '600', color: theme.text }}>{d.name}</span>
-                        <button onClick={(e) => { e.stopPropagation(); deleteDiagram(d.id); }} style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '2px' }}><Trash size={12} /></button>
+                        <button onClick={(e) => { e.stopPropagation(); deleteDiagram(d.id); }} aria-label="Delete diagram" style={{ background: 'none', border: 'none', color: theme.textMuted, cursor: 'pointer', padding: '2px' }}><Trash size={12} /></button>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '4px' }}><Clock size={9} style={{ color: theme.textMuted }} /><span style={{ fontSize: '10px', color: theme.textMuted }}>{new Date(d.updated_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span></div>
                     </div>

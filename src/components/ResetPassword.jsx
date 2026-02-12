@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeSlash, Lock, CheckCircle, WarningCircle, SpinnerGap, Sun, Moon, ArrowLeft } from '@phosphor-icons/react';
 import { supabase } from '../lib/supabase';
+import SEO from './SEO';
 
 // ============================================
 // BREWEDOPS BRAND CONFIGURATION
@@ -232,6 +233,7 @@ const ResetPassword = ({ isDark, setIsDark, onComplete }) => {
       display: 'flex',
       flexDirection: 'column',
     }}>
+      <SEO title="Reset Password | BrewedOps" description="Reset your BrewedOps account password securely." />
       {/* Header */}
       <div style={{
         padding: '16px 24px',

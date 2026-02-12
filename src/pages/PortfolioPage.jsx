@@ -51,7 +51,8 @@ import {
   Globe,
   Timer,
   FileMagnifyingGlass,
-  DeviceMobile
+  DeviceMobile,
+  PenNib
 } from '@phosphor-icons/react';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import SEO from '@/components/SEO';
@@ -264,6 +265,8 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
 const AI_TOOLS = [
   { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'AI-generated GHL CRM practice scenarios with workflow diagrams' },
   { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'OCR-powered text extraction from images and scanned PDFs' },
+  { icon: PenNib, title: 'AI Proposal Writer', path: '/proposal-writer', description: 'Generate tailored Upwork proposals from job descriptions' },
+  { icon: ChatCircle, title: 'AI GHL Advisor', path: '/ghl-advisor', description: 'Get expert GoHighLevel CRM advice with screenshot analysis' },
 ];
 
 const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {

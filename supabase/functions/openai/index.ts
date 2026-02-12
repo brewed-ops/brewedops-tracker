@@ -24,10 +24,10 @@ Deno.serve(async (req: Request) => {
     let requestBody
 
     if (type === 'chat') {
-      // GHL Scenario Generator — text-only chat completion
-      const { messages, temperature = 0.8, max_tokens = 2000 } = body
+      // Chat completion — supports text-only and vision (when model is specified)
+      const { messages, temperature = 0.8, max_tokens = 2000, model = 'gpt-4o-mini' } = body
       requestBody = {
-        model: 'gpt-4o-mini',
+        model,
         messages,
         temperature,
         max_tokens,

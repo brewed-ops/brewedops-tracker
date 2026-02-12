@@ -31,9 +31,11 @@
     <!-- Preload LCP hero image -->
     <link rel="preload" as="image" type="image/webp" href="/herbg2.webp" />
 
-    <!-- Fonts: preconnect + non-render-blocking load -->
+    <!-- Preconnect: fonts + third-party widgets -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+    <link rel="preconnect" href="https://widgets.leadconnectorhq.com" />
+    <link rel="preconnect" href="https://services.leadconnectorhq.com" />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" />
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
     <noscript><link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" /></noscript>
@@ -74,11 +76,14 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
-    <script
-      async
-      src="https://widgets.leadconnectorhq.com/loader.js"
-      data-resources-url="https://widgets.leadconnectorhq.com/chat-widget/loader.js"
-      data-widget-id="698ab9cfe64c73b6b8993527">
+    <script>
+      window.addEventListener('load', function() {
+        var s = document.createElement('script');
+        s.src = 'https://widgets.leadconnectorhq.com/loader.js';
+        s.setAttribute('data-resources-url', 'https://widgets.leadconnectorhq.com/chat-widget/loader.js');
+        s.setAttribute('data-widget-id', '698ab9cfe64c73b6b8993527');
+        document.body.appendChild(s);
+      });
     </script>
   </body>
 </html>

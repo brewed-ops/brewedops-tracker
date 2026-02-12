@@ -10,7 +10,7 @@ import {
   Scissors, ArrowsOut, ArrowsIn, ArrowsClockwise, Palette, FileImage,
   GitMerge, FileDashed, BookOpen, MagnifyingGlass, TextT, Hash,
   GitBranch, BracketsCurly, Clock, CurrencyDollar, Note,
-  FileMagnifyingGlass, Headphones, GearSix, ClipboardText, CalendarCheck, CheckCircle, Handshake
+  FileMagnifyingGlass, Headphones, GearSix, ClipboardText, CalendarCheck, CheckCircle, Handshake, PenNib, ChatCircle
 } from '@phosphor-icons/react';
 import ThemeToggle from './ui/ThemeToggle';
 import SEO from './SEO';
@@ -57,14 +57,16 @@ const TOOL_CATEGORIES = [
 
 const PRODUCTIVITY_TOOLS = [
   { icon: CurrencyDollar, title: 'Finance Tracker', path: '/finance' },
-  { icon: DeviceMobile, title: 'VA Kita', path: '/vakita' },
+  { icon: Headphones, title: 'VA Kita', path: '/vakita' },
   { icon: CheckSquare, title: 'Task Manager', path: '/taskmanager' },
   { icon: Note, title: 'Brewed Notes', path: '/brewednotes' },
 ];
 
 const AI_TOOLS = [
-  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'Generate GoHighLevel automation scenarios with AI' },
-  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'Extract text from images using AI-powered OCR' },
+  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'AI-generated GHL CRM practice scenarios with workflow diagrams' },
+  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'OCR-powered text extraction from images and scanned PDFs' },
+  { icon: PenNib, title: 'AI Proposal Writer', path: '/proposal-writer', description: 'Generate tailored Upwork proposals from job descriptions' },
+  { icon: ChatCircle, title: 'AI GHL Advisor', path: '/ghl-advisor', description: 'Get expert GoHighLevel CRM advice with screenshot analysis' },
 ];
 
 // TOOLS DROPDOWN
