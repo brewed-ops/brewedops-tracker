@@ -123,7 +123,7 @@ export function AppSidebar({ isDark, ...props }) {
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: '0.5px',
-    color: isDark ? '#6b5f52' : '#a09585',
+    color: isDark ? '#9a8d80' : '#6b5f52',
     padding: '4px 8px 2px 8px',
   }
 

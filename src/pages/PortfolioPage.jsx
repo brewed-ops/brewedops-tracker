@@ -806,7 +806,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                         <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body }}>{social.username}</span>
                       </div>
                     ) : (
-                      <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" style={{ width: '42px', height: '42px', borderRadius: '10px', backgroundColor: isDark ? '#2a2420' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, textDecoration: 'none' }} title={social.name}>
+                      <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name} style={{ width: '42px', height: '42px', borderRadius: '10px', backgroundColor: isDark ? '#2a2420' : '#faf8f5', display: 'flex', alignItems: 'center', justifyContent: 'center', color: theme.textMuted, textDecoration: 'none' }} title={social.name}>
                         <social.icon size={18} />
                       </a>
                     )
@@ -1087,7 +1087,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                   >
                     View services & book a call <ArrowSquareOut size={15} />
                   </button>
-                  <p style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body, marginTop: '12px', opacity: 0.7 }}>
+                  <p style={{ fontSize: '13px', color: theme.textMuted, fontFamily: FONTS.body, marginTop: '12px' }}>
                     Free intro call — no commitment
                   </p>
                 </div>
@@ -1332,7 +1332,7 @@ function PortfolioPage({ isDark, setIsDark }) {
                     <span style={{ fontSize: '12px', fontFamily: FONTS.body }}>{social.username}</span>
                   </div>
                 ) : (
-                  <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" style={{ color: theme.textMuted, textDecoration: 'none' }} title={social.name}>
+                  <a key={i} href={social.href} target="_blank" rel="noopener noreferrer" aria-label={social.name} style={{ color: theme.textMuted, textDecoration: 'none' }} title={social.name}>
                     <social.icon size={16} />
                   </a>
                 )

@@ -1929,7 +1929,6 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                   fontFamily: FONTS.body,
                   marginTop: '16px',
                   marginBottom: 0,
-                  opacity: 0.7,
                 }}>
                   Hover to activate the flow
                 </p>
@@ -2014,12 +2013,12 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                         transform: isActive ? 'scale(1.08)' : 'scale(1)',
                       }}>
                         <TabIcon size={isSmall ? 18 : (isMobile ? 22 : 26)}
-                          style={{ color: isActive ? '#fff' : (isDark ? '#6b5f52' : '#8a7a68'), transition: 'color 0.3s ease' }} />
+                          style={{ color: isActive ? '#fff' : (isDark ? '#9a8d80' : '#6b5f52'), transition: 'color 0.3s ease' }} />
                       </div>
                       <span style={{
                         fontSize: isSmall ? '9px' : (isMobile ? '10px' : '13px'),
                         fontWeight: isActive ? '700' : '500',
-                        color: isActive ? tab.color : (isDark ? '#6b5f52' : '#8a7a68'),
+                        color: isActive ? tab.color : (isDark ? '#9a8d80' : '#6b5f52'),
                         fontFamily: FONTS.heading, transition: 'all 0.3s ease',
                       }}>
                         {isMobile ? tab.label : tab.fullLabel}
@@ -2098,7 +2097,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                       </div>
                       <div style={{ padding: '12px 16px', borderTop: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`, display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <div style={{ flex: 1, height: '36px', backgroundColor: isDark ? '#0d0b09' : '#faf8f5', borderRadius: '18px', padding: '0 14px', display: 'flex', alignItems: 'center', border: `1px solid ${isDark ? '#332d26' : '#e0d6c8'}` }}>
-                          <span style={{ fontSize: '12px', color: isDark ? '#4a4038' : '#b8ad9f', fontFamily: FONTS.body }}>Type a message...</span>
+                          <span style={{ fontSize: '12px', color: isDark ? '#85796c' : '#7d7062', fontFamily: FONTS.body }}>Type a message...</span>
                         </div>
                         <div style={{ width: '36px', height: '36px', borderRadius: '50%', backgroundColor: BRAND.blue, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                           <CaretRight size={14} weight="bold" style={{ color: '#fff' }} />
@@ -2132,7 +2131,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                             </div>
                             <span style={{
                               fontSize: '12px', fontFamily: FONTS.body,
-                              color: task.done ? (isDark ? '#6b5f52' : '#a09585') : (isDark ? '#f5f0eb' : BRAND.brown),
+                              color: task.done ? (isDark ? '#9a8d80' : '#6b5f52') : (isDark ? '#f5f0eb' : BRAND.brown),
                               textDecoration: task.done ? 'line-through' : 'none',
                             }}>{task.text}</span>
                           </div>
@@ -2140,7 +2139,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                       </div>
                       <div style={{ padding: '14px 20px', borderTop: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}` }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
-                          <span style={{ fontSize: '11px', color: isDark ? '#6b5f52' : '#a09585', fontFamily: FONTS.body }}>Daily Progress</span>
+                          <span style={{ fontSize: '11px', color: isDark ? '#9a8d80' : '#6b5f52', fontFamily: FONTS.body }}>Daily Progress</span>
                           <span style={{ fontSize: '11px', color: BRAND.green, fontWeight: '600', fontFamily: FONTS.body }}>60%</span>
                         </div>
                         <div style={{ height: '4px', backgroundColor: isDark ? '#2a2420' : '#e8e0d4', borderRadius: '2px', overflow: 'hidden' }}>
@@ -2176,7 +2175,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                               </div>
                               <span style={{
                                 fontSize: '12px', fontFamily: FONTS.body, fontWeight: step.status === 'active' ? '600' : '400',
-                                color: step.status === 'pending' ? (isDark ? '#6b5f52' : '#a09585') : (isDark ? '#f5f0eb' : BRAND.brown),
+                                color: step.status === 'pending' ? (isDark ? '#9a8d80' : '#6b5f52') : (isDark ? '#f5f0eb' : BRAND.brown),
                               }}>{step.label}</span>
                               {step.status === 'active' && (
                                 <span style={{ marginLeft: 'auto', fontSize: '8px', padding: '2px 8px', borderRadius: '100px', backgroundColor: '#f59e0b', color: '#fff', fontFamily: FONTS.body, fontWeight: '700', letterSpacing: '0.5px' }}>
@@ -2209,7 +2208,7 @@ const HomePage = ({ onNavigate, isDark, setIsDark }) => {
                         </pre>
                       </div>
                       <div style={{ margin: '0 16px 16px', padding: '12px 16px', backgroundColor: isDark ? '#0d0b09' : '#1e1a16', borderRadius: '10px' }}>
-                        <div style={{ fontSize: '9px', color: '#6b5f52', marginBottom: '6px', fontFamily: FONTS.body, letterSpacing: '1px', textTransform: 'uppercase' }}>Terminal</div>
+                        <div style={{ fontSize: '9px', color: '#9a8d80', marginBottom: '6px', fontFamily: FONTS.body, letterSpacing: '1px', textTransform: 'uppercase' }}>Terminal</div>
                         <div style={{ fontSize: '11px', color: BRAND.green, fontFamily: "'Fira Code', 'Consolas', monospace" }}>{'\u2713'} Built successfully in 1.2s</div>
                         <div style={{ fontSize: '11px', color: '#a09585', fontFamily: "'Fira Code', 'Consolas', monospace" }}>{'\u2192'} Running at localhost:5173</div>
                       </div>

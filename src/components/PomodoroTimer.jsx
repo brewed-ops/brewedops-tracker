@@ -22,7 +22,7 @@ const getTheme = (isDark) => ({
   cardBorder: isDark ? '#2a2420' : '#e8e0d4',
   text: isDark ? '#f5f0eb' : '#3F200C',
   textMuted: isDark ? '#a09585' : '#7a6652',
-  textSubtle: isDark ? '#6b5f52' : '#a09585',
+  textSubtle: isDark ? '#9a8d80' : '#6b5f52',
   inputBg: isDark ? '#1e1a16' : '#faf8f5',
   inputBorder: isDark ? '#332d26' : '#e0d6c8',
   hoverBg: isDark ? '#2a2420' : '#f0e8dc',

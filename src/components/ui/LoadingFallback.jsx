@@ -10,7 +10,7 @@ const LoadingFallback = () => (
     <SpinnerGap style={{
       width: '32px',
       height: '32px',
-      color: '#6b5f52',
+      color: '#9a8d80',
       animation: 'spin 1s linear infinite',
     }} />
   </div>

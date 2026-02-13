@@ -29,7 +29,7 @@ const getTheme = (isDark) => ({
   cardBorder: isDark ? '#2a2420' : '#e8e0d4',
   text: isDark ? '#f5f0eb' : '#3F200C',
   textMuted: isDark ? '#a09585' : '#7a6652',
-  textSubtle: isDark ? '#6b5f52' : '#a09585',
+  textSubtle: isDark ? '#9a8d80' : '#6b5f52',
 });
 
 // ============================================

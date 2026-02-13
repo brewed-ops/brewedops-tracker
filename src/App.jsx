@@ -575,7 +575,7 @@ useEffect(() => {
         alignItems: 'center',
         justifyContent: 'center'
       }}>
-        <SpinnerGap style={{ width: '32px', height: '32px', color: isDark ? '#6b5f52' : '#a09585', animation: 'spin 1s linear infinite' }} />
+        <SpinnerGap style={{ width: '32px', height: '32px', color: isDark ? '#9a8d80' : '#6b5f52', animation: 'spin 1s linear infinite' }} />
         <style>{`
           @keyframes spin {
             from { transform: rotate(0deg); }

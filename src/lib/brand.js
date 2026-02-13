@@ -67,7 +67,7 @@ export const getBrandTheme = (isDark) => ({
   // Text
   text: isDark ? '#f5f0eb' : BRAND.brown,
   textMuted: isDark ? '#a09585' : '#5e4d38',
-  textLight: isDark ? '#6b5f52' : '#8a7a68',
+  textLight: isDark ? '#9a8d80' : '#6b5f52',
 
   // Brand accent
   accent: BRAND.blue,
