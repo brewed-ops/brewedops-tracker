@@ -80,6 +80,10 @@ const GHLScenarioGenerator = React.lazy(() => import('./components/GHLScenarioGe
 const TextExtractor = React.lazy(() => import('./components/TextExtractor'));
 const ProposalWriter = React.lazy(() => import('./components/ProposalWriter'));
 const GHLAdvisor = React.lazy(() => import('./components/GHLAdvisor'));
+const GrammarPolisher = React.lazy(() => import('./components/GrammarPolisher'));
+const SOWGenerator = React.lazy(() => import('./components/SOWGenerator'));
+const OnboardingChecklist = React.lazy(() => import('./components/OnboardingChecklist'));
+const ContentCalendar = React.lazy(() => import('./components/ContentCalendar'));
 const NotFound = React.lazy(() => import('./pages/NotFound'));
 
 // shadcn Sidebar imports
@@ -680,6 +684,10 @@ return (
     <Route path="/text-extractor" element={<GuestToolLayout toolName="AI Text Extractor" isDark={isDark} setIsDark={setIsDark}><TextExtractor isDark={isDark} /></GuestToolLayout>} />
     <Route path="/proposal-writer" element={<GuestToolLayout toolName="AI Proposal Writer" isDark={isDark} setIsDark={setIsDark}><ProposalWriter isDark={isDark} /></GuestToolLayout>} />
     <Route path="/ghl-advisor" element={<GuestToolLayout toolName="AI GHL Advisor" isDark={isDark} setIsDark={setIsDark}><GHLAdvisor isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/grammar-polisher" element={<GuestToolLayout toolName="AI Grammar Polisher" isDark={isDark} setIsDark={setIsDark}><GrammarPolisher isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/sow-generator" element={<GuestToolLayout toolName="AI SOW & Contract Generator" isDark={isDark} setIsDark={setIsDark}><SOWGenerator isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/onboarding-checklist" element={<GuestToolLayout toolName="AI Onboarding Checklist" isDark={isDark} setIsDark={setIsDark}><OnboardingChecklist isDark={isDark} /></GuestToolLayout>} />
+    <Route path="/content-calendar" element={<GuestToolLayout toolName="AI Content Calendar" isDark={isDark} setIsDark={setIsDark}><ContentCalendar isDark={isDark} /></GuestToolLayout>} />
 
     {/* 404 catch-all */}
     <Route path="*" element={<NotFound isDark={isDark} />} />

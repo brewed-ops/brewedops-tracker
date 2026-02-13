@@ -52,7 +52,11 @@ import {
   PenNib,
   Gear,
   ChatsCircle,
-  Terminal
+  Terminal,
+  TextAa,
+  FileText,
+  ClipboardText,
+  CalendarDots
 } from '@phosphor-icons/react';
 import ThemeToggle from '../components/ui/ThemeToggle';
 import SEO from '@/components/SEO';
@@ -262,11 +266,30 @@ const ToolsDropdown = ({ isDark, theme, onToolClick, onLoginClick }) => {
 // ============================================
 // AI TOOLS DATA & DROPDOWN
 // ============================================
-const AI_TOOLS = [
-  { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario', description: 'AI-generated GHL CRM practice scenarios with workflow diagrams' },
-  { icon: FileMagnifyingGlass, title: 'AI Text Extractor', path: '/text-extractor', description: 'OCR-powered text extraction from images and scanned PDFs' },
-  { icon: PenNib, title: 'AI Proposal Writer', path: '/proposal-writer', description: 'Generate tailored Upwork proposals from job descriptions' },
-  { icon: ChatCircle, title: 'AI GHL Advisor', path: '/ghl-advisor', description: 'Get expert GoHighLevel CRM advice with screenshot analysis' },
+const AI_TOOL_CATEGORIES = [
+  {
+    name: 'GHL / CRM',
+    tools: [
+      { icon: Lightning, title: 'GHL Scenario Generator', path: '/ghl-scenario' },
+      { icon: ChatCircle, title: 'AI GHL Advisor', path: '/ghl-advisor' },
+    ]
+  },
+  {
+    name: 'Writing & Docs',
+    tools: [
+      { icon: TextAa, title: 'Grammar Polisher', path: '/grammar-polisher' },
+      { icon: PenNib, title: 'Proposal Writer', path: '/proposal-writer' },
+      { icon: FileText, title: 'SOW Generator', path: '/sow-generator' },
+    ]
+  },
+  {
+    name: 'Business',
+    tools: [
+      { icon: ClipboardText, title: 'Onboarding Checklist', path: '/onboarding-checklist' },
+      { icon: CalendarDots, title: 'Content Calendar', path: '/content-calendar' },
+      { icon: FileMagnifyingGlass, title: 'Text Extractor', path: '/text-extractor' },
+    ]
+  },
 ];
 
 const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {
@@ -300,26 +323,28 @@ const AIToolsDropdown = ({ isDark, theme, onToolClick }) => {
         <CaretDown size={14} style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.2s' }} />
       </button>
       {isOpen && (
-        <div style={{ position: 'absolute', top: '100%', left: '0', marginTop: '4px', backgroundColor: isDark ? '#171411' : '#ffffff', border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`, borderRadius: '12px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)', padding: '12px', zIndex: 1000, minWidth: '240px' }}>
-          <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>AI-Powered Tools</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
-            {AI_TOOLS.map((tool) => {
-              const IconComponent = tool.icon;
-              return (
-                <button key={tool.path} onClick={() => { setIsOpen(false); onToolClick(tool.path); }} style={{ padding: '8px 10px', backgroundColor: 'transparent', border: 'none', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: '10px', textAlign: 'left' }}
-                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = BRAND.blue; Array.from(e.currentTarget.querySelectorAll('svg, span')).forEach(el => el.style.color = '#fff'); }}
-                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; const spans = e.currentTarget.querySelectorAll('span'); if (spans[0]) spans[0].style.color = theme.text; if (spans[1]) spans[1].style.color = theme.textMuted; e.currentTarget.querySelector('svg').style.color = BRAND.blue; }}
-                >
-                  <div style={{ width: '32px', height: '32px', borderRadius: '8px', backgroundColor: BRAND.blue + '18', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                    <IconComponent size={16} weight="fill" style={{ color: BRAND.blue }} />
-                  </div>
-                  <div>
-                    <span style={{ fontSize: '13px', fontWeight: '600', color: theme.text, fontFamily: FONTS.body, display: 'block' }}>{tool.title}</span>
-                    <span style={{ fontSize: '11px', color: theme.textMuted, fontFamily: FONTS.body, display: 'block', marginTop: '2px' }}>{tool.description}</span>
-                  </div>
-                </button>
-              );
-            })}
+        <div style={{ position: 'absolute', top: '100%', left: '0', marginTop: '4px', backgroundColor: isDark ? '#171411' : '#ffffff', border: `1px solid ${isDark ? '#2a2420' : '#e8e0d4'}`, borderRadius: '12px', boxShadow: isDark ? '0 8px 32px rgba(0,0,0,0.5)' : '0 8px 32px rgba(0,0,0,0.1)', padding: '12px', zIndex: 1000 }}>
+          <div style={{ display: 'flex', gap: '20px' }}>
+            {AI_TOOL_CATEGORIES.map((category) => (
+              <div key={category.name} style={{ minWidth: '150px' }}>
+                <div style={{ fontSize: '10px', fontWeight: '600', color: theme.textMuted, letterSpacing: '0.5px', marginBottom: '6px', textTransform: 'uppercase', fontFamily: FONTS.body }}>{category.name}</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1px' }}>
+                  {category.tools.map((tool) => {
+                    const IconComponent = tool.icon;
+                    return (
+                      <button key={tool.path} onClick={() => { setIsOpen(false); onToolClick(tool.path); }}
+                        style={{ padding: '5px 8px', backgroundColor: 'transparent', border: 'none', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px', textAlign: 'left' }}
+                        onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = BRAND.blue; e.currentTarget.querySelector('svg').style.color = '#fff'; e.currentTarget.querySelector('span').style.color = '#fff'; }}
+                        onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.querySelector('svg').style.color = theme.textMuted; e.currentTarget.querySelector('span').style.color = theme.text; }}
+                      >
+                        <IconComponent size={13} style={{ color: theme.textMuted, flexShrink: 0 }} />
+                        <span style={{ fontSize: '12px', fontWeight: '500', color: theme.text, fontFamily: FONTS.body, whiteSpace: 'nowrap' }}>{tool.title}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
